@@ -1,0 +1,6 @@
+Python Hot Code:
+<form action="/run" method="post">
+	{% csrf_token %}
+	<textarea name="command" rows="10" cols="50" style="font-family: monospace;">{{ command }}</textarea>
+	<input type="submit" value="RUN">
+</form>

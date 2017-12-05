@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>HST | Registration</title>
+		<style type="text/css">
+			.error {
+				color: red;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>New Family Registration</h1>
+		<form method="post">{% csrf_token %}
+			<table>
+				<tr>
+					<td>Family Last Name:</td>
+					<td><input type="text" name="last" value="{{family.last.p}}"></td>
+					<td class="error">{{family.last.e}}</td>
+				</tr>
+				<tr>
+					<td>Family Phone Number:</td>
+					<td><input type="text" name="phone" value="{{family.phone.p}}"></td>
+					<td class="error">{{family.phone.e}}</td>
+				</tr>
+				<tr>
+					<td>Main Family Email:</td>
+					<td><input type="text" name="email" value="{{family.email.p}}"></td>
+					<td class="error">{{family.email.e}}</td>
+				</tr>
+				<tr>
+					<td>Username:</td>
+					<td><input type="text" name="username" value="{{user.username.p}}"></td>
+					<td class="error">{{user.username.e}}</td>
+				</tr>
+				<tr>
+					<td>Password:</td>
+					<td><input type="password" name="password" value="{{user.password.p}}"></td>
+					<td class="error">{{user.password.e}}</td>
+				</tr>
+				<tr>
+					<td>Confirm Password:</td>
+					<td><input type="password" name="pw_confm" value="{{user.pw_confm.p}}"></td>
+					<td class="error">{{user.pw_confm.e}}</td>
+				</tr>
+			</table>
+		<button>Continue</button>
+		</form>
+	</body>
+</html>
