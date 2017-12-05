@@ -6,3 +6,11 @@ def get(obj, key):
 				return kvp[1]
 	else:
 		return getattr(obj, key)
+
+def copy(source, keys=False):
+	this = {}
+	if not keys:
+		keys = source.keys()
+	for key in keys:
+		this[key] = source[key]
+	return this

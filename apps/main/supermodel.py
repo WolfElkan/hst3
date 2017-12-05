@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 from django.db import models, connection
 from datetime import datetime
 import re
-from .utilities import get
+from .utilities import get, copy
 
 # - - - - - CLASSES - - - - -
 
@@ -17,9 +17,7 @@ class Validation(object):
 	def __mistype(self, data):
 		return not isinstance(data[self.field],self.types)
 	def __valid(self, data):
-		# print '*'*100
 		datum = get(data, self.field)
-		# print datum
 		return self.__mistype(data) or re.match(self.regex, datum) != None
 	def isValid(self, data, andLast=True):
 		return andLast and self.__valid(data)
@@ -96,8 +94,9 @@ class SuperManager(models.Manager):
 			datum = data[x.field]
 			messages = x.errors(datum, messages)
 		return messages
-	def create(self, new_thing):
-		super(SuperManager, self).create(**new_thing)
+	def create(self, data):
+		new_thing = copy(data,self.fields)
+		return super(SuperManager, self).create(**new_thing)
 
 def quickvalid(request, form, valid_bool, field, message):
 	if valid_bool:

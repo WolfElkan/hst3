@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from .models import User, Family, Student, Parent
 from datetime import datetime
-from .utilities import get
+from .utilities import copy, get as _
 
 Users    = User.objects
 Families = Family.objects
@@ -22,14 +22,6 @@ def forminit(request, form_name, fields):
 	for f in fields:
 		blank[f] = {'p':"", 'e':""}
 	seshinit(request, form_name, blank)
-
-def copy(source, keys=False):
-	this = {}
-	if not keys:
-		keys = source.keys()
-	for key in keys:
-		this[key] = source[key]
-	return this
 
 # - - - - - DEVELOPER VIEWS - - - - -
 
@@ -88,7 +80,6 @@ def reg_familyinfo_get(request):
 	return render(request, 'register/familyinfo.html', context)
 
 def reg_familyinfo_post(request):
-	# Creates both Family AND User in database if they are valid
 	new_family = copy(request.POST,['last','phone','email'])
 	new_family['joined_hst'] = datetime.now().year
 	new_user = copy(request.POST,['username','password','pw_confm'])
@@ -98,6 +89,7 @@ def reg_familyinfo_post(request):
 		new_family = Families.create(new_family)
 		new_user['owner_id'] = new_family.id
 		me = Users.create(new_user)
+		request.session['meid'] = me.id
 		return redirect('/')
 	else:
 		request.session['family'] = Families.errors(new_family)

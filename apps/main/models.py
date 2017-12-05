@@ -63,6 +63,10 @@ class Student(models.Model):
 		return self._prefer()+' '+self._last()
 
 class UserManager(sm.SuperManager):
+	def __init__(self):
+		super(UserManager, self).__init__('main','user')
+		self.fields = ['username','password','owner_type','owner_id']
+		self.validations = []
 	def isValid(self, data):
 		return True
 
@@ -81,7 +85,7 @@ class User(models.Model):
 			if self.owner_type == self.owner_types[x][0]:
 				owner_type_model = self.owner_type_models[x]
 		return owner_type_model.objects.get(id=self.owner_id)
-	objects = UserManager('main','user')
+	objects = UserManager()
 
 class Parent(models.Model):
 	first      = models.CharField(max_length=20)
