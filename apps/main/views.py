@@ -95,15 +95,9 @@ def reg_familyinfo_post(request):
 	new_user['owner_type'] = 'F'
 	# print Families.create.__func__.func_code.co_varnames
 	if Families.isValid(new_family) and Users.isValid(new_user):
-		new_family = Families.create(
-			last=str(get(new_family,'last')),
-			phone=str(get(new_family,'phone')),
-			email=str(get(new_family,'email')),
-			joined_hst=str(get(new_family,'joined_hst')),
-		)
-		print new_family
-		# new_user['owner_id'] = new_family.id
-		# Users.create(new_user)
+		new_family = Families.create(new_family)
+		new_user['owner_id'] = new_family.id
+		me = Users.create(new_user)
 		return redirect('/')
 	else:
 		request.session['family'] = Families.errors(new_family)

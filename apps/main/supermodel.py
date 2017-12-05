@@ -96,8 +96,8 @@ class SuperManager(models.Manager):
 			datum = data[x.field]
 			messages = x.errors(datum, messages)
 		return messages
-	# def create(self, new_thing):
-	# 	super(SuperManager, self).create(**new_thing)
+	def create(self, new_thing):
+		super(SuperManager, self).create(**new_thing)
 
 def quickvalid(request, form, valid_bool, field, message):
 	if valid_bool:
