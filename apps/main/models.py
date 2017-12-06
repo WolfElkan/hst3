@@ -77,7 +77,7 @@ class UserManager(sm.SuperManager):
 class User(models.Model):
 	username   = models.CharField(max_length=30)
 	password   = custom.BcryptField()
-	owner      = custom.PolymorphicField('owner', UserManager, [Family,Student,'Teacher','Admin'])
+	owner      = custom.PolymorphicField('owner', UserManager, [Family,Student])
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
 	objects    = UserManager()

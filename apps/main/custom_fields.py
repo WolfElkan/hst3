@@ -61,24 +61,28 @@ class PolymorphicField(gipi.MultiColumnField):
 	def __init__(self, attname, manager, relatables):
 		self.attname = str(attname)
 		self.manager = manager
-		self.relatables = []
+		self.relatables = relatables
+		self.relatable_names = []
 		for rel in relatables:
-			self.relatables += [rel if type(rel) in [str,unicode] else rel.__name__]
+			self.relatable_names += [rel.__name__]
 		self.fields = {
-			'type': sqlmod.EnumField(null=True, choices=self.relatables),
+			'type': sqlmod.EnumField(null=True, choices=self.relatable_names),
 			'id'  : models.PositiveIntegerField(null=True, rel=True),
 		}
+
 		this = self
 		old_create = self.manager.create
 		def new_create(self, thing):
-			print '*'*100
-			print thing
 			attr = thing.pop(this.attname)
 			thing[this.attname + '_type'] = attr.__class__.__name__
 			thing[this.attname + '_id'] = attr.id
 			return old_create(self, thing)
 		self.manager.create = new_create
-	# def pre_save(self, model_instance, add):
-	# 	print model_instance
-	# 	value = super(PolymorphicField,self).pre_save(model_instance, add)
-	# 	return value
+
+	def __get__(self, thing, model):
+		_type = _(thing , self.attname + '_type')
+		_id = _(thing , self.attname + '_id')
+		model_index = self.relatable_names.index(_type)
+		model = self.relatables[model_index]
+		return model.objects.get(id=_id)
+	
