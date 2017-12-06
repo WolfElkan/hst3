@@ -20,11 +20,15 @@ class FamilyManager(sm.SuperManager):
 			sm.Validation('email',r''        , 'Please enter a valid email address.'),
 		]
 
+class Address(models.Model):
+	pass
+
 class Family(models.Model):
 	last       = models.CharField(max_length=30)
 	phone      = models.DecimalField(max_digits=11, decimal_places=0)
 	email      = models.EmailField()
 	joined_hst = models.DecimalField(max_digits=4, decimal_places=0)
+	# address    = models.OneToOneField(u'self', null=True, primary_key=False, rel=True)
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
 	objects    = FamilyManager()
@@ -73,19 +77,10 @@ class UserManager(sm.SuperManager):
 class User(models.Model):
 	username   = models.CharField(max_length=30)
 	password   = custom.BcryptField()
+	owner      = custom.PolymorphicField('owner', UserManager, [Family,Student,'Teacher','Admin'])
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
-	# owner    = custom.PolymorphicField([Family,Student,'Faculty','Admin'])
-	owner_types = [('F','Family'),('S','Student'),('T','Faculty'),('A','Admin')]
-	owner_type_models = [Family,Student,None,None]
-	owner_type = models.CharField(max_length=1, choices=owner_types)
-	owner_id   = models.PositiveIntegerField(null=True)
-	def owner(self):
-		for x in xrange(len(self.owner_types)):
-			if self.owner_type == self.owner_types[x][0]:
-				owner_type_model = self.owner_type_models[x]
-		return owner_type_model.objects.get(id=self.owner_id)
-	objects = UserManager()
+	objects    = UserManager()
 
 class Parent(models.Model):
 	first      = models.CharField(max_length=20)

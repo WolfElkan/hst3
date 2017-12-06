@@ -8,4 +8,5 @@ urlpatterns = [
 	url(r'^test$', views.test),
 	url(r'^register$', views.reg),
 	url(r'^register/familyinfo$', views.reg_familyinfo),
+	# url(r'^nuke$', views.nuke),
 ]
