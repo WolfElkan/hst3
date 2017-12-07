@@ -1,12 +1,13 @@
 from django.shortcuts import render, redirect
-from .models import User, Family, Student, Parent
+from .models import USER, FAMILY, STUDENT, PARENT
+from .custom_fields import BcryptHash
 from datetime import datetime
-from .utilities import copy, get as _
+from .utilities import copy, reprint
 
-Users    = User.objects
-Families = Family.objects
-Students = Student.objects
-Parents  = Parent.objects
+Users    = USER.objects
+Families = FAMILY.objects
+Students = STUDENT.objects
+Parents  = PARENT.objects
 
 # Create your views here.
 
@@ -18,10 +19,13 @@ def seshinit(request, sesh, val=''):
 		request.session[sesh] = val
 
 def forminit(request, form_name, fields):
-	blank = {}
-	for f in fields:
-		blank[f] = {'p':"", 'e':""}
-	seshinit(request, form_name, blank)
+	for pe in 'pe':
+		seshinit(request, pe, {})
+		if form_name not in request.session[pe]:
+			request.session[pe][form_name] = {}
+			for f in fields:
+				if f not in request.session[pe][form_name]:
+					request.session[pe][form_name][f] = ''
 
 # - - - - - DEVELOPER VIEWS - - - - -
 
@@ -46,6 +50,10 @@ def nuke(request):
 	Parents.all().delete()
 	return redirect ('/hot')
 
+def clear(request):
+	request.session.clear()
+	return redirect ('/hot')
+
 # - - - - - APPLICATION VIEWS - - - - -
 
 def index(request):
@@ -53,7 +61,6 @@ def index(request):
 	return render(request, 'main/index.html', context)
 
 def test(request):
-	# print models.User.password
 	return render(request, 'main/index.html')
 
 #   - - - - NEW FAMILY REGISTRATION - - - -
@@ -73,10 +80,9 @@ def reg_familyinfo(request):
 		return index(request)
 
 def reg_familyinfo_get(request):
-	context = {
-		'family': request.session['family'],
-		'user'  : request.session['user'],
-	}
+	context = copy(request.session, ['p','e'])
+	# print '*'*100
+	# print context
 	return render(request, 'register/familyinfo.html', context)
 
 def reg_familyinfo_post(request):
@@ -90,7 +96,14 @@ def reg_familyinfo_post(request):
 		request.session['meid'] = me.id
 		return redirect('/')
 	else:
-		request.session['family'] = Families.errors(new_family)
-		request.session['user'] = Users.errors(new_user)
+		print '~'*100
+		request.session['p'] = {
+			'family': new_family,
+			'user'  : new_user,
+		}
+		request.session['e'] = {
+			'family': Families.errors(new_family),
+			'user'  : Users.errors(new_user)
+		}
 		return redirect('/register/familyinfo')
 

@@ -23,7 +23,10 @@ class Validation(object):
 		return andLast and self.__valid(data)
 	def errors(self, data, messages):
 		if not self.__valid(data):
-			messages += [self.error]
+			if self.field not in messages:
+				messages[self.field] = self.error
+			else:
+				messages[self.field] += ' ' + self.error
 		return messages
 
 class Confirmation(Validation):
@@ -75,11 +78,17 @@ class Field(object):
 		fields_array += [self]
 
 class SuperManager(models.Manager):
-	def __init__(self, app, table):
-		self.name   = 'objects'
-		self._db    = None
+	def __init__(self, app_name, ic):
+		self.name = 'objects'
+		self._db = None
 		self._hints = {}
-		self.table_name  = app + '_' + table
+		if type(ic) in [str,unicode]:
+			self.ic = None
+			self.class_name = ic
+		else:
+			self.ic = ic
+			self.class_name = ic.__name__
+		self.table_name = app_name + '_' + self.class_name.lower()
 		self.fields = []
 		self.validations = []
 	def isValid(self, data):
@@ -89,14 +98,20 @@ class SuperManager(models.Manager):
 			valid = x.isValid(data, valid)
 		return valid
 	def errors(self, data):
-		messages = []
+		messages = {}
 		for x in self.validations:
-			datum = data[x.field]
-			messages = x.errors(datum, messages)
+			# datum = data[x.field]
+			messages = x.errors(data, messages)
 		return messages
 	def create(self, data):
 		new_thing = copy(data,self.fields)
 		return super(SuperManager, self).create(**new_thing)
+	def get(self, **kwery):
+		got_thing = super(SuperManager, self).get(**kwery)
+		if self.ic:
+			return self.ic(got_thing)
+		else:
+			return got_thing
 
 def quickvalid(request, form, valid_bool, field, message):
 	if valid_bool:

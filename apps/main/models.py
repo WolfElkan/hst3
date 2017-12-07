@@ -1,11 +1,19 @@
 from __future__ import unicode_literals
 from django.db import models
-# from django.contrib.contenttypes.fields import GenericForeignKey
-# from django.contrib.contenttypes.models import ContentType
 from . import custom_fields as custom
 from . import supermodel as sm
 
 # Create your models here.
+
+class ADDRESS(models.Model):
+	line1      = models.CharField(null=False, max_length=50)
+	line2      = models.CharField(null=True, max_length=50)
+	city       = models.CharField(null=True, max_length=25)
+	state      = models.CharField(null=True, max_length=2)
+	zipcode    = models.DecimalField(null=False, max_digits=9, decimal_places=4)
+	created_at = models.DateTimeField(auto_now_add=True)
+	updated_at = models.DateTimeField(auto_now=True)
+	objects    = sm.SuperManager('main','address')
 
 class FamilyManager(sm.SuperManager):
 	def __init__(self):
@@ -19,29 +27,26 @@ class FamilyManager(sm.SuperManager):
 			sm.Validation('email',r'.+'      , 'Please enter an email address.'),
 			sm.Validation('email',r''        , 'Please enter a valid email address.'),
 		]
-
-class Address(models.Model):
-	pass
-
-class Family(models.Model):
+class FAMILY(models.Model):
 	last       = models.CharField(max_length=30)
 	phone      = models.DecimalField(max_digits=11, decimal_places=0)
 	email      = models.EmailField()
 	joined_hst = models.DecimalField(max_digits=4, decimal_places=0)
-	# address    = models.OneToOneField(u'self', null=True, primary_key=False, rel=True)
+	address    = models.OneToOneField(ADDRESS, null=True, primary_key=False, rel=True)
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
 	objects    = FamilyManager()
 	def __str__(self):
 		return self.last+' Family'
 
-class Student(models.Model):
+
+class STUDENT(models.Model):
 	first      = models.CharField(max_length=20)
 	middle     = models.CharField(max_length=20)
 	last       = models.CharField(max_length=30)
 	prefer     = models.CharField(max_length=20)
 	sex        = models.CharField(max_length=1, choices=[('M','Male'),('F','Female')])
-	family     = models.ForeignKey(Family, related_name='children')
+	family     = models.ForeignKey(FAMILY, related_name='children')
 	birthday   = models.DateField()
 	height     = models.FloatField()
 	t_shirt_sizes = [
@@ -66,23 +71,31 @@ class Student(models.Model):
 	def __str__(self):
 		return self._prefer()+' '+self._last()
 
+
+class User(object):
+	def __init__(self, sql):
+		self.username   = sql.username
+		self.password   = custom.BcryptHash(sql.password)
+		self.owner      = sql.owner
+		self.created_at = sql.created_at
+		self.updated_at = sql.updated_at
+	def __str__(self):
+		return self.username
 class UserManager(sm.SuperManager):
 	def __init__(self):
-		super(UserManager, self).__init__('main','user')
+		super(UserManager, self).__init__('main',User)
 		self.fields = ['username','password','owner_type','owner_id']
 		self.validations = []
-	def isValid(self, data):
-		return True
-
-class User(models.Model):
+class USER(models.Model):
 	username   = models.CharField(max_length=30)
 	password   = custom.BcryptField()
-	owner      = custom.PolymorphicField('owner', UserManager, [Family,Student])
+	owner      = custom.PolymorphicField('owner', UserManager, [FAMILY,STUDENT])
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
 	objects    = UserManager()
 
-class Parent(models.Model):
+
+class PARENT(models.Model):
 	first      = models.CharField(max_length=20)
 	last       = models.CharField(max_length=30)
 	sex        = models.CharField(max_length=1, choices=[('M','Male'),('F','Female')])

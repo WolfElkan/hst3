@@ -9,4 +9,5 @@ urlpatterns = [
 	url(r'^register$', views.reg),
 	url(r'^register/familyinfo$', views.reg_familyinfo),
 	# url(r'^nuke$', views.nuke),
+	url(r'^clear$', views.clear),
 ]

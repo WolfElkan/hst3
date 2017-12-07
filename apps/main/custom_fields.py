@@ -7,16 +7,12 @@ from . import gistfile1 as gipi
 
 class BcryptHash(object):
 	def __init__(self, char60):
-		self.hashed = char60 if char60[0] == '$' else char60[1:]
+		self.full = char60 if char60[0] == '$' else char60[1:]
+		self.html = '<span title='+self.full+'>&#x1f512;</span>'
 	def __call__(self, pw):
-		return bcrypt.checkpw(bytes(pw), bytes(self.hashed))
+		return bcrypt.checkpw(bytes(pw), bytes(self.full))
 	def __str__(self):
-		trunc = self.hashed[:5]+'~'+self.hashed[55:]
-		return u'\U0001f512 ' + unicode(trunc)
-	def full(self):
-		return self.hashed
-	def html(self):
-		return '<span title="%s">&#x1f512;</span>'.format(self.hashed)
+		return self.full[:7]+self.full[55:]
 
 class BcryptField(models.Field):
 	def __init__(self):
@@ -32,30 +28,6 @@ class BcryptField(models.Field):
 		if len(hashed) == 59:
 			hashed = '+' + hashed
 		return hashed
-	def __value__(self, obj):
-		char60 = getattr(obj, self.attname)
-		return BcryptHash(char60)
-
-class PolymorphicIdField(models.PositiveIntegerField):
-	def __init__(self):
-		super(EnumField,self).__init__(rel=True)
-
-class PolymorphicField(models.CharField):
-	def __init__(self, manager, relatables):
-		super(PolymorphicField,self).__init__(max_length=30)
-		self.manager = manager
-		self.relatables = relatables
-		type_col_name = self.attname+'_type'
-		id_col_name = self.attname+'_id'
-		self.model[type_col_name] = EnumField(relatables)
-		self.model[id_col_name] = PolymorphicIdField()
-	def pre_save(self, model_instance, add):
-		value = super(PolymorphicField,self).pre_save(model_instance, add)
-		return value.__str__()
-	def __value__(self, obj):
-		_type = getattr(obj, self.type_col_name)
-		_id = getattr(obj, self.id_col_name)
-		return self.relatables[_type].objects.get(id=_id)
 
 class PolymorphicField(gipi.MultiColumnField):
 	def __init__(self, attname, manager, relatables):
@@ -64,7 +36,7 @@ class PolymorphicField(gipi.MultiColumnField):
 		self.relatables = relatables
 		self.relatable_names = []
 		for rel in relatables:
-			self.relatable_names += [rel.__name__]
+			self.relatable_names += [rel.__name__.title()]
 		self.fields = {
 			'type': sqlmod.EnumField(null=True, choices=self.relatable_names),
 			'id'  : models.PositiveIntegerField(null=True, rel=True),
@@ -74,13 +46,12 @@ class PolymorphicField(gipi.MultiColumnField):
 		old_create = self.manager.create
 		def new_create(self, thing):
 			attr = thing.pop(this.attname)
-			thing[this.attname + '_type'] = attr.__class__.__name__
+			thing[this.attname + '_type'] = attr.__class__.__name__.title()
 			thing[this.attname + '_id'] = attr.id
 			return old_create(self, thing)
 		self.manager.create = new_create
-
 	def __get__(self, thing, model):
-		_type = _(thing , self.attname + '_type')
+		_type = _(thing , self.attname + '_type').title()
 		_id = _(thing , self.attname + '_id')
 		model_index = self.relatable_names.index(_type)
 		model = self.relatables[model_index]
