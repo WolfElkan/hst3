@@ -20,12 +20,12 @@ class FamilyManager(sm.SuperManager):
 		super(FamilyManager, self).__init__('main','family')
 		self.fields = ['last','phone','email','joined_hst']
 		self.validations = [
-			sm.Validation('last', r'.+'      , 'Please enter the family surname, as used by the children.'),
-			sm.Validation('last', r'^.{,30}$', 'Name is too long.  Max is 30 characters.'),
-			sm.Validation('phone',r'.+'      , 'Please enter the main family phone number.'),
-			sm.Validation('phone',r'.+'      , 'Please enter a valid 10-digit phone number.'),
-			sm.Validation('email',r'.+'      , 'Please enter an email address.'),
-			sm.Validation('email',r''        , 'Please enter a valid email address.'),
+			sm.Present('last' ,'Please enter the family surname, as used by the children.'),
+			sm.Regular('last', r'^.{,30}$','Name is too long.  Max is 30 characters.'),
+			sm.Present('phone','Please enter the main family phone number.'),
+			sm.Regular('phone',r'^$|^[ -.()/\\]*(\d[ -.()/\\]*){10}$','Please enter a valid 10-digit phone number.'),
+			sm.Present('email','Please enter an email address.'),
+			sm.Regular('email',r'^$|(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)','Please enter a valid email address.'),
 		]
 class FAMILY(models.Model):
 	last       = models.CharField(max_length=30)
@@ -85,7 +85,14 @@ class UserManager(sm.SuperManager):
 	def __init__(self):
 		super(UserManager, self).__init__('main',User)
 		self.fields = ['username','password','owner_type','owner_id']
-		self.validations = []
+		self.validations = [
+			sm.Present('username','Please enter a username.'),
+			sm.Unique(self,'username','This username is taken. Please select another.'),
+			sm.Present('password','Please enter a password'),
+			sm.Regular('password', r'^$|^.{8,}$','Password is too short. It should be at least 8 characters.'),
+			sm.Present('pw_confm','Please confirm your password'),
+			sm.Confirmation('pw_confm','password','Passwords do not match.')
+		]
 class USER(models.Model):
 	username   = models.CharField(max_length=30)
 	password   = custom.BcryptField()

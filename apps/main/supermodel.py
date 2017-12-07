@@ -9,16 +9,36 @@ from .utilities import get, copy
 # - - - - - CLASSES - - - - -
 
 class Validation(object):
-	def __init__(self, field, regex, error):
+	def __init__(self, field, error):
+		# print '*'*50, 'Validation.__init__'
 		self.field = field
-		self.regex = regex
 		self.error = error
-		self.types = (str,unicode,buffer)
+		self.types = [object]
 	def __mistype(self, data):
-		return not isinstance(data[self.field],self.types)
+		return type(data[self.field]) not in self.types
+		# return not isinstance(data[self.field],self.types)
+	def isValid(self, data, andLast=True):
+		return andLast and self.__valid(data)
+		# print '*'*50, 'Validation.isValid'
+	def errors(self, data, messages):
+		if not self.__valid(data):
+			if self.field not in messages:
+				messages[self.field] = self.error
+			else:
+				messages[self.field] += ' ' + self.error
+		return messages
+
+class Regular(Validation):
+	def __init__(self, field, regex, error):
+		super(Regular, self).__init__(field, error)
+		self.regex = regex
+		self.types = [str,unicode,buffer]
+	def __mistype(self, data):
+		return type(data[self.field]) not in self.types
 	def __valid(self, data):
+		# print '*'*50, 'Validation.__valid'
 		datum = get(data, self.field)
-		return self.__mistype(data) or re.match(self.regex, datum) != None
+		return self.__mistype(data) or re.match(self.regex, datum)
 	def isValid(self, data, andLast=True):
 		return andLast and self.__valid(data)
 	def errors(self, data, messages):
@@ -29,18 +49,80 @@ class Validation(object):
 				messages[self.field] += ' ' + self.error
 		return messages
 
+class Present(Regular):
+	def __init__(self, field, error):
+		super(Present, self).__init__(field, r'.+', error)
+	def __mistype(self, data):
+		return type(data[self.field]) not in self.types
+	def __valid(self, data):
+		datum = get(data, self.field)
+		return self.__mistype(data) or re.match(self.regex, datum)
+	def isValid(self, data, andLast=True):
+		return andLast and self.__valid(data)
+	def errors(self, data, messages):
+		if not self.__valid(data):
+			if self.field not in messages:
+				messages[self.field] = self.error
+			else:
+				messages[self.field] += ' ' + self.error
+		return messages
+
+class Unique(Validation):
+	def __init__(self, manager, field, error):
+		# print '*'*50, 'Unique.__init__'
+		self.manager = manager
+		self.field = field
+		self.error = error
+		self.types = [str,unicode,buffer]
+	def __mistype(self, data):
+		return type(data[self.field]) not in self.types
+	# def isValid(self, data, andLast=True):
+	# 	# print '*'*50, 'Unique.isValid'
+	# 	return andLast and self.__valid(data)
+	def __valid(self, data):
+		# print '*'*50, 'Unique.__valid'
+		return not self.manager.filter(**{self.field:data[self.field]})
+	# def errors(self, data, messages):
+	# 	if not self.__valid(data):
+	# 		if self.field not in messages:
+	# 			messages[self.field] = self.error
+	# 		else:
+	# 			messages[self.field] += ' ' + self.error
+	def isValid(self, data, andLast=True):
+		return andLast and self.__valid(data)
+	# 	return messages
+	def errors(self, data, messages):
+		if not self.__valid(data):
+			if self.field not in messages:
+				messages[self.field] = self.error
+			else:
+				messages[self.field] += ' ' + self.error
+		return messages
+
 class Confirmation(Validation):
 	def __init__(self, field, other, error):
-		super(Confirmation, self).__init__()
+		self.field = field
 		self.other = other
-		self.types = (object)
+		self.error = error
+		self.types = [object]
+	def __mistype(self, data):
+		return type(data[self.field]) not in self.types
 	def __valid(self, data):
 		return self.__mistype(data) or data[self.field] == data[self.other]
+	def isValid(self, data, andLast=True):
+		return andLast and self.__valid(data)
+	def errors(self, data, messages):
+		if not self.__valid(data):
+			if self.field not in messages:
+				messages[self.field] = self.error
+			else:
+				messages[self.field] += ' ' + self.error
+		return messages
 
 class FutureDate(Validation):
 	def __init__(self, field, error):
 		super(FutureDate, self).__init__()
-		self.types = (datetime)
+		self.types = [datetime]
 	def __valid(self, data):
 		datum = data[self.field]
 		return self.__mistype(data) or datum > datetime.date(datetime.now())
@@ -54,7 +136,7 @@ class Comparison(Validation):
 	def __init__(self, field, after, error):
 		super(Comparison, self).__init__()
 		self.after = after
-		self.types = (int,float,datetime)
+		self.types = [int,float,datetime]
 	def __mistype(self, data):
 		return False
 	def __valid(self, data):
@@ -65,6 +147,13 @@ class Comparison(Validation):
 		different = type(datum) != type(latum)
 		mistype = datum_bad or latum_bad or different
 		return mistype or datum < latum
+
+class Manual(Validation):
+	def __init__(self, field, valid, error):
+		super(Confirmation, self).__init__()
+		self.valid = valid
+	def __valid(self, data):
+		return self.valid
 
 class Field(object):
 	def __init__(self, fields_array, name, data_type, *validations):
@@ -79,6 +168,7 @@ class Field(object):
 
 class SuperManager(models.Manager):
 	def __init__(self, app_name, ic):
+		# print '*'*50, 'SuperManager.__init__'
 		self.name = 'objects'
 		self._db = None
 		self._hints = {}
@@ -92,15 +182,15 @@ class SuperManager(models.Manager):
 		self.fields = []
 		self.validations = []
 	def isValid(self, data):
+		# print '*'*50, 'SuperManager.isValid'
 		valid = True
 		for x in self.validations:
-			# datum = data[x.field]
 			valid = x.isValid(data, valid)
 		return valid
 	def errors(self, data):
+		# print '*'*50, 'SuperManager.isValid'
 		messages = {}
 		for x in self.validations:
-			# datum = data[x.field]
 			messages = x.errors(data, messages)
 		return messages
 	def create(self, data):
@@ -112,9 +202,3 @@ class SuperManager(models.Manager):
 			return self.ic(got_thing)
 		else:
 			return got_thing
-
-def quickvalid(request, form, valid_bool, field, message):
-	if valid_bool:
-		request.session[form][field]['e'] = ""
-	else:
-		request.session[form][field]['e'] = message
