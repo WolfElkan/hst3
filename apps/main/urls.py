@@ -13,5 +13,5 @@ urlpatterns = [
 	url(r'^run$', views.run),
 	url(r'^test$', views.test),
 	url(r'^clear$', views.clear),
-	# url(r'^nuke$', views.clearthedatabaselikeanuclearbombandthisnameisverylongsoyoudontcallitbymistake),
+	url(r'^nuke$', views.clearthedatabaselikeanuclearbombandthisnameisverylongsoyoudontcallitbymistake),
 ]

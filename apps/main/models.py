@@ -24,7 +24,7 @@ class Family(object):
 		self.last       = sql.last
 		self.phone      = custom.PhoneNumber(sql.phone)
 		self.email      = sql.email
-		# self.reg_status = sql.reg_status
+		self.reg_status = sql.reg_status
 		self.joined_hst = sql.joined_hst
 		self.address    = Address(sql.address)
 		self.created_at = sql.created_at
@@ -45,9 +45,7 @@ class FamilyManager(sm.SuperManager):
 			sm.Regular('email',r'^$|(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)','Please enter a valid email address.'),
 		]
 	def create(self, family):
-		print family['phone']
 		family['phone'] = custom.PhoneNumber(family['phone']).num
-		print family['phone']
 		return super(FamilyManager, self).create(family)
 
 
@@ -55,7 +53,7 @@ class FAMILY(models.Model):
 	last       = models.CharField(max_length=30)
 	phone      = models.DecimalField(max_digits=10, decimal_places=0)
 	email      = models.EmailField()
-	# reg_status = models.PositiveSmallIntegerField(default=0)
+	reg_status = models.PositiveSmallIntegerField(default=0)
 	joined_hst = models.DecimalField(max_digits=4, decimal_places=0)
 	address    = models.OneToOneField(ADDRESS, null=True, primary_key=False, rel=True)
 	created_at = models.DateTimeField(auto_now_add=True)

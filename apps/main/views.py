@@ -92,16 +92,15 @@ def reg_familyinfo_post(request):
 	print '\n\n\n'
 	new_family = copy(request.POST,['last','phone','email'])
 	new_family['joined_hst'] = datetime.now().year
-	new_family['reg_status'] = 0
+	new_family['reg_status'] = 1
 	new_user = copy(request.POST,['username','password','pw_confm'])
 	if Families.isValid(new_family) and Users.isValid(new_user):
 		new_family = Families.create(new_family)
 		new_user['owner'] = new_family
 		me = Users.create(new_user)
 		request.session['meid'] = me.id
-		return redirect('register/parentsinfo')
+		return redirect('/register/parentsinfo')
 	else:
-		print '~'*100
 		request.session['p'] = {
 			'family': new_family,
 			'user'  : new_user,
