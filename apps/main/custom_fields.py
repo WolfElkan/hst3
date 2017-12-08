@@ -1,11 +1,11 @@
 from django.db import models
-import bcrypt
+import bcrypt, re
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django_mysql import models as sqlmod
 from .utilities import get as _
 from . import gistfile1 as gipi
 
-class BcryptHash(object):
+class Bcrypt(object):
 	def __init__(self, char60):
 		self.full = char60 if char60[0] == '$' else char60[1:]
 		self.html = '<span title='+self.full+'>&#x1f512;</span>'
@@ -29,6 +29,32 @@ class BcryptField(models.Field):
 			hashed = '+' + hashed
 		return hashed
 
+class PhoneNumber(object):
+	def __init__(self, *num):
+		self.num = num if type(num) is int else self.sanitize(num)
+		self.cod  = self.num / 10**7
+		self.mid  = self.num % 10**7 / 10**4
+		self.last = self.num % 10**4
+	def sanitize(self, *num):
+		num = str(num)
+		num = re.findall(r'\d',num)
+		num = ''.join(num)
+		num = int(num)
+		num %= 10**10
+		return num
+	def __str__(self):
+		return '('+str(self.cod)+') '+str(self.mid)+'-'+str(self.last)
+
+class PhoneNumberField(models.DecimalField):
+	def __init__(self):
+		super(PhoneNumberField, self).__init__(max_digits=10, decimal_places=0)
+	def pre_save(self, model_instance, add):
+		num = getattr(model_instance, self.attname)
+		# return PhoneNumber(num).sanitize()
+		num = re.findall(r'\d',num)
+		num = ''.join(num)
+		return int(num)
+
 class PolymorphicField(gipi.MultiColumnField):
 	def __init__(self, attname, manager, relatables):
 		self.attname = str(attname)
@@ -41,7 +67,6 @@ class PolymorphicField(gipi.MultiColumnField):
 			'type': sqlmod.EnumField(null=True, choices=self.relatable_names),
 			'id'  : models.PositiveIntegerField(null=True, rel=True),
 		}
-
 		this = self
 		old_create = self.manager.create
 		def new_create(self, thing):

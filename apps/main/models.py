@@ -5,6 +5,9 @@ from . import supermodel as sm
 
 # Create your models here.
 
+def Address(sql):
+	return sql
+
 class ADDRESS(models.Model):
 	line1      = models.CharField(null=False, max_length=50)
 	line2      = models.CharField(null=True, max_length=50)
@@ -15,9 +18,23 @@ class ADDRESS(models.Model):
 	updated_at = models.DateTimeField(auto_now=True)
 	objects    = sm.SuperManager('main','address')
 
+
+class Family(object):
+	def __init__(self, sql):
+		self.last       = sql.last
+		self.phone      = custom.PhoneNumber(sql.phone)
+		self.email      = sql.email
+		# self.reg_status = sql.reg_status
+		self.joined_hst = sql.joined_hst
+		self.address    = Address(sql.address)
+		self.created_at = sql.created_at
+		self.updated_at = sql.updated_at
+	def __str__(self):
+		return self.last+' Family'
+		
 class FamilyManager(sm.SuperManager):
 	def __init__(self):
-		super(FamilyManager, self).__init__('main','family')
+		super(FamilyManager, self).__init__('main',Family)
 		self.fields = ['last','phone','email','joined_hst']
 		self.validations = [
 			sm.Present('last' ,'Please enter the family surname, as used by the children.'),
@@ -27,17 +44,23 @@ class FamilyManager(sm.SuperManager):
 			sm.Present('email','Please enter an email address.'),
 			sm.Regular('email',r'^$|(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)','Please enter a valid email address.'),
 		]
+	def create(self, family):
+		print family['phone']
+		family['phone'] = custom.PhoneNumber(family['phone']).num
+		print family['phone']
+		return super(FamilyManager, self).create(family)
+
+
 class FAMILY(models.Model):
 	last       = models.CharField(max_length=30)
-	phone      = models.DecimalField(max_digits=11, decimal_places=0)
+	phone      = models.DecimalField(max_digits=10, decimal_places=0)
 	email      = models.EmailField()
+	# reg_status = models.PositiveSmallIntegerField(default=0)
 	joined_hst = models.DecimalField(max_digits=4, decimal_places=0)
 	address    = models.OneToOneField(ADDRESS, null=True, primary_key=False, rel=True)
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
 	objects    = FamilyManager()
-	def __str__(self):
-		return self.last+' Family'
 
 
 class STUDENT(models.Model):
@@ -75,7 +98,7 @@ class STUDENT(models.Model):
 class User(object):
 	def __init__(self, sql):
 		self.username   = sql.username
-		self.password   = custom.BcryptHash(sql.password)
+		self.password   = custom.Bcrypt(sql.password)
 		self.owner      = sql.owner
 		self.created_at = sql.created_at
 		self.updated_at = sql.updated_at

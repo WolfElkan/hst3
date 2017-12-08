@@ -16,10 +16,8 @@ class Validation(object):
 		self.types = [object]
 	def __mistype(self, data):
 		return type(data[self.field]) not in self.types
-		# return not isinstance(data[self.field],self.types)
 	def isValid(self, data, andLast=True):
 		return andLast and self.__valid(data)
-		# print '*'*50, 'Validation.isValid'
 	def errors(self, data, messages):
 		if not self.__valid(data):
 			if self.field not in messages:
@@ -36,7 +34,6 @@ class Regular(Validation):
 	def __mistype(self, data):
 		return type(data[self.field]) not in self.types
 	def __valid(self, data):
-		# print '*'*50, 'Validation.__valid'
 		datum = get(data, self.field)
 		return self.__mistype(data) or re.match(self.regex, datum)
 	def isValid(self, data, andLast=True):
@@ -69,25 +66,16 @@ class Present(Regular):
 
 class Unique(Validation):
 	def __init__(self, manager, field, error):
-		# print '*'*50, 'Unique.__init__'
 		self.manager = manager
 		self.field = field
 		self.error = error
 		self.types = [str,unicode,buffer]
 	def __mistype(self, data):
 		return type(data[self.field]) not in self.types
-	# def isValid(self, data, andLast=True):
-	# 	# print '*'*50, 'Unique.isValid'
-	# 	return andLast and self.__valid(data)
 	def __valid(self, data):
-		# print '*'*50, 'Unique.__valid'
 		return not self.manager.filter(**{self.field:data[self.field]})
-	# def errors(self, data, messages):
-	# 	if not self.__valid(data):
-	# 		if self.field not in messages:
-	# 			messages[self.field] = self.error
-	# 		else:
-	# 			messages[self.field] += ' ' + self.error
+	def isValid(self, data, andLast=True):
+		return andLast and self.__valid(data)
 	def isValid(self, data, andLast=True):
 		return andLast and self.__valid(data)
 	# 	return messages
