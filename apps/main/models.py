@@ -31,7 +31,6 @@ class Family(object):
 		self.updated_at = sql.updated_at
 	def __str__(self):
 		return self.last+' Family'
-		
 class FamilyManager(sm.SuperManager):
 	def __init__(self):
 		super(FamilyManager, self).__init__('main',Family)
@@ -44,14 +43,9 @@ class FamilyManager(sm.SuperManager):
 			sm.Present('email','Please enter an email address.'),
 			sm.Regular('email',r'^$|(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)','Please enter a valid email address.'),
 		]
-	def create(self, family):
-		family['phone'] = custom.PhoneNumber(family['phone']).num
-		return super(FamilyManager, self).create(family)
-
-
 class FAMILY(models.Model):
 	last       = models.CharField(max_length=30)
-	phone      = models.DecimalField(max_digits=10, decimal_places=0)
+	phone      = custom.PhoneNumberField()
 	email      = models.EmailField()
 	reg_status = models.PositiveSmallIntegerField(default=0)
 	joined_hst = models.DecimalField(max_digits=4, decimal_places=0)
@@ -122,17 +116,37 @@ class USER(models.Model):
 	updated_at = models.DateTimeField(auto_now=True)
 	objects    = UserManager()
 
-
-class PARENT(models.Model):
-	first      = models.CharField(max_length=20)
-	last       = models.CharField(max_length=30)
-	sex        = models.CharField(max_length=1, choices=[('M','Male'),('F','Female')])
-	created_at = models.DateTimeField(auto_now_add=True)
-	updated_at = models.DateTimeField(auto_now=True)
+class Parent(object):
+	def __init__(self, sql):
+		super(Parent, self).__init__()
+		self.first      = sql.first     
+		self.family     = sql.family   
+		self.last       = sql.last if sql.last else sql.family.last
+		self.sex        = sql.sex       
+		self.alt_phone  = custom.PhoneNumber(sql.alt_phone)
+		self.alt_email  = sql.alt_email 
+		self.created_at = sql.created_at
+		self.updated_at = sql.updated_at
 	def __str__(self):
 		if self.sex == 'M':
 			prefix = 'Mr. '
 		elif self.sex == 'F':
 			prefix == 'Mrs. '
-		return prefix+self.first+' '+self._last()
+		return prefix+self.first+' '+self.last
+		
+class ParentManager(sm.SuperManager):
+	def __init__(self):
+		super(ParentManager, self).__init__('main',Parent)
+		self.fields = []
+		self.validations = []	
+
+class PARENT(models.Model):
+	first      = models.CharField(max_length=20)
+	last       = models.CharField(max_length=30)
+	family     = models.ForeignKey(FAMILY, related_name='parents')
+	sex        = models.CharField(max_length=1, choices=[('M','Male'),('F','Female')])
+	alt_phone  = custom.PhoneNumberField()
+	alt_email  = models.EmailField()
+	created_at = models.DateTimeField(auto_now_add=True)
+	updated_at = models.DateTimeField(auto_now=True)
 

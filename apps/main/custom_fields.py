@@ -36,6 +36,7 @@ class PhoneNumber(object):
 		self.mid  = self.num % 10**7 / 10**4
 		self.last = self.num % 10**4
 	def sanitize(self, *num):
+		num = num if num else self.num
 		num = str(num)
 		num = re.findall(r'\d',num)
 		num = ''.join(num)
@@ -50,10 +51,7 @@ class PhoneNumberField(models.DecimalField):
 		super(PhoneNumberField, self).__init__(max_digits=10, decimal_places=0)
 	def pre_save(self, model_instance, add):
 		num = getattr(model_instance, self.attname)
-		# return PhoneNumber(num).sanitize()
-		num = re.findall(r'\d',num)
-		num = ''.join(num)
-		return int(num)
+		return PhoneNumber(num).sanitize()
 
 class PolymorphicField(gipi.MultiColumnField):
 	def __init__(self, attname, manager, relatables):

@@ -2,48 +2,48 @@
 <html>
 	<head>
 		<title>HST | Registration</title>
-		<style type="text/css">
-			.error {
-				color: red;
-			}
-		</style>
+		{% load staticfiles %}
+		<script src="{% static 'main/js/script.js' %}" charset="utf-8"></script>
+		<link rel="stylesheet" type="text/css" href="{% static 'main/css/style.css' %}">
 	</head>
-	<body>
-		<h1>New Family Registration</h1>
-		<form method="post">{% csrf_token %}
-			<table>
-				<tr>
-					<td>Family Last Name:</td>
-					<td><input type="text" name="last" value="{{p.family.last}}"></td>
-					<td class="error">{{e.family.last}}</td>
-				</tr>
-				<tr>
-					<td>Family Phone Number:</td>
-					<td><input type="text" name="phone" value="{{p.family.phone}}"></td>
-					<td class="error">{{e.family.phone}}</td>
-				</tr>
-				<tr>
-					<td>Main Family Email:</td>
-					<td><input type="text" name="email" value="{{p.family.email}}"></td>
-					<td class="error">{{e.family.email}}</td>
-				</tr>
-				<tr>
-					<td>Username:</td>
-					<td><input type="text" name="username" value="{{p.user.username}}"></td>
-					<td class="error">{{e.user.username}}</td>
-				</tr>
-				<tr>
-					<td>Password:</td>
-					<td><input type="password" name="password" value="{{p.user.password}}"></td>
-					<td class="error">{{e.user.password}}</td>
-				</tr>
-				<tr>
-					<td>Confirm Password:</td>
-					<td><input type="password" name="pw_confm" value="{{p.user.pw_confm}}"></td>
-					<td class="error">{{e.user.pw_confm}}</td>
-				</tr>
-			</table>
-		<button>Continue</button>
-		</form>
+	<body id="register_familyinfo">
+		<center>
+			<h1>New Family Registration</h1>
+			<form method="post">{% csrf_token %}
+				<table>
+					<tr>
+						<td>Family Last Name:</td>
+						<td><input type="text" name="last" value="{{p.family.last}}"></td>
+						<td class="error">{{e.family.last}}</td>
+					</tr>
+					<tr>
+						<td>Family Phone Number:</td>
+						<td><input type="text" name="phone" value="{{p.family.phone}}"></td>
+						<td class="error">{{e.family.phone}}</td>
+					</tr>
+					<tr>
+						<td>Main Family Email:</td>
+						<td><input type="text" name="email" value="{{p.family.email}}"></td>
+						<td class="error">{{e.family.email}}</td>
+					</tr>
+					<tr>
+						<td>Username:</td>
+						<td><input type="text" name="username" value="{{p.user.username}}"></td>
+						<td class="error">{{e.user.username}}</td>
+					</tr>
+					<tr>
+						<td>Password:</td>
+						<td><input type="password" name="password" value="{{p.user.password}}"></td>
+						<td class="error">{{e.user.password}}</td>
+					</tr>
+					<tr>
+						<td>Confirm Password:</td>
+						<td><input type="password" name="pw_confm" value="{{p.user.pw_confm}}"></td>
+						<td class="error">{{e.user.pw_confm}}</td>
+					</tr>
+				</table>
+			<button>Next >></button>
+			</form>
+		</center>
 	</body>
 </html>
