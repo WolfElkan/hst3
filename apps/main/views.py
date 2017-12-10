@@ -1,14 +1,14 @@
 from django.shortcuts import render, redirect, HttpResponse
-from .models import USER, FAMILY, STUDENT, PARENT, ADDRESS
+from .models import User, Family, Student, Parent, Address
 from .custom_fields import Bcrypt, PhoneNumber
 from datetime import datetime
 from .utilities import copy, reprint
 
-Users     = USER.objects
-Families  = FAMILY.objects
-Students  = STUDENT.objects
-Parents   = PARENT.objects
-Addresses = ADDRESS.objects
+Addresses = Address.objects
+Families  = Family.objects
+Parents   = Parent.objects
+Students  = Student.objects
+Users     = User.objects
 
 # Create your views here.
 
@@ -125,9 +125,9 @@ def reg_parentsinfo(request):
 def reg_parentsinfo_get(request):
 	me = Users.get(id=request.session['meid'])
 	context = {
-		'last'  : me.owner.last,
-		'phone' : me.owner.phone,
-		'email' : me.owner.email,
+		'last'  : me.owner.last_(),
+		'phone' : me.owner.phone_(),
+		'email' : me.owner.email_(),
 		'p'     : request.session['p'],
 		'e'     : request.session['e'],
 	}
@@ -146,6 +146,9 @@ def reg_parentsinfo_post(request):
 	# May it be many years before we have to change these two lines of code.
 	mother['sex'] = 'F'
 	father['sex'] = 'M'
+	# Assign Parents to Family
+	mother['family_id'] = me.owner.id
+	father['family_id'] = me.owner.id
 	# Return sarcastic condescending message if both parents were somehow skipped.
 	if mother['skipped'] and father['skipped']:
 		return HttpResponse('''

@@ -179,11 +179,5 @@ class SuperManager(models.Manager):
 			messages = x.errors(data, messages)
 		return messages
 	def create(self, data):
-		new_thing = copy(data, self.fields)
-		return super(SuperManager, self).create(**new_thing)
-	def get(self, **kwery):
-		got_thing = super(SuperManager, self).get(**kwery)
-		if self.friendly:
-			return self.friendly(got_thing)
-		else:
-			return got_thing
+		# new_thing = copy(data, self.fields)
+		return super(SuperManager, self).create(**data)
