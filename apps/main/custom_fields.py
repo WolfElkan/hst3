@@ -3,7 +3,7 @@ import bcrypt, re
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django_mysql import models as sqlmod
 from .utilities import get as _
-from . import gistfile1 as gipi
+from . import gistfile1 as poly
 
 class Bcrypt(object):
 	def __init__(self, char60):
@@ -29,31 +29,41 @@ class BcryptField(models.Field):
 			hashed = '+' + hashed
 		return hashed
 
+# I'd make this a lambda if I knew how.  
+# Or, I'm sure there's a built-in Python function for zero-padding
+# If I had internet access...
+def zeropad(num, places):
+	return '0'*(places-len(str(num)))+str(num)
+
 class PhoneNumber(object):
 	def __init__(self, *num):
 		self.num = num if type(num) is int else self.sanitize(num)
-		self.cod  = self.num / 10**7
-		self.mid  = self.num % 10**7 / 10**4
-		self.last = self.num % 10**4
+		self.cod  = zeropad(self.num / 10**7, 3)
+		self.mid  = zeropad(self.num % 10**7 / 10**4, 3)
+		self.last = zeropad(self.num % 10**4, 4)
 	def sanitize(self, *num):
 		num = num if num else self.num
 		num = str(num)
 		num = re.findall(r'\d',num)
+		if len(num) == 0:
+			return 0
 		num = ''.join(num)
 		num = int(num)
 		num %= 10**10
 		return num
 	def __str__(self):
-		return '('+str(self.cod)+') '+str(self.mid)+'-'+str(self.last)
+		return '('+self.cod+') '+self.mid+'-'+self.last
 
 class PhoneNumberField(models.DecimalField):
-	def __init__(self):
-		super(PhoneNumberField, self).__init__(max_digits=10, decimal_places=0)
+	def __init__(self, **kwargs):
+		kwargs['max_digits'] = 10
+		kwargs['decimal_places'] = 0
+		super(PhoneNumberField, self).__init__(**kwargs)
 	def pre_save(self, model_instance, add):
 		num = getattr(model_instance, self.attname)
 		return PhoneNumber(num).sanitize()
 
-class PolymorphicField(gipi.MultiColumnField):
+class PolymorphicField(poly.MultiColumnField):
 	def __init__(self, attname, manager, relatables):
 		self.attname = str(attname)
 		self.manager = manager

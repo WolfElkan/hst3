@@ -103,58 +103,113 @@
 	</script>
 </head>
 <body>
-Please enter the contact information for the parents.  You may skip one parent for now, (but not both) and add the information later.  Only the First Name is required.  Leave other fields blank if they are the same as the Family Information.
+	<h1>New Family Registration</h1>
+	<h2>Step 2: Parents Information</h2>
+	<span class="instructions">Please enter the first name of at least one parent.  Skip any fields that are the same as the Family Information.</span>
 	<center>
-		<form>
+		<form method="post">{% csrf_token %}
 			<div class="parent" id="mom">
-				<center><h2>Mother</h2></center>
+				<center><h3>Mother</h3></center>
 				<table>
-					<input type="hidden" id="mom_skipped" nafme="mom_skipped" value="false">
+					<input 
+					type="hidden" 
+					id="mom_skipped" 
+					name="mom_skipped" 
+					value="false">
 					<tr>
 						<td><b>First Name:</b></td>
-						<td><input type="text" name="mom_first" id="mom_first"></td>
+						<td><input 
+							type="text" 
+							name="mom_first" 
+							id="mom_first"
+							value="{{p.mom.mom_first}}">
+						</td>
 					</tr>
 					<tr>
 						<td>Last Name:</td>
-						<td><input type="text" name="mom_last" id="mom_last"></td>
+						<td><input 
+							type="text" 
+							name="mom_last" 
+							id="mom_last" 
+							placeholder="{{last}}"
+							value="{{p.mom.mom_last}}">
+						</td>
 					</tr>
 					<tr>
 						<td>Alternate Phone:</td>
-						<td><input type="text" name="mom_alt_phone" id="mom_alt_phone"></td>
+						<td><input 
+							type="text" 
+							name="mom_alt_phone" 
+							id="mom_alt_phone" 
+							placeholder="{{phone}}"
+							value="{{p.mom.mom_alt_phone}}">
+						</td>
 					</tr>
 					<tr>
 						<td>Alternate Email:</td>
-						<td><input type="text" name="mom_alt_email" id="mom_alt_email"></td>
+						<td><input 
+							type="text" 
+							name="mom_alt_email" 
+							id="mom_alt_email" 
+							placeholder="{{email}}"
+							value="{{p.mom.mom_alt_email}}">
+						</td>
 					</tr>
 				</table>
 				<div class="skip_button" id="skip_mom">Skip</div>
 			</div>
 			<div class="parent" id="dad">
-				<center><h2>Father</h2></center>
+				<center><h3>Father</h3></center>
 				<table>
-					<input type="hidden" id="dad_skipped" namfe="dad_skipped" value="false">
+					<input 
+					type="hidden" 
+					id="dad_skipped" 
+					name="dad_skipped" 
+					value="false">
 					<tr>
 						<td><b>First Name:</b></td>
-						<td><input type="text" name="dad_first" id="dad_first"></td>
+						<td><input 
+							type="text" 
+							name="dad_first" i
+							id="dad_first"
+							value="{{p.dad.dad_first}}">
+						</td>
 					</tr>
 					<tr>
 						<td>Last Name:</td>
-						<td><input type="text" name="dad_last" id="dad_last"></td>
+						<td><input 
+							type="text" 
+							name="dad_last" 
+							id="dad_last" 
+							placeholder="{{last}}"
+							value="{{p.dad.dad_last}}">
+						</td>
 					</tr>
 					<tr>
 						<td>Alternate Phone:</td>
-						<td><input type="text" name="dad_alt_phone" id="dad_alt_phone"></td>
+						<td><input 
+							type="text" 
+							name="dad_alt_phone" 
+							id="dad_alt_phone" 
+							placeholder="{{phone}}"
+							value="{{p.dad.dad_alt_phone}}">
+						</td>
 					</tr>
 					<tr>
 						<td>Alternate Email:</td>
-						<td><input type="text" name="dad_alt_email" id="dad_alt_email"></td>
+						<td><input 
+							type="text" 
+							name="dad_alt_email" 
+							id="dad_alt_email" 
+							placeholder="{{email}}"
+							value="{{p.dad.dad_alt_email}}">
+						</td>
 					</tr>
 				</table>
 				<div class="skip_button" id="skip_dad">Skip</div>
 			</div>
 			<button type="submit">Next >></button>
 		</form>
-		*If different from Family name
 	</center>
 </body>
 </html>

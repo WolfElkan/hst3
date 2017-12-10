@@ -7,12 +7,13 @@ def get(obj, key):
 	else:
 		return getattr(obj, key)
 
-def copy(source, keys=False):
+def copy(source, keys=False, trunc=0):
 	this = {}
 	if not keys:
 		keys = source.keys()
 	for key in keys:
-		this[key] = source[key]
+		trunckey = key[trunc:]
+		this[trunckey] = source[key]
 	return this
 
 def reprint(obj, lev=0):
@@ -24,16 +25,3 @@ def reprint(obj, lev=0):
 			reprint(key, lev+1)
 	else:
 		print '  '*lev + str(obj)
-
-class BcryptHash(object):
-	def __init__(self, char60):
-		self.hashed = char60 if char60[0] == '$' else char60[1:]
-	def __call__(self, pw):
-		return bcrypt.checkpw(bytes(pw), bytes(self.hashed))
-	def __str__(self):
-		return self.hashed[:7]+self.hashed[55:]
-		# return u'\U0001f512 ' + unicode(trunc)
-	def full(self):
-		return self.hashed
-	def html(self):
-		return '<span title='+self.hashed+'>&#x1f512;</span>'

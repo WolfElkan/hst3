@@ -10,7 +10,6 @@ from .utilities import get, copy
 
 class Validation(object):
 	def __init__(self, field, error):
-		# print '*'*50, 'Validation.__init__'
 		self.field = field
 		self.error = error
 		self.types = [object]
@@ -143,6 +142,7 @@ class Manual(Validation):
 	def __valid(self, data):
 		return self.valid
 
+# I have no idea what this class is supposed to do.
 class Field(object):
 	def __init__(self, fields_array, name, data_type, *validations):
 		kwargs = ""
@@ -155,38 +155,35 @@ class Field(object):
 		fields_array += [self]
 
 class SuperManager(models.Manager):
-	def __init__(self, app_name, ic):
-		# print '*'*50, 'SuperManager.__init__'
+	def __init__(self, app_name, friendly):
 		self.name = 'objects'
 		self._db = None
 		self._hints = {}
-		if type(ic) in [str,unicode]:
-			self.ic = None
-			self.class_name = ic
+		if type(friendly) in [str,unicode]:
+			self.friendly = None
+			self.class_name = friendly
 		else:
-			self.ic = ic
-			self.class_name = ic.__name__
+			self.friendly = friendly
+			self.class_name = friendly.__name__
 		self.table_name = app_name + '_' + self.class_name.lower()
 		self.fields = []
 		self.validations = []
 	def isValid(self, data):
-		# print '*'*50, 'SuperManager.isValid'
 		valid = True
 		for x in self.validations:
 			valid = x.isValid(data, valid)
 		return valid
 	def errors(self, data):
-		# print '*'*50, 'SuperManager.isValid'
 		messages = {}
 		for x in self.validations:
 			messages = x.errors(data, messages)
 		return messages
 	def create(self, data):
-		new_thing = copy(data,self.fields)
+		new_thing = copy(data, self.fields)
 		return super(SuperManager, self).create(**new_thing)
 	def get(self, **kwery):
 		got_thing = super(SuperManager, self).get(**kwery)
-		if self.ic:
-			return self.ic(got_thing)
+		if self.friendly:
+			return self.friendly(got_thing)
 		else:
 			return got_thing

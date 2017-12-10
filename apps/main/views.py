@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, HttpResponse
 from .models import USER, FAMILY, STUDENT, PARENT, ADDRESS
 from .custom_fields import Bcrypt, PhoneNumber
 from datetime import datetime
@@ -89,7 +89,6 @@ def reg_familyinfo_get(request):
 	return render(request, 'register/familyinfo.html', context)
 
 def reg_familyinfo_post(request):
-	print '\n\n\n'
 	new_family = copy(request.POST,['last','phone','email'])
 	new_family['joined_hst'] = datetime.now().year
 	new_family['reg_status'] = 1
@@ -113,6 +112,8 @@ def reg_familyinfo_post(request):
 
 
 def reg_parentsinfo(request):
+	forminit(request,'mom',['mom_skipped','mom_first','mom_last','mom_alt_phone','mom_alt_email'])
+	forminit(request,'dad',['dad_skipped','dad_first','dad_last','dad_alt_phone','dad_alt_email'])
 	if request.method == 'GET':
 		return reg_parentsinfo_get(request)
 	elif request.method == 'POST':
@@ -122,11 +123,58 @@ def reg_parentsinfo(request):
 		return index(request)
 
 def reg_parentsinfo_get(request):
-	context = {}
+	me = Users.get(id=request.session['meid'])
+	context = {
+		'last'  : me.owner.last,
+		'phone' : me.owner.phone,
+		'email' : me.owner.email,
+		'p'     : request.session['p'],
+		'e'     : request.session['e'],
+	}
 	return render(request, 'register/parentsinfo.html', context)
 
 def reg_parentsinfo_post(request):
-	return redirect('register')
+	me = Users.get(id=request.session['meid'])
+	# Create new Parent objects
+	mom = copy(request.POST, ['mom_skipped','mom_first','mom_last','mom_alt_phone','mom_alt_email'])
+	dad = copy(request.POST, ['dad_skipped','dad_first','dad_last','dad_alt_phone','dad_alt_email'])
+	mother = copy(mom,trunc=4)
+	father = copy(dad,trunc=4)
+	# Convert 'skipped' booleans from JavaScript-friendly strings, to Python bools
+	mother['skipped'] = mother['skipped'] == 'true'
+	father['skipped'] = father['skipped'] == 'true'
+	# May it be many years before we have to change these two lines of code.
+	mother['sex'] = 'F'
+	father['sex'] = 'M'
+	# Return sarcastic condescending message if both parents were somehow skipped.
+	if mother['skipped'] and father['skipped']:
+		return HttpResponse('''
+			Congratulations!  You figured out how to hack JavaScript and skip both parents!
+			Seriously though, we do need at least one first name.  Sorry.
+			''')
+	# Validate new Parent objects
+	mother_valid = not mother['skipped'] and Parents.isValid(mother)
+	father_valid = not father['skipped'] and Parents.isValid(father)
+	if mother_valid and father_valid:
+		# Add parents to Database if they have not been skipped
+		if not mother.pop('skipped'):
+			mother = Parents.create(mother)
+			me.owner.mother = mother
+		if not father.pop('skipped'):
+			father = Parents.create(father)
+			me.owner.father = father
+		me.owner.save()
+		return redirect('/register/studentsinfo')
+	else:
+		request.session['p'] = {
+			'mom':mom,
+			'dad':dad,
+		}
+		request.session['e'] = {
+			'mom':Parents.errors(mother),
+			'dad':Parents.errors(father),
+		}
+		return redirect('/register/parentsinfo')		
 
 
 def reg_studentsinfo(request):
