@@ -1,1 +1,303 @@
-Students Info
+<!DOCTYPE html>
+<html>
+<head>
+	<title>HST | Registration</title>
+	{% load staticfiles %}
+	<script src="{% static 'main/js/jquery.js' %}" charset="utf-8"></script>
+	<script src="{% static 'main/js/script.js' %}" charset="utf-8"></script>
+	<link rel="stylesheet" type="text/css" href="{% static 'main/css/style.css' %}">
+	<style type="text/css">
+		#student_list_div,
+		#student_form_div,
+		#student_form {
+			display: inline-block;
+		}
+		#student_form_div {
+			border: solid black 1px;
+			padding: 5px;
+			display: none;
+		}
+		#height_ft, #height_in {
+			width: 40px;
+		}
+		h3 {
+			margin: 0 3px 7px;
+			font-weight: normal;
+		}
+		#student_list td {
+			text-align: center;
+		}
+	</style>
+	<script type="text/javascript">
+
+		var fields = ['first','middle','last','prefer','sex','birthday','est_grad','tshirt','alt_phone','alt_email']
+
+		var family_last = '{{family.last}}'
+		var reg_year = Number('{{reg_year}}')
+
+		function zeropad(num, places) {
+			num = Math.floor(num)
+			var pad = ''
+			for (var i = 0; i < places-String(num).length; i++) {
+				pad += '0'
+			}
+			return pad + String(num)
+		}
+
+		function phone_format(num) {
+			var cod  = zeropad(num / 10**7, 3)
+			var mid  = zeropad(num % 10**7 / 10**4, 3)
+			var last = zeropad(num % 10**4, 4)
+			return `(${cod}) ${mid}-${last}`
+		}
+
+		function Student(sid) {
+			this.sid = sid
+			this.exists = true
+			for (var i = 0; i < fields.length; i++) {
+				var field = fields[i]
+				this[field] = $$('#'+field).value
+			}
+			this.height = Number($$('#height_ft').value) * 12 + Number($$('#height_in').value)
+			this.height_ft = Math.floor(this.height / 12)
+			this.height_in = this.height % 12
+			this.height_tr = this.height ? `${this.height_ft}' ${this.height_in}"` : ``
+			this.hst_age = reg_year - Number(this.birthday.substr(0,4)) - 1
+			this.cur_age = function() {
+				var b_month = Number(this.birthday.substr(5,2))
+				var b_date  = Number(this.birthday.substr(8,2))
+				var now = new Date()
+				var c_month = now.getMonth() + 1
+				var c_date  = now.getDate()
+				var had_birthday = c_month * 31 + c_date >= b_month * 31 + b_date
+				var age_this_year = now.getFullYear() - Number(this.birthday.substr(0,4))
+				var age = age_this_year + (had_birthday ? 0 : -1)
+				if (age != this.hst_age) {
+					$('.footnote').show()
+				}
+				return age
+			}
+			this.display = function() {
+				for (var i = 0; i < fields.length; i++) {
+					var field = fields[i]
+					$$('#'+field).value = this[field]
+				}				
+				$$('#height_ft').value = this.height_ft
+				$$('#height_in').value = this.height_in
+			}
+			this.inner = function(index) {
+				return `
+<td>${this.prefer ? this.prefer : this.first} ${this.last ? this.last : family_last}</td>
+<td>${this.birthday ? this.hst_age : ''}${this.hst_age == this.cur_age() ? '' : '*'}</td>
+<td>${this.sex}</td>
+<td>${this.est_grad ? reg_year - this.est_grad + 12 : ''}</td>
+<td>${this.height_tr}</td>
+<td>${this.tshirt}</td>
+<td>${this.alt_phone ? phone_format(this.alt_phone) : ''}</td>
+<td>${this.alt_email ? this.alt_email : ''}</td>
+<td><button class="edit">Edit</button><button class="delete">Delete</button>${index}</td>`
+			}
+			this.tr = function(index) {
+				return `
+<tr id="s${index}">
+${this.inner(index)}
+</tr>
+				`
+			}
+		}
+
+		function clear_form() {
+			for (var i = 0; i < fields.length; i++) {
+				var field = fields[i]
+				$$('#'+field).value = ''
+			}
+			update_prefer_placeholder()
+		}
+
+		function update_prefer_placeholder() {
+			$$('#prefer').placeholder = $$('#first').value
+		}
+
+		function form_display(type) {
+			form_type = type
+			if (type) {
+				$('#student_form_div').css('display','inline-block')
+				if (type == 1) {
+					$$('#student_form_type').innerText = 'New Student:'
+				} else if (type == 2) {
+					$$('#student_form_type').innerText = 'Edit Student:'
+				}
+			} else {
+				$('#student_form_div').css('display','none')
+			}
+		}
+
+		function find_student(sid) {
+			for (var i = 0; i < student_bank.length; i++) {
+				var student = student_bank[i]
+				if (student.sid == sid) {
+					student.index = i
+					return student
+				}
+			}
+		}
+
+		function edit_student(sid) {
+			current_sid = sid
+			var student = find_student(sid)
+			student.display()
+			form_display(2)
+		}
+
+		function delete_student(sid) {
+			find_student(sid).exists = false
+			if (sid == current_sid) {
+				form_display(0)
+			}
+			$('#s'+sid).hide()
+		}
+
+		function dynamic(sid) {
+			trid = $('#s'+sid)
+			trid.find('.edit').click(function() {
+				edit_student(sid)
+			})
+			trid.find('.delete').click(function() {
+				delete_student(sid)
+			})
+		}
+
+		// Kind of like a FEFW Factory
+		var student_bank = []
+
+		// Which student is currently being created or edited
+		var current_sid = 0
+
+		// 0 = Form Hidden, 1 = New Student, 2 = Edit Student
+		var form_type = 0
+
+		$(document).ready(function() {
+
+			$('#add_student').click(function() {
+				if (form_type == 0) {
+					current_sid++
+					form_display(1)
+				}
+			})
+
+			$('#save_student').click(function() {
+				var student = new Student(current_sid)
+				if (form_type == 1) {
+					student_bank.push(student)
+					$('#student_list').append(student.tr(current_sid))
+				} else if (form_type == 2) {
+					$$('#s'+current_sid).innerHTML = student.inner(current_sid)
+					x = find_student(current_sid).index
+					student_bank[x] = student
+				}
+				dynamic(current_sid)
+				form_display(0)
+				clear_form()
+			})
+
+			$('#cancel').click(function() {
+				form_display(0)
+			})
+
+			$('#first').focusout(function() {
+				update_prefer_placeholder()
+			})
+
+		})
+
+	</script>
+</head>
+<body>
+	<h1>New Family Registration</h1>
+	<h2>Step 3: Students Information</h2>
+	<span class="instructions">Registering for {{reg_year|add:-1}}-{{reg_year}} year.  Fields in <b>bold</b> are required.  Leave placeholders in other fields if they are the same as the Family.</span>
+	<div>
+		<div id="student_list_div">
+			<table id="student_list">
+				<thead>
+					<th>Name</th>
+					<th>Age</th>
+					<th>Sex</th>
+					<th>Grade</th>
+					<th>Height</th>
+					<th>T-Shirt</th>
+					<th>Phone</th>
+					<th>Email</th>
+					<th></th>
+				</thead>
+			</table>
+			<button id="add_student">Add Student</button>
+		</div>
+		<div id="student_form_div">
+			<h3 id="student_form_type">Hello</h3>
+			<table id="student_form">
+				<tr><td><b>First Name:</b></td>
+					<td><input type="text" name="first" id="first"></td>
+				</tr>
+				<tr><td>Middle Name:</td>
+					<td><input type="text" name="middle" id="middle"></td>
+				</tr>
+				<tr><td>Last Name:</td>
+					<td><input type="text" name="last" id="last" placeholder="{{family.last}}"></td>
+				</tr>
+				<tr><td>Preferred Name:</td>
+					<td><input type="text" name="prefer" id="prefer"></td>
+				</tr>
+				<tr><td><b>Sex:</b></td>
+					<td>
+						<select name="sex" id="sex">
+							<option></option>
+							<option value="M">Male</option>
+							<option value="F">Female</option>
+							<!-- <option value="H">Some wierd-ass hippy crap</option> -->
+						</select>
+					</td>
+				</tr>
+				<tr><td><b>Birthday:</b></td>
+					<td><input type="date" name="birthday" id="birthday"></td>
+				</tr>
+				<tr><td>Grade:</td>
+					<td>
+						<select name="est_grad" id="est_grad">
+							<option></option>
+							{% for g in grades %}
+							<option value="{{g.est_grad}}" id="{{g.est_grad}}">{{g.grade}}</option>
+							{% endfor %}
+						</select>
+					</td>
+				</tr>
+				<tr><td>Height:</td>
+					<td>
+						<input type="number" name="height_ft" id="height_ft" min="0"> ft
+						<input type="number" name="height_in" id="height_in" min="0" max="11"> in
+					</td>
+				</tr>
+				<tr><td>T-Shirt Size:</td>
+					<td>
+						<select type="text" name="tshirt" id="tshirt">
+							<option></option>
+							{% for size in t_shirt_sizes %}
+							<option value="{{size.no0}}" id="{{size.no0}}">{{size.no1}}</option>
+							{% endfor %}
+						</select>
+					</td>
+				</tr>
+				<tr><td>Phone Number:</td>
+					<td><input type="text" name="alt_phone" id="alt_phone" placeholder="Use Family Phone"></td>
+				</tr>
+				<tr><td>Email Address:</td>
+					<td><input type="text" name="alt_email" id="alt_email" placeholder="Use Family Email"></td>
+				</tr>
+			</table>
+			<br><button id="save_student">Save</button>
+			<button id="cancel">Cancel</button>
+		</div>
+	</div>
+	<span class="footnote" style="display: none;">*HST calculates ages as of December 31 of the current academic year ({{reg_year|add:-1}}-{{reg_year}})</span>
+</body>
+</html>

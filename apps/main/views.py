@@ -28,6 +28,18 @@ def forminit(request, form_name, fields):
 				if f not in request.session[pe][form_name]:
 					request.session[pe][form_name][f] = ''
 
+def numero(obj):
+	result = {}
+	for x in range(len(obj)):
+		result['no'+str(x)] = obj[x]
+	return result
+
+def metanumero(obj):
+	result = []
+	for x in obj:
+		result += [numero(x)]
+	return result
+
 # - - - - - DEVELOPER VIEWS - - - - -
 
 def hot(request):
@@ -90,10 +102,11 @@ def reg_familyinfo_get(request):
 
 def reg_familyinfo_post(request):
 	new_family = copy(request.POST,['last','phone','email'])
+	new_user = copy(request.POST,['username','password','pw_confm'])
 	new_family['joined_hst'] = datetime.now().year
 	new_family['reg_status'] = 1
-	new_user = copy(request.POST,['username','password','pw_confm'])
 	if Families.isValid(new_family) and Users.isValid(new_user):
+		new_user.pop('pw_confm')
 		new_family = Families.create(new_family)
 		new_user['owner'] = new_family
 		me = Users.create(new_user)
@@ -190,7 +203,20 @@ def reg_studentsinfo(request):
 		return index(request)
 
 def reg_studentsinfo_get(request):
-	context = {}
+	me = Users.get(id=request.session['meid'])
+	# Every year on April 1, registration switches to the following year.
+	now = datetime.now()
+	next_year = 0 if now.month < 4 else 1
+	reg_year = now.year + next_year
+	grades = []
+	for x in range(1,13):
+		grades += [{'grade':x,'est_grad':reg_year - x + 12}]
+	context = {
+		'reg_year': reg_year,
+		'grades'  : grades,
+		'family'  : me.owner,
+		't_shirt_sizes':metanumero(Student.t_shirt_sizes),
+	}
 	return render(request, 'register/studentsinfo.html', context)
 
 def reg_studentsinfo_post(request):

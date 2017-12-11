@@ -91,7 +91,7 @@ class Confirmation(Validation):
 		self.field = field
 		self.other = other
 		self.error = error
-		self.types = [object]
+		self.types = [str,unicode,buffer]
 	def __mistype(self, data):
 		return type(data[self.field]) not in self.types
 	def __valid(self, data):
