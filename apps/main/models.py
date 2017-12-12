@@ -26,10 +26,26 @@ class ParentManager(sm.SuperManager):
 		self.fields = ['first','last','sex','alt_phone','alt_email']
 		self.validations = [
 			sm.Present('first','Please enter the first name for at least one parent'),
-			sm.Regular('first',r'^$|^.{,20}$','This name is too long.  The maximum is 20 characters.'),
-			sm.Regular('last',r'^$|^.{,30}$','This name is too long.  The maximum is 30 characters.'),
+			sm.Regular('first',r'^.{,20}$','This name is too long.  The maximum is 20 characters.'),
+			sm.Regular('last',r'^.{,30}$','This name is too long.  The maximum is 30 characters.'),
 			sm.Regular('alt_phone',r'^$|^[ -.()/\\~]*(\d[ -.()/\\~]*){10}$','Please enter a valid 10-digit phone number.'),
 			sm.Regular('alt_email',r'^$|(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)','Please enter a valid email address.'),
+		]
+
+class StudentManager(sm.SuperManager):
+	def __init__(self):
+		super(StudentManager, self).__init__('main','student')
+		self.fields = ['first','middle','last','prefer','sex','birthday','est_grad','height','alt_phone','alt_email','tshirt']
+		self.validations = [
+			sm.Present('first','Please enter a first name.'),
+			sm.Regular('first',r'^.{0,20}$','This name is too long.  The maximum is 20 characters.'),
+			sm.Regular('middle',r'^.{0,20}$','This name is too long.  The maximum is 20 characters.'),
+			sm.Regular('last',r'^.{0,30}$','This name is too long.  The maximum is 30 characters.'),
+			sm.Regular('prefer',r'^.{0,20}$','This name is too long.  The maximum is 20 characters.'),
+			sm.Present('sex','Please select a sex.'),
+			sm.Present('birthday','Please enter a date of birth.'),
+			sm.Regular('alt_phone',r'^$|^[^\d]*(\d[^\d]*){10}$','Please enter a valid 10-digit phone number, or leave blank to use family phone.'),
+			sm.Regular('alt_email',r'^$|(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)','Please enter a valid email address, or leave blank to use family email.'),
 		]
 
 class UserManager(sm.SuperManager):
@@ -191,7 +207,7 @@ class Student(models.Model):
 	updated_at = models.DateTimeField(auto_now=True)
 	def updated_at_(self):
 		return self.updated_at
-	objects = sm.SuperManager('main','student')
+	objects = StudentManager()
 	def __str__(self):
 		return self._prefer()+' '+self._last()
 

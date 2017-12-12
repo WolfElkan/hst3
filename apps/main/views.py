@@ -40,6 +40,18 @@ def metanumero(obj):
 		result += [numero(x)]
 	return result
 
+def json(obj):
+	result = []
+	for x in obj:
+		result += [x.__dict__]
+	result = str(result)
+	result = result.replace('\'','"')
+	result = result.replace('&quot','"')
+	result = result.replace('u"','"')
+	result = result.replace('<type ','')
+	result = result.replace('>','')
+	return result
+
 # - - - - - DEVELOPER VIEWS - - - - -
 
 def hot(request):
@@ -215,7 +227,8 @@ def reg_studentsinfo_get(request):
 		'reg_year': reg_year,
 		'grades'  : grades,
 		'family'  : me.owner,
-		't_shirt_sizes':metanumero(Student.t_shirt_sizes),
+		't_shirt_sizes': metanumero(Student.t_shirt_sizes),
+		'validations'  : json(Students.validations),
 	}
 	return render(request, 'register/studentsinfo.html', context)
 

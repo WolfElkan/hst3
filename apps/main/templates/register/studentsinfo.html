@@ -27,6 +27,9 @@
 		#student_list td {
 			text-align: center;
 		}
+		#student_list td:nth-child(1) {
+			text-align: left;
+		}
 	</style>
 	<script type="text/javascript">
 
@@ -34,6 +37,14 @@
 
 		var family_last = '{{family.last}}'
 		var reg_year = Number('{{reg_year}}')
+
+		validations = "{{validations}}".replace(/&quot;/g, '"')
+		// validations = validations.replace(/("regex": )(")([^"]*)(")/g, "$1/$3/")
+		// validations = validations.replace(/"regex": "/g, '"regex": /')
+		validations = validations.replace(/\\/g,"\\\\")
+		// validations = validations.replace(/~/g,"~")
+		// validations = JSON.stringify(validations)
+		validations = JSON.parse(validations)
 
 		function zeropad(num, places) {
 			num = Math.floor(num)
@@ -62,22 +73,56 @@
 			this.height_ft = Math.floor(this.height / 12)
 			this.height_in = this.height % 12
 			this.height_tr = this.height ? `${this.height_ft}' ${this.height_in}"` : ``
-			this.hst_age = reg_year - Number(this.birthday.substr(0,4)) - 1
+			if (this.birthday) {
+				this.birthday = {
+					'year' : Number(this.birthday.substr(0,4)),
+					'month': Number(this.birthday.substr(5,2)),
+					'date' : Number(this.birthday.substr(8,2)),
+				}
+				if (this.birthday.year < reg_year % 100) {
+					this.birthday.year += Math.floor(reg_year / 100) * 100
+				} else if (this.birthday.year < 100) {
+					this.birthday.year += Math.floor(reg_year / 100) * 100 - 100
+				}
+				this.birthday.js = new Date(this.birthday.year, this.birthday.month-1, this.birthday.date)
+			}
+			this.hst_age = reg_year - this.birthday.year - 1
 			this.cur_age = function() {
-				var b_month = Number(this.birthday.substr(5,2))
-				var b_date  = Number(this.birthday.substr(8,2))
 				var now = new Date()
 				var c_month = now.getMonth() + 1
 				var c_date  = now.getDate()
-				var had_birthday = c_month * 31 + c_date >= b_month * 31 + b_date
-				var age_this_year = now.getFullYear() - Number(this.birthday.substr(0,4))
+				var had_birthday = c_month * 31 + c_date >= this.birthday.month * 31 + this.birthday.date
+				var age_this_year = now.getFullYear() - this.birthday.year
 				var age = age_this_year + (had_birthday ? 0 : -1)
 				if (age != this.hst_age) {
 					$('.footnote').show()
 				}
 				return age
 			}
-			this.display = function() {
+			this.isValid = function(validations) {
+				for (var i = 0; i < validations.length; i++) {
+					var regex = new RegExp(validations[i].regex)
+					var field = validations[i].field
+					if (!String(this[field]).match(regex)) {
+						return false
+					}
+				}
+				return true
+			}
+			this.show_errors = function(validations) {
+				var error_tds = $('.error')
+				for (var i = 0; i < error_tds.length; i++) {
+					error_tds[i].innerText = ''
+				}
+				for (var i = 0; i < validations.length; i++) {
+					var regex = new RegExp(validations[i].regex)
+					var field = validations[i].field
+					if (!this[field].match(regex)) {
+						$$('#'+field+'_error').innerText = validations[i].error
+					}
+				}
+			}
+			this.populate_form = function() {
 				for (var i = 0; i < fields.length; i++) {
 					var field = fields[i]
 					$$('#'+field).value = this[field]
@@ -95,7 +140,7 @@
 <td>${this.tshirt}</td>
 <td>${this.alt_phone ? phone_format(this.alt_phone) : ''}</td>
 <td>${this.alt_email ? this.alt_email : ''}</td>
-<td><button class="edit">Edit</button><button class="delete">Delete</button>${index}</td>`
+<td><button class="edit">Edit</button><button class="delete">Delete</button></td>`
 			}
 			this.tr = function(index) {
 				return `
@@ -111,6 +156,8 @@ ${this.inner(index)}
 				var field = fields[i]
 				$$('#'+field).value = ''
 			}
+			$$('#height_ft').value = ''
+			$$('#height_in').value = ''
 			update_prefer_placeholder()
 		}
 
@@ -142,10 +189,24 @@ ${this.inner(index)}
 			}
 		}
 
+		function save_student(sid, student) {
+			if (form_type == 1) {
+				student_bank.push(student)
+				$('#student_list').append(student.tr(sid))
+			} else if (form_type == 2) {
+				$$('#s'+sid).innerHTML = student.inner(sid)
+				x = find_student(sid).index
+				student_bank[x] = student
+			}
+			dynamic(sid)
+			form_display(0)
+			clear_form()
+		}
+
 		function edit_student(sid) {
 			current_sid = sid
 			var student = find_student(sid)
-			student.display()
+			student.populate_form()
 			form_display(2)
 		}
 
@@ -157,6 +218,7 @@ ${this.inner(index)}
 			$('#s'+sid).hide()
 		}
 
+		// Add functionality to dynamically created Edit and Delete buttons
 		function dynamic(sid) {
 			trid = $('#s'+sid)
 			trid.find('.edit').click(function() {
@@ -167,7 +229,7 @@ ${this.inner(index)}
 			})
 		}
 
-		// Kind of like a FEFW Factory
+		// Array to hold the students until page is submitted
 		var student_bank = []
 
 		// Which student is currently being created or edited
@@ -187,17 +249,11 @@ ${this.inner(index)}
 
 			$('#save_student').click(function() {
 				var student = new Student(current_sid)
-				if (form_type == 1) {
-					student_bank.push(student)
-					$('#student_list').append(student.tr(current_sid))
-				} else if (form_type == 2) {
-					$$('#s'+current_sid).innerHTML = student.inner(current_sid)
-					x = find_student(current_sid).index
-					student_bank[x] = student
+				if (student.isValid(validations)) {
+					save_student(current_sid, student)
+				} else {
+					student.show_errors(validations)
 				}
-				dynamic(current_sid)
-				form_display(0)
-				clear_form()
 			})
 
 			$('#cancel').click(function() {
@@ -215,7 +271,7 @@ ${this.inner(index)}
 <body>
 	<h1>New Family Registration</h1>
 	<h2>Step 3: Students Information</h2>
-	<span class="instructions">Registering for {{reg_year|add:-1}}-{{reg_year}} year.  Fields in <b>bold</b> are required.  Leave placeholders in other fields if they are the same as the Family.</span>
+	<span class="instructions">Click the Add Student button to register your students for the {{reg_year|add:-1}}-{{reg_year}} school year with HST.  (You will sign them up for their classes on the next screen.)  Fields in <b>bold</b> are required.  Leave placeholders in other fields if they are the same as the Family.</span>
 	<div>
 		<div id="student_list_div">
 			<table id="student_list">
@@ -238,15 +294,19 @@ ${this.inner(index)}
 			<table id="student_form">
 				<tr><td><b>First Name:</b></td>
 					<td><input type="text" name="first" id="first"></td>
+					<td class="error" id="first_error"></td>
 				</tr>
 				<tr><td>Middle Name:</td>
 					<td><input type="text" name="middle" id="middle"></td>
+					<td class="error" id="middle_error"></td>
 				</tr>
 				<tr><td>Last Name:</td>
 					<td><input type="text" name="last" id="last" placeholder="{{family.last}}"></td>
+					<td class="error" id="last_error"></td>
 				</tr>
 				<tr><td>Preferred Name:</td>
 					<td><input type="text" name="prefer" id="prefer"></td>
+					<td class="error" id="prefer_error"></td>
 				</tr>
 				<tr><td><b>Sex:</b></td>
 					<td>
@@ -257,9 +317,11 @@ ${this.inner(index)}
 							<!-- <option value="H">Some wierd-ass hippy crap</option> -->
 						</select>
 					</td>
+					<td class="error" id="sex_error"></td>
 				</tr>
 				<tr><td><b>Birthday:</b></td>
 					<td><input type="date" name="birthday" id="birthday"></td>
+					<td class="error" id="birthday_error"></td>
 				</tr>
 				<tr><td>Grade:</td>
 					<td>
@@ -270,12 +332,14 @@ ${this.inner(index)}
 							{% endfor %}
 						</select>
 					</td>
+					<td></td>
 				</tr>
 				<tr><td>Height:</td>
 					<td>
 						<input type="number" name="height_ft" id="height_ft" min="0"> ft
 						<input type="number" name="height_in" id="height_in" min="0" max="11"> in
 					</td>
+					<td></td>
 				</tr>
 				<tr><td>T-Shirt Size:</td>
 					<td>
@@ -286,12 +350,15 @@ ${this.inner(index)}
 							{% endfor %}
 						</select>
 					</td>
+					<td></td>
 				</tr>
-				<tr><td>Phone Number:</td>
+				<tr><td>Personal Phone:</td>
 					<td><input type="text" name="alt_phone" id="alt_phone" placeholder="Use Family Phone"></td>
+					<td class="error" id="alt_phone_error"></td>
 				</tr>
-				<tr><td>Email Address:</td>
+				<tr><td>Personal Email:</td>
 					<td><input type="text" name="alt_email" id="alt_email" placeholder="Use Family Email"></td>
+					<td class="error" id="alt_email_error"></td>
 				</tr>
 			</table>
 			<br><button id="save_student">Save</button>
