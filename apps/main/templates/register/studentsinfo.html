@@ -5,6 +5,7 @@
 	{% load staticfiles %}
 	<script src="{% static 'main/js/jquery.js' %}" charset="utf-8"></script>
 	<script src="{% static 'main/js/script.js' %}" charset="utf-8"></script>
+	<script src="{% static 'main/js/loremfamily.js' %}" charset="utf-8"></script>
 	<link rel="stylesheet" type="text/css" href="{% static 'main/css/style.css' %}">
 	<style type="text/css">
 		#student_list_div,
@@ -33,7 +34,7 @@
 	</style>
 	<script type="text/javascript">
 
-		var fields = ['first','middle','last','prefer','sex','birthday','est_grad','tshirt','alt_phone','alt_email']
+		var fields = ['first','middle','last','prefer','sex','birthday','grad_year','tshirt','alt_phone','alt_email']
 
 		var family_last = '{{family.last}}'
 		var reg_year = Number('{{reg_year}}')
@@ -64,6 +65,7 @@
 
 		function Student(sid) {
 			this.sid = sid
+			this.isNew = true
 			this.exists = true
 			for (var i = 0; i < fields.length; i++) {
 				var field = fields[i]
@@ -85,6 +87,7 @@
 					this.birthday.year += Math.floor(reg_year / 100) * 100 - 100
 				}
 				this.birthday.js = new Date(this.birthday.year, this.birthday.month-1, this.birthday.date)
+				this.birthday.db = `${zeropad(this.birthday.year,4)}-${zeropad(this.birthday.month,2)}-${zeropad(this.birthday.date,2)}`
 			}
 			this.hst_age = reg_year - this.birthday.year - 1
 			this.cur_age = function() {
@@ -135,7 +138,7 @@
 <td>${this.prefer ? this.prefer : this.first} ${this.last ? this.last : family_last}</td>
 <td>${this.birthday ? this.hst_age : ''}${this.hst_age == this.cur_age() ? '' : '*'}</td>
 <td>${this.sex}</td>
-<td>${this.est_grad ? reg_year - this.est_grad + 12 : ''}</td>
+<td>${this.grad_year ? reg_year - this.grad_year + 12 : ''}</td>
 <td>${this.height_tr}</td>
 <td>${this.tshirt}</td>
 <td>${this.alt_phone ? phone_format(this.alt_phone) : ''}</td>
@@ -148,6 +151,18 @@
 ${this.inner(index)}
 </tr>
 				`
+			}
+			this.json = function() {
+				var columns = ['first','middle','last','prefer','sex','grad_year','height','alt_phone','alt_email','tshirt','exists','isNew']
+				json_obj = {}
+				for (var i = 0; i < columns.length; i++) {
+					var col = columns[i]
+					if (this[col] || this[col] === false) {
+						json_obj[col] = this[col]
+					}
+				}
+				json_obj.birthday = this.birthday.db
+				return json_obj
 			}
 		}
 
@@ -251,6 +266,7 @@ ${this.inner(index)}
 				var student = new Student(current_sid)
 				if (student.isValid(validations)) {
 					save_student(current_sid, student)
+					$('#submit').show()
 				} else {
 					student.show_errors(validations)
 				}
@@ -264,9 +280,21 @@ ${this.inner(index)}
 				update_prefer_placeholder()
 			})
 
+			$('#submit').click(function() {
+				students_json = []
+				for (var i = 0; i < student_bank.length; i++) {
+					students_json.push(student_bank[i].json())
+				}
+				$$('#data').value = JSON.stringify(students_json)
+				// console.log(students_json)
+				$('#submission').submit()
+			})
+
 		})
 
 	</script>
+
+	
 </head>
 <body>
 	<h1>New Family Registration</h1>
@@ -325,10 +353,10 @@ ${this.inner(index)}
 				</tr>
 				<tr><td>Grade:</td>
 					<td>
-						<select name="est_grad" id="est_grad">
+						<select name="grad_year" id="grad_year">
 							<option></option>
 							{% for g in grades %}
-							<option value="{{g.est_grad}}" id="{{g.est_grad}}">{{g.grade}}</option>
+							<option value="{{g.grad_year}}" id="{{g.grad_year}}">{{g.grade}}</option>
 							{% endfor %}
 						</select>
 					</td>
@@ -366,5 +394,9 @@ ${this.inner(index)}
 		</div>
 	</div>
 	<span class="footnote" style="display: none;">*HST calculates ages as of December 31 of the current academic year ({{reg_year|add:-1}}-{{reg_year}})</span>
+	<form id="submission" style="display: none;" method="post">{% csrf_token %}
+		<input id="data" type="hidden" name="students" value="">
+	</form>
+	<button style="display: none;" id="submit">Next >></button>
 </body>
 </html>

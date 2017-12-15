@@ -1,0 +1,11 @@
+Student Interface
+	Clear validation errors when saving student
+	Repopulate non-text inputs when editing student
+	(eventually) Support loading existing students from database for editing, track by internal id's
+	Combine the Student.td() and Student.inner() functions, by using .outerHTML
+
+Parent Interface
+	Make validations work
+	Clear validations when successful
+	Investigate MultiDictKeyError when skipping parent
+	Actually save Parent ID's to database

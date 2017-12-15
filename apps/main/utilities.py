@@ -13,7 +13,10 @@ def copy(source, keys=False, trunc=0):
 		keys = source.keys()
 	for key in keys:
 		trunckey = key[trunc:]
-		this[trunckey] = source[key]
+		if key in source:
+			this[trunckey] = source[key]
+		else:
+			this[trunckey] = None
 	return this
 
 def reprint(obj, lev=0):

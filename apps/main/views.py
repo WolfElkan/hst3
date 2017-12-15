@@ -3,6 +3,8 @@ from .models import User, Family, Student, Parent, Address
 from .custom_fields import Bcrypt, PhoneNumber
 from datetime import datetime
 from .utilities import copy, reprint
+import json as JSON
+from io import StringIO
 
 Addresses = Address.objects
 Families  = Family.objects
@@ -233,4 +235,16 @@ def reg_studentsinfo_get(request):
 	return render(request, 'register/studentsinfo.html', context)
 
 def reg_studentsinfo_post(request):
-	return redirect('register')
+	me = Users.get(id=request.session['meid'])
+	students = JSON.loads(request.POST['students'])
+	# print students
+	for student in students:
+		if student.pop('exists'):
+			if student.pop('isNew'):
+				student['family'] = me.owner
+				Students.create(student)
+			else:
+				pass
+	return redirect('/register/studentsinfo')
+
+

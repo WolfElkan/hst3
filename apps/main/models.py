@@ -35,7 +35,7 @@ class ParentManager(sm.SuperManager):
 class StudentManager(sm.SuperManager):
 	def __init__(self):
 		super(StudentManager, self).__init__('main','student')
-		self.fields = ['first','middle','last','prefer','sex','birthday','est_grad','height','alt_phone','alt_email','tshirt']
+		self.fields = ['first','middle','last','prefer','sex','birthday','grad_year','height','alt_phone','alt_email','tshirt']
 		self.validations = [
 			sm.Present('first','Please enter a first name.'),
 			sm.Regular('first',r'^.{0,20}$','This name is too long.  The maximum is 20 characters.'),
@@ -157,7 +157,7 @@ class Student(models.Model):
 		return self.middle
 	last = models.CharField(max_length=30, null=True)
 	def last_(self):
-		return self.last if self.last else family_().last_()
+		return self.last if self.last else self.family_().last_()
 	prefer = models.CharField(max_length=20, null=True)
 	def prefer_(self):
 		return self.prefer if self.prefer else self.first
@@ -170,21 +170,21 @@ class Student(models.Model):
 	birthday = models.DateField()
 	def birthday_(self):
 		return self.birthday
-	est_grad = models.DecimalField(max_digits=4, decimal_places=0)
-	def est_grad_(self):
-		return self.est_grad
+	grad_year = models.DecimalField(max_digits=4, decimal_places=0, null=True)
+	def grad_year_(self):
+		return self.grad_year
 	def grade_(self, *year):
 		if not year:
 			now = datetime.now()
 			year = now.year + (0 if now.month < 4 else 1)
-		grade = year - self.est_grad + 12
-		return grade if grade else 'K'
-	height = models.FloatField()
+		grade = year - self.grad_year + 12
+		return grade if grade <= 12 else 'A'
+	height = models.FloatField(null=True)
 	def height_(self):
 		return self.height
 	alt_phone  = custom.PhoneNumberField(null=True)
 	def phone_(self):
-		return self.alt_phone if self.alt_phone else family_().phone_()
+		return self.alt_phone if self.alt_phone else self.family_().phone_()
 	alt_email  = models.EmailField(null=True)
 	t_shirt_sizes = [
 		('YS','Youth Small'),
@@ -198,7 +198,7 @@ class Student(models.Model):
 		('2X','Adult 2XL'),
 		('3X','Adult 3XL'),
 	]
-	tshirt = models.CharField(max_length=2, choices=t_shirt_sizes)
+	tshirt = models.CharField(max_length=2, choices=t_shirt_sizes, null=True)
 	def tshirt_(self):
 		return self.tshirt
 	created_at = models.DateTimeField(auto_now_add=True)
@@ -209,7 +209,7 @@ class Student(models.Model):
 		return self.updated_at
 	objects = StudentManager()
 	def __str__(self):
-		return self._prefer()+' '+self._last()
+		return self.prefer_()+' '+self.last_()
 
 class User(models.Model):
 	def id_(self):
