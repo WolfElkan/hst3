@@ -162,9 +162,9 @@ def reg_parentsinfo(request):
 def reg_parentsinfo_get(request):
 	me = Users.get(id=request.session['meid'])
 	context = {
-		'last'  : me.owner.last_(),
-		'phone' : me.owner.phone_(),
-		'email' : me.owner.email_(),
+		'last'  : me.owner.last,
+		'phone' : me.owner.phone,
+		'email' : me.owner.email,
 		'p'     : request.session['p'],
 		'e'     : request.session['e'],
 	}
@@ -196,19 +196,17 @@ def reg_parentsinfo_post(request):
 	mother_valid = mother['skipped'] or Parents.isValid(mother)
 	father_valid = father['skipped'] or Parents.isValid(father)
 	if mother_valid and father_valid:
-		print 'Parents Valid'
 		request.session['e'] = {}
 		# Add parents to Database if they have not been skipped
 		if not mother.pop('skipped'):
 			mother = Parents.create(mother)
-			me.owner.set_mother(mother)
+			me.owner.mother = mother
 		if not father.pop('skipped'):
 			father = Parents.create(father)
-			me.owner.set_father(father)
+			me.owner.father = father
 		me.owner.save()
 		return redirect('/register/studentsinfo')
 	else:
-		print 'Parents Invalid'
 		request.session['p'] = {
 			'mom':mom,
 			'dad':dad,

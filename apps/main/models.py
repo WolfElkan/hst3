@@ -130,7 +130,9 @@ class Family(models.Model):
 	def __str__(self):
 		return self.last+' Family'
 	def __getattribute__(self, field):
-		if field == 'phone':
+		if field == '':
+			pass
+		elif field == 'phone':
 			return custom.PhoneNumber(super(Family, self).__getattribute__('phone'))
 		elif field == 'mother':
 			return Parents.get(id=super(Family, self).__getattribute__('mother_id'))
@@ -142,10 +144,10 @@ class Family(models.Model):
 	def __setattr__(self, field, value):
 		if field == 'mother' and value.__class__ == Parent:
 			super(Family, self).__setattr__('mother_id', value.id)
-			return self.save()
+			# return self.save()
 		if field == 'father' and value.__class__ == Parent:
 			super(Family, self).__setattr__('father_id', value.id)
-			return self.save()
+			# return self.save()
 		else:
 			return super(Family, self).__setattr__(field, value)
 

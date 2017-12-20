@@ -29,18 +29,19 @@ class BcryptField(models.Field):
 			hashed = '+' + hashed
 		return hashed
 
-# I'd make this a lambda if I knew how.  
-# Or, I'm sure there's a built-in Python function for zero-padding
-# If I had internet access...
-def zeropad(num, places):
-	return '0'*(places-len(str(num)))+str(num)
-
 class PhoneNumber(object):
 	def __init__(self, *num):
-		self.num = num if type(num) is int else self.sanitize(num)
-		self.cod  = zeropad(self.num / 10**7, 3)
-		self.mid  = zeropad(self.num % 10**7 / 10**4, 3)
-		self.last = zeropad(self.num % 10**4, 4)
+		if type(num) is tuple:
+			num = num[0]
+		if type(num) is PhoneNumber:
+			self.num = num.num
+		elif type(num) is int:
+			self.num = num 
+		else:
+			self.num = self.sanitize(num)
+		self.cod  = str(self.num / 10**7).zfill(3)
+		self.mid  = str(self.num % 10**7 / 10**4).zfill(3)
+		self.last = str(self.num % 10**4).zfill(4)
 	def sanitize(self, *num):
 		num = num if num else self.num
 		num = str(num)
@@ -53,6 +54,8 @@ class PhoneNumber(object):
 		return num
 	def __str__(self):
 		return '('+self.cod+') '+self.mid+'-'+self.last
+	def __get__(self):
+		return int(self.num)
 
 class PhoneNumberField(models.DecimalField):
 	def __init__(self, **kwargs):
