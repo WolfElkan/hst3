@@ -95,9 +95,6 @@ def index(request):
 	context = {}
 	return render(request, 'main/index.html', context)
 
-def test(request):
-	return render(request, 'main/index.html')
-
 #   - - - - NEW FAMILY REGISTRATION - - - -
 
 def admin(request):
@@ -204,7 +201,6 @@ def reg_parentsinfo_post(request):
 		if not father.pop('skipped'):
 			father = Parents.create(father)
 			me.owner.father = father
-		me.owner.save()
 		return redirect('/register/studentsinfo')
 	else:
 		request.session['p'] = {

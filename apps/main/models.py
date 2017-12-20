@@ -140,14 +140,13 @@ class Family(models.Model):
 			return Parents.get(id=super(Family, self).__getattribute__('father_id'))
 		else:
 			return super(Family, self).__getattribute__(field)
-	# Works, but messes up the phone number for some reason?
 	def __setattr__(self, field, value):
 		if field == 'mother' and value.__class__ == Parent:
 			super(Family, self).__setattr__('mother_id', value.id)
-			# return self.save()
+			return self.save()
 		if field == 'father' and value.__class__ == Parent:
 			super(Family, self).__setattr__('father_id', value.id)
-			# return self.save()
+			return self.save()
 		else:
 			return super(Family, self).__setattr__(field, value)
 

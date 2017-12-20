@@ -28,3 +28,22 @@ def reprint(obj, lev=0):
 			reprint(key, lev+1)
 	else:
 		print '  '*lev + str(obj)
+
+class Copy(object):
+	def __init__(self, source, *keys):
+		if not keys:
+			keys = source.keys()
+		for key in keys:
+			if key in source:
+				self[key] = source[key]
+			else:
+				self[key] = None
+	def __getattr__(self, key):
+		return super(Copy, self).__getitem__(key)
+	# def __getitem__(self, key):
+	# 	return super(Copy, self).__getitem__(key)
+	def __setattr__(self, key, value):
+		return super(Copy, self).__setitem__(key, value)
+	# def __setitem__(self, key, value):
+	# 	return super(Copy, self).__setitem__(key, value)
+		
