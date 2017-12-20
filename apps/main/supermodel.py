@@ -155,17 +155,11 @@ class Field(object):
 		fields_array += [self]
 
 class SuperManager(models.Manager):
-	def __init__(self, app_name, friendly):
+	def __init__(self, table_name):
 		self.name = 'objects'
 		self._db = None
 		self._hints = {}
-		if type(friendly) in [str,unicode]:
-			self.friendly = None
-			self.class_name = friendly
-		else:
-			self.friendly = friendly
-			self.class_name = friendly.__name__
-		self.table_name = app_name + '_' + self.class_name.lower()
+		self.table_name = table_name
 		self.fields = []
 		self.validations = []
 	def isValid(self, data):
@@ -179,5 +173,5 @@ class SuperManager(models.Manager):
 			messages = x.errors(data, messages)
 		return messages
 	def create(self, data):
-		# new_thing = copy(data, self.fields)
+		# data = copy(data, self.fields)
 		return super(SuperManager, self).create(**data)

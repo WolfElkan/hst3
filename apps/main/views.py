@@ -84,6 +84,11 @@ def clear(request):
 	request.session.clear()
 	return redirect ('/hot')
 
+# - - - - - SECURITY FUNCTIONS - - - - -
+
+def authorized(request):
+	return 'meid' in request.session
+
 # - - - - - APPLICATION VIEWS - - - - -
 
 def index(request):
@@ -94,6 +99,9 @@ def test(request):
 	return render(request, 'main/index.html')
 
 #   - - - - NEW FAMILY REGISTRATION - - - -
+
+def admin(request):
+	return redirect('/')
 
 def reg(request):
 	# TODO: Detect if family has partially registered, redirect to appropriate step.
@@ -139,6 +147,8 @@ def reg_familyinfo_post(request):
 
 
 def reg_parentsinfo(request):
+	if not authorized(request):
+		return redirect('/')
 	forminit(request,'mom',['mom_skipped','mom_first','mom_last','mom_alt_phone','mom_alt_email'])
 	forminit(request,'dad',['dad_skipped','dad_first','dad_last','dad_alt_phone','dad_alt_email'])
 	if request.method == 'GET':
@@ -167,7 +177,7 @@ def reg_parentsinfo_post(request):
 	dad = copy(request.POST, ['dad_skipped','dad_first','dad_last','dad_alt_phone','dad_alt_email'])
 	mother = copy(mom,trunc=4)
 	father = copy(dad,trunc=4)
-	# Convert 'skipped' booleans from JavaScript-friendly strings, to Python bools
+	# Convert 'skipped' booleans from JavaScript strings, to Python bools.
 	mother['skipped'] = mother['skipped'] == 'true'
 	father['skipped'] = father['skipped'] == 'true'
 	# May it be many years before we have to change these two lines of code.
@@ -183,19 +193,22 @@ def reg_parentsinfo_post(request):
 			Seriously though, we do need at least one first name.  Sorry.
 			''')
 	# Validate new Parent objects
-	mother_valid = not mother['skipped'] and Parents.isValid(mother)
-	father_valid = not father['skipped'] and Parents.isValid(father)
+	mother_valid = mother['skipped'] or Parents.isValid(mother)
+	father_valid = father['skipped'] or Parents.isValid(father)
 	if mother_valid and father_valid:
+		print 'Parents Valid'
+		request.session['e'] = {}
 		# Add parents to Database if they have not been skipped
 		if not mother.pop('skipped'):
 			mother = Parents.create(mother)
-			me.owner.mother = mother
+			me.owner.set_mother(mother)
 		if not father.pop('skipped'):
 			father = Parents.create(father)
-			me.owner.father = father
+			me.owner.set_father(father)
 		me.owner.save()
 		return redirect('/register/studentsinfo')
 	else:
+		print 'Parents Invalid'
 		request.session['p'] = {
 			'mom':mom,
 			'dad':dad,
@@ -208,7 +221,9 @@ def reg_parentsinfo_post(request):
 
 
 def reg_studentsinfo(request):
-	if request.method == 'GET':
+	if not authorized(request):
+		return redirect('/')
+	elif request.method == 'GET':
 		return reg_studentsinfo_get(request)
 	elif request.method == 'POST':
 		return reg_studentsinfo_post(request)
@@ -224,7 +239,7 @@ def reg_studentsinfo_get(request):
 	reg_year = now.year + next_year
 	grades = []
 	for x in range(1,13):
-		grades += [{'grade':x,'est_grad':reg_year - x + 12}]
+		grades += [{'grade':x,'grad_year':reg_year - x + 12}]
 	context = {
 		'reg_year': reg_year,
 		'grades'  : grades,
@@ -242,6 +257,7 @@ def reg_studentsinfo_post(request):
 		if student.pop('exists'):
 			if student.pop('isNew'):
 				student['family'] = me.owner
+				student['current'] = True
 				Students.create(student)
 			else:
 				pass

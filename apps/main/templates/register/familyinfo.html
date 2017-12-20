@@ -5,6 +5,7 @@
 		{% load staticfiles %}
 		<script src="{% static 'main/js/script.js' %}" charset="utf-8"></script>
 		<link rel="stylesheet" type="text/css" href="{% static 'main/css/style.css' %}">
+		<link rel="icon" type="image/png" href="{% static 'main/images/favicon.ico/favicon.ico' %}">
 	</head>
 	<body id="register_familyinfo">
 			<h1>New Family Registration</h1>
@@ -15,32 +16,32 @@
 				<table>
 					<tr>
 						<td>Family Last Name:</td>
-						<td><input type="text" name="last" value="{{p.family.last}}"></td>
+						<td><input type="text" name="last" value="Elkan{{p.family.last}}"></td>
 						<td class="error">{{e.family.last}}</td>
 					</tr>
 					<tr>
 						<td>Main Phone Number:</td>
-						<td><input type="text" name="phone" value="{{p.family.phone}}"></td>
+						<td><input type="text" name="phone" value="6034467797{{p.family.phone}}"></td>
 						<td class="error">{{e.family.phone}}</td>
 					</tr>
 					<tr>
 						<td>Main Family Email:</td>
-						<td><input type="text" name="email" value="{{p.family.email}}"></td>
+						<td><input type="text" name="email" value="theelkans@gmail.com{{p.family.email}}"></td>
 						<td class="error">{{e.family.email}}</td>
 					</tr>
 					<tr>
 						<td>Username:</td>
-						<td><input type="text" name="username" value="{{p.user.username}}"></td>
+						<td><input type="text" name="username" value="elkan{{p.user.username}}"></td>
 						<td class="error">{{e.user.username}}</td>
 					</tr>
 					<tr>
 						<td>Password:</td>
-						<td><input type="password" name="password" value="{{p.user.password}}"></td>
+						<td><input type="password" name="password" value="asdfasdf{{p.user.password}}"></td>
 						<td class="error">{{e.user.password}}</td>
 					</tr>
 					<tr>
 						<td>Confirm Password:</td>
-						<td><input type="password" name="pw_confm" value="{{p.user.pw_confm}}"></td>
+						<td><input type="password" name="pw_confm" value="asdfasdf{{p.user.pw_confm}}"></td>
 						<td class="error">{{e.user.pw_confm}}</td>
 					</tr>
 				</table>

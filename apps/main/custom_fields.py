@@ -90,3 +90,10 @@ class PolymorphicField(poly.MultiColumnField):
 		model = self.relatables[model_index]
 		return model.objects.get(id=_id)
 	
+class BooleanField(models.Field):
+	def __init__(self):
+		# pass
+		super(BooleanField, self).__init__()
+	def db_type(self, connection):
+		return 'BOOLEAN()'
+		

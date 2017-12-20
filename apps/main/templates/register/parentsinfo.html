@@ -4,6 +4,9 @@
 	<title>HST | Registration</title>
 	{% load staticfiles %}
 	<script src="{% static 'main/js/jquery.js' %}" charset="utf-8"></script>
+	<link rel="stylesheet" type="text/css" href="{% static 'main/css/style.css' %}">
+	<script src="{% static 'main/js/script.js' %}" charset="utf-8"></script>
+	<link rel="icon" type="image/png" href="{% static 'main/images/favicon.ico/favicon.ico' %}">
 	<style type="text/css">
 		.parent {
 			display: inline-block;
@@ -22,6 +25,9 @@
 		.skipped {
 			color: gray;
 		}
+		.skipped .error {
+			color: pink;
+		}
 	</style>
 	<script type="text/javascript">
 
@@ -34,19 +40,19 @@
 			this.save = function() {
 				for (var i = 0; i < fields.length; i++) {
 					var field = fields[i]
-					this[field] = $('#'+name+'_'+field)[0].value
+					this[field] = $$('#'+name+'_'+field).value
 				}
 			}
 			this.call = function() {
 				for (var i = 0; i < fields.length; i++) {
 					var field = fields[i]
-					$('#'+name+'_'+field)[0].value = this[field]
+					$$('#'+name+'_'+field).value = this[field]
 				}
 			}
 			this.clear = function() {
 				for (var i = 0; i < fields.length; i++) {
 					var field = fields[i]
-					$('#'+name+'_'+field)[0].value = ''
+					$$('#'+name+'_'+field).value = ''
 				}
 			}
 			this.skip = function() {
@@ -54,30 +60,29 @@
 				this.clear()
 				for (var i = 0; i < fields.length; i++) {
 					var field = fields[i]
-					$('#'+name+'_'+field)[0].disabled = true
+					$$('#'+name+'_'+field).disabled = true
 				}
 				$('#'+name).addClass('skipped')
-				$('#skip_'+name)[0].innerText = 'Unskip'
-				$('#'+name+'_skipped')[0].value = 'true'
+				$$('#skip_'+name).innerText = 'Unskip'
+				$$('#'+name+'_skipped').value = 'true'
 				this.skipped = true
 			}
 			this.unskip = function() {
 				for (var i = 0; i < fields.length; i++) {
 					var field = fields[i]
-					$('#'+name+'_'+field)[0].disabled = false
+					$$('#'+name+'_'+field).disabled = false
 				}
 				this.call()
 				$('#'+name).removeClass('skipped')
-				$('#skip_mom')[0].innerText = 'Skip'
-				$('#'+name+'_skipped')[0].value = 'false'
+				$$('#skip_'+name).innerText = 'Skip'
+				$$('#'+name+'_skipped').value = 'false'
 				this.skipped = false	
 			}
 			this.button = function() {
 				if (this.skipped) {
 					this.unskip()
 				} else {
-					if ($('#'+spouse+'_skipped')[0].value == 'true') {
-
+					if ($$('#'+spouse+'_skipped').value == 'true') {
 						$('#skip_'+spouse).click()
 					}
 					this.skip()
@@ -105,7 +110,7 @@
 <body>
 	<h1>New Family Registration</h1>
 	<h2>Step 2: Parents Information</h2>
-	<span class="instructions">Please enter the first name of at least one parent.  Skip any fields that are the same as the Family Information.  (Note: Gray placeholder texts are default values.  Simply type over them and they will disappear.)</span>
+	<span class="instructions">Please enter the information for at least one parent.  <b>Bold</b> fields are required.  Skip any fields that are the same as the Family Information.  (Note: Gray placeholder texts are default values.  Simply type over them and they will disappear.)  </span>
 	<center>
 		<form method="post">{% csrf_token %}
 			<div class="parent" id="mom">
@@ -124,6 +129,7 @@
 							id="mom_first"
 							value="{{p.mom.mom_first}}">
 						</td>
+						<td class="error">{{e.mom.first}}</td>
 					</tr>
 					<tr>
 						<td>Last Name:</td>
@@ -134,16 +140,17 @@
 							placeholder="{{last}}"
 							value="{{p.mom.mom_last}}">
 						</td>
+						<td class="error">{{e.mom.last}}</td>
 					</tr>
 					<tr>
-						<td>Alternate Phone:</td>
+						<td>Cell Phone:</td>
 						<td><input 
 							type="text" 
 							name="mom_alt_phone" 
 							id="mom_alt_phone" 
-							placeholder="{{phone}}"
 							value="{{p.mom.mom_alt_phone}}">
 						</td>
+						<td class="error">{{e.mom.alt_phone}}</td>
 					</tr>
 					<tr>
 						<td>Alternate Email:</td>
@@ -154,6 +161,7 @@
 							placeholder="{{email}}"
 							value="{{p.mom.mom_alt_email}}">
 						</td>
+						<td class="error">{{e.mom.alt_email}}</td>
 					</tr>
 				</table>
 				<div class="skip_button" id="skip_mom">Skip</div>
@@ -174,6 +182,7 @@
 							id="dad_first"
 							value="{{p.dad.dad_first}}">
 						</td>
+						<td class="error">{{e.dad.first}}</td>
 					</tr>
 					<tr>
 						<td>Last Name:</td>
@@ -184,16 +193,17 @@
 							placeholder="{{last}}"
 							value="{{p.dad.dad_last}}">
 						</td>
+						<td class="error">{{e.dad.last}}</td>
 					</tr>
 					<tr>
-						<td>Alternate Phone:</td>
+						<td>Cell Phone:</td>
 						<td><input 
 							type="text" 
 							name="dad_alt_phone" 
 							id="dad_alt_phone" 
-							placeholder="{{phone}}"
 							value="{{p.dad.dad_alt_phone}}">
 						</td>
+						<td class="error">{{e.dad.alt_phone}}</td>
 					</tr>
 					<tr>
 						<td>Alternate Email:</td>
@@ -204,11 +214,12 @@
 							placeholder="{{email}}"
 							value="{{p.dad.dad_alt_email}}">
 						</td>
+						<td class="error">{{e.dad.alt_email}}</td>
 					</tr>
 				</table>
 				<div class="skip_button" id="skip_dad">Skip</div>
 			</div>
-			<button type="submit">Next >></button>
+			<br><button type="submit">Next >></button>
 		</form>
 	</center>
 </body>
