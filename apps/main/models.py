@@ -153,48 +153,18 @@ class Family(models.Model):
 
 
 class Student(models.Model):
-	def id_(self):
-		return self.id
-	first = models.CharField(max_length=20)
-	def first_(self):
-		return self.first
-	middle = models.CharField(max_length=20, null=True)
-	def middle_(self):
-		return self.middle
-	last = models.CharField(max_length=30, null=True)
-	def last_(self):
-		return self.last if self.last else self.family_().last_()
-	prefer = models.CharField(max_length=20, null=True)
-	def prefer_(self):
-		return self.prefer if self.prefer else self.first
-	family = models.ForeignKey(Family)
-	def family_(self):
-		return self.family
-	sex = models.CharField(max_length=1, choices=[('M','Male'),('F','Female')])
-	def sex_(self):
-		return self.sex
-	current = custom.BooleanField()
-	def current_(self):
-		return self.current
-	birthday = models.DateField()
-	def birthday_(self):
-		return self.birthday
+	first     = models.CharField(max_length=20)
+	middle    = models.CharField(max_length=20, null=True)
+	last      = models.CharField(max_length=30, null=True)
+	prefer    = models.CharField(max_length=20, null=True)
+	family    = models.ForeignKey(Family, related_name='children')
+	sex       = models.CharField(max_length=1, choices=[('M','Male'),('F','Female')])
+	current   = custom.BooleanField()
+	birthday  = models.DateField()
 	grad_year = models.DecimalField(max_digits=4, decimal_places=0, null=True)
-	def grad_year_(self):
-		return self.grad_year
-	def grade_(self, *year):
-		if not year:
-			now = datetime.now()
-			year = now.year + (0 if now.month < 4 else 1)
-		grade = year - self.grad_year + 12
-		return grade if grade <= 12 else 'A'
-	height = models.FloatField(null=True)
-	def height_(self):
-		return self.height
-	alt_phone  = custom.PhoneNumberField(null=True)
-	def phone_(self):
-		return self.alt_phone if self.alt_phone else self.family_().phone_()
-	alt_email  = models.EmailField(null=True)
+	height    = models.FloatField(null=True)
+	alt_phone = custom.PhoneNumberField(null=True)
+	alt_email = models.EmailField(null=True)
 	t_shirt_sizes = [
 		('YS','Youth Small'),
 		('YM','Youth Medium'),
@@ -207,28 +177,44 @@ class Student(models.Model):
 		('2X','Adult 2XL'),
 		('3X','Adult 3XL'),
 	]
-	tshirt = models.CharField(max_length=2, choices=t_shirt_sizes, null=True)
-	def tshirt_(self):
-		return self.tshirt
+	tshirt     = models.CharField(max_length=2, choices=t_shirt_sizes, null=True)
 	created_at = models.DateTimeField(auto_now_add=True)
-	def created_at_(self):
-		return self.created_at
 	updated_at = models.DateTimeField(auto_now=True)
-	def updated_at_(self):
-		return self.updated_at
 	objects = Students
 	def __str__(self):
-		return self.prefer_()+' '+self.last_()
+		return self.prefer+' '+self.last
+	def __getattribute__(self, field):
+		if field == '':
+			pass
+		elif field == 'prefer':
+			if super(Student, self).__getattribute__('prefer'):
+				return super(Student, self).__getattribute__('prefer') 
+			else: 
+				return super(Student, self).__getattribute__('first')
+		elif field == 'last':
+			if super(Student, self).__getattribute__('last'):
+				return super(Student, self).__getattribute__('last') 
+			else: 
+				return super(Student, self).__getattribute__('family').last
+		elif field == 'phone':
+			return custom.PhoneNumber(self.alt_phone if self.alt_phone else self.family.phone)
+		elif field == 'grade':
+			now = datetime.now()
+			# Switch to the following year on May 1
+			year = now.year + (0 if now.month < 5 else 1)
+			grade = year - self.grad_year + 12
+			return grade
+		elif field == 'family':
+			family_id = super(Student, self).__getattribute__('family_id')
+			return Families.get(id=family_id)
+		else:
+			return super(Student, self).__getattribute__(field)
+	def __getattr__(self, field):
+		return None
 
 class User(models.Model):
 	username = models.CharField(max_length=30, unique=True)
 	password = custom.BcryptField()
-	# def password_(self, *guess):
-	# 	bcrypt = custom.Bcrypt(self.password)
-	# 	if not guess:
-	# 		return bcrypt
-	# 	else:
-	# 		return bcrypt(guess)
 	# TODO: Change this to manual polymorphism.  I don't trust this.
 	owner = custom.PolymorphicField('owner', UserManager, [Family,Student])
 	created_at = models.DateTimeField(auto_now_add=True)

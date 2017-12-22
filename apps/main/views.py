@@ -310,9 +310,9 @@ def reg_studentsinfo(request):
 
 def reg_studentsinfo_get(request):
 	me = getme(request)
-	# Every year on April 1, registration switches to the following year.
+	# Every year on May 1, registration switches to the following year.
 	now = datetime.now()
-	next_year = 0 if now.month < 4 else 1
+	next_year = 0 if now.month < 5 else 1
 	reg_year = now.year + next_year
 	grades = []
 	for x in range(1,13):
@@ -329,7 +329,6 @@ def reg_studentsinfo_get(request):
 def reg_studentsinfo_post(request):
 	me = getme(request)
 	students = JSON.loads(request.POST['students'])
-	# print students
 	for student in students:
 		if student.pop('exists'):
 			if student.pop('isNew'):

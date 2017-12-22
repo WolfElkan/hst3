@@ -97,9 +97,9 @@ class PolymorphicField(poly.MultiColumnField):
 		return model.objects.get(id=_id)
 	
 class BooleanField(models.Field):
-	def __init__(self):
+	def __init__(self, **kwargs):
 		# pass
-		super(BooleanField, self).__init__()
+		super(BooleanField, self).__init__(**kwargs)
 	def db_type(self, connection):
 		return 'BOOLEAN()'
 		

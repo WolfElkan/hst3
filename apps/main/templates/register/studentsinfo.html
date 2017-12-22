@@ -84,6 +84,7 @@
 				this.birthday.js = new Date(this.birthday.year, this.birthday.month-1, this.birthday.date)
 				this.birthday.db = `${zeropad(this.birthday.year,4)}-${zeropad(this.birthday.month,2)}-${zeropad(this.birthday.date,2)}`
 			}
+			this.grade = this.grad_year ? reg_year - this.grad_year + 12 : ''
 			this.hst_age = reg_year - this.birthday.year - 1
 			this.cur_age = function() {
 				var now = new Date()
@@ -130,7 +131,7 @@
 				$$('#birthday').value = this.birthday.db
 			}
 			this.tr = function(index) {
-				return `<tr id="s${index}"><td>${this.prefer ? this.prefer : this.first} ${this.last ? this.last : family_last}</td><td>${this.birthday ? this.hst_age : ''}${this.hst_age == this.cur_age() ? '' : '*'}</td><td>${this.sex}</td><td>${this.grad_year ? reg_year - this.grad_year + 12 : ''}</td><td>${this.height_tr}</td><td>${this.tshirt}</td><td>${this.alt_phone ? phone_format(this.alt_phone) : ''}</td><td>${this.alt_email ? this.alt_email : ''}</td><td><button class="edit">Edit</button><button class="delete">Delete</button></td></tr>`
+				return `<tr id="s${index}"><td>${this.prefer ? this.prefer : this.first} ${this.last ? this.last : family_last}</td><td>${this.birthday ? this.hst_age : ''}${this.hst_age == this.cur_age() ? '' : '*'}</td><td>${this.sex}</td><td>${this.grade}</td><td>${this.height_tr}</td><td>${this.tshirt}</td><td>${this.alt_phone ? phone_format(this.alt_phone) : ''}</td><td>${this.alt_email ? this.alt_email : ''}</td><td><button class="edit">Edit</button><button class="delete">Delete</button></td></tr>`
 			}
 			this.json = function() {
 				var columns = ['first','middle','last','prefer','sex','grad_year','height','alt_phone','alt_email','tshirt','exists','isNew']

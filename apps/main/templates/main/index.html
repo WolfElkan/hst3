@@ -12,8 +12,10 @@
 		<h1>HST Homepage</h1>
 		{% if name %}
 		<p>Hello {{name}}!</p>
-		{% endif %}
-		<a href="/register">First-Time Registration</a><br>
+		<a href="/logout">Log Out</a>
+		{% else %}
 		<a href="/login">Returning User Login</a>
+		{% endif %}<br>
+		<a href="/register">First-Time Registration</a><br>
 	</body>
 </html>
