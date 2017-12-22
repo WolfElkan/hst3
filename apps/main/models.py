@@ -60,6 +60,7 @@ class UserManager(sm.SuperManager):
 			sm.Unique(self,'username','This username is taken. Please select another.'),
 			sm.Present('password','Please enter a password'),
 			sm.Regular('password', r'^$|^.{8,}$','Password is too short. It should be at least 8 characters.'),
+			sm.Regular('password', r'^$|^[^$].*$','Password may not begin with a dollar sign ($).'),
 			sm.Present('pw_confm','Please confirm your password'),
 			sm.Confirmation('pw_confm','password','Passwords do not match.')
 		]
@@ -220,28 +221,23 @@ class Student(models.Model):
 		return self.prefer_()+' '+self.last_()
 
 class User(models.Model):
-	def id_(self):
-		return self.id
 	username = models.CharField(max_length=30, unique=True)
-	def username_(self):
-		return self.username
 	password = custom.BcryptField()
-	def password_(self, *guess):
-		bcrypt = custom.Bcrypt(self.password)
-		if not guess:
-			return bcrypt
-		else:
-			return bcrypt(guess)
+	# def password_(self, *guess):
+	# 	bcrypt = custom.Bcrypt(self.password)
+	# 	if not guess:
+	# 		return bcrypt
+	# 	else:
+	# 		return bcrypt(guess)
 	# TODO: Change this to manual polymorphism.  I don't trust this.
 	owner = custom.PolymorphicField('owner', UserManager, [Family,Student])
-	def owner_(self):
-		return self.owner
 	created_at = models.DateTimeField(auto_now_add=True)
-	def created_at_(self):
-		return self.created_at
 	updated_at = models.DateTimeField(auto_now=True)
-	def updated_at_(self):
-		return self.updated_at
 	objects = Users
 	def __str__(self):
 		return self.username
+	def __getattribute__(self, field):
+		if field == 'pw':
+			return custom.Bcrypt(super(User, self).__getattribute__('password'))
+		else:
+			return super(User, self).__getattribute__(field)

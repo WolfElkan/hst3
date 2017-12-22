@@ -7,6 +7,7 @@ from . import gistfile1 as poly
 
 class Bcrypt(object):
 	def __init__(self, char60):
+		self.char60 = char60
 		self.full = char60 if char60[0] == '$' else char60[1:]
 		self.html = '<span title='+self.full+'>&#x1f512;</span>'
 	def __call__(self, pw):
@@ -24,6 +25,8 @@ class BcryptField(models.Field):
 			return 'CHAR(60)' # TODO: Figure out equivalent field in other db softwares
 	def pre_save(self, model_instance, add):
 		plaintext = getattr(model_instance, self.attname)
+		if type(plaintext) == Bcrypt:
+			plaintext = plaintext.char60
 		hashed = bcrypt.hashpw(plaintext.encode(), bcrypt.gensalt())
 		if len(hashed) == 59:
 			hashed = '+' + hashed

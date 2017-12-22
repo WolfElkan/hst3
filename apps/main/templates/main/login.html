@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>HST | Login</title>
+	{% load staticfiles %}
+	<script src="{% static 'main/js/script.js' %}" charset="utf-8"></script>
+	<link rel="stylesheet" type="text/css" href="{% static 'main/css/style.css' %}">
+	<link rel="icon" type="image/png" href="{% static 'main/images/favicon.ico/favicon.ico' %}">
+</head>
+<body id="login">
+	<center>
+		Returning user login:
+		<form method="post">{% csrf_token %}
+			<table>
+				<tr>
+					<td>Username:</td>
+					<td><input type="text" name="username" value="{{p.login.username}}"></td>
+					<td class="error">{{e.login.username}}</td>
+				</tr>
+				<tr>
+					<td>Password:</td>
+					<td><input type="password" name="password" value="{{p.login.password}}"></td>
+					<td class="error">{{e.login.password}}</td>
+				</tr>
+			</table>
+			<button>Submit</button>
+		</form>
+	</center>
+</body>
+</html>

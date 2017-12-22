@@ -21,6 +21,7 @@ def seshinit(request, sesh, val=''):
 	if sesh not in request.session:
 		request.session[sesh] = val
 
+# Initialize form error/persist structure in session
 def forminit(request, form_name, fields):
 	for pe in 'pe':
 		seshinit(request, pe, {})
@@ -30,12 +31,58 @@ def forminit(request, form_name, fields):
 				if f not in request.session[pe][form_name]:
 					request.session[pe][form_name][f] = ''
 
+# Select the first element in a query, without causing errors
+def first(arr):
+	if len(arr) == 0:
+		return None
+	else:
+		return arr[0]
+
+# Find User object for current logged-in user, without causing errors.
+# me is always a User, never a Family, Student, or Faculty
+def getme(request):
+	if 'meid' not in request.session:
+		return None
+	else:
+		return first(Users.filter(id=request.session['meid']))
+
+# def setpath(obj,keypath,value):
+#   if type(keypath) in [list,tuple] and len(keypath) > 1:
+#       if '__getitem__' in dir(obj):
+#           setpath(obj.__getitem__(keypath[0]),keypath[1:],value)
+#       else:
+#           setpath(obj.__getattribute__(keypath[0]),keypath[1:],value)
+#   else:
+#       obj.__setitem__(keypath[0], value)
+#   return obj
+
+# Does my having written this function belie a fundamental misunderstanding of Python?
+def add(obj,tree):
+	methods = dir(obj)
+	for branch in tree:
+		if type(tree[branch]) is not dict:
+			if '__setitem__' in methods:
+				obj.__setitem__(branch, tree[branch])
+			elif '__setattr__' in methods:
+				obj.__setattr__(branch, tree[branch])
+		else:
+			if '__getitem__' in methods:
+				level = obj.__getitem__(branch)
+			if '__getattr__' in methods:
+				level = obj.__getattr__(branch)
+			else:
+				level = obj.__getattribute__(branch)
+			add(level, tree[branch])
+	return obj
+
+# Convert a list to a dict object, so it can be parsed correctly on front end
 def numero(obj):
 	result = {}
 	for x in range(len(obj)):
 		result['no'+str(x)] = obj[x]
 	return result
 
+# Just like numero, but meta
 def metanumero(obj):
 	result = []
 	for x in obj:
@@ -57,14 +104,15 @@ def json(obj):
 # - - - - - DEVELOPER VIEWS - - - - -
 
 def hot(request):
+	me = getme(request)
 	seshinit(request,'command')
 	context = {
-		# Models
 		'command': request.session['command']
 	}
 	return render(request, 'main/hot.html', context)
 
 def run(request):
+	me = getme(request)
 	command = request.POST['command']
 	request.session['command'] = command
 	exec(command)
@@ -92,15 +140,49 @@ def authorized(request):
 # - - - - - APPLICATION VIEWS - - - - -
 
 def index(request):
-	context = {}
+	me = getme(request)
+	context = {
+		'name':me.owner if me else None
+	}
 	return render(request, 'main/index.html', context)
+
+def login(request):
+	forminit(request,'login',['username','password'])
+	if request.method == 'GET':
+		return login_get(request)
+	elif request.method == 'POST':
+		return login_post(request)
+	else:
+		print "Unrecognized HTTP Verb"
+		return index(request)
+
+def login_get(request):
+	context = copy(request.session, ['p','e'])
+	return render(request, 'main/login.html', context)
+
+def login_post(request):
+	me = first(Users.filter(username=request.POST['username']))
+	persist = copy(request.POST, ['username','password'])
+	if not me:
+		request.session['e'] = {'login':{'username': "You do not have an account.  Please register."}}
+		request.session['p'] = {'login':persist}
+		return redirect('/login')
+	elif not me.pw(request.POST['password']):
+		request.session['e'] = {'login':{'password': "Your password is incorrect"}}
+		request.session['p'] = {'login':persist}
+		return redirect('/login')
+	else:
+		request.session['meid'] = me.id
+		return redirect('/')
+
+def logout(request):
+	request.session.clear()
+	return redirect ('/')
 
 #   - - - - NEW FAMILY REGISTRATION - - - -
 
-def admin(request):
-	return redirect('/')
-
 def reg(request):
+	me = getme(request)
 	# TODO: Detect if family has partially registered, redirect to appropriate step.
 	return redirect('/register/familyinfo')
 
@@ -128,6 +210,7 @@ def reg_familyinfo_post(request):
 		new_user.pop('pw_confm')
 		new_family = Families.create(new_family)
 		new_user['owner'] = new_family
+		print new_user
 		me = Users.create(new_user)
 		request.session['meid'] = me.id
 		return redirect('/register/parentsinfo')
@@ -157,7 +240,7 @@ def reg_parentsinfo(request):
 		return index(request)
 
 def reg_parentsinfo_get(request):
-	me = Users.get(id=request.session['meid'])
+	me = getme(request)
 	context = {
 		'last'  : me.owner.last,
 		'phone' : me.owner.phone,
@@ -168,7 +251,7 @@ def reg_parentsinfo_get(request):
 	return render(request, 'register/parentsinfo.html', context)
 
 def reg_parentsinfo_post(request):
-	me = Users.get(id=request.session['meid'])
+	me = getme(request)
 	# Create new Parent objects
 	mom = copy(request.POST, ['mom_skipped','mom_first','mom_last','mom_alt_phone','mom_alt_email'])
 	dad = copy(request.POST, ['dad_skipped','dad_first','dad_last','dad_alt_phone','dad_alt_email'])
@@ -211,7 +294,7 @@ def reg_parentsinfo_post(request):
 			'mom':Parents.errors(mother),
 			'dad':Parents.errors(father),
 		}
-		return redirect('/register/parentsinfo')		
+		return redirect('/register/parentsinfo')        
 
 
 def reg_studentsinfo(request):
@@ -226,7 +309,7 @@ def reg_studentsinfo(request):
 		return index(request)
 
 def reg_studentsinfo_get(request):
-	me = Users.get(id=request.session['meid'])
+	me = getme(request)
 	# Every year on April 1, registration switches to the following year.
 	now = datetime.now()
 	next_year = 0 if now.month < 4 else 1
@@ -244,7 +327,7 @@ def reg_studentsinfo_get(request):
 	return render(request, 'register/studentsinfo.html', context)
 
 def reg_studentsinfo_post(request):
-	me = Users.get(id=request.session['meid'])
+	me = getme(request)
 	students = JSON.loads(request.POST['students'])
 	# print students
 	for student in students:
