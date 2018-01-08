@@ -1,3 +1,5 @@
+Make registration landing page redirect to appropriate step if family has partially registered.
+
 Student Interface
 	(eventually) Support loading existing students from database for editing, track by internal id's
 	Make titles of required fields bold automatically
@@ -6,7 +8,3 @@ Parent Interface
 	Make validations work
 	Actually save Parent ID's to database
 	Make titles of required fields bold automatically
-
-Login for Returning Families
-
-Support Attribute assignment for model instances using __getattribute__ and __setattr__ methods

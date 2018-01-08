@@ -37,13 +37,13 @@ Parents = ParentManager()
 class StudentManager(sm.SuperManager):
 	def __init__(self):
 		super(StudentManager, self).__init__('main_student')
-		self.fields = ['first','middle','alt_last','prefer','sex','birthday','grad_year','height','alt_phone','alt_email','tshirt']
+		self.fields = ['first','middle','alt_last','alt_first','sex','birthday','grad_year','height','alt_phone','alt_email','tshirt']
 		self.validations = [
 			sm.Present('first','Please enter a first name.'),
 			sm.Regular('first',r'^.{0,20}$','This name is too long.  The maximum is 20 characters.'),
 			sm.Regular('middle',r'^.{0,20}$','This name is too long.  The maximum is 20 characters.'),
 			sm.Regular('alt_last',r'^.{0,30}$','This name is too long.  The maximum is 30 characters.'),
-			sm.Regular('prefer',r'^.{0,20}$','This name is too long.  The maximum is 20 characters.'),
+			sm.Regular('alt_first',r'^.{0,20}$','This name is too long.  The maximum is 20 characters.'),
 			sm.Present('sex','Please select a sex.'),
 			sm.Present('birthday','Please enter a date of birth.'),
 			sm.Regular('alt_phone',r'^$|^[^\d]*(\d[^\d]*){10}$','Please enter a valid 10-digit phone number, or leave blank to use family phone.'),
@@ -154,9 +154,9 @@ class Family(models.Model):
 
 class Student(models.Model):
 	first     = models.CharField(max_length=20)
+	alt_first = models.CharField(max_length=20, null=True)
 	middle    = models.CharField(max_length=20, null=True)
 	alt_last  = models.CharField(max_length=30, null=True)
-	prefer    = models.CharField(max_length=20, null=True)
 	family    = models.ForeignKey(Family, related_name='children')
 	sex       = models.CharField(max_length=1, choices=[('M','Male'),('F','Female')])
 	current   = models.BooleanField()
@@ -187,8 +187,8 @@ class Student(models.Model):
 		if field == '':
 			pass
 		elif field == 'prefer':
-			if super(Student, self).__getattribute__('prefer'):
-				return super(Student, self).__getattribute__('prefer') 
+			if super(Student, self).__getattribute__('alt_first'):
+				return super(Student, self).__getattribute__('alt_first') 
 			else: 
 				return super(Student, self).__getattribute__('first')
 		elif field == 'last':
@@ -212,11 +212,20 @@ class Student(models.Model):
 	def __getattr__(self, field):
 		return None
 
+class Teacher(models.Model):
+	first      = models.CharField(max_length=20)
+	last       = models.CharField(max_length=30)
+	sex        = models.CharField(max_length=1, choices=[('M','Male'),('F','Female')])
+	phone      = custom.PhoneNumberField()
+	email      = models.EmailField()
+	address    = models.OneToOneField(Address, null=True, primary_key=False, rel=True)
+	created_at = models.DateTimeField(auto_now_add=True)
+	updated_at = models.DateTimeField(auto_now=True)		
+
 class User(models.Model):
-	username = models.CharField(max_length=30, unique=True)
-	password = custom.BcryptField()
-	# TODO: Change this to manual polymorphism.  I don't trust this.
-	owner = custom.PolymorphicField('owner', UserManager, [Family,Student,Parent])
+	username   = models.CharField(max_length=30, unique=True)
+	password   = custom.BcryptField()
+	owner      = custom.PolymorphicField('owner', UserManager, [Family,Student,Teacher,Parent])
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
 	objects = Users
