@@ -32,7 +32,7 @@
 	<script type="text/javascript">
 
 		function Parent(name,spouse) {
-			var fields = ['first','last','alt_phone','alt_email']
+			var fields = ['first','alt_last','alt_phone','alt_email']
 			this.skipped = false
 			for (var i = 0; i < fields.length; i++) {
 				this[fields[i]] = ''
@@ -135,12 +135,12 @@
 						<td>Last Name:</td>
 						<td><input 
 							type="text" 
-							name="mom_last" 
-							id="mom_last" 
+							name="mom_alt_last" 
+							id="mom_alt_last" 
 							placeholder="{{last}}"
-							value="{{p.mom.mom_last}}">
+							value="{{p.mom.mom_alt_last}}">
 						</td>
-						<td class="error">{{e.mom.last}}</td>
+						<td class="error">{{e.mom.alt_last}}</td>
 					</tr>
 					<tr>
 						<td>Cell Phone:</td>
@@ -178,7 +178,7 @@
 						<td><b>First Name:</b></td>
 						<td><input 
 							type="text" 
-							name="dad_first" i
+							name="dad_first"
 							id="dad_first"
 							value="{{p.dad.dad_first}}">
 						</td>
@@ -188,12 +188,12 @@
 						<td>Last Name:</td>
 						<td><input 
 							type="text" 
-							name="dad_last" 
-							id="dad_last" 
+							name="dad_alt_last" 
+							id="dad_alt_last" 
 							placeholder="{{last}}"
-							value="{{p.dad.dad_last}}">
+							value="{{p.dad.dad_alt_last}}">
 						</td>
-						<td class="error">{{e.dad.last}}</td>
+						<td class="error">{{e.dad.alt_last}}</td>
 					</tr>
 					<tr>
 						<td>Cell Phone:</td>

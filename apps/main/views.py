@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, HttpResponse
-from .models import User, Family, Student, Parent, Address
+from .models import Family, Address, Parent, User, Student
 from .custom_fields import Bcrypt, PhoneNumber
 from datetime import datetime
 from .utilities import copy, reprint
@@ -45,35 +45,6 @@ def getme(request):
 		return None
 	else:
 		return first(Users.filter(id=request.session['meid']))
-
-# def setpath(obj,keypath,value):
-#   if type(keypath) in [list,tuple] and len(keypath) > 1:
-#       if '__getitem__' in dir(obj):
-#           setpath(obj.__getitem__(keypath[0]),keypath[1:],value)
-#       else:
-#           setpath(obj.__getattribute__(keypath[0]),keypath[1:],value)
-#   else:
-#       obj.__setitem__(keypath[0], value)
-#   return obj
-
-# Does my having written this function belie a fundamental misunderstanding of Python?
-def add(obj,tree):
-	methods = dir(obj)
-	for branch in tree:
-		if type(tree[branch]) is not dict:
-			if '__setitem__' in methods:
-				obj.__setitem__(branch, tree[branch])
-			elif '__setattr__' in methods:
-				obj.__setattr__(branch, tree[branch])
-		else:
-			if '__getitem__' in methods:
-				level = obj.__getitem__(branch)
-			if '__getattr__' in methods:
-				level = obj.__getattr__(branch)
-			else:
-				level = obj.__getattribute__(branch)
-			add(level, tree[branch])
-	return obj
 
 # Convert a list to a dict object, so it can be parsed correctly on front end
 def numero(obj):
@@ -229,8 +200,8 @@ def reg_familyinfo_post(request):
 def reg_parentsinfo(request):
 	if not authorized(request):
 		return redirect('/')
-	forminit(request,'mom',['mom_skipped','mom_first','mom_last','mom_alt_phone','mom_alt_email'])
-	forminit(request,'dad',['dad_skipped','dad_first','dad_last','dad_alt_phone','dad_alt_email'])
+	forminit(request,'mom',['mom_skipped','mom_first','mom_alt_last','mom_alt_phone','mom_alt_email'])
+	forminit(request,'dad',['dad_skipped','dad_first','dad_alt_last','dad_alt_phone','dad_alt_email'])
 	if request.method == 'GET':
 		return reg_parentsinfo_get(request)
 	elif request.method == 'POST':
@@ -253,8 +224,8 @@ def reg_parentsinfo_get(request):
 def reg_parentsinfo_post(request):
 	me = getme(request)
 	# Create new Parent objects
-	mom = copy(request.POST, ['mom_skipped','mom_first','mom_last','mom_alt_phone','mom_alt_email'])
-	dad = copy(request.POST, ['dad_skipped','dad_first','dad_last','dad_alt_phone','dad_alt_email'])
+	mom = copy(request.POST, ['mom_skipped','mom_first','mom_alt_last','mom_alt_phone','mom_alt_email'])
+	dad = copy(request.POST, ['dad_skipped','dad_first','dad_alt_last','dad_alt_phone','dad_alt_email'])
 	mother = copy(mom,trunc=4)
 	father = copy(dad,trunc=4)
 	# Convert 'skipped' booleans from JavaScript strings, to Python bools.
@@ -337,6 +308,4 @@ def reg_studentsinfo_post(request):
 				Students.create(student)
 			else:
 				pass
-	return redirect('/register/studentsinfo')
-
-
+	return HttpResponse('You have reached the end of the demo.')

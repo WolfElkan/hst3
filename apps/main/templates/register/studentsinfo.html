@@ -35,7 +35,7 @@
 	</style>
 	<script type="text/javascript">
 
-		var fields = ['first','middle','last','prefer','sex','birthday','grad_year','tshirt','alt_phone','alt_email']
+		var fields = ['first','middle','alt_last','prefer','sex','birthday','grad_year','tshirt','alt_phone','alt_email']
 
 		var family_last = '{{family.last}}'
 		var reg_year = Number('{{reg_year}}')
@@ -131,10 +131,10 @@
 				$$('#birthday').value = this.birthday.db
 			}
 			this.tr = function(index) {
-				return `<tr id="s${index}"><td>${this.prefer ? this.prefer : this.first} ${this.last ? this.last : family_last}</td><td>${this.birthday ? this.hst_age : ''}${this.hst_age == this.cur_age() ? '' : '*'}</td><td>${this.sex}</td><td>${this.grade}</td><td>${this.height_tr}</td><td>${this.tshirt}</td><td>${this.alt_phone ? phone_format(this.alt_phone) : ''}</td><td>${this.alt_email ? this.alt_email : ''}</td><td><button class="edit">Edit</button><button class="delete">Delete</button></td></tr>`
+				return `<tr id="s${index}"><td>${this.prefer ? this.prefer : this.first} ${this.alt_last ? this.alt_last : family_last}</td><td>${this.birthday ? this.hst_age : ''}${this.hst_age == this.cur_age() ? '' : '*'}</td><td>${this.sex}</td><td>${this.grade}</td><td>${this.height_tr}</td><td>${this.tshirt}</td><td>${this.alt_phone ? phone_format(this.alt_phone) : ''}</td><td>${this.alt_email ? this.alt_email : ''}</td><td><button class="edit">Edit</button><button class="delete">Delete</button></td></tr>`
 			}
 			this.json = function() {
-				var columns = ['first','middle','last','prefer','sex','grad_year','height','alt_phone','alt_email','tshirt','exists','isNew']
+				var columns = ['first','middle','alt_last','prefer','sex','grad_year','height','alt_phone','alt_email','tshirt','exists','isNew']
 				json_obj = {}
 				for (var i = 0; i < columns.length; i++) {
 					var col = columns[i]
@@ -313,8 +313,8 @@
 					<td class="error" id="middle_error"></td>
 				</tr>
 				<tr><td>Last Name:</td>
-					<td><input type="text" name="last" id="last" placeholder="{{family.last}}"></td>
-					<td class="error" id="last_error"></td>
+					<td><input type="text" name="alt_last" id="alt_last" placeholder="{{family.last}}"></td>
+					<td class="error" id="alt_last_error"></td>
 				</tr>
 				<tr><td>Preferred Name:</td>
 					<td><input type="text" name="prefer" id="prefer"></td>
