@@ -1,7 +1,8 @@
 from __future__ import unicode_literals
 from django.db import models
-from . import custom_fields as custom
-from . import supermodel as sm
+from Utils import custom_fields as custom
+from Utils import supermodel as sm
+from django_mysql import models as sqlmod
 from datetime import datetime
 
 
@@ -10,7 +11,7 @@ from datetime import datetime
 class FamilyManager(sm.SuperManager):
 	def __init__(self):
 		super(FamilyManager, self).__init__('main_family')
-		self.fields = ['last','phone','email','joined_hst']
+		self.fields = ['last','phone','email','phone_type']
 		self.validations = [
 			sm.Present('last' ,'Please enter the family surname, as used by the children.'),
 			sm.Regular('last' ,r'^.{,30}$','This name is too long.  The maximum is 30 characters.'),
@@ -24,9 +25,9 @@ Families = FamilyManager()
 class ParentManager(sm.SuperManager):
 	def __init__(self):
 		super(ParentManager, self).__init__('main_parent')
-		self.fields = ['first','alt_last','sex','alt_phone','alt_email']
+		self.fields = ['first','alt_last','sex','alt_phone','alt_email','phone_type']
 		self.validations = [
-			sm.Present('first','Please enter the first name for at least one parent'),
+			sm.Present('first','Please enter a first name or skip this parent'),
 			sm.Regular('first',r'^.{,20}$','This name is too long.  The maximum is 20 characters.'),
 			sm.Regular('alt_last',r'^.{,30}$','This name is too long.  The maximum is 30 characters.'),
 			sm.Regular('alt_phone',r'^$|^[ -.()/\\~]*(\d[ -.()/\\~]*){10}$','Please enter a valid 10-digit phone number.'),
@@ -85,45 +86,43 @@ class Parent(models.Model):
 	alt_last   = models.CharField(null=True, max_length=30)
 	sex        = models.CharField(max_length=1, choices=[('M','Male'),('F','Female')])
 	alt_phone  = custom.PhoneNumberField(null=True)
+	phone_type = sqlmod.EnumField(null=True, choices=['Home','Cell','Work'])
 	alt_email  = models.EmailField(null=True)
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
 	objects = Parents
-	def id_(self):
-		return self.id
-	def first_(self):
-		return self.first
-	def family_(self):
-		# print 'hello'
-		# print FamilyManager()
-		return Families.get(id=self.family_id)
-	def last_(self):
-		return self.last if self.last else self.family_().last
-	def sex_(self):
-		return self.sex
-	def phone_(self):
-		return custom.PhoneNumber(self.phone if self.phone else self.family_().phone_())
-	def email_(self):
-		return self.email if self.email else self.family_().email_()
-	def created_at_(self):
-		return self.created_at
-	def updated_at_(self):
-		return self.updated_at
+	def __getattribute__(self, field):
+		if field == '':
+			pass
+		elif field == 'last':
+			if super(Parent, self).__getattribute__('alt_last'):
+				return super(Parent, self).__getattribute__('alt_last') 
+			else: 
+				return super(Parent, self).__getattribute__('family').last
+		elif field == 'phone':
+			return custom.PhoneNumber(self.alt_phone if self.alt_phone else self.family.phone)
+		elif field == 'email':
+			return self.alt_email if self.alt_email else self.family.email
+		elif field == 'family':
+			family_id = super(Parent, self).__getattribute__('family_id')
+			return Families.get(id=family_id)
+		else:
+			return super(Parent, self).__getattribute__(field)
 	def __str__(self):
 		if self.sex == 'M':
 			prefix = 'Mr. '
 		elif self.sex == 'F':
 			prefix = 'Mrs. '
-		return prefix+self.first+' '+self.last_()
+		return prefix+self.first+' '+self.last
 
 class Family(models.Model):
 	last       = models.CharField(max_length=30)
 	phone      = custom.PhoneNumberField()
+	phone_type = sqlmod.EnumField(null=True, choices=['Home','Cell','Work'])
 	email      = models.EmailField()
 	mother_id  = models.PositiveIntegerField(null=True)
 	father_id  = models.PositiveIntegerField(null=True)
 	reg_status = models.PositiveSmallIntegerField(default=0)
-	joined_hst = models.DecimalField(max_digits=4, decimal_places=0)
 	address    = models.OneToOneField(Address, null=True, primary_key=False, rel=True)
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
@@ -195,9 +194,11 @@ class Student(models.Model):
 			if super(Student, self).__getattribute__('alt_last'):
 				return super(Student, self).__getattribute__('alt_last') 
 			else: 
-				return super(Student, self).__getattribute__('family').last
+				return self.family.last
 		elif field == 'phone':
 			return custom.PhoneNumber(self.alt_phone if self.alt_phone else self.family.phone)
+		elif field == 'email':
+			return self.alt_email if self.alt_email else self.family.email
 		elif field == 'grade':
 			now = datetime.now()
 			# Switch to the following year on May 1
@@ -207,6 +208,8 @@ class Student(models.Model):
 		elif field == 'family':
 			family_id = super(Student, self).__getattribute__('family_id')
 			return Families.get(id=family_id)
+		elif field == 'full_name':
+			return ' '.join([self.first,self.middle,self.last] if self.middle else [self.first,self.last])
 		else:
 			return super(Student, self).__getattribute__(field)
 	def __getattr__(self, field):
@@ -226,6 +229,16 @@ class User(models.Model):
 	username   = models.CharField(max_length=30, unique=True)
 	password   = custom.BcryptField()
 	owner      = custom.PolymorphicField('owner', UserManager, [Family,Student,Teacher,Parent])
+	perm_levels = [
+		(0,'Public') ,
+		(1,'Student'),
+		(2,'Parent') ,
+		(3,'Captain'),
+		(4,'Teacher'),
+		(5,'Founder'),
+		(6,'Admin')
+	]
+	permission = models.PositiveSmallIntegerField(default=0, choices=perm_levels)
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
 	objects = Users

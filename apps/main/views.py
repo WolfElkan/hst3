@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect, HttpResponse
 from .models import Family, Address, Parent, User, Student
-from .custom_fields import Bcrypt, PhoneNumber
+from Utils.custom_fields import Bcrypt, PhoneNumber
 from datetime import datetime
-from .utilities import copy, reprint
+from Utils.hacks import copy
 import json as JSON
 from io import StringIO
 
@@ -173,15 +173,14 @@ def reg_familyinfo_get(request):
 	return render(request, 'register/familyinfo.html', context)
 
 def reg_familyinfo_post(request):
-	new_family = copy(request.POST,['last','phone','email'])
+	new_family = copy(request.POST,['last','phone','phone_type','email'])
 	new_user = copy(request.POST,['username','password','pw_confm'])
-	new_family['joined_hst'] = datetime.now().year
 	new_family['reg_status'] = 1
+	new_user['permission'] = 2
 	if Families.isValid(new_family) and Users.isValid(new_user):
 		new_user.pop('pw_confm')
 		new_family = Families.create(new_family)
 		new_user['owner'] = new_family
-		print new_user
 		me = Users.create(new_user)
 		request.session['meid'] = me.id
 		return redirect('/register/parentsinfo')
@@ -224,8 +223,22 @@ def reg_parentsinfo_get(request):
 def reg_parentsinfo_post(request):
 	me = getme(request)
 	# Create new Parent objects
-	mom = copy(request.POST, ['mom_skipped','mom_first','mom_alt_last','mom_alt_phone','mom_alt_email'])
-	dad = copy(request.POST, ['dad_skipped','dad_first','dad_alt_last','dad_alt_phone','dad_alt_email'])
+	mom = copy(request.POST, [
+		'mom_skipped',
+		'mom_first',
+		'mom_alt_last',
+		'mom_alt_phone',
+		'mom_phone_type',
+		'mom_alt_email'
+	])
+	dad = copy(request.POST, [
+		'dad_skipped',
+		'dad_first',
+		'dad_alt_last',
+		'dad_alt_phone',
+		'dad_phone_type',
+		'dad_alt_email'
+	])
 	mother = copy(mom,trunc=4)
 	father = copy(dad,trunc=4)
 	# Convert 'skipped' booleans from JavaScript strings, to Python bools.

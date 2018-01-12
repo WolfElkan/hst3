@@ -3,9 +3,18 @@
 	<head>
 		<title>HST | Registration</title>
 		{% load staticfiles %}
+		<script src="{% static 'main/js/jquery.js' %}" charset="utf-8"></script>
 		<script src="{% static 'main/js/script.js' %}" charset="utf-8"></script>
 		<link rel="stylesheet" type="text/css" href="{% static 'main/css/style.css' %}">
 		<link rel="icon" type="image/png" href="{% static 'main/images/favicon.ico/favicon.ico' %}">
+		<script type="text/javascript">
+			var p_family_phone_type = "{{p.family.phone_type}}"
+			$(document).ready(function() {
+				if (p_family_phone_type) {
+					set('#phone_type',p_family_phone_type)
+				}
+			})
+		</script>
 	</head>
 	<body id="register_familyinfo">
 			<h1>New Family Registration</h1>
@@ -22,7 +31,14 @@
 					<tr>
 						<td>Main Phone Number:</td>
 						<td><input type="text" name="phone" value="{{p.family.phone}}"></td>
-						<td class="error">{{e.family.phone}}</td>
+						<td>
+							<select name="phone_type" id="phone_type">
+								<option value="Home">Home</option>
+								<option value="Cell">Cell</option>
+								<option value="Work">Work</option>
+							</select>
+						<span class="error">{{e.family.phone}}{{e.family.phone_type}}</td></span>
+						</td>
 					</tr>
 					<tr>
 						<td>Main Family Email:</td>

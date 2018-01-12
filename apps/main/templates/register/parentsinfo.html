@@ -143,14 +143,23 @@
 						<td class="error">{{e.mom.alt_last}}</td>
 					</tr>
 					<tr>
-						<td>Cell Phone:</td>
+						<td>Alternate Phone:</td>
 						<td><input 
 							type="text" 
 							name="mom_alt_phone" 
 							id="mom_alt_phone" 
 							value="{{p.mom.mom_alt_phone}}">
 						</td>
-						<td class="error">{{e.mom.alt_phone}}</td>
+						<td>
+							<select name="mom_phone_type" id="phone_type">
+								<option value="Cell">Cell</option>
+								<option value="Home">Home</option>
+								<option value="Work">Work</option>
+							</select>
+						<span class="error">{{e.mom.alt_phone}}{{e.mom.phone_type}}</td></span>
+						</td>
+					</tr>
+
 					</tr>
 					<tr>
 						<td>Alternate Email:</td>
@@ -196,14 +205,23 @@
 						<td class="error">{{e.dad.alt_last}}</td>
 					</tr>
 					<tr>
-						<td>Cell Phone:</td>
+						<td>Alternate Phone:</td>
 						<td><input 
 							type="text" 
 							name="dad_alt_phone" 
 							id="dad_alt_phone" 
 							value="{{p.dad.dad_alt_phone}}">
 						</td>
-						<td class="error">{{e.dad.alt_phone}}</td>
+						<td>
+							<select name="dad_phone_type" id="phone_type">
+								<option value="Cell">Cell</option>
+								<option value="Home">Home</option>
+								<option value="Work">Work</option>
+							</select>
+						<span class="error">{{e.dad.alt_phone}}{{e.dad.phone_type}}</td></span>
+						</td>
+					</tr>
+
 					</tr>
 					<tr>
 						<td>Alternate Email:</td>
