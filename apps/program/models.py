@@ -4,7 +4,7 @@ from Utils import custom_fields as custom
 from Utils import supermodel as sm
 from django_mysql import models as sqlmod
 
-# from apps.main import models as main
+from apps.main import models as main
 
 # - - - - - M A N A G E R S - - - - - 
 
@@ -12,7 +12,7 @@ from django_mysql import models as sqlmod
 
 class Venue(models.Model):
 	name    = models.CharField(max_length=30)
-	# address = models.ForeignKey(main.Address)
+	address = models.ForeignKey(main.Address)
 
 class CourseTrad(models.Model):
 	# General:
@@ -43,7 +43,7 @@ class Course(models.Model):
 	year       = models.DecimalField(max_digits=4, decimal_places=0)
 	tradition  = models.ForeignKey(CourseTrad)
 	last       = models.DateField()
-	# teacher    = models.ForeignKey(main.Teacher)
+	teacher    = models.ForeignKey(main.Teacher)
 	tuition    = models.DecimalField(max_digits=6, decimal_places=2)
 	vol_hours  = models.FloatField()
 	the_hours  = models.FloatField()
