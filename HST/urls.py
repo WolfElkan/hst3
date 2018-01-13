@@ -20,4 +20,24 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
 ]
 from django.conf.urls import include
-urlpatterns = [ url(r'^', include('apps.main.urls')) ]
+import apps.main.views as main
+import apps.program.views as program
+
+urlpatterns = [
+	url(r'^$', main.index),
+
+	url(r'^login$', main.login),
+	url(r'^logout$', main.logout),
+	
+	url(r'^register$', main.reg),
+	url(r'^register/familyinfo$', main.reg_familyinfo),
+	url(r'^register/parentsinfo$', main.reg_parentsinfo),
+	url(r'^register/studentsinfo$', main.reg_studentsinfo),
+	
+	url(r'^hot$', main.hot),
+	url(r'^run$', main.run),
+	url(r'^clear$', main.clear),
+	url(r'^nuke$', main.clearthedatabaselikeanuclearbombandthisnameisverylongsoyoudontcallitbymistake),
+
+	url(r'^seed$', program.SeedCourseTraditions),
+]

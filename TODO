@@ -1,10 +1,15 @@
-Make registration landing page redirect to appropriate step if family has partially registered.
+main
+	Make registration landing page redirect to appropriate step if family has partially registered.
 
-Student Interface
-	(eventually) Support loading existing students from database for editing, track by internal id's
-	Make titles of required fields bold automatically
+	What did we decide about login by email?
 
-Parent Interface
-	Make validations work
-	Actually save Parent ID's to database
-	Make titles of required fields bold automatically
+	Student Interface
+		(eventually) Support loading existing students from database for editing, track by internal id's
+		Make titles of required fields bold automatically
+
+	Parent Interface
+		Make validations work
+		Make titles of required fields bold automatically
+		If someone tries to create parents that have already been created, update the existing parents.
+
+program

@@ -5,3 +5,6 @@ from django.apps import AppConfig
 
 class ProgramConfig(AppConfig):
     name = 'program'
+
+class MainConfig(AppConfig):
+    name = 'main'

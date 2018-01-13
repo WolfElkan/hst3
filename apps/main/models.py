@@ -5,7 +5,6 @@ from Utils import supermodel as sm
 from django_mysql import models as sqlmod
 from datetime import datetime
 
-
 # - - - - - M A N A G E R S - - - - - 
 
 class FamilyManager(sm.SuperManager):
