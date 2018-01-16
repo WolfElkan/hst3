@@ -32,10 +32,11 @@ class BcryptField(models.Field):
 			hashed = '+' + hashed
 		return hashed
 
-short_days = [b'Sun',b'Mon',b'Tue',b'Wed',b'Thb',b'Fri',b'Sat']
-long_days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']
+short_days = ['---','Mon','Tue','Wed','Thu','Fri','Sat','Sun']
+long_days = [None,'Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']
 
 class DayOfWeek(object):
+	# TODO: Passing a datetime object into DayOfWeek returns that datetime's day of the week.
 	def __init__(self, short):
 		self.num = short_days.index(short)
 	def __str__(self):
@@ -46,11 +47,10 @@ class DayOfWeek(object):
 class DayOfWeekField(sqlmod.EnumField):
 	def __init__(self, **kwargs):
 		kwargs['choices'] = short_days
+		# kwargs['max_length'] = 3
 		super(DayOfWeekField, self).__init__(**kwargs)
-	def pre_save(self, model_instance, add):
-		return str(getattr(model_instance, self.attname))
-	def to_python(self, value):
-		return DayOfWeek(value)
+	# def to_python(self, value):
+	# 	return DayOfWeek(value)
 
 
 class PhoneNumber(object):
@@ -117,10 +117,17 @@ class PolymorphicField(poly.MultiColumnField):
 		model = self.relatables[model_index]
 		return model.objects.get(id=_id)
 	
-class BooleanField(models.Field):
-	def __init__(self, **kwargs):
-		super(BooleanField, self).__init__(**kwargs)
-	def db_type(self, connection):
-		return 'BOOLEAN()'
+# https://djangosnippets.org/snippets/2513/
+class TinyIntegerField(models.SmallIntegerField):
+    def db_type(self, connection):
+        if connection.settings_dict['ENGINE'] == 'django.db.backends.mysql':
+            return "tinyint"
+        else:
+            return super(TinyIntegerField, self).db_type(connection)
 
-		
+class PositiveTinyIntegerField(models.PositiveSmallIntegerField):
+    def db_type(self, connection):
+        if connection.settings_dict['ENGINE'] == 'django.db.backends.mysql':
+            return "tinyint unsigned"
+        else:
+            return super(PositiveTinyIntegerField, self).db_type(connection)

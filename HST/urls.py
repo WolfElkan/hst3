@@ -22,6 +22,7 @@ urlpatterns = [
 from django.conf.urls import include
 import apps.main.views as main
 import apps.program.views as program
+import apps.program.seed as program_seed
 
 urlpatterns = [
 	url(r'^$', main.index),
@@ -39,5 +40,5 @@ urlpatterns = [
 	url(r'^clear$', main.clear),
 	url(r'^nuke$', main.clearthedatabaselikeanuclearbombandthisnameisverylongsoyoudontcallitbymistake),
 
-	url(r'^seed$', program.SeedCourseTraditions),
+	url(r'^seed$', program_seed.CourseTraditions),
 ]

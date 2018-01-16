@@ -82,6 +82,6 @@ X*	Tech Program
 	XM: Make up team
 	XX: Tech Team
 Y*	- not used -
-Z*	Dance Class Genre: Broadway Jazz [See note at P*]
+Z*	Dance Class Genre: Broadway Jazz [ See note at P* ]
 	Z1: Broadway Jazz 1
 	Z2: Broadway Jazz 2
