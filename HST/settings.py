@@ -91,7 +91,10 @@ DATABASES = {
         'USER': 'django',
         'PASSWORD': 'E&Na2rVG8#nnVQVv23DW@b4f#8Ebrl83kL8c2FE9bdTgGTpl?#t?h02lnef3',
         'HOST': '127.0.0.1',
-        'PORT': '3306'
+        'PORT': '3306',
+        'OPTIONS': {
+            'charset': 'utf8mb4'
+        },
     },
 }
 
