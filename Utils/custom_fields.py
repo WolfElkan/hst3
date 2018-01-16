@@ -32,7 +32,7 @@ class BcryptField(models.Field):
 			hashed = '+' + hashed
 		return hashed
 
-short_days = ['---','Mon','Tue','Wed','Thu','Fri','Sat','Sun']
+short_days = ['','Mon','Tue','Wed','Thu','Fri','Sat','Sun']
 long_days = [None,'Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']
 
 class DayOfWeek(object):

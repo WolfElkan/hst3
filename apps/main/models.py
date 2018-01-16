@@ -179,6 +179,8 @@ class Student(models.Model):
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
 	objects = Students
+	def eligible(self, course):
+		return True
 	def __str__(self):
 		return self.prefer+' '+self.last
 	def __getattribute__(self, field):

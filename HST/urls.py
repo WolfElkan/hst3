@@ -23,6 +23,7 @@ from django.conf.urls import include
 import apps.main.views as main
 import apps.program.views as program
 import apps.program.seed as program_seed
+from . import dev_views as dev
 
 urlpatterns = [
 	url(r'^$', main.index),
@@ -35,10 +36,10 @@ urlpatterns = [
 	url(r'^register/parentsinfo$', main.reg_parentsinfo),
 	url(r'^register/studentsinfo$', main.reg_studentsinfo),
 	
-	url(r'^hot$', main.hot),
-	url(r'^run$', main.run),
-	url(r'^clear$', main.clear),
-	url(r'^nuke$', main.clearthedatabaselikeanuclearbombandthisnameisverylongsoyoudontcallitbymistake),
+	url(r'^hot$', dev.hot),
+	url(r'^run$', dev.run),
+	url(r'^clear$', dev.clear),
+	url(r'^nuke$', dev.clearthedatabaselikeanuclearbombandthisnameisverylongsoyoudontcallitbymistake),
 
 	url(r'^seed$', program_seed.CourseTraditions),
 ]

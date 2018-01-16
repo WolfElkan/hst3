@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, HttpResponse
 from .models import Family, Address, Parent, User, Student
 from Utils.custom_fields import Bcrypt, PhoneNumber
 from datetime import datetime
-from Utils.hacks import copy
+from Utils.hacks import copy, seshinit, forminit, first, getme, numero, metanumero, json
 import json as JSON
 from io import StringIO
 
@@ -11,66 +11,6 @@ Families  = Family.objects
 Parents   = Parent.objects
 Students  = Student.objects
 Users     = User.objects
-
-# Create your views here.
-
-# - - - - - HELPER FUNCTIONS - - - - -
-
-# Function for initializing session variables.
-def seshinit(request, sesh, val=''):
-	if sesh not in request.session:
-		request.session[sesh] = val
-
-# Initialize form error/persist structure in session
-def forminit(request, form_name, fields):
-	for pe in 'pe':
-		seshinit(request, pe, {})
-		if form_name not in request.session[pe]:
-			request.session[pe][form_name] = {}
-			for f in fields:
-				if f not in request.session[pe][form_name]:
-					request.session[pe][form_name][f] = ''
-
-# Select the first element in a query, without causing errors
-def first(arr):
-	if len(arr) == 0:
-		return None
-	else:
-		return arr[0]
-
-# Find User object for current logged-in user, without causing errors.
-# me is always a User, never a Family, Student, or Faculty
-def getme(request):
-	if 'meid' not in request.session:
-		return None
-	else:
-		return first(Users.filter(id=request.session['meid']))
-
-# Convert a list to a dict object, so it can be parsed correctly on front end
-def numero(obj):
-	result = {}
-	for x in range(len(obj)):
-		result['no'+str(x)] = obj[x]
-	return result
-
-# Just like numero, but meta
-def metanumero(obj):
-	result = []
-	for x in obj:
-		result += [numero(x)]
-	return result
-
-def json(obj):
-	result = []
-	for x in obj:
-		result += [x.__dict__]
-	result = str(result)
-	result = result.replace('\'','"')
-	result = result.replace('&quot','"')
-	result = result.replace('u"','"')
-	result = result.replace('<type ','')
-	result = result.replace('>','')
-	return result
 
 # - - - - - DEVELOPER VIEWS - - - - -
 
