@@ -13,3 +13,6 @@ main
 		If someone tries to create parents that have already been created, update the existing parents.
 
 program
+	Models
+		CourseTrad
+			Provide validation to make infinite aliasing impossible

@@ -14,6 +14,19 @@ class CourseTradManager(sm.SuperManager):
 		return thing.alias if thing.alias else thing
 CourseTrads = CourseTradManager()
 
+class CourseManager(sm.SuperManager):
+	def __init__(self):
+		super(CourseManager, self).__init__('program_course')
+	def create(self, **data):
+		# Inherit these fields from Tradition, unless overridden.
+		for field in ['tuition','vol_hours','the_hours','prepaid']:
+			if field not in data:
+				data[field] = data['tradition'].__getattribute__(field)
+		data['id'] = str(int(data['year'])%100).zfill(2)+data['tradition'].id
+		# print data
+		super(CourseManager, self).create(data)
+Courses = CourseManager()
+
 # - - - - - M O D E L S - - - - - 
 
 class Venue(models.Model):
@@ -50,14 +63,41 @@ class CourseTrad(models.Model):
 	the_hours  = models.FloatField(default=0)
 	prepaid    = models.BooleanField(default=False)
 	objects = CourseTrads
+	def __str__(self):
+		return self.title.upper()
+	def genre(self):
+		code = self.id[0]
+		genre_codes = {
+			'A':'Acting',
+			'C':'Choir',
+			'F':'Finale Group',
+			'G':'General Audition',
+			'H':'Hip-Hop',
+			'I':'Irish',
+			'J':'Jazz',
+			'P':'Tap',
+			'S':'Troupe',
+			'T':'Tap',
+			'W':'Workshop',
+			'X':'Tech',
+			'Z':'Jazz',
+		}
+		if code in genre_codes:
+			return genre_codes[code]
 
 class Course(models.Model):
 	id         = models.CharField(max_length=4, primary_key=True)
 	year       = models.DecimalField(max_digits=4, decimal_places=0)
-	tradition  = models.ForeignKey(CourseTrad)
-	last       = models.DateField()
+	tradition  = models.ForeignKey(CourseTrad, unique_for_year=True, db_column='trad_id')
+	last_meet  = models.DateField(null=True)
 	teacher    = models.ForeignKey('main.Teacher', null=True)
 	tuition    = models.DecimalField(max_digits=6, decimal_places=2)
 	vol_hours  = models.FloatField()
 	the_hours  = models.FloatField()
 	prepaid    = models.BooleanField()
+	objects = Courses
+	# def __getattribute__(self, field):
+	# 	if field not in self:
+	# 		return self.tradition.__getattribute__(field)
+	# 	else:
+	# 		return super(User, self).__getattribute__(field)

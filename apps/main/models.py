@@ -179,8 +179,13 @@ class Student(models.Model):
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
 	objects = Students
+	# Mirror functions: student.fxn(course) calls course.fxn(student)
 	def eligible(self, course):
-		return True
+		return course.eligible(self)
+	def audition(self, course):
+		return course.audition(self)
+	def enroll(self, course):
+		return course.enroll(self)
 	def __str__(self):
 		return self.prefer+' '+self.last
 	def __getattribute__(self, field):
