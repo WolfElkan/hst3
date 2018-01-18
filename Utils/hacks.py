@@ -67,6 +67,11 @@ def json(obj):
 	result = result.replace('>','')
 	return result
 
+# Return the current HST registration year (This year until May 1, next year thereafter)
+def year():
+	now = datetime.now()
+	return now.year + (0 if now.month < 5 else 1)
+
 # Find User object for current logged-in user, without causing errors.
 # me is always a User, never a Family, Student, or Teacher
 import apps

@@ -7,6 +7,11 @@ from datetime import datetime
 
 # - - - - - M A N A G E R S - - - - - 
 
+class AddressManager(sm.SuperManager):
+	def __init__(self):
+		super(AddressManager, self).__init__('address_family')
+Addresses = AddressManager()
+
 class FamilyManager(sm.SuperManager):
 	def __init__(self):
 		super(FamilyManager, self).__init__('main_family')
@@ -76,8 +81,12 @@ class Address(models.Model):
 	zipcode    = models.DecimalField(null=False, max_digits=9, decimal_places=4)
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
-	def id_(self):
-		return self.id
+	objects = Addresses
+	def __str__(self):
+		zipcode = str(self.zipcode)
+		zipcode = zipcode[:5] + ('' if self.zipcode % 1 == 0 else '-'+zipcode[6:])
+		title = self.line1 + ('\n'+self.line2 if self.line2 else '') + '\n' + self.city + ', ' + self.state + '\n' + zipcode
+		return title.upper()
 
 class Parent(models.Model):
 	first      = models.CharField(max_length=20)
@@ -157,7 +166,7 @@ class Student(models.Model):
 	alt_last  = models.CharField(max_length=30, null=True)
 	family    = models.ForeignKey(Family, related_name='children')
 	sex       = models.CharField(max_length=1, choices=[('M','Male'),('F','Female')])
-	current   = models.BooleanField()
+	current   = models.BooleanField(default=True)
 	birthday  = models.DateField()
 	grad_year = models.DecimalField(max_digits=4, decimal_places=0, null=True)
 	height    = models.FloatField(null=True)
@@ -182,10 +191,22 @@ class Student(models.Model):
 	# Mirror functions: student.fxn(course) calls course.fxn(student)
 	def eligible(self, course):
 		return course.eligible(self)
-	def audition(self, course):
-		return course.audition(self)
-	def enroll(self, course):
-		return course.enroll(self)
+	def audible(self, course):
+		return course.audible(self)
+	def take(self, course):
+		return course.take(self)
+	def saud(self, course):
+		return course.saud(self)
+	def hst_age(self, *year):
+		if not year:
+			now = datetime.now()
+			year = now.year + (0 if now.month < 5 else 1)
+		return year - self.birthday.year - 1
+	def grade(self, *year):
+		if not year:
+			now = datetime.now()
+			year = now.year + (0 if now.month < 5 else 1)
+		return year - self.grad_year + 12
 	def __str__(self):
 		return self.prefer+' '+self.last
 	def __getattribute__(self, field):

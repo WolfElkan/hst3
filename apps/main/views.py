@@ -261,4 +261,4 @@ def reg_studentsinfo_post(request):
 				Students.create(student)
 			else:
 				pass
-	return HttpResponse('You have reached the end of the demo.')
+	return redirect('/')

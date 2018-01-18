@@ -175,3 +175,9 @@ class SuperManager(models.Manager):
 	def create(self, data):
 		# data = copy(data, self.fields)
 		return super(SuperManager, self).create(**data)
+	def kreate(self, **kwargs):
+		return self.create(**kwargs)
+	def fetch(self, **kwargs):
+		things = self.filter(**kwargs)
+		if things:
+			return things[0]

@@ -23,9 +23,19 @@ class CourseManager(sm.SuperManager):
 			if field not in data:
 				data[field] = data['tradition'].__getattribute__(field)
 		data['id'] = str(int(data['year'])%100).zfill(2)+data['tradition'].id
-		# print data
 		super(CourseManager, self).create(data)
+	# TODO: Support aliases in getting/fetching Courses
 Courses = CourseManager()
+
+class EnrollmentManager(sm.SuperManager):
+	def __init__(self):
+		super(EnrollmentManager, self).__init__('program_enrollment')
+Enrollments = EnrollmentManager()
+
+class AuditionManager(sm.SuperManager):
+	def __init__(self):
+		super(AuditionManager, self).__init__('program_audition')
+Auditions = AuditionManager()
 
 # - - - - - M O D E L S - - - - - 
 
@@ -51,6 +61,8 @@ class CourseTrad(models.Model):
 	# Prerequisites
 	min_age = models.PositiveIntegerField(default=9)
 	max_age = models.PositiveIntegerField(default=18)
+	min_grd = models.PositiveIntegerField(default=1)
+	max_grd = models.PositiveIntegerField(default=12)
 	M = models.BooleanField(default=True)  # Boys may enroll
 	F = models.BooleanField(default=True)  # Girls may enroll
 	C = models.BooleanField(default=False) # Only current students may enroll
@@ -65,6 +77,8 @@ class CourseTrad(models.Model):
 	objects = CourseTrads
 	def __str__(self):
 		return self.title.upper()
+	def make(self, year):
+		Courses.kreate(tradition=self, year=year)
 	def genre(self):
 		code = self.id[0]
 		genre_codes = {
@@ -84,20 +98,59 @@ class CourseTrad(models.Model):
 		}
 		if code in genre_codes:
 			return genre_codes[code]
+	def eligible(self, student, year):
+		return True
+	def audible(self, student, year):
+		return True
+	def take(self, student, year):
+		course = Courses.fetch(tradition=self, year=year)
+		if course:
+			return course.take(student)
+	def saud(self, student, year):
+		course = Courses.fetch(tradition=self, year=year)
+		if course:
+			return course.saud(student)
 
 class Course(models.Model):
 	id         = models.CharField(max_length=4, primary_key=True)
 	year       = models.DecimalField(max_digits=4, decimal_places=0)
 	tradition  = models.ForeignKey(CourseTrad, unique_for_year=True, db_column='trad_id')
-	last_meet  = models.DateField(null=True)
+	last_date  = models.DateField(null=True)
+	aud_date   = models.DateField(null=True)
 	teacher    = models.ForeignKey('main.Teacher', null=True)
 	tuition    = models.DecimalField(max_digits=6, decimal_places=2)
 	vol_hours  = models.FloatField()
 	the_hours  = models.FloatField()
 	prepaid    = models.BooleanField()
 	objects = Courses
-	# def __getattribute__(self, field):
-	# 	if field not in self:
-	# 		return self.tradition.__getattribute__(field)
-	# 	else:
-	# 		return super(User, self).__getattribute__(field)
+	def __str__(self):
+		return self.tradition.title+' ('+str(self.year)+')'
+	def eligible(self, student):
+		return self.tradition.eligible(student, self.year)
+	def audible(self, student):
+		return self.tradition.audible(student, self.year)
+	def take(self, student):
+		if self.eligible(student):
+			Enrollments.create({'course': self, 'student': student})
+	def saud(self, student):
+		if self.audible(student):
+			Auditions.create({'course': self, 'student': student})
+
+class Enrollment(models.Model):
+	student    = models.ForeignKey('main.Student')
+	course     = models.ForeignKey(Course)
+	role       = models.TextField(null=True)
+	role_type  = sqlmod.EnumField(choices=['','Chorus','Support','Lead'])
+	created_at = models.DateTimeField(auto_now_add=True)		
+	objects = Enrollments
+
+class Audition(models.Model):
+	student    = models.ForeignKey('main.Student')
+	course     = models.ForeignKey(Course)
+	auto       = models.BooleanField(default=False)
+	date       = models.DateField(null=True)
+	happened   = models.BooleanField(default=False)
+	success    = models.NullBooleanField()
+	created_at = models.DateTimeField(auto_now_add=True)
+	updated_at = models.DateTimeField(auto_now=True)		
+	objects = Auditions
