@@ -24,6 +24,7 @@ import apps.main.views as main
 import apps.program.views as program
 import apps.program.seed as program_seed
 from . import dev_views as dev
+from .seed import views as seed
 
 urlpatterns = [
 	url(r'^$', main.index),
@@ -41,5 +42,8 @@ urlpatterns = [
 	url(r'^clear$', dev.clear),
 	url(r'^nuke$', dev.clearthedatabaselikeanuclearbombandthisnameisverylongsoyoudontcallitbymistake),
 
-	url(r'^seed$', program_seed.CourseTraditions),
+	url(r'^seed/old_load$', seed.old_load),
+	url(r'^seed/load$', seed.load),
+	url(r'^seed/dump$', seed.dump),
+	url(r'^seed/nuke$', seed.nuke),
 ]

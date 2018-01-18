@@ -104,9 +104,9 @@ class Parent(models.Model):
 			pass
 		elif field == 'last':
 			if super(Parent, self).__getattribute__('alt_last'):
-				return super(Parent, self).__getattribute__('alt_last') 
+				return super(Parent, self).__getattribute__('alt_last')
 			else: 
-				return super(Parent, self).__getattribute__('family').last
+				return self.family.last
 		elif field == 'phone':
 			return custom.PhoneNumber(self.alt_phone if self.alt_phone else self.family.phone)
 		elif field == 'email':

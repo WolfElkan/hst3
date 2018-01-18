@@ -1,0 +1,7 @@
+JSON:
+<form method="post">
+	{% csrf_token %}
+	<textarea name="json_dump" rows="30" cols="100" style="font-family: monospace;">{{ json_dump }}</textarea>
+	<input type="submit" value="IMPORT">
+</form>
+<a href="nuke">Nuke Database</a>

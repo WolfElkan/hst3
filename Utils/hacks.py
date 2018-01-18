@@ -19,6 +19,15 @@ def copy(source, keys=False, trunc=0):
 			this[trunckey] = None
 	return this
 
+def copyatts(source, keys):
+	this = {}
+	for key in keys:
+		if hasattr(source, key):
+			this[key] = source.__getattribute__(key)
+		else:
+			this[key] = None
+	return this
+
 # Function for initializing session variables.
 def seshinit(request, sesh, val=''):
 	if sesh not in request.session:

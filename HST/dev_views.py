@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, HttpResponse
 from Utils.custom_fields import Bcrypt, PhoneNumber
 from datetime import datetime
 from Utils.hacks import copy, getme, seshinit, first
-import json
+# import json
 import io
 
 from apps.main.models import Family, Address, Parent, User, Student
@@ -17,27 +17,29 @@ Venues      = Venue.objects
 CourseTrads = CourseTrad.objects
 Courses     = Course.objects
 
-from . import families2017_json as families
-fam17 = json.loads(families.json)
+# from . import families2017_json as families
+# fam17 = json.loads(families.json)
 
-def seed2017():
-	for fam in fam17:
-		print 'Importing '+fam['last']
-		address = copy(fam,['line1','city','state','zipcode'])
-		address = Addresses.create(address)
-		family = copy(fam,['last','phone','email'])
-		family['address'] = address
-		family = Families.create(family)
-		mother = Parents.create({'first':fam['mother'],'family_id':family.id, 'sex':'F'}) if fam['mother'] != fam['last'] else None
-		father = Parents.create({'first':fam['father'],'family_id':family.id, 'sex':'M'}) if fam['father'] != fam['last'] else None
-		family.mother = mother
-		family.father = father
-		family.save()
-		for stu in fam['students']:
-			student = copy(stu)
-			student['family'] = family
-			Students.create(student)
-	print str(len(fam))+' families imported!'
+from seed.data import data
+
+# def seed2017():
+# 	for fam in fam17:
+# 		print 'Importing '+fam['last']
+# 		address = copy(fam,['line1','city','state','zipcode'])
+# 		address = Addresses.create(address)
+# 		family = copy(fam,['last','phone','email'])
+# 		family['address'] = address
+# 		family = Families.create(family)
+# 		mother = Parents.create({'first':fam['mother'],'family_id':family.id, 'sex':'F'}) if fam['mother'] != fam['last'] else None
+# 		father = Parents.create({'first':fam['father'],'family_id':family.id, 'sex':'M'}) if fam['father'] != fam['last'] else None
+# 		family.mother = mother
+# 		family.father = father
+# 		family.save()
+# 		for stu in fam['students']:
+# 			student = copy(stu)
+# 			student['family'] = family
+# 			Students.create(student)
+# 	print str(len(fam))+' families imported!'
 
 def hot(request):
 	me = getme(request)

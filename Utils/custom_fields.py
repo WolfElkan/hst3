@@ -76,6 +76,8 @@ class PhoneNumber(object):
 		num = int(num)
 		num %= 10**10
 		return num
+	def __int__(self):
+		return self.num
 	def __str__(self):
 		return '('+self.cod+') '+self.mid+'-'+self.last
 	def __get__(self):
