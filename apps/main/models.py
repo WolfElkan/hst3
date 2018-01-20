@@ -143,9 +143,9 @@ class Family(models.Model):
 		elif field == 'phone':
 			return custom.PhoneNumber(super(Family, self).__getattribute__('phone'))
 		elif field == 'mother':
-			return Parents.get(id=super(Family, self).__getattribute__('mother_id'))
+			return Parents.fetch(id=super(Family, self).__getattribute__('mother_id'))
 		elif field == 'father':
-			return Parents.get(id=super(Family, self).__getattribute__('father_id'))
+			return Parents.fetch(id=super(Family, self).__getattribute__('father_id'))
 		else:
 			return super(Family, self).__getattribute__(field)
 	def __setattr__(self, field, value):

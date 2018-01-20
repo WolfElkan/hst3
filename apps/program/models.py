@@ -49,7 +49,7 @@ class CourseTrad(models.Model):
 	id         = models.CharField(max_length=2, primary_key=True)
 	title      = models.CharField(max_length=50)
 	alias      = models.ForeignKey('self', null=True)
-	enroll     = models.BooleanField(default=True)
+	e          = models.BooleanField(default=True)
 	# Commitment:
 	day        = custom.DayOfWeekField(default='')
 	start      = models.TimeField(default="00:00:00")

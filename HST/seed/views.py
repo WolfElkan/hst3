@@ -108,6 +108,8 @@ class VarChar(object):
 		self.maxlength = maxlength
 	def widget(self, field, value):
 		return '<input type="text" maxlength="{}" name="{}" value="{}">'.format(self.maxlength, field, value)
+	def static(self, field, value):
+		return value
 
 class Numeric(object):
 	def __init__(self, suffix=''):
@@ -115,6 +117,8 @@ class Numeric(object):
 		self.suffix = suffix
 	def widget(self, field, value):
 		return '<input type="number" name="{}" value="{}"> {}'.format(field, value, self.suffix)
+	def static(self, field, value):
+		return value
 
 class Enum(object):
 	def __init__(self, *options):
@@ -126,6 +130,8 @@ class Enum(object):
 			html += '<option value="{}"{}>{}</option>'.format(option,' selected' if value == option else '',option)
 		html += '</select>'
 		return html
+	def static(self, field, value):
+		return value
 
 class Radio(object):
 	def __init__(self, options):
@@ -137,6 +143,8 @@ class Radio(object):
 		for o in range(len(self.options)):
 			html += '<input type="radio" name="{}" value="{}" {}>{}<br>'.format(field, o,' checked' if value == o else '',self.options[o])
 		return html
+	def static(self, field, value):
+		return value
 
 class Checkbox(object):
 	def __init__(self, suffix=''):
@@ -144,26 +152,38 @@ class Checkbox(object):
 		self.suffix = suffix
 	def widget(self, field, value):
 		return '<input type="checkbox" name="{}" {}> {}'.format(field, ' checked' if value else '',self.suffix)
+	def static(self, field, value):
+		return value
 
 class Date(object):
 	def __init__(self):
 		self.force = False
 	def widget(self, field, value):
 		return '<input type="date" name="{}" value="{}">'.format(field, value)
+	def static(self, field, value):
+		return value
 
 class Time(object):
 	def __init__(self):
 		self.force = False
 	def widget(self, field, value):
 		return '<input type="time" name="{}" value="{}">'.format(field, value)
+	def static(self, field, value):
+		return value
 
 class ForeignKey(object):
 	def __init__(self):
 		self.force = False
 	def widget(self, field, value):
-		if field in ['mother','father']:
-			field = 'parent'
-		return '<a href="/seed/manual/{}/{}">{}</a>'.format(field,value.id,str(value))
+		rel = field
+		if value:
+			if field in ['mother','father']:
+				field = 'parent'
+			return '<a href="/seed/manual/{}/{}">{}</a>'.format(field,value.id,str(value))
+		else:
+			return '<a href="new/{}">add</a>'.format(rel)
+	def static(self, field, value):
+		return value if value else ''
 
 FIELDS = {
 	'address'   : [
@@ -208,13 +228,13 @@ FIELDS = {
 	],
 	'coursetrad': [
 		{'field':'title'     , 'template': VarChar(50)},
-		{'field':'enroll'    , 'template': Checkbox()},
+		{'field':'e'         , 'template': Checkbox('This is a real course that may be enrolled in, not a student group for admin purposes')},
 		{'field':'day'       , 'template': Enum('','Mon','Tue','Wed','Thu','Fri','Sat','Sun')},
 		{'field':'start'     , 'template': Time()},
 		{'field':'end'       , 'template': Time()},
 		{'field':'nMeets'    , 'template': Numeric()},
 		{'field':'show'      , 'template': VarChar(2)},
-		{'field':'vs'        , 'template': Checkbox()},
+		{'field':'vs'        , 'template': Checkbox('This class performs in the Variety Show')},
 		{'field':'min_age'   , 'template': Numeric()},
 		{'field':'max_age'   , 'template': Numeric()},
 		{'field':'min_grd'   , 'template': Numeric()},
@@ -234,7 +254,7 @@ FIELDS = {
 		{'field':'redtuit'   , 'template': Numeric()},
 		{'field':'vol_hours' , 'template': Numeric()},
 		{'field':'the_hours' , 'template': Numeric()},
-		{'field':'prepaid'   , 'template': Checkbox()},
+		{'field':'prepaid'   , 'template': Checkbox('Families must purchase 10 prepaid tickets for $100, not included in tuition')},
 	],
 	'course'    : [
 		{'field':'year'      , 'template': Numeric()},
@@ -276,7 +296,7 @@ def manual(request, *args, **kwargs):
 def manual_get(request, model, id):
 	manager = MODELS[model]
 	thing = manager.get(id=id)
-	print thing
+	# print thing
 	tempset = FIELDS[model]
 	display = []
 	for ftp in tempset:
@@ -289,7 +309,8 @@ def manual_get(request, model, id):
 	context = {
 		'thing'   : thing,
 		'display' : display,
-		'model'   : 'Course Tradition' if model == 'coursetrad' else model.title(),
+		'model'   : model,
+		'Model'   : 'Course Tradition' if model == 'coursetrad' else model.title(),
 	}
 	return render(request, 'main/manual.html', context)
 

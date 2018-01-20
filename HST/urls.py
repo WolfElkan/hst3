@@ -29,21 +29,21 @@ from .seed import views as seed
 urlpatterns = [
 	url(r'^$', main.index),
 
-	url(r'^login$', main.login),
-	url(r'^logout$', main.logout),
+	url(r'^login/?$', main.login),
+	url(r'^logout/?$', main.logout),
 	
-	url(r'^register$', main.reg),
-	url(r'^register/familyinfo$', main.reg_familyinfo),
-	url(r'^register/parentsinfo$', main.reg_parentsinfo),
-	url(r'^register/studentsinfo$', main.reg_studentsinfo),
+	url(r'^register/?$', main.reg),
+	url(r'^register/familyinfo/?$', main.reg_familyinfo),
+	url(r'^register/parentsinfo/?$', main.reg_parentsinfo),
+	url(r'^register/studentsinfo/?$', main.reg_studentsinfo),
 	
-	url(r'^hot$', dev.hot),
-	url(r'^run$', dev.run),
-	url(r'^clear$', dev.clear),
-	url(r'^nuke$', dev.clearthedatabaselikeanuclearbombandthisnameisverylongsoyoudontcallitbymistake),
+	url(r'^hot/?$', dev.hot),
+	url(r'^run/?$', dev.run),
+	url(r'^clear/?$', dev.clear),
+	url(r'^nuke/?$', dev.clearthedatabaselikeanuclearbombandthisnameisverylongsoyoudontcallitbymistake),
 
-	url(r'^seed/load$', seed.load),
-	url(r'^seed/manual/(?P<model>[a-z]+)/(?P<id>\d+|(\d\d)?\w\w)$', seed.manual),
-	url(r'^seed/dump$', seed.dump),
-	url(r'^seed/nuke$', seed.nuke),
+	url(r'^seed/load/?$', seed.load),
+	url(r'^seed/manual/(?P<model>[a-zA-Z]+)/(?P<id>\d+|(\d\d)?\w\w)/?$', seed.manual),
+	url(r'^seed/dump/?$', seed.dump),
+	url(r'^seed/nuke/?$', seed.nuke),
 ]
