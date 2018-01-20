@@ -42,8 +42,8 @@ urlpatterns = [
 	url(r'^clear$', dev.clear),
 	url(r'^nuke$', dev.clearthedatabaselikeanuclearbombandthisnameisverylongsoyoudontcallitbymistake),
 
-	url(r'^seed/old_load$', seed.old_load),
 	url(r'^seed/load$', seed.load),
+	url(r'^seed/manual/(?P<model>[a-z]+)/(?P<id>\d+|(\d\d)?\w\w)$', seed.manual),
 	url(r'^seed/dump$', seed.dump),
 	url(r'^seed/nuke$', seed.nuke),
 ]
