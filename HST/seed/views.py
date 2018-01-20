@@ -100,16 +100,27 @@ def load_post(request):
 
 	return redirect('/seed/load')
 
-def varchar(maxlength):
-	return '<input type="text" maxlength="'+str(maxlength)+'" name="{}" value="{}">'
+# MANUAL DATA ENTRY (REST)
 
-def number():
-	return '<input type="number" name="{}" value="{}">'
+class VarChar(object):
+	def __init__(self, maxlength):
+		self.force = False
+		self.maxlength = maxlength
+	def widget(self, field, value):
+		return '<input type="text" maxlength="{}" name="{}" value="{}">'.format(self.maxlength, field, value)
+
+class Numeric(object):
+	def __init__(self, suffix=''):
+		self.force = True
+		self.suffix = suffix
+	def widget(self, field, value):
+		return '<input type="number" name="{}" value="{}"> {}'.format(field, value, self.suffix)
 
 class Enum(object):
 	def __init__(self, *options):
+		self.force = True
 		self.options = options
-	def format(self, field, value):
+	def widget(self, field, value):
 		html = '<select name={}>'.format(field)
 		for option in self.options:
 			html += '<option value="{}"{}>{}</option>'.format(option,' selected' if value == option else '',option)
@@ -118,8 +129,9 @@ class Enum(object):
 
 class Radio(object):
 	def __init__(self, options):
+		self.force = True
 		self.options = options
-	def format(self, field, value):
+	def widget(self, field, value):
 		value = value if value else 0
 		html = ''
 		for o in range(len(self.options)):
@@ -127,81 +139,90 @@ class Radio(object):
 		return html
 
 class Checkbox(object):
-	def format(self, field, value):
-		return '<input type="checkbox" name="{}" {}>'.format(field, ' checked' if value else '')
+	def __init__(self, suffix=''):
+		self.force = True
+		self.suffix = suffix
+	def widget(self, field, value):
+		return '<input type="checkbox" name="{}" {}> {}'.format(field, ' checked' if value else '',self.suffix)
 
-def date():
-	return '<input type="date" name="{}" value="{}">'
+class Date(object):
+	def __init__(self):
+		self.force = False
+	def widget(self, field, value):
+		return '<input type="date" name="{}" value="{}">'.format(field, value)
 
-def time():
-	return '<input type="time" name="{}" value="{}">'
+class Time(object):
+	def __init__(self):
+		self.force = False
+	def widget(self, field, value):
+		return '<input type="time" name="{}" value="{}">'.format(field, value)
 
 class ForeignKey(object):
 	def __init__(self):
-		super(ForeignKey, self).__init__()
-	def format(self, field, value):
+		self.force = False
+	def widget(self, field, value):
 		if field in ['mother','father']:
 			field = 'parent'
 		return '<a href="/seed/manual/{}/{}">{}</a>'.format(field,value.id,str(value))
 
 FIELDS = {
 	'address'   : [
-		{'field':'line1'     , 'template': varchar(50)},
-		{'field':'line2'     , 'template': varchar(50)},
-		{'field':'city'      , 'template': varchar(25)},
-		{'field':'state'     , 'template': varchar(2)},
-		{'field':'zipcode'   , 'template': number()},
+		{'field':'line1'     , 'template': VarChar(50)},
+		{'field':'line2'     , 'template': VarChar(50)},
+		{'field':'city'      , 'template': VarChar(25)},
+		{'field':'state'     , 'template': VarChar(2)},
+		{'field':'zipcode'   , 'template': Numeric()},
 	],
 	'family'    : [
-		{'field':'last'      , 'template': varchar(30)},
-		{'field':'phone'     , 'template': number()},
+		{'field':'last'      , 'template': VarChar(30)},
+		{'field':'phone'     , 'template': Numeric()},
 		{'field':'phone_type', 'template': Enum('','Home','Cell','Work')},
-		{'field':'email'     , 'template': varchar(254)},
+		{'field':'email'     , 'template': VarChar(254)},
 		{'field':'mother'    , 'template': ForeignKey()},
 		{'field':'father'    , 'template': ForeignKey()},
 		{'field':'address'   , 'template': ForeignKey()},
 	],
 	'parent'    : [
-		{'field':'first'     , 'template': varchar(20)},
+		{'field':'first'     , 'template': VarChar(20)},
 		{'field':'family'    , 'template': ForeignKey()},
-		{'field':'alt_last'  , 'template': varchar(30)},
+		{'field':'alt_last'  , 'template': VarChar(30)},
 		{'field':'sex'       , 'template': Enum('M','F')},
-		{'field':'alt_phone' , 'template': number()},
+		{'field':'alt_phone' , 'template': Numeric()},
 		{'field':'phone_type', 'template': Enum('','Home','Cell','Work')},
-		{'field':'alt_email' , 'template': varchar(254)},
+		{'field':'alt_email' , 'template': VarChar(254)},
 	],
 	'student'   : [
-		{'field':'first'     , 'template': varchar(20)},
-		{'field':'alt_first' , 'template': varchar(20)},
-		{'field':'middle'    , 'template': varchar(20)},
-		{'field':'alt_last'  , 'template': varchar(30)},
+		{'field':'first'     , 'template': VarChar(20)},
+		{'field':'alt_first' , 'template': VarChar(20)},
+		{'field':'middle'    , 'template': VarChar(20)},
+		{'field':'alt_last'  , 'template': VarChar(30)},
 		{'field':'sex'       , 'template': Enum('M','F')},
-		{'field':'current'   , 'template': Checkbox()},
-		{'field':'birthday'  , 'template': date()},
-		{'field':'grad_year' , 'template': number()},
-		{'field':'height'    , 'template': number()},
-		{'field':'alt_phone' , 'template': number()},
-		{'field':'alt_email' , 'template': varchar(254)},
-		{'field':'tshirt'    , 'template': varchar(2)},
+		{'field':'current'   , 'template': Checkbox('Student is currently in HST')},
+		{'field':'birthday'  , 'template': Date()},
+		{'field':'grad_year' , 'template': Numeric()},
+		{'field':'height'    , 'template': Numeric('inches')},
+		{'field':'alt_phone' , 'template': Numeric()},
+		{'field':'alt_email' , 'template': VarChar(254)},
+		{'field':'tshirt'    , 'template': VarChar(2)},
 		{'field':'family'    , 'template': ForeignKey()},
 	],
 	'coursetrad': [
-		{'field':'title'     , 'template': varchar(50)},
+		{'field':'title'     , 'template': VarChar(50)},
 		{'field':'enroll'    , 'template': Checkbox()},
 		{'field':'day'       , 'template': Enum('','Mon','Tue','Wed','Thu','Fri','Sat','Sun')},
-		{'field':'start'     , 'template': time()},
-		{'field':'end'       , 'template': time()},
-		{'field':'nMeets'    , 'template': number()},
-		{'field':'show'      , 'template': varchar(2)},
+		{'field':'start'     , 'template': Time()},
+		{'field':'end'       , 'template': Time()},
+		{'field':'nMeets'    , 'template': Numeric()},
+		{'field':'show'      , 'template': VarChar(2)},
 		{'field':'vs'        , 'template': Checkbox()},
-		{'field':'min_age'   , 'template': number()},
-		{'field':'max_age'   , 'template': number()},
-		{'field':'min_grd'   , 'template': number()},
-		{'field':'max_grd'   , 'template': number()},
-		{'field':'M'         , 'template': Checkbox()},
-		{'field':'F'         , 'template': Checkbox()},
-		{'field':'C'         , 'template': Checkbox()},
-		{'field':'I'         , 'template': Checkbox()},
+		{'field':'min_age'   , 'template': Numeric()},
+		{'field':'max_age'   , 'template': Numeric()},
+		{'field':'min_grd'   , 'template': Numeric()},
+		{'field':'max_grd'   , 'template': Numeric()},
+		{'field':'M'         , 'template': Checkbox('Boys may enroll')},
+		{'field':'F'         , 'template': Checkbox('Girls may enroll')},
+		{'field':'C'         , 'template': Checkbox('Only current students may enroll')},
+		{'field':'I'         , 'template': Checkbox('Students must complete 1 year of Tap or Irish Soft Shoe to enroll')},
 		{'field':'A'         , 'template': Radio([
 			'No audition or acting class required',
 			'Students must pass a skills assessment (or have already taken this class) to enroll',
@@ -209,25 +230,25 @@ FIELDS = {
 			'1 year of Acting A or B required to audition',
 			'1 year of Acting and 1 year of Troupe required to audition',
 		])},
-		{'field':'tuition'   , 'template': number()},
-		{'field':'redtuit'   , 'template': number()},
-		{'field':'vol_hours' , 'template': number()},
-		{'field':'the_hours' , 'template': number()},
+		{'field':'tuition'   , 'template': Numeric()},
+		{'field':'redtuit'   , 'template': Numeric()},
+		{'field':'vol_hours' , 'template': Numeric()},
+		{'field':'the_hours' , 'template': Numeric()},
 		{'field':'prepaid'   , 'template': Checkbox()},
 	],
 	'course'    : [
-		{'field':'year'      , 'template': number()},
-		{'field':'last_date' , 'template': date()},
-		{'field':'tuition'   , 'template': number()},
-		{'field':'vol_hours' , 'template': number()},
-		{'field':'the_hours' , 'template': number()},
+		{'field':'year'      , 'template': Numeric()},
+		{'field':'last_date' , 'template': Date()},
+		{'field':'tuition'   , 'template': Numeric()},
+		{'field':'vol_hours' , 'template': Numeric()},
+		{'field':'the_hours' , 'template': Numeric()},
 		{'field':'prepaid'   , 'template': Checkbox()},
 		{'field':'teacher'   , 'template': ForeignKey()},
-		{'field':'trad'      , 'template': varchar(2)},
-		{'field':'aud_date'  , 'template': date()},
+		{'field':'trad'      , 'template': VarChar(2)},
+		{'field':'aud_date'  , 'template': Date()},
 	],
 	'enrollment': [
-		{'field':'role'      , 'template': varchar(0)},
+		{'field':'role'      , 'template': VarChar(0)},
 		{'field':'role_type' , 'template': Enum('','Chorus','Support','Lead')},
 		{'field':'course'    , 'template': ForeignKey()},
 		{'field':'student'   , 'template': ForeignKey()},
@@ -258,12 +279,12 @@ def manual_get(request, model, id):
 	print thing
 	tempset = FIELDS[model]
 	display = []
-	for kvp in tempset:
-		value = thing.__getattribute__(kvp['field'])
+	for ftp in tempset:
+		value = thing.__getattribute__(ftp['field'])
 		value = value if value else ''
 		display.append({
-			'field':kvp['field'], 
-			'input':kvp['template'].format(kvp['field'],value)
+			'field':ftp['field'], 
+			'input':ftp['template'].widget(ftp['field'],value)
 		})
 	context = {
 		'thing'   : thing,
@@ -273,8 +294,15 @@ def manual_get(request, model, id):
 	return render(request, 'main/manual.html', context)
 
 
-def manual_post(request):
-	pass
+def manual_post(request, model, id):
+	manager = MODELS[model]
+	thing = manager.get(id=id)
+	for ftp in FIELDS[model]:
+		field = ftp['field']
+		if field in request.POST and (request.POST[field] or ftp['template'].force):
+			print field, request.POST[field]
+			# TODO: Actually make the changes
+	return HttpResponse(str(thing))
 
 def dump(request):
 	data = {

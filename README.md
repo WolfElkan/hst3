@@ -1,6 +1,7 @@
-# Ignore this ReadMe
+# HST Website Django Backend
+*Technical Documentation & User Guide*
 
-A*	Acting Classes
+<!-- A*	Acting Classes
 	AA: Acting A
 	AB: Acting B
 	A0: Showcase Acting Skit #0 (rarely used) (non-enrollable)
@@ -84,4 +85,4 @@ X*	Tech Program
 Y*	- not used -
 Z*	Dance Class Genre: Broadway Jazz [ See note at P* ]
 	Z1: Broadway Jazz 1
-	Z2: Broadway Jazz 2
+	Z2: Broadway Jazz 2 -->

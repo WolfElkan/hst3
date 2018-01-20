@@ -1,23 +1,26 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Manual Data Entry Interface</title>
+	<title>HST | {{thing}}</title>
 </head>
 <body>
 	<h1>{{thing}}</h1>
 	<h2>{{model}}</h2>
-	<table>
-		<tr>
-			<td>id:</td>
-			<td>{{thing.id}}</td>
-		</tr>
-		{% for kvp in display %}
-		<tr>
-			<td>{{kvp.field}}:</td>
-			<td>{{kvp.input|safe}}</td>
-		</tr>
-		{% endfor %}
-	</table>
+	<form method="POST"> {% csrf_token %}
+		<table>
+			<tr>
+				<td>id:</td>
+				<td>{{thing.id}}</td>
+			</tr>
+			{% for kvp in display %}
+			<tr>
+				<td>{{kvp.field}}:</td>
+				<td>{{kvp.input|safe}}</td>
+			</tr>
+			{% endfor %}
+		</table>
+		<button type="submit">Update</button>
+	</form>
 	<a href="{{thing.id|add:'-1'}}">&lt;Prev</a>
 	<a href="{{thing.id|add:'1'}}">Next&gt;</a>
 </body>
