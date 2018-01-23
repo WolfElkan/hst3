@@ -52,9 +52,8 @@ class DayOfWeekField(sqlmod.EnumField):
 		kwargs['choices'] = short_days
 		# kwargs['max_length'] = 3
 		super(DayOfWeekField, self).__init__(**kwargs)
-	# def to_python(self, value):
+	# def from_db_value(self, value, col, wrapper, options):
 	# 	return DayOfWeek(value)
-
 
 class PhoneNumber(object):
 	def __init__(self, *num):
@@ -93,6 +92,7 @@ class PhoneNumber(object):
 			value = int(value)
 		return '<input type="number" name="{}" value="{}">'.format(field, value)
 	def static(self, field, value):
+		# print value
 		self.__init__(value)
 		if value:
 			return str(self)
@@ -109,35 +109,48 @@ class PhoneNumberField(models.DecimalField):
 	def pre_save(self, model_instance, add):
 		num = getattr(model_instance, self.attname)
 		return PhoneNumber(num).sanitize()
+	def from_db_value(self, value, col, wrapper, options):
+		return PhoneNumber(value)
 
 class ZipCode(object):
 	def __init__(self, *value):
 		if value:
 			if type(value) is tuple and len(value) == 1:
 				self.value = value[0]
+			elif type(value) is ZipCode:
+				self.value = value.value
+			elif type(value) is str:
+				self.value = float(value.replace('-','.'))
 			else:
 				self.value = value
+			self.value = float(self.value)
+		else:
+			self.value = 00000.0000
 	def __str__(self):
 		result = str(int(self.value)).zfill(5)
-		if not self.value._isinteger():
+		if self.value % 1:
 			result += '-' + str(self.value)[-4:]
 		return result
+	def __float__(self):
+		return self.value
+	def __int__(self):
+		return int(self.value)
 	def static(self, field, value):
 		self.__init__(value)
 		return str(self)
 	def widget(self, field, value):
-		if value:
-			value = float(value)
-		return '<input type="number" name="{}" value="{}" step="0.0001">'.format(field, value)
+		self.__init__(value)
+		return '<input type="number" name="{}" value="{}" step="0.0001"> (If adding an extra 4 digits, use a decimal point in place of a dash)'.format(field, self.value)
 	def clean(self, value):
-		return value if value else 0
+		self.__init__(value)
+		return self.value
 
 class ZipCodeField(models.DecimalField):
 	def __init__(self, **kwargs):
 		kwargs['max_digits'] = 9
 		kwargs['decimal_places'] = 4
 		super(ZipCodeField, self).__init__(**kwargs)
-	def to_python(self, value):
+	def from_db_value(self, value, col, wrapper, options):
 		return ZipCode(value)
 
 class PolymorphicField(poly.MultiColumnField):

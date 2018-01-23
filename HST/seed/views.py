@@ -186,7 +186,8 @@ class Date(object):
 	def widget(self, field, value):
 		return '<input type="date" name="{}" value="{}">'.format(field, value)
 	def static(self, field, value):
-		return value.strftime('%B %-d, %Y')
+		if value:
+			return value.strftime('%B %-d, %Y')
 	def clean(self, value):
 		return value
 
@@ -201,7 +202,9 @@ class Time(object):
 		return value
 
 class ForeignKey(object):
-	def __init__(self):
+	def __init__(self, *manager):
+		if manager:
+			self.manager = manager
 		self.force = False
 	def widget(self, field, value):
 		rel = field
@@ -224,12 +227,18 @@ class ForeignKey(object):
 		return value
 
 class ForeignSet(object):
-	def __init__(self, arg):
+	def __init__(self, foreign):
 		self.force = False
-	def widget(self):
+		self.foreign = foreign
+	def widget(self, field, value):
 		pass
-	def static(self):
-		pass
+	def static(self, field, value):
+		things = self.foreign.filter(**value['mapping'])
+		html = '<ul>'
+		for thing in things:
+			html += '<li>{}</li>'.format(ForeignKey().static(value['model'], thing))
+		html += '</ul>'
+		return html
 	def clean(self, value):
 		return value
 
@@ -249,6 +258,7 @@ FIELDS = {
 		{'field':'mother'    , 'template': ForeignKey()},
 		{'field':'father'    , 'template': ForeignKey()},
 		{'field':'address'   , 'template': ForeignKey()},
+		{'field':'_children' , 'template': ForeignSet(Students)},
 	],
 	'parent'    : [
 		{'field':'first'     , 'template': VarChar(20)},
@@ -273,10 +283,11 @@ FIELDS = {
 		{'field':'alt_phone' , 'template': PhoneNumber()},
 		{'field':'alt_email' , 'template': VarChar(254)},
 		{'field':'tshirt'    , 'template': Enum('','YS','YM','YL','XS','AS','AM','AL','XL','2X','3X')},
+		{'field':'_enrollments','template': ForeignSet(Enrollments)},
 	],
 	'coursetrad': [
 		{'field':'title'     , 'template': VarChar(50)},
-		{'field':'e'         , 'template': Checkbox('This is a real course that may be enrolled in, not a student group for admin purposes')},
+		{'field':'e'         , 'template': Checkbox('This is a real (and currently offered) course that may be enrolled in, not a student group for admin purposes')},
 		{'field':'day'       , 'template': Enum('','Mon','Tue','Wed','Thu','Fri','Sat','Sun')},
 		{'field':'start'     , 'template': Time()},
 		{'field':'end'       , 'template': Time()},
@@ -303,6 +314,7 @@ FIELDS = {
 		{'field':'vol_hours' , 'template': Integer()},
 		{'field':'the_hours' , 'template': Integer()},
 		{'field':'prepaid'   , 'template': Checkbox('Families must purchase 10 prepaid tickets for $100, not included in tuition')},
+		{'field':'_courses'  , 'template': ForeignSet(Courses)},
 	],
 	'course'    : [
 		{'field':'year'      , 'template': Integer()},
@@ -312,8 +324,9 @@ FIELDS = {
 		{'field':'the_hours' , 'template': Integer()},
 		{'field':'prepaid'   , 'template': Checkbox()},
 		{'field':'teacher'   , 'template': ForeignKey()},
-		{'field':'trad'      , 'template': ForeignKey()},
+		{'field':'trad'      , 'template': ForeignKey(CourseTrads)},
 		{'field':'aud_date'  , 'template': Date()},
+		{'field':'_students' , 'template': ForeignSet(Enrollments)},
 	],
 	'enrollment': [
 		{'field':'student'   , 'template': ForeignKey()},
@@ -360,6 +373,9 @@ def update(request, model, id):
 	thing = manager.get(id=id)
 	for ftp in FIELDS[model]:
 		field = ftp['field']
+		if type(ftp['template']) is ForeignKey:
+			field += '_id'
+		# print field
 		if field in request.POST and (request.POST[field] or ftp['template'].force):
 			value = request.POST[field]
 			value = ftp['template'].clean(value)

@@ -3,47 +3,7 @@ from django.db import models
 from Utils import custom_fields as custom
 from Utils import supermodel as sm
 from django_mysql import models as sqlmod
-
-# - - - - - M A N A G E R S - - - - - 
-
-class CourseTradManager(sm.SuperManager):
-	def __init__(self):
-		super(CourseTradManager, self).__init__('program_coursetrad')
-	def get(self, **kwargs):
-		thing = super(CourseTradManager, self).get(**kwargs)
-		return thing.alias if thing.alias else thing
-CourseTrads = CourseTradManager()
-
-class CourseManager(sm.SuperManager):
-	def __init__(self):
-		super(CourseManager, self).__init__('program_course')
-	def create(self, **data):
-		# Inherit these fields from Tradition, unless overridden.
-		for field in ['tuition','vol_hours','the_hours','prepaid']:
-			if field not in data:
-				data[field] = data['tradition'].__getattribute__(field)
-		data['id'] = str(int(data['year'])%100).zfill(2)+data['tradition'].id
-		super(CourseManager, self).create(data)
-	def fetch(self, **kwargs):
-		things = self.filter(**kwargs)
-		if things:
-			alias_id = things[0].alias_id
-			if alias_id:
-				return self.fetch(id=alias_id)
-	# TODO: Figure out inheritance
-Courses = CourseManager()
-
-class EnrollmentManager(sm.SuperManager):
-	def __init__(self):
-		super(EnrollmentManager, self).__init__('program_enrollment')
-Enrollments = EnrollmentManager()
-
-class AuditionManager(sm.SuperManager):
-	def __init__(self):
-		super(AuditionManager, self).__init__('program_audition')
-Auditions = AuditionManager()
-
-# - - - - - M O D E L S - - - - - 
+from .managers import CourseTrads, Courses, Enrollments, Auditions
 
 class Venue(models.Model):
 	id   = models.CharField(max_length=3, primary_key=True)
@@ -81,6 +41,8 @@ class CourseTrad(models.Model):
 	the_hours  = models.FloatField(default=0)
 	prepaid    = models.BooleanField(default=False)
 	objects = CourseTrads
+	def _courses(self):
+		return {'mapping':{'trad_id':self.id},'model':'course'}
 	def __str__(self):
 		return self.title.upper()
 	def make(self, year):
@@ -129,6 +91,8 @@ class Course(models.Model):
 	the_hours  = models.FloatField()
 	prepaid    = models.BooleanField()
 	objects = Courses
+	def _students(self):
+		return {'mapping':{'course_id':self.id},'model':'student'}
 	def __str__(self):
 		return self.tradition.title+' ('+str(self.year)+')'
 	def eligible(self, student):
@@ -147,8 +111,10 @@ class Enrollment(models.Model):
 	course     = models.ForeignKey(Course)
 	role       = models.TextField(null=True)
 	role_type  = sqlmod.EnumField(choices=['','Chorus','Support','Lead'])
-	created_at = models.DateTimeField(auto_now_add=True)		
+	created_at = models.DateTimeField(auto_now_add=True)
 	objects = Enrollments
+	def __str__(self):
+		return str(self.student) + (' as '+self.role if self.role else '') + ' in ' + str(self.course)
 
 class Audition(models.Model):
 	student    = models.ForeignKey('main.Student')

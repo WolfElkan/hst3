@@ -3,90 +3,21 @@ from django.db import models
 from Utils import custom_fields as custom
 from Utils import supermodel as sm
 from django_mysql import models as sqlmod
+from .managers import Addresses, Families, Parents, Students, Users
 from datetime import datetime
 
-# - - - - - M A N A G E R S - - - - - 
-
-class AddressManager(sm.SuperManager):
-	def __init__(self):
-		super(AddressManager, self).__init__('address_family')
-Addresses = AddressManager()
-
-class FamilyManager(sm.SuperManager):
-	def __init__(self):
-		super(FamilyManager, self).__init__('main_family')
-		self.fields = ['last','phone','email','phone_type']
-		self.validations = [
-			sm.Present('last' ,'Please enter the family surname, as used by the children.'),
-			sm.Regular('last' ,r'^.{,30}$','This name is too long.  The maximum is 30 characters.'),
-			sm.Present('phone','Please enter the main family phone number.'),
-			sm.Regular('phone',r'^$|^[ -.()/\\~]*(\d[ -.()/\\~]*){10}$','Please enter a valid 10-digit phone number.'),
-			sm.Present('email','Please enter an email address.'),
-			sm.Regular('email',r'^$|(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)','Please enter a valid email address.'),
-		]
-Families = FamilyManager()
-
-class ParentManager(sm.SuperManager):
-	def __init__(self):
-		super(ParentManager, self).__init__('main_parent')
-		self.fields = ['first','alt_last','sex','alt_phone','alt_email','phone_type']
-		self.validations = [
-			sm.Present('first','Please enter a first name or skip this parent'),
-			sm.Regular('first',r'^.{,20}$','This name is too long.  The maximum is 20 characters.'),
-			sm.Regular('alt_last',r'^.{,30}$','This name is too long.  The maximum is 30 characters.'),
-			sm.Regular('alt_phone',r'^$|^[ -.()/\\~]*(\d[ -.()/\\~]*){10}$','Please enter a valid 10-digit phone number.'),
-			sm.Regular('alt_email',r'^$|(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)','Please enter a valid email address.'),
-		]
-Parents = ParentManager()
-
-class StudentManager(sm.SuperManager):
-	def __init__(self):
-		super(StudentManager, self).__init__('main_student')
-		self.fields = ['first','middle','alt_last','alt_first','sex','birthday','grad_year','height','alt_phone','alt_email','tshirt']
-		self.validations = [
-			sm.Present('first','Please enter a first name.'),
-			sm.Regular('first',r'^.{0,20}$','This name is too long.  The maximum is 20 characters.'),
-			sm.Regular('middle',r'^.{0,20}$','This name is too long.  The maximum is 20 characters.'),
-			sm.Regular('alt_last',r'^.{0,30}$','This name is too long.  The maximum is 30 characters.'),
-			sm.Regular('alt_first',r'^.{0,20}$','This name is too long.  The maximum is 20 characters.'),
-			sm.Present('sex','Please select a sex.'),
-			sm.Present('birthday','Please enter a date of birth.'),
-			sm.Regular('alt_phone',r'^$|^[^\d]*(\d[^\d]*){10}$','Please enter a valid 10-digit phone number, or leave blank to use family phone.'),
-			sm.Regular('alt_email',r'^$|(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)','Please enter a valid email address, or leave blank to use family email.'),
-		]
-Students = StudentManager()
-
-class UserManager(sm.SuperManager):
-	def __init__(self):
-		super(UserManager, self).__init__('main_user')
-		self.fields = ['username','password','owner_type','owner_id']
-		self.validations = [
-			sm.Present('username','Please enter a username.'),
-			sm.Unique(self,'username','This username is taken. Please select another.'),
-			sm.Present('password','Please enter a password'),
-			sm.Regular('password', r'^$|^.{8,}$','Password is too short. It should be at least 8 characters.'),
-			sm.Regular('password', r'^$|^[^$].*$','Password may not begin with a dollar sign ($).'),
-			sm.Present('pw_confm','Please confirm your password'),
-			sm.Confirmation('pw_confm','password','Passwords do not match.')
-		]
-Users = UserManager()
-
-# - - - - - M O D E L S - - - - - 
 
 class Address(models.Model):
 	line1      = models.CharField(null=False, max_length=50)
 	line2      = models.CharField(null=True, max_length=50)
 	city       = models.CharField(null=True, max_length=25)
 	state      = models.CharField(null=True, max_length=2)
-	zipcode    = models.DecimalField(null=False, max_digits=9, decimal_places=4)
+	zipcode    = custom.ZipCodeField()
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
 	objects = Addresses
 	def __str__(self):
-		zipcode = custom.ZipCode(self.zipcode)
-		zipcode = str(zipcode)
-		# zipcode = zipcode[:5] + ('' if self.zipcode % 1 == 0 else '-'+zipcode[6:])
-		title = self.line1 + ('\n'+self.line2 if self.line2 else '') + '\n' + self.city + ', ' + self.state + '\n' + zipcode
+		title = self.line1 + ('\n'+self.line2 if self.line2 else '') + '\n' + self.city + ', ' + self.state + '\n' + str(self.zipcode)
 		return title.upper()
 
 class Parent(models.Model):
@@ -136,19 +67,20 @@ class Family(models.Model):
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
 	objects = Families
+	def mother(self):
+		return Parents.fetch(id=super(Family, self).__getattribute__('mother_id'))
+	def father(self):
+		return Parents.fetch(id=super(Family, self).__getattribute__('father_id'))
 	def unique_last(self):
 		return self.last
+	def _children(self):
+		return {'mapping':{'family_id': self.id}, 'model':'student'}
 	def __str__(self):
 		return self.last+' Family'
 	def __getattribute__(self, field):
-		if field == '':
-			pass
-		elif field == 'phone':
-			return custom.PhoneNumber(super(Family, self).__getattribute__('phone'))
-		elif field == 'mother':
-			return Parents.fetch(id=super(Family, self).__getattribute__('mother_id'))
-		elif field == 'father':
-			return Parents.fetch(id=super(Family, self).__getattribute__('father_id'))
+		if field in ['mother','father','unique_last','_children']:
+			function = super(Family, self).__getattribute__(field)
+			return function()
 		else:
 			return super(Family, self).__getattribute__(field)
 	def __setattr__(self, field, value):
@@ -161,13 +93,12 @@ class Family(models.Model):
 		else:
 			return super(Family, self).__setattr__(field, value)
 
-
 class Student(models.Model):
 	first     = models.CharField(max_length=20)
 	alt_first = models.CharField(max_length=20, null=True)
 	middle    = models.CharField(max_length=20, null=True)
 	alt_last  = models.CharField(max_length=30, null=True)
-	family    = models.ForeignKey(Family, related_name='children')
+	family    = models.ForeignKey(Family)
 	sex       = models.CharField(max_length=1, choices=[('M','Male'),('F','Female')])
 	current   = models.BooleanField(default=True)
 	birthday  = models.DateField()
@@ -210,6 +141,8 @@ class Student(models.Model):
 			now = datetime.now()
 			year = now.year + (0 if now.month < 5 else 1)
 		return year - self.grad_year + 12
+	def _enrollments(self):
+		return {'mapping':{'student_id':self.id},'model':'enrollment'}
 	def __str__(self):
 		return self.prefer+' '+self.last
 	def __getattribute__(self, field):
@@ -258,7 +191,7 @@ class Teacher(models.Model):
 class User(models.Model):
 	username   = models.CharField(max_length=30, unique=True)
 	password   = custom.BcryptField()
-	owner      = custom.PolymorphicField('owner', UserManager, [Family,Student,Teacher,Parent])
+	owner      = custom.PolymorphicField('owner', Users, [Family,Student,Teacher,Parent])
 	perm_levels = [
 		(0,'Public') ,
 		(1,'Student'),
