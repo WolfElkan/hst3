@@ -76,6 +76,16 @@ def json(obj):
 	result = result.replace('>','')
 	return result
 
+def pretty(arr, level=0):
+	for thing in arr:
+		if type(thing) is list:
+			pretty(thing, level+1)
+		else:
+			print '  '*level + str(thing)
+
+def pdir(thing):
+	pretty(dir(thing))
+
 # Return the current HST registration year (This year until May 1, next year thereafter)
 def year():
 	now = datetime.now()

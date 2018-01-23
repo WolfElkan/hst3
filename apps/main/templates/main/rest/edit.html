@@ -6,7 +6,7 @@
 <body>
 	<h1>{{thing}}</h1>
 	<h2>{{Model}}</h2>
-	<form method="POST"> {% csrf_token %}
+	<form action="/rest/update/{{model}}/{{thing.id}}" method="POST"> {% csrf_token %}
 		<table>
 			<tr>
 				<td>id:</td>
@@ -20,8 +20,7 @@
 			{% endfor %}
 		</table>
 		<button type="submit">Update</button>
+		<a href="/rest/show/{{model}}/{{thing.id}}">Cancel</a>
 	</form>
-	<a href="/seed/manual/{{model}}/{{thing.id|add:'-1'}}">&lt;Prev</a>
-	<a href="/seed/manual/{{model}}/{{thing.id|add:'1'}}">Next&gt;</a>
 </body>
 </html>

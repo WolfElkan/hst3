@@ -42,8 +42,16 @@ urlpatterns = [
 	url(r'^clear/?$', dev.clear),
 	url(r'^nuke/?$', dev.clearthedatabaselikeanuclearbombandthisnameisverylongsoyoudontcallitbymistake),
 
+	url(r'^rest/edit/(?P<model>[a-zA-Z]+)/(?P<id>\d+|(\d\d)?\w\w)/?$', seed.edit),
+	url(r'^rest/(?P<model>[a-zA-Z]+)/edit/(?P<id>\d+|(\d\d)?\w\w)/?$', seed.edit),
+
+	url(r'^rest/show/(?P<model>[a-zA-Z]+)/(?P<id>\d+|(\d\d)?\w\w)/?$', seed.show),
+	url(r'^rest/(?P<model>[a-zA-Z]+)/show/(?P<id>\d+|(\d\d)?\w\w)/?$', seed.show),
+
+	url(r'^rest/update/(?P<model>[a-zA-Z]+)/(?P<id>\d+|(\d\d)?\w\w)/?$', seed.update),
+	url(r'^rest/(?P<model>[a-zA-Z]+)/update/(?P<id>\d+|(\d\d)?\w\w)/?$', seed.update),
+
 	url(r'^seed/load/?$', seed.load),
-	url(r'^seed/manual/(?P<model>[a-zA-Z]+)/(?P<id>\d+|(\d\d)?\w\w)/?$', seed.manual),
 	url(r'^seed/dump/?$', seed.dump),
 	url(r'^seed/nuke/?$', seed.nuke),
 ]

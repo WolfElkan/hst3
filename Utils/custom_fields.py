@@ -9,11 +9,14 @@ class Bcrypt(object):
 	def __init__(self, char60):
 		self.char60 = char60
 		self.full = char60 if char60[0] == '$' else char60[1:]
-		self.html = '<span title='+self.full+'>&#x1f512;</span>'
 	def __call__(self, pw):
 		return bcrypt.checkpw(bytes(pw), bytes(self.full))
 	def __str__(self):
 		return self.full[:7]+self.full[55:]
+	def widget(self):
+		pass
+	def static(self):
+		return '<span title='+self.full+'>&#x1f512;</span>'
 
 class BcryptField(models.Field):
 	def __init__(self):
@@ -55,17 +58,19 @@ class DayOfWeekField(sqlmod.EnumField):
 
 class PhoneNumber(object):
 	def __init__(self, *num):
-		if type(num) is tuple:
-			num = num[0]
-		if type(num) is PhoneNumber:
-			self.num = num.num
-		elif type(num) is int:
-			self.num = num 
-		else:
-			self.num = self.sanitize(num)
-		self.cod  = str(self.num / 10**7).zfill(3)
-		self.mid  = str(self.num % 10**7 / 10**4).zfill(3)
-		self.last = str(self.num % 10**4).zfill(4)
+		self.force = False
+		if num:
+			if type(num) is tuple:
+				num = num[0]
+			if type(num) is PhoneNumber:
+				self.num = num.num
+			elif type(num) is int:
+				self.num = num 
+			else:
+				self.num = self.sanitize(num)
+			self.cod  = str(self.num / 10**7).zfill(3)
+			self.mid  = str(self.num % 10**7 / 10**4).zfill(3)
+			self.last = str(self.num % 10**4).zfill(4)
 	def sanitize(self, *num):
 		num = num if num else self.num
 		num = str(num)
@@ -82,6 +87,19 @@ class PhoneNumber(object):
 		return '('+self.cod+') '+self.mid+'-'+self.last
 	def __get__(self):
 		return int(self.num)
+	def widget(self, field, value):
+		self.__init__(value)
+		if value:
+			value = int(value)
+		return '<input type="number" name="{}" value="{}">'.format(field, value)
+	def static(self, field, value):
+		self.__init__(value)
+		if value:
+			return str(self)
+	def clean(self, value):
+		self.__init__(value)
+		return self.num
+
 
 class PhoneNumberField(models.DecimalField):
 	def __init__(self, **kwargs):
@@ -91,6 +109,36 @@ class PhoneNumberField(models.DecimalField):
 	def pre_save(self, model_instance, add):
 		num = getattr(model_instance, self.attname)
 		return PhoneNumber(num).sanitize()
+
+class ZipCode(object):
+	def __init__(self, *value):
+		if value:
+			if type(value) is tuple and len(value) == 1:
+				self.value = value[0]
+			else:
+				self.value = value
+	def __str__(self):
+		result = str(int(self.value)).zfill(5)
+		if not self.value._isinteger():
+			result += '-' + str(self.value)[-4:]
+		return result
+	def static(self, field, value):
+		self.__init__(value)
+		return str(self)
+	def widget(self, field, value):
+		if value:
+			value = float(value)
+		return '<input type="number" name="{}" value="{}" step="0.0001">'.format(field, value)
+	def clean(self, value):
+		return value if value else 0
+
+class ZipCodeField(models.DecimalField):
+	def __init__(self, **kwargs):
+		kwargs['max_digits'] = 9
+		kwargs['decimal_places'] = 4
+		super(ZipCodeField, self).__init__(**kwargs)
+	def to_python(self, value):
+		return ZipCode(value)
 
 class PolymorphicField(poly.MultiColumnField):
 	def __init__(self, attname, manager, relatables):

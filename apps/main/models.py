@@ -83,8 +83,9 @@ class Address(models.Model):
 	updated_at = models.DateTimeField(auto_now=True)
 	objects = Addresses
 	def __str__(self):
-		zipcode = str(self.zipcode)
-		zipcode = zipcode[:5] + ('' if self.zipcode % 1 == 0 else '-'+zipcode[6:])
+		zipcode = custom.ZipCode(self.zipcode)
+		zipcode = str(zipcode)
+		# zipcode = zipcode[:5] + ('' if self.zipcode % 1 == 0 else '-'+zipcode[6:])
 		title = self.line1 + ('\n'+self.line2 if self.line2 else '') + '\n' + self.city + ', ' + self.state + '\n' + zipcode
 		return title.upper()
 
@@ -135,6 +136,8 @@ class Family(models.Model):
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
 	objects = Families
+	def unique_last(self):
+		return self.last
 	def __str__(self):
 		return self.last+' Family'
 	def __getattribute__(self, field):

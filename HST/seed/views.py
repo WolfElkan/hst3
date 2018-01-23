@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, HttpResponse
-from Utils.custom_fields import Bcrypt, PhoneNumber
+from Utils.custom_fields import Bcrypt, PhoneNumber, ZipCode
 from datetime import datetime
-from Utils.hacks import copy, getme, seshinit, forminit, first, copyatts
+from Utils.hacks import copy, getme, seshinit, forminit, first, copyatts, pdir
 import json
 import io
 
@@ -102,6 +102,18 @@ def load_post(request):
 
 # MANUAL DATA ENTRY (REST)
 
+MODELS = {
+	'address'   : Addresses,
+	'family'    : Families,
+	'parent'    : Parents,
+	'student'   : Students,
+	'coursetrad': CourseTrads,
+	'course'    : Courses,
+	'enrollment': Enrollments,
+}
+
+	# WIDGET TEMPLATES
+
 class VarChar(object):
 	def __init__(self, maxlength):
 		self.force = False
@@ -110,27 +122,36 @@ class VarChar(object):
 		return '<input type="text" maxlength="{}" name="{}" value="{}">'.format(self.maxlength, field, value)
 	def static(self, field, value):
 		return value
+	def clean(self, value):
+		return value
 
-class Numeric(object):
+class Integer(object):
 	def __init__(self, suffix=''):
-		self.force = True
+		self.force = False
 		self.suffix = suffix
 	def widget(self, field, value):
+		if value:
+			value = int(value)
 		return '<input type="number" name="{}" value="{}"> {}'.format(field, value, self.suffix)
 	def static(self, field, value):
-		return value
+		if value:
+			return str(value) +' '+ self.suffix
+	def clean(self, value):
+		return value if value else 0
 
 class Enum(object):
 	def __init__(self, *options):
 		self.force = True
 		self.options = options
 	def widget(self, field, value):
-		html = '<select name={}>'.format(field)
+		html = '<select name="{}">'.format(field)
 		for option in self.options:
 			html += '<option value="{}"{}>{}</option>'.format(option,' selected' if value == option else '',option)
 		html += '</select>'
 		return html
 	def static(self, field, value):
+		return value
+	def clean(self, value):
 		return value
 
 class Radio(object):
@@ -145,6 +166,8 @@ class Radio(object):
 		return html
 	def static(self, field, value):
 		return value
+	def clean(self, value):
+		return value
 
 class Checkbox(object):
 	def __init__(self, suffix=''):
@@ -154,6 +177,8 @@ class Checkbox(object):
 		return '<input type="checkbox" name="{}" {}> {}'.format(field, ' checked' if value else '',self.suffix)
 	def static(self, field, value):
 		return value
+	def clean(self, value):
+		return value == 'on'
 
 class Date(object):
 	def __init__(self):
@@ -161,6 +186,8 @@ class Date(object):
 	def widget(self, field, value):
 		return '<input type="date" name="{}" value="{}">'.format(field, value)
 	def static(self, field, value):
+		return value.strftime('%B %-d, %Y')
+	def clean(self, value):
 		return value
 
 class Time(object):
@@ -170,20 +197,41 @@ class Time(object):
 		return '<input type="time" name="{}" value="{}">'.format(field, value)
 	def static(self, field, value):
 		return value
+	def clean(self, value):
+		return value
 
 class ForeignKey(object):
 	def __init__(self):
 		self.force = False
 	def widget(self, field, value):
 		rel = field
+		if field in ['mother','father']:
+			field = 'parent'
+		html = '<select name="{}_id">'.format(rel)
+		for foreign in MODELS[field].all():
+			html += '<option value="{}"{}>{}</option>'.format(foreign.id,' selected' if value == foreign else '',str(foreign))
+		html += '</select>'
+		return html
+	def static(self, field, value):
+		rel = field
 		if value:
 			if field in ['mother','father']:
 				field = 'parent'
-			return '<a href="/seed/manual/{}/{}">{}</a>'.format(field,value.id,str(value))
+			return '<a href="/rest/show/{}/{}">{}</a>'.format(field,value.id,str(value))
 		else:
 			return '<a href="new/{}">add</a>'.format(rel)
-	def static(self, field, value):
-		return value if value else ''
+	def clean(self, value):
+		return value
+
+class ForeignSet(object):
+	def __init__(self, arg):
+		self.force = False
+	def widget(self):
+		pass
+	def static(self):
+		pass
+	def clean(self, value):
+		return value
 
 FIELDS = {
 	'address'   : [
@@ -191,11 +239,11 @@ FIELDS = {
 		{'field':'line2'     , 'template': VarChar(50)},
 		{'field':'city'      , 'template': VarChar(25)},
 		{'field':'state'     , 'template': VarChar(2)},
-		{'field':'zipcode'   , 'template': Numeric()},
+		{'field':'zipcode'   , 'template': ZipCode()},
 	],
 	'family'    : [
 		{'field':'last'      , 'template': VarChar(30)},
-		{'field':'phone'     , 'template': Numeric()},
+		{'field':'phone'     , 'template': PhoneNumber()},
 		{'field':'phone_type', 'template': Enum('','Home','Cell','Work')},
 		{'field':'email'     , 'template': VarChar(254)},
 		{'field':'mother'    , 'template': ForeignKey()},
@@ -207,7 +255,7 @@ FIELDS = {
 		{'field':'family'    , 'template': ForeignKey()},
 		{'field':'alt_last'  , 'template': VarChar(30)},
 		{'field':'sex'       , 'template': Enum('M','F')},
-		{'field':'alt_phone' , 'template': Numeric()},
+		{'field':'alt_phone' , 'template': PhoneNumber()},
 		{'field':'phone_type', 'template': Enum('','Home','Cell','Work')},
 		{'field':'alt_email' , 'template': VarChar(254)},
 	],
@@ -215,16 +263,16 @@ FIELDS = {
 		{'field':'first'     , 'template': VarChar(20)},
 		{'field':'alt_first' , 'template': VarChar(20)},
 		{'field':'middle'    , 'template': VarChar(20)},
+		{'field':'family'    , 'template': ForeignKey()},
 		{'field':'alt_last'  , 'template': VarChar(30)},
 		{'field':'sex'       , 'template': Enum('M','F')},
 		{'field':'current'   , 'template': Checkbox('Student is currently in HST')},
 		{'field':'birthday'  , 'template': Date()},
-		{'field':'grad_year' , 'template': Numeric()},
-		{'field':'height'    , 'template': Numeric('inches')},
-		{'field':'alt_phone' , 'template': Numeric()},
+		{'field':'grad_year' , 'template': Integer()},
+		{'field':'height'    , 'template': Integer('inches')},
+		{'field':'alt_phone' , 'template': PhoneNumber()},
 		{'field':'alt_email' , 'template': VarChar(254)},
-		{'field':'tshirt'    , 'template': VarChar(2)},
-		{'field':'family'    , 'template': ForeignKey()},
+		{'field':'tshirt'    , 'template': Enum('','YS','YM','YL','XS','AS','AM','AL','XL','2X','3X')},
 	],
 	'coursetrad': [
 		{'field':'title'     , 'template': VarChar(50)},
@@ -232,13 +280,13 @@ FIELDS = {
 		{'field':'day'       , 'template': Enum('','Mon','Tue','Wed','Thu','Fri','Sat','Sun')},
 		{'field':'start'     , 'template': Time()},
 		{'field':'end'       , 'template': Time()},
-		{'field':'nMeets'    , 'template': Numeric()},
+		{'field':'nMeets'    , 'template': Integer()},
 		{'field':'show'      , 'template': VarChar(2)},
 		{'field':'vs'        , 'template': Checkbox('This class performs in the Variety Show')},
-		{'field':'min_age'   , 'template': Numeric()},
-		{'field':'max_age'   , 'template': Numeric()},
-		{'field':'min_grd'   , 'template': Numeric()},
-		{'field':'max_grd'   , 'template': Numeric()},
+		{'field':'min_age'   , 'template': Integer()},
+		{'field':'max_age'   , 'template': Integer()},
+		{'field':'min_grd'   , 'template': Integer()},
+		{'field':'max_grd'   , 'template': Integer()},
 		{'field':'M'         , 'template': Checkbox('Boys may enroll')},
 		{'field':'F'         , 'template': Checkbox('Girls may enroll')},
 		{'field':'C'         , 'template': Checkbox('Only current students may enroll')},
@@ -250,61 +298,54 @@ FIELDS = {
 			'1 year of Acting A or B required to audition',
 			'1 year of Acting and 1 year of Troupe required to audition',
 		])},
-		{'field':'tuition'   , 'template': Numeric()},
-		{'field':'redtuit'   , 'template': Numeric()},
-		{'field':'vol_hours' , 'template': Numeric()},
-		{'field':'the_hours' , 'template': Numeric()},
+		{'field':'tuition'   , 'template': Integer()},
+		{'field':'redtuit'   , 'template': Integer()},
+		{'field':'vol_hours' , 'template': Integer()},
+		{'field':'the_hours' , 'template': Integer()},
 		{'field':'prepaid'   , 'template': Checkbox('Families must purchase 10 prepaid tickets for $100, not included in tuition')},
 	],
 	'course'    : [
-		{'field':'year'      , 'template': Numeric()},
+		{'field':'year'      , 'template': Integer()},
 		{'field':'last_date' , 'template': Date()},
-		{'field':'tuition'   , 'template': Numeric()},
-		{'field':'vol_hours' , 'template': Numeric()},
-		{'field':'the_hours' , 'template': Numeric()},
+		{'field':'tuition'   , 'template': Integer()},
+		{'field':'vol_hours' , 'template': Integer()},
+		{'field':'the_hours' , 'template': Integer()},
 		{'field':'prepaid'   , 'template': Checkbox()},
 		{'field':'teacher'   , 'template': ForeignKey()},
-		{'field':'trad'      , 'template': VarChar(2)},
+		{'field':'trad'      , 'template': ForeignKey()},
 		{'field':'aud_date'  , 'template': Date()},
 	],
 	'enrollment': [
+		{'field':'student'   , 'template': ForeignKey()},
+		{'field':'course'    , 'template': ForeignKey()},
 		{'field':'role'      , 'template': VarChar(0)},
 		{'field':'role_type' , 'template': Enum('','Chorus','Support','Lead')},
-		{'field':'course'    , 'template': ForeignKey()},
-		{'field':'student'   , 'template': ForeignKey()},
 	],
 }
 
-MODELS = {
-	'address'   : Addresses,
-	'family'    : Families,
-	'parent'    : Parents,
-	'student'   : Students,
-	'coursetrad': CourseTrads,
-	'course'    : Courses,
-	'enrollment': Enrollments,
-}
+def show(request, model, id):
+	return show_or_edit(request, model, id, False)
 
-def manual(request, *args, **kwargs):
-	if request.method == 'GET':
-		return manual_get(request, *args, **kwargs)
-	elif request.method == 'POST':
-		return manual_post(request, *args, **kwargs)
-	else:
-		return HttpResponse("Unrecognized HTTP Verb")
+def edit(request, model, id):
+	return show_or_edit(request, model, id, True)
 
-def manual_get(request, model, id):
+def show_or_edit(request, model, id, isEdit):
 	manager = MODELS[model]
 	thing = manager.get(id=id)
-	# print thing
 	tempset = FIELDS[model]
 	display = []
 	for ftp in tempset:
 		value = thing.__getattribute__(ftp['field'])
 		value = value if value else ''
+		if isEdit:
+			value = ftp['template'].widget(ftp['field'],value)
+		else:
+			value = ftp['template'].static(ftp['field'],value)
+		if value == None:
+			value = ''
 		display.append({
 			'field':ftp['field'], 
-			'input':ftp['template'].widget(ftp['field'],value)
+			'input':value
 		})
 	context = {
 		'thing'   : thing,
@@ -312,18 +353,19 @@ def manual_get(request, model, id):
 		'model'   : model,
 		'Model'   : 'Course Tradition' if model == 'coursetrad' else model.title(),
 	}
-	return render(request, 'main/manual.html', context)
+	return render(request, 'main/rest/edit.html' if isEdit else 'main/rest/show.html', context)
 
-
-def manual_post(request, model, id):
+def update(request, model, id):
 	manager = MODELS[model]
 	thing = manager.get(id=id)
 	for ftp in FIELDS[model]:
 		field = ftp['field']
 		if field in request.POST and (request.POST[field] or ftp['template'].force):
-			print field, request.POST[field]
-			# TODO: Actually make the changes
-	return HttpResponse(str(thing))
+			value = request.POST[field]
+			value = ftp['template'].clean(value)
+			thing.__setattr__(field, value)
+	thing.save()
+	return redirect("/rest/show/{}/{}".format(model, thing.id))
 
 def dump(request):
 	data = {

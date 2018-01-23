@@ -12,37 +12,6 @@ Parents   = Parent.objects
 Students  = Student.objects
 Users     = User.objects
 
-# - - - - - DEVELOPER VIEWS - - - - -
-
-def hot(request):
-	me = getme(request)
-	seshinit(request,'command')
-	context = {
-		'command': request.session['command']
-	}
-	return render(request, 'main/hot.html', context)
-
-def run(request):
-	me = getme(request)
-	command = request.POST['command']
-	request.session['command'] = command
-	exec(command)
-	return redirect ('/hot')
-
-def clearthedatabaselikeanuclearbombandthisnameisverylongsoyoudontcallitbymistake(request):
-	Users.all().delete()
-	Families.all().delete()
-	Students.all().delete()
-	Parents.all().delete()
-	Addresses.all().delete()
-	request.session.clear()
-	print '\n\n'+' '*34+'THE RADIANCE OF A THOUSAND SUNS'+'\n\n'
-	return redirect ('/hot')
-
-def clear(request):
-	request.session.clear()
-	return redirect ('/hot')
-
 # - - - - - SECURITY FUNCTIONS - - - - -
 
 def authorized(request):

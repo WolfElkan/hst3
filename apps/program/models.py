@@ -24,7 +24,13 @@ class CourseManager(sm.SuperManager):
 				data[field] = data['tradition'].__getattribute__(field)
 		data['id'] = str(int(data['year'])%100).zfill(2)+data['tradition'].id
 		super(CourseManager, self).create(data)
-	# TODO: Support aliases in getting/fetching Courses
+	def fetch(self, **kwargs):
+		things = self.filter(**kwargs)
+		if things:
+			alias_id = things[0].alias_id
+			if alias_id:
+				return self.fetch(id=alias_id)
+	# TODO: Figure out inheritance
 Courses = CourseManager()
 
 class EnrollmentManager(sm.SuperManager):
@@ -78,7 +84,7 @@ class CourseTrad(models.Model):
 	def __str__(self):
 		return self.title.upper()
 	def make(self, year):
-		Courses.kreate(tradition=self, year=year)
+		return Courses.create(tradition=self, year=year)
 	def genre(self):
 		code = self.id[0]
 		genre_codes = {
