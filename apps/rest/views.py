@@ -10,8 +10,28 @@ def home(request, model):
 	return render(request, 'rest/home.html')
 
 def index(request, model):
-	context = {}
-	return render(request, 'rest/index.html')
+	columns = []
+	for ftp in FIELDS[model]:
+		columns.append(ftp['field'])
+	query = request.GET
+	# print query
+	qset = MODELS[model].filter(**query)
+	display = []
+	for thing in qset:
+		dthing = ['<a href="show/{}">{}</a>'.format(thing.id, thing.id)]
+		for ftp in FIELDS[model]:
+			value = thing.__getattribute__(ftp['field'])
+			value = value if value else ''
+			template = ftp['template']
+			dthing.append(template.static(ftp['field'],value))
+		display.append(dthing)
+	context = {
+		'columns' : columns,
+		'display' : display,
+		'model'   : model,
+		'Model'   : 'Course Tradition' if model == 'coursetrad' else model.title(),
+	}
+	return render(request, 'rest/index.html', context)
 
 def show(request, model, id):
 	return show_or_edit(request, model, id, False)
