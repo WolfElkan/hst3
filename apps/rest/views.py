@@ -5,6 +5,10 @@ from Utils.hacks import copy, getme, seshinit, forminit, first, copyatts, pretty
 from .fields import FIELDS
 from .widgets import MODELS
 
+def home(request, model):
+	context = {}
+	return render(request, 'rest/home.html')
+
 def index(request, model):
 	context = {}
 	return render(request, 'rest/index.html')
@@ -23,14 +27,15 @@ def show_or_edit(request, model, id, isEdit):
 	for ftp in tempset:
 		value = thing.__getattribute__(ftp['field'])
 		value = value if value else ''
+		template = ftp['template']
 		if isEdit:
-			value = ftp['template'].widget(ftp['field'],value)
+			value = template.widget(ftp['field'],value)
 		else:
-			value = ftp['template'].static(ftp['field'],value)
+			value = template.static(ftp['field'],value)
 		if value == None:
 			value = ''
 		display.append({
-			'field':ftp['field'], 
+			'field':template.field if template.field else ftp['field'], 
 			'input':value
 		})
 	context = {

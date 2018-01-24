@@ -79,12 +79,10 @@ class Family(models.Model):
 		return self.last
 	def children(self):
 		return Students.filter(family_id=self.id)
-	def _children(self):
-		return {'mapping':{'family_id': self.id}, 'model':'student'}
 	def __str__(self):
 		return self.last+' Family'
 	def __getattribute__(self, field):
-		if field in ['mother','father','unique_last','_children','children']:
+		if field in ['mother','father','unique_last','children']:
 			function = super(Family, self).__getattribute__(field)
 			return function()
 		else:
@@ -158,8 +156,11 @@ class Student(models.Model):
 		for enrollment in self.enrollments:
 			qset.append(Courses.get(id=enrollment.course_id))
 		return qset
-	def _enrollments(self):
-		return {'mapping':{'student_id':self.id},'model':'enrollment'}
+	def courses_toggle_enrollments(self):
+		qset = []
+		for enrollment in self.enrollments:
+			qset.append({'widget':enrollment,'static':Courses.get(id=enrollment.course_id)})
+		return qset
 	def prefer(self):
 		return self.alt_first if self.alt_first else self.first
 	def last(self):
@@ -177,7 +178,7 @@ class Student(models.Model):
 	def __str__(self):
 		return self.prefer+' '+self.last
 	def __getattribute__(self, field):
-		if field in ['hst_age','grade','enrollments','courses','_enrollments','prefer','last','phone','email','full_name','mother','father']:
+		if field in ['hst_age','grade','enrollments','courses','courses_toggle_enrollments','prefer','last','phone','email','full_name','mother','father']:
 			call = super(Student, self).__getattribute__(field)
 			return call()
 		else:

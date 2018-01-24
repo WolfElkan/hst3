@@ -55,8 +55,6 @@ class CourseTrad(models.Model):
 		return self.title.upper()
 	def courses(self):
 		return Courses.filter(tradition_id=self.id)
-	def _courses(self):
-		return {'mapping':{'tradition_id':self.id},'model':'course'}
 	def make(self, year):
 		return Courses.create(tradition=self, year=year)
 	def genre(self):
@@ -91,7 +89,7 @@ class CourseTrad(models.Model):
 		if course:
 			return course.saud(student)
 	def __getattribute__(self, field):
-		if field in ['_courses','courses','genre']:
+		if field in ['courses','genre']:
 			function = super(CourseTrad, self).__getattribute__(field)
 			return function()
 		else:
@@ -117,8 +115,11 @@ class Course(models.Model):
 		for enrollment in self.enrollments:
 			qset.append(Students.get(id=enrollment.student_id))
 		return qset
-	def _students(self):
-		return {'mapping':{'course_id':self.id},'model':'student'}
+	def students_toggle_enrollments(self):
+		qset = []
+		for enrollment in self.enrollments:
+			qset.append({'widget':enrollment,'static':Students.get(id=enrollment.student_id)})
+		return qset
 	def __str__(self):
 		return self.tradition.title+' ('+str(self.year)+')'
 	def eligible(self, student):
@@ -132,7 +133,7 @@ class Course(models.Model):
 		if self.audible(student):
 			Auditions.create({'course': self, 'student': student})
 	def __getattribute__(self, field):
-		if field in ['_students','students','enrollments']:
+		if field in ['students_toggle_enrollments','students','enrollments']:
 			call = super(Course, self).__getattribute__(field)
 			return call()
 		else:

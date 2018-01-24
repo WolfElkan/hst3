@@ -8,6 +8,7 @@ from datetime import datetime
 
 class Bcrypt(object):
 	def __init__(self, char60):
+		self.field = None
 		self.char60 = char60
 		self.full = char60 if char60[0] == '$' else char60[1:]
 	def __call__(self, pw):
@@ -42,6 +43,7 @@ long_days = ['N/A','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'
 
 class DayOfWeek(object):
 	def __init__(self, *value):
+		self.field = None
 		if value:
 			if type(value) is tuple:
 				value = value[0]
@@ -63,6 +65,8 @@ class DayOfWeek(object):
 		return long_days[self.value]
 	def __int__(self):
 		return self.value
+	def __json__(self):
+		return short_days[self.value]
 	def widget(self, field, value):
 		self.__init__(value)
 		html = '<select name="{}">'.format(field)
@@ -88,6 +92,7 @@ class DayOfWeekField(sqlmod.EnumField):
 
 class PhoneNumber(object):
 	def __init__(self, *value):
+		self.field = None
 		self.force = False
 		if value:
 			if type(value) is tuple:
@@ -144,6 +149,7 @@ class PhoneNumberField(models.DecimalField):
 
 class ZipCode(object):
 	def __init__(self, *value):
+		self.field = None
 		if value:
 			if type(value) is tuple:
 				self.value = value[0]

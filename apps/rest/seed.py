@@ -98,6 +98,13 @@ def load_post(request):
 
 	return redirect('/seed/load/')
 
+class FriendlyEncoder(json.JSONEncoder):
+	def default(self, obj):
+		if hasattr(obj,'__json__'):
+			return obj.__json__()
+		else:
+			return str(obj)
+
 def dump(request):
 	data = {
 		'venues':[],
@@ -110,7 +117,7 @@ def dump(request):
 			data['coursetrads'].append({
 				'id'       : ct.id,
 				'title'    : ct.title,
-				'enroll'   : ct.enroll,
+				'e'        : ct.e,
 				'day'      : ct.day,
 				'start'    : str(ct.start),
 				'end'      : str(ct.end),
@@ -188,9 +195,7 @@ def dump(request):
 				student_obj['enrollments'] = []
 				family_obj['students'].append(student_obj)
 		data['families'].append(family_obj)
-		huge = json.dumps(data)
-	print 'Rendered ' + str(len(huge)) + ' characters of JSON'
-	return HttpResponse(huge)
+	return HttpResponse(json.dumps(data, cls=FriendlyEncoder))
 
 def nuke(request):
 	Users.all().delete()

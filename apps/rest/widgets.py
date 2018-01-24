@@ -41,9 +41,10 @@ def rest_list(qset):
 
 
 class VarChar(object):
-	def __init__(self, maxlength):
+	def __init__(self, **kwargs):
+		self.field = kwargs['field'] if 'field' in kwargs else None		
+		self.maxlength = kwargs['maxlength'] if 'maxlength' in kwargs else None		
 		self.force = ''
-		self.maxlength = maxlength
 	def widget(self, field, value):
 		return '<input type="text" maxlength="{}" name="{}" value="{}">'.format(self.maxlength, field, value)
 	def static(self, field, value):
@@ -52,9 +53,10 @@ class VarChar(object):
 		return value
 
 class Integer(object):
-	def __init__(self, suffix=''):
+	def __init__(self, **kwargs):
+		self.field = kwargs['field'] if 'field' in kwargs else None
+		self.suffix = kwargs['suffix'] if 'suffix' in kwargs else ''
 		self.force = 0
-		self.suffix = suffix
 	def widget(self, field, value):
 		if value:
 			value = int(value)
@@ -66,10 +68,11 @@ class Integer(object):
 		return value if value else 0
 
 class Enum(object):
-	def __init__(self, *options):
-		self.options = options
-		if not options[0]:
-			self.force = options[0]
+	def __init__(self, **kwargs):
+		self.field = kwargs['field'] if 'field' in kwargs else None
+		self.options = kwargs['options'] if 'options' in kwargs else []
+		if not self.options[0]:
+			self.force = self.options[0]
 	def widget(self, field, value):
 		html = '<select name="{}">'.format(field)
 		for option in self.options:
@@ -82,9 +85,10 @@ class Enum(object):
 		return value
 
 class Radio(object):
-	def __init__(self, options):
+	def __init__(self, **kwargs):
+		self.field = kwargs['field'] if 'field' in kwargs else None
+		self.options = kwargs['options'] if 'options' in kwargs else []
 		self.force = 0
-		self.options = options
 	def widget(self, field, value):
 		value = value if value else 0
 		html = ''
@@ -97,9 +101,10 @@ class Radio(object):
 		return value
 
 class Checkbox(object):
-	def __init__(self, suffix=''):
+	def __init__(self, **kwargs):
+		self.field = kwargs['field'] if 'field' in kwargs else None
+		self.suffix = kwargs['suffix'] if 'suffix' in kwargs else ''
 		self.force = False
-		self.suffix = suffix
 	def widget(self, field, value):
 		return '<input type="checkbox" name="{}" {}> {}'.format(field, ' checked' if value else '',self.suffix)
 	def static(self, field, value):
@@ -110,6 +115,8 @@ class Checkbox(object):
 		return value == 'on'
 
 class Date(object):
+	def __init__(self, **kwargs):
+		self.field = kwargs['field'] if 'field' in kwargs else None
 	def widget(self, field, value):
 		return '<input type="date" name="{}" value="{}">'.format(field, value)
 	def static(self, field, value):
@@ -119,14 +126,38 @@ class Date(object):
 		return value
 
 class Time(object):
+	def __init__(self, **kwargs):
+		self.field = kwargs['field'] if 'field' in kwargs else None
 	def widget(self, field, value):
 		return '<input type="time" name="{}" value="{}">'.format(field, value)
 	def static(self, field, value):
-		return value
+		if value:
+			return value.strftime('%-I:%M %p')
 	def clean(self, value):
 		return value
 
+class Price(object):
+	def __init__(self, **kwargs):
+		self.field = kwargs['field'] if 'field' in kwargs else None
+		self.force = 0.00
+	def widget(self, field, value):
+		if value:
+			value = float(value)
+		else:
+			value = 0
+		return '<input type="number" step="0.01" name="{}" value="{:.2f}">'.format(field, value)
+	def static(self, field, value):
+		if value:
+			value = float(value)
+			return '${:.2f}'.format(value)
+		else:
+			return ''
+	def clean(self, value):
+		return value if value else 0
+
 class ForeignKey(object):
+	def __init__(self, **kwargs):
+		self.field = kwargs['field'] if 'field' in kwargs else None
 	def static(self, field, value):
 		self.field = field
 		if value:
@@ -146,7 +177,7 @@ class ForeignKey(object):
 
 class ForeignSet(object):
 	def __init__(self, **kwargs):
-		self.widget_query = kwargs['widget_query'] if 'widget_query' in kwargs else None
+		self.field = kwargs['field'] if 'field' in kwargs else None
 	def static(self, field, qset):
 		return rest_list(qset)
 	def widget(self, field, qset):
@@ -156,16 +187,17 @@ class ForeignSet(object):
 
 class ToggleSet(object):
 	def __init__(self, **kwargs):
-		self.static_set = kwargs['static_set'] if 'static_set' in kwargs else None
-		self.widget_set = kwargs['widget_set'] if 'widget_set' in kwargs else None
-		self.clean_func = kwargs['clean_func'] if 'clean_func' in kwargs else None
+		self.field = kwargs['field'] if 'field' in kwargs else None
 	def static(self, field, qset):
-		pass
+		display = []
+		for foreign in qset:
+			display.append(foreign['static'])
+		return rest_list(display)
 	def widget(self, field, qset):
-		pass
+		display = []
+		for foreign in qset:
+			display.append(foreign['widget'])
+		return rest_list(display)
 	def clean(self, value):
-		if self.clean_func:
-			return self.clean_func(value)
-		else:
-			return value
+		return value
 	
