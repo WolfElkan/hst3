@@ -18,7 +18,7 @@ def index(request, model):
 	qset = MODELS[model].filter(**query)
 	display = []
 	for thing in qset:
-		dthing = ['<a href="show/{}">{}</a>'.format(thing.id, thing.id)]
+		dthing = ['<a href="/rest/show/{}/{}">{}</a>'.format(model, thing.id, thing.id)]
 		for ftp in FIELDS[model]:
 			value = thing.__getattribute__(ftp['field'])
 			value = value if value else ''
