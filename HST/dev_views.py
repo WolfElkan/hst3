@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, HttpResponse
-from Utils.custom_fields import Bcrypt, PhoneNumber
+from Utils.custom_fields import Bcrypt, PhoneNumber, DayOfWeek
 from datetime import datetime
 from Utils.hacks import copy, getme, seshinit, first, pretty, pdir
 

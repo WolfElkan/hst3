@@ -6,6 +6,7 @@ from django_mysql import models as sqlmod
 from .managers import Addresses, Families, Parents, Students, Users
 from datetime import datetime
 
+from apps.program.managers import CourseTrads, Courses, Enrollments, Auditions
 
 class Address(models.Model):
 	line1      = models.CharField(null=False, max_length=50)
@@ -15,10 +16,11 @@ class Address(models.Model):
 	zipcode    = custom.ZipCodeField()
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
+	rest_model = "address"
 	objects = Addresses
 	def __str__(self):
 		title = self.line1 + ('\n'+self.line2 if self.line2 else '') + '\n' + self.city + ', ' + self.state + '\n' + str(self.zipcode)
-		return title.upper()
+		return title
 
 class Parent(models.Model):
 	first      = models.CharField(max_length=20)
@@ -30,6 +32,7 @@ class Parent(models.Model):
 	alt_email  = models.EmailField(null=True)
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
+	rest_model = "parent"
 	objects = Parents
 	def __getattribute__(self, field):
 		if field == '':
@@ -66,19 +69,22 @@ class Family(models.Model):
 	address    = models.OneToOneField(Address, null=True, primary_key=False, rel=True)
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
+	rest_model = "family"
 	objects = Families
 	def mother(self):
-		return Parents.fetch(id=super(Family, self).__getattribute__('mother_id'))
+		return Parents.fetch(id=self.mother_id)
 	def father(self):
-		return Parents.fetch(id=super(Family, self).__getattribute__('father_id'))
+		return Parents.fetch(id=self.father_id)
 	def unique_last(self):
 		return self.last
+	def children(self):
+		return Students.filter(family_id=self.id)
 	def _children(self):
 		return {'mapping':{'family_id': self.id}, 'model':'student'}
 	def __str__(self):
 		return self.last+' Family'
 	def __getattribute__(self, field):
-		if field in ['mother','father','unique_last','_children']:
+		if field in ['mother','father','unique_last','_children','children']:
 			function = super(Family, self).__getattribute__(field)
 			return function()
 		else:
@@ -106,6 +112,7 @@ class Student(models.Model):
 	height    = models.FloatField(null=True)
 	alt_phone = custom.PhoneNumberField(null=True)
 	alt_email = models.EmailField(null=True)
+	rest_model = "student"
 	t_shirt_sizes = [
 		('YS','Youth Small'),
 		('YM','Youth Medium'),
@@ -131,52 +138,50 @@ class Student(models.Model):
 		return course.take(self)
 	def saud(self, course):
 		return course.saud(self)
-	def hst_age(self, *year):
-		if not year:
-			now = datetime.now()
-			year = now.year + (0 if now.month < 5 else 1)
+	def hst_age_in(self, year):
 		return year - self.birthday.year - 1
-	def grade(self, *year):
-		if not year:
-			now = datetime.now()
-			year = now.year + (0 if now.month < 5 else 1)
+	def hst_age(self):
+		now = datetime.now()
+		year = now.year + (0 if now.month < 5 else 1)
+		return self.hst_age_in(year)
+	def grade_in(self, year):
 		return year - self.grad_year + 12
+	def grade(self):
+		now = datetime.now()
+		# Switch to the following year on May 1
+		year = now.year + (0 if now.month < 5 else 1)
+		return self.grade_in(year)
+	def enrollments(self):
+		return Enrollments.filter(student_id=self.id)
+	def courses(self):
+		qset = []
+		for enrollment in self.enrollments:
+			qset.append(Courses.get(id=enrollment.course_id))
+		return qset
 	def _enrollments(self):
 		return {'mapping':{'student_id':self.id},'model':'enrollment'}
+	def prefer(self):
+		return self.alt_first if self.alt_first else self.first
+	def last(self):
+		return self.alt_last  if self.alt_last  else self.family.last
+	def phone(self):
+		return self.alt_phone if self.alt_phone else self.family.phone
+	def email(self):
+		return self.alt_email if self.alt_email else self.family.email
+	def full_name(self):
+		return ' '.join([self.first,self.middle,self.last] if self.middle else [self.first,self.last])
+	def mother(self):
+		return self.family.mother
+	def father(self):
+		return self.family.father
 	def __str__(self):
 		return self.prefer+' '+self.last
 	def __getattribute__(self, field):
-		if field == '':
-			pass
-		elif field == 'prefer':
-			if super(Student, self).__getattribute__('alt_first'):
-				return super(Student, self).__getattribute__('alt_first') 
-			else: 
-				return super(Student, self).__getattribute__('first')
-		elif field == 'last':
-			if super(Student, self).__getattribute__('alt_last'):
-				return super(Student, self).__getattribute__('alt_last') 
-			else: 
-				return self.family.last
-		elif field == 'phone':
-			return custom.PhoneNumber(self.alt_phone if self.alt_phone else self.family.phone)
-		elif field == 'email':
-			return self.alt_email if self.alt_email else self.family.email
-		elif field == 'grade':
-			now = datetime.now()
-			# Switch to the following year on May 1
-			year = now.year + (0 if now.month < 5 else 1)
-			grade = year - self.grad_year + 12
-			return grade
-		elif field == 'family':
-			family_id = super(Student, self).__getattribute__('family_id')
-			return Families.get(id=family_id)
-		elif field == 'full_name':
-			return ' '.join([self.first,self.middle,self.last] if self.middle else [self.first,self.last])
+		if field in ['hst_age','grade','enrollments','courses','_enrollments','prefer','last','phone','email','full_name','mother','father']:
+			call = super(Student, self).__getattribute__(field)
+			return call()
 		else:
 			return super(Student, self).__getattribute__(field)
-	def __getattr__(self, field):
-		return None
 
 class Teacher(models.Model):
 	first      = models.CharField(max_length=20)
@@ -186,7 +191,8 @@ class Teacher(models.Model):
 	email      = models.EmailField()
 	address    = models.OneToOneField(Address, null=True, primary_key=False, rel=True)
 	created_at = models.DateTimeField(auto_now_add=True)
-	updated_at = models.DateTimeField(auto_now=True)		
+	updated_at = models.DateTimeField(auto_now=True)
+	rest_model = "teacher"
 
 class User(models.Model):
 	username   = models.CharField(max_length=30, unique=True)
@@ -204,6 +210,7 @@ class User(models.Model):
 	permission = models.PositiveSmallIntegerField(default=0, choices=perm_levels)
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
+	rest_model = "user"
 	objects = Users
 	def __str__(self):
 		return self.username

@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, HttpResponse
-from Utils.custom_fields import Bcrypt, PhoneNumber, ZipCode
+from Utils.custom_fields import Bcrypt, PhoneNumber, ZipCode, DayOfWeek
 from datetime import datetime
-from Utils.hacks import copy, getme, seshinit, forminit, first, copyatts, pdir
+from Utils.hacks import copy, getme, seshinit, forminit, first, copyatts, pretty, pdir
 import json
 import io
 
@@ -116,7 +116,7 @@ MODELS = {
 
 class VarChar(object):
 	def __init__(self, maxlength):
-		self.force = False
+		self.force = ''
 		self.maxlength = maxlength
 	def widget(self, field, value):
 		return '<input type="text" maxlength="{}" name="{}" value="{}">'.format(self.maxlength, field, value)
@@ -127,7 +127,7 @@ class VarChar(object):
 
 class Integer(object):
 	def __init__(self, suffix=''):
-		self.force = False
+		self.force = 0
 		self.suffix = suffix
 	def widget(self, field, value):
 		if value:
@@ -141,8 +141,9 @@ class Integer(object):
 
 class Enum(object):
 	def __init__(self, *options):
-		self.force = True
 		self.options = options
+		if not options[0]:
+			self.force = options[0]
 	def widget(self, field, value):
 		html = '<select name="{}">'.format(field)
 		for option in self.options:
@@ -156,7 +157,7 @@ class Enum(object):
 
 class Radio(object):
 	def __init__(self, options):
-		self.force = True
+		self.force = 0
 		self.options = options
 	def widget(self, field, value):
 		value = value if value else 0
@@ -165,24 +166,24 @@ class Radio(object):
 			html += '<input type="radio" name="{}" value="{}" {}>{}<br>'.format(field, o,' checked' if value == o else '',self.options[o])
 		return html
 	def static(self, field, value):
-		return value
+		return self.options[value]
 	def clean(self, value):
 		return value
 
 class Checkbox(object):
 	def __init__(self, suffix=''):
-		self.force = True
+		self.force = False
 		self.suffix = suffix
 	def widget(self, field, value):
 		return '<input type="checkbox" name="{}" {}> {}'.format(field, ' checked' if value else '',self.suffix)
 	def static(self, field, value):
-		return value
+		return 'Yes' if value else 'No'
 	def clean(self, value):
+		print '*'*100
+		print value
 		return value == 'on'
 
 class Date(object):
-	def __init__(self):
-		self.force = False
 	def widget(self, field, value):
 		return '<input type="date" name="{}" value="{}">'.format(field, value)
 	def static(self, field, value):
@@ -192,8 +193,6 @@ class Date(object):
 		return value
 
 class Time(object):
-	def __init__(self):
-		self.force = False
 	def widget(self, field, value):
 		return '<input type="time" name="{}" value="{}">'.format(field, value)
 	def static(self, field, value):
@@ -201,46 +200,66 @@ class Time(object):
 	def clean(self, value):
 		return value
 
+def rest_link(foreign):
+	if foreign:
+		return '<a href="/rest/show/{}/{}/">{}</a>'.format(foreign.rest_model,foreign.id,str(foreign))
+	else:
+		return ''
+
+def rest_list(qset):
+	if qset:
+		html = '<span>({})</span><ul>'.format(len(qset))
+		for foreign in qset:
+			html += '<li>{}</li>'.format(rest_link(foreign))
+		html += '</ul>'
+		return html
+	else:
+		return '(0)'
+
+
 class ForeignKey(object):
-	def __init__(self, *manager):
-		if manager:
-			self.manager = manager
-		self.force = False
+	def static(self, field, value):
+		self.field = field
+		if value:
+			return rest_link(value)
+		else:
+			return '<a href="new/{}/">add</a>'.format(field)
 	def widget(self, field, value):
-		rel = field
-		if field in ['mother','father']:
-			field = 'parent'
-		html = '<select name="{}_id">'.format(rel)
-		for foreign in MODELS[field].all():
-			html += '<option value="{}"{}>{}</option>'.format(foreign.id,' selected' if value == foreign else '',str(foreign))
+		self.field = field
+		html = '<select name="{}_id">'.format(field)
+		if value:
+			for foreign in MODELS[value.rest_model].all():
+				html += '<option value="{}"{}>{}</option>'.format(foreign.id,' selected' if value == foreign else '',str(foreign))
 		html += '</select>'
 		return html
-	def static(self, field, value):
-		rel = field
-		if value:
-			if field in ['mother','father']:
-				field = 'parent'
-			return '<a href="/rest/show/{}/{}">{}</a>'.format(field,value.id,str(value))
-		else:
-			return '<a href="new/{}">add</a>'.format(rel)
 	def clean(self, value):
 		return value
 
 class ForeignSet(object):
-	def __init__(self, foreign):
-		self.force = False
-		self.foreign = foreign
-	def widget(self, field, value):
+	def __init__(self, **kwargs):
+		self.widget_query = kwargs['widget_query'] if 'widget_query' in kwargs else None
+	def static(self, field, qset):
+		return rest_list(qset)
+	def widget(self, field, qset):
+		return rest_list(qset)
+	def clean(self, qset):
+		return qset
+
+class ToggleSet(object):
+	def __init__(self, **kwargs):
+		self.static_set = kwargs['static_set'] if 'static_set' in kwargs else None
+		self.widget_set = kwargs['widget_set'] if 'widget_set' in kwargs else None
+		self.clean_func = kwargs['clean_func'] if 'clean_func' in kwargs else None
+	def static(self, field, qset):
 		pass
-	def static(self, field, value):
-		things = self.foreign.filter(**value['mapping'])
-		html = '<ul>'
-		for thing in things:
-			html += '<li>{}</li>'.format(ForeignKey().static(value['model'], thing))
-		html += '</ul>'
-		return html
+	def widget(self, field, qset):
+		pass
 	def clean(self, value):
-		return value
+		if self.clean_func:
+			return self.clean_func(value)
+		else:
+			return value
+		
 
 FIELDS = {
 	'address'   : [
@@ -258,7 +277,7 @@ FIELDS = {
 		{'field':'mother'    , 'template': ForeignKey()},
 		{'field':'father'    , 'template': ForeignKey()},
 		{'field':'address'   , 'template': ForeignKey()},
-		{'field':'_children' , 'template': ForeignSet(Students)},
+		{'field':'children'  , 'template': ForeignSet()},
 	],
 	'parent'    : [
 		{'field':'first'     , 'template': VarChar(20)},
@@ -271,8 +290,8 @@ FIELDS = {
 	],
 	'student'   : [
 		{'field':'first'     , 'template': VarChar(20)},
-		{'field':'alt_first' , 'template': VarChar(20)},
 		{'field':'middle'    , 'template': VarChar(20)},
+		{'field':'alt_first' , 'template': VarChar(20)},
 		{'field':'family'    , 'template': ForeignKey()},
 		{'field':'alt_last'  , 'template': VarChar(30)},
 		{'field':'sex'       , 'template': Enum('M','F')},
@@ -283,12 +302,12 @@ FIELDS = {
 		{'field':'alt_phone' , 'template': PhoneNumber()},
 		{'field':'alt_email' , 'template': VarChar(254)},
 		{'field':'tshirt'    , 'template': Enum('','YS','YM','YL','XS','AS','AM','AL','XL','2X','3X')},
-		{'field':'_enrollments','template': ForeignSet(Enrollments)},
+		{'field':'courses'   , 'template': ForeignSet(widget_query='enrollments')},
 	],
 	'coursetrad': [
 		{'field':'title'     , 'template': VarChar(50)},
 		{'field':'e'         , 'template': Checkbox('This is a real (and currently offered) course that may be enrolled in, not a student group for admin purposes')},
-		{'field':'day'       , 'template': Enum('','Mon','Tue','Wed','Thu','Fri','Sat','Sun')},
+		{'field':'day'       , 'template': DayOfWeek()},
 		{'field':'start'     , 'template': Time()},
 		{'field':'end'       , 'template': Time()},
 		{'field':'nMeets'    , 'template': Integer()},
@@ -314,7 +333,7 @@ FIELDS = {
 		{'field':'vol_hours' , 'template': Integer()},
 		{'field':'the_hours' , 'template': Integer()},
 		{'field':'prepaid'   , 'template': Checkbox('Families must purchase 10 prepaid tickets for $100, not included in tuition')},
-		{'field':'_courses'  , 'template': ForeignSet(Courses)},
+		{'field':'courses'   , 'template': ForeignSet()},
 	],
 	'course'    : [
 		{'field':'year'      , 'template': Integer()},
@@ -324,9 +343,9 @@ FIELDS = {
 		{'field':'the_hours' , 'template': Integer()},
 		{'field':'prepaid'   , 'template': Checkbox()},
 		{'field':'teacher'   , 'template': ForeignKey()},
-		{'field':'trad'      , 'template': ForeignKey(CourseTrads)},
+		{'field':'tradition' , 'template': ForeignKey()},
 		{'field':'aud_date'  , 'template': Date()},
-		{'field':'_students' , 'template': ForeignSet(Enrollments)},
+		{'field':'students'  , 'template': ForeignSet(widget_query='enrollments')},
 	],
 	'enrollment': [
 		{'field':'student'   , 'template': ForeignKey()},
@@ -372,14 +391,16 @@ def update(request, model, id):
 	manager = MODELS[model]
 	thing = manager.get(id=id)
 	for ftp in FIELDS[model]:
-		field = ftp['field']
-		if type(ftp['template']) is ForeignKey:
-			field += '_id'
-		# print field
-		if field in request.POST and (request.POST[field] or ftp['template'].force):
+		template = ftp['template']
+		field = template.field if hasattr(template, 'field') else ftp['field']
+		# print field, field in request.POST
+		if field in request.POST and request.POST[field]:
 			value = request.POST[field]
 			value = ftp['template'].clean(value)
+			# print field, value
 			thing.__setattr__(field, value)
+		elif hasattr(template,'force'):
+			thing.__setattr__(field, template.force)
 	thing.save()
 	return redirect("/rest/show/{}/{}".format(model, thing.id))
 

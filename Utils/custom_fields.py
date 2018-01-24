@@ -4,6 +4,7 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django_mysql import models as sqlmod
 from .hacks import get as _
 from . import gistfile1 as poly
+from datetime import datetime
 
 class Bcrypt(object):
 	def __init__(self, char60):
@@ -35,71 +36,99 @@ class BcryptField(models.Field):
 			hashed = '+' + hashed
 		return hashed
 
+
 short_days = ['','Mon','Tue','Wed','Thu','Fri','Sat','Sun']
-long_days = [None,'Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']
+long_days = ['N/A','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
 
 class DayOfWeek(object):
-	# TODO: Passing a datetime object into DayOfWeek returns that datetime's day of the week.
-	def __init__(self, short):
-		self.num = short_days.index(short)
+	def __init__(self, *value):
+		if value:
+			if type(value) is tuple:
+				value = value[0]
+			if type(value) is DayOfWeek:
+				self.value = int(value.value)
+			elif type(value) in [int,float]:
+				self.value = int(value)
+			elif type(value) is datetime:
+				self.value = value.isoweekday()
+			elif type(value) in [str,unicode]:
+				value = value.title()
+				if value in short_days:
+					self.value = short_days.index(value)
+				elif value in long_days:
+					self.value = long_days.index(value)
+		else:
+			self.value = 0
 	def __str__(self):
-		return long_days[self.num]
+		return long_days[self.value]
 	def __int__(self):
-		return self.num
+		return self.value
+	def widget(self, field, value):
+		self.__init__(value)
+		html = '<select name="{}">'.format(field)
+		for x in range(len(short_days)):
+			html += '<option value="{}"{}>{}</option>'.format(x,' selected' if self.value == x else '', short_days[x])
+		html += '</select>'
+		return html
+	def static(self, field, value):
+		self.__init__(value)
+		return str(self)
+	def clean(self, value):
+		self.__init__(value)
+		# print self.value
+		return short_days[self.value]
 		
 class DayOfWeekField(sqlmod.EnumField):
 	def __init__(self, **kwargs):
 		kwargs['choices'] = short_days
-		# kwargs['max_length'] = 3
 		super(DayOfWeekField, self).__init__(**kwargs)
-	# def from_db_value(self, value, col, wrapper, options):
-	# 	return DayOfWeek(value)
+	def from_db_value(self, value, col, wrapper, options):
+		return DayOfWeek(value)
+
 
 class PhoneNumber(object):
-	def __init__(self, *num):
+	def __init__(self, *value):
 		self.force = False
-		if num:
-			if type(num) is tuple:
-				num = num[0]
-			if type(num) is PhoneNumber:
-				self.num = num.num
-			elif type(num) is int:
-				self.num = num 
+		if value:
+			if type(value) is tuple:
+				value = value[0]
+			if type(value) is PhoneNumber:
+				self.value = value.value
+			elif type(value) is int:
+				self.value = value 
 			else:
-				self.num = self.sanitize(num)
-			self.cod  = str(self.num / 10**7).zfill(3)
-			self.mid  = str(self.num % 10**7 / 10**4).zfill(3)
-			self.last = str(self.num % 10**4).zfill(4)
-	def sanitize(self, *num):
-		num = num if num else self.num
-		num = str(num)
-		num = re.findall(r'\d',num)
-		if len(num) == 0:
+				self.value = self.sanitize(value)
+			self.cod  = str(self.value / 10**7).zfill(3)
+			self.mid  = str(self.value % 10**7 / 10**4).zfill(3)
+			self.last = str(self.value % 10**4).zfill(4)
+	def sanitize(self, *value):
+		value = value if value else self.value
+		value = str(value)
+		value = re.findall(r'\d',value)
+		if len(value) == 0:
 			return 0
-		num = ''.join(num)
-		num = int(num)
-		num %= 10**10
-		return num
+		value = ''.join(value)
+		value = int(value)
+		value %= 10**10
+		return value
 	def __int__(self):
-		return self.num
+		return self.value
 	def __str__(self):
-		return '('+self.cod+') '+self.mid+'-'+self.last
+		return '('+self.cod+') '+self.mid+'-'+self.last if self.value else ''
 	def __get__(self):
-		return int(self.num)
+		return int(self.value)
 	def widget(self, field, value):
 		self.__init__(value)
 		if value:
 			value = int(value)
 		return '<input type="number" name="{}" value="{}">'.format(field, value)
 	def static(self, field, value):
-		# print value
 		self.__init__(value)
 		if value:
 			return str(self)
 	def clean(self, value):
 		self.__init__(value)
-		return self.num
-
+		return self.value
 
 class PhoneNumberField(models.DecimalField):
 	def __init__(self, **kwargs):
@@ -112,10 +141,11 @@ class PhoneNumberField(models.DecimalField):
 	def from_db_value(self, value, col, wrapper, options):
 		return PhoneNumber(value)
 
+
 class ZipCode(object):
 	def __init__(self, *value):
 		if value:
-			if type(value) is tuple and len(value) == 1:
+			if type(value) is tuple:
 				self.value = value[0]
 			elif type(value) is ZipCode:
 				self.value = value.value
@@ -152,6 +182,7 @@ class ZipCodeField(models.DecimalField):
 		super(ZipCodeField, self).__init__(**kwargs)
 	def from_db_value(self, value, col, wrapper, options):
 		return ZipCode(value)
+
 
 class PolymorphicField(poly.MultiColumnField):
 	def __init__(self, attname, manager, relatables):

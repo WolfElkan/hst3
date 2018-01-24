@@ -5,10 +5,19 @@ from Utils import supermodel as sm
 from django_mysql import models as sqlmod
 from .managers import CourseTrads, Courses, Enrollments, Auditions
 
+from apps.main.managers import Students
+
 class Venue(models.Model):
 	id   = models.CharField(max_length=3, primary_key=True)
 	name = models.CharField(max_length=30)
 	address = models.ForeignKey('main.Address', null=True)
+	rest_model = "venue"
+	# def __getattribute__(self, field):
+	# 	if field in []:
+	# 		function = super(Venue, self).__getattribute__(field)
+	# 		return function()
+	# 	else:
+	# 		return super(Venue, self).__getattribute__(field)
 
 class CourseTrad(models.Model):
 	# General:
@@ -40,11 +49,14 @@ class CourseTrad(models.Model):
 	vol_hours  = models.FloatField(default=0)
 	the_hours  = models.FloatField(default=0)
 	prepaid    = models.BooleanField(default=False)
+	rest_model = "coursetrad"
 	objects = CourseTrads
-	def _courses(self):
-		return {'mapping':{'trad_id':self.id},'model':'course'}
 	def __str__(self):
 		return self.title.upper()
+	def courses(self):
+		return Courses.filter(tradition_id=self.id)
+	def _courses(self):
+		return {'mapping':{'tradition_id':self.id},'model':'course'}
 	def make(self, year):
 		return Courses.create(tradition=self, year=year)
 	def genre(self):
@@ -78,6 +90,12 @@ class CourseTrad(models.Model):
 		course = Courses.fetch(tradition=self, year=year)
 		if course:
 			return course.saud(student)
+	def __getattribute__(self, field):
+		if field in ['_courses','courses','genre']:
+			function = super(CourseTrad, self).__getattribute__(field)
+			return function()
+		else:
+			return super(CourseTrad, self).__getattribute__(field)
 
 class Course(models.Model):
 	id         = models.CharField(max_length=4, primary_key=True)
@@ -90,7 +108,15 @@ class Course(models.Model):
 	vol_hours  = models.FloatField()
 	the_hours  = models.FloatField()
 	prepaid    = models.BooleanField()
+	rest_model = "course"
 	objects = Courses
+	def enrollments(self):
+		return Enrollments.filter(course_id=self.id)
+	def students(self):
+		qset = []
+		for enrollment in self.enrollments:
+			qset.append(Students.get(id=enrollment.student_id))
+		return qset
 	def _students(self):
 		return {'mapping':{'course_id':self.id},'model':'student'}
 	def __str__(self):
@@ -105,6 +131,12 @@ class Course(models.Model):
 	def saud(self, student):
 		if self.audible(student):
 			Auditions.create({'course': self, 'student': student})
+	def __getattribute__(self, field):
+		if field in ['_students','students','enrollments']:
+			call = super(Course, self).__getattribute__(field)
+			return call()
+		else:
+			return super(Course, self).__getattribute__(field)
 
 class Enrollment(models.Model):
 	student    = models.ForeignKey('main.Student')
@@ -112,17 +144,33 @@ class Enrollment(models.Model):
 	role       = models.TextField(null=True)
 	role_type  = sqlmod.EnumField(choices=['','Chorus','Support','Lead'])
 	created_at = models.DateTimeField(auto_now_add=True)
+	rest_model = "enrollment"
 	objects = Enrollments
 	def __str__(self):
 		return str(self.student) + (' as '+self.role if self.role else '') + ' in ' + str(self.course)
+	# def __getattribute__(self, field):
+	# 	if field in []:
+	# 		function = super(Enrollment, self).__getattribute__(field)
+	# 		return function()
+	# 	else:
+	# 		return super(Enrollment, self).__getattribute__(field)
 
 class Audition(models.Model):
 	student    = models.ForeignKey('main.Student')
 	course     = models.ForeignKey(Course)
-	auto       = models.BooleanField(default=False)
 	date       = models.DateField(null=True)
+	auto       = models.BooleanField(default=False)
+	ret_status = models.BooleanField(default=False)
 	happened   = models.BooleanField(default=False)
 	success    = models.NullBooleanField()
 	created_at = models.DateTimeField(auto_now_add=True)
-	updated_at = models.DateTimeField(auto_now=True)		
+	updated_at = models.DateTimeField(auto_now=True)	
+	rest_model = "audition"	
 	objects = Auditions
+	# def __getattribute__(self, field):
+	# 	if field in []:
+	# 		function = super(Audition, self).__getattribute__(field)
+	# 		return function()
+	# 	else:
+	# 		return super(Audition, self).__getattribute__(field)
+
