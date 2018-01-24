@@ -51,7 +51,7 @@ def update(request, model, id):
 	thing = manager.get(id=id)
 	for ftp in FIELDS[model]:
 		template = ftp['template']
-		field = template.field if hasattr(template, 'field') else ftp['field']
+		field = template.field if template.field else ftp['field']
 		# print field, field in request.POST
 		if field in request.POST and request.POST[field]:
 			value = request.POST[field]

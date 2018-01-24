@@ -110,8 +110,6 @@ class Checkbox(object):
 	def static(self, field, value):
 		return 'Yes' if value else 'No'
 	def clean(self, value):
-		print '*'*100
-		print value
 		return value == 'on'
 
 class Date(object):
