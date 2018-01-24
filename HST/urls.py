@@ -22,9 +22,10 @@ urlpatterns = [
 from django.conf.urls import include
 import apps.main.views as main
 import apps.program.views as program
+import apps.rest.views as rest
+import apps.rest.seed as seed
 import apps.program.seed as program_seed
 from . import dev_views as dev
-from .seed import views as seed
 
 urlpatterns = [
 	url(r'^$', main.index),
@@ -42,14 +43,10 @@ urlpatterns = [
 	url(r'^clear/?$', dev.clear),
 	url(r'^nuke/?$', dev.clearthedatabaselikeanuclearbombandthisnameisverylongsoyoudontcallitbymistake),
 
-	url(r'^rest/edit/(?P<model>[a-zA-Z]+)/(?P<id>\d+|(\d\d)?\w\w)/?$', seed.edit),
-	url(r'^rest/(?P<model>[a-zA-Z]+)/edit/(?P<id>\d+|(\d\d)?\w\w)/?$', seed.edit),
-
-	url(r'^rest/show/(?P<model>[a-zA-Z]+)/(?P<id>\d+|(\d\d)?\w\w)/?$', seed.show),
-	url(r'^rest/(?P<model>[a-zA-Z]+)/show/(?P<id>\d+|(\d\d)?\w\w)/?$', seed.show),
-
-	url(r'^rest/update/(?P<model>[a-zA-Z]+)/(?P<id>\d+|(\d\d)?\w\w)/?$', seed.update),
-	url(r'^rest/(?P<model>[a-zA-Z]+)/update/(?P<id>\d+|(\d\d)?\w\w)/?$', seed.update),
+	url(r'^rest/edit/(?P<model>[a-zA-Z]+)/(?P<id>\d+|(\d\d)?\w\w)/?$', rest.edit),
+	url(r'^rest/show/(?P<model>[a-zA-Z]+)/(?P<id>\d+|(\d\d)?\w\w)/?$', rest.show),
+	url(r'^rest/update/(?P<model>[a-zA-Z]+)/(?P<id>\d+|(\d\d)?\w\w)/?$', rest.update),
+	url(r'^rest/index/(?P<model>[a-zA-Z]+)/?$', rest.index),
 
 	url(r'^seed/load/?$', seed.load),
 	url(r'^seed/dump/?$', seed.dump),
