@@ -48,6 +48,8 @@ urlpatterns = [
 	url(r'^rest/show/(?P<model>[a-zA-Z]+)/(?P<id>\d+|(\d\d)?\w\w)/?$', rest.show),
 	url(r'^rest/update/(?P<model>[a-zA-Z]+)/(?P<id>\d+|(\d\d)?\w\w)/?$', rest.update),
 	url(r'^rest/index/(?P<model>[a-zA-Z]+)/?$', rest.index),
+	url(r'^rest/new/(?P<model>[a-zA-Z]+)/?$', rest.new),
+	url(r'^rest/create/(?P<model>[a-zA-Z]+)/?$', rest.create),
 
 	url(r'^seed/load/?$', seed.load),
 	url(r'^seed/dump/?$', seed.dump),

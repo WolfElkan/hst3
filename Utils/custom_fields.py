@@ -44,31 +44,37 @@ long_days = ['N/A','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'
 class DayOfWeek(object):
 	def __init__(self, *value):
 		self.field = None
+		self.value = self.parse(value)
+		self.short = short_days[self.value]
+		self.long  = long_days [self.value]
+	def parse(self, value):
 		if value:
 			if type(value) is tuple:
-				value = value[0]
-			if type(value) is DayOfWeek:
-				self.value = int(value.value)
+				return self.parse(value[0])
 			elif type(value) in [int,float]:
-				self.value = int(value)
+				return int(value)
 			elif type(value) is datetime:
-				self.value = value.isoweekday()
+				return value.isoweekday()
+			elif type(value) is DayOfWeek:
+				return int(value.value)
 			elif type(value) in [str,unicode]:
-				value = value.title()
-				if value in short_days:
-					self.value = short_days.index(value)
+				if re.match(r'^\d+$', value):
+					return int(value)
+				elif value in short_days:
+					return short_days.index(value)
 				elif value in long_days:
-					self.value = long_days.index(value)
+					return long_days.index(value)
 		else:
-			self.value = 0
+			return 0
 	def __str__(self):
-		return long_days[self.value]
+		return self.long
 	def __int__(self):
 		return self.value
 	def __json__(self):
-		return short_days[self.value]
+		return self.short
 	def widget(self, field, value):
 		self.__init__(value)
+		self.field = field
 		html = '<select name="{}">'.format(field)
 		for x in range(len(short_days)):
 			html += '<option value="{}"{}>{}</option>'.format(x,' selected' if self.value == x else '', short_days[x])
@@ -76,12 +82,12 @@ class DayOfWeek(object):
 		return html
 	def static(self, field, value):
 		self.__init__(value)
+		self.field = field
 		return str(self)
 	def clean(self, value):
 		self.__init__(value)
-		# print self.value
-		return short_days[self.value]
-		
+		return self.short
+
 class DayOfWeekField(sqlmod.EnumField):
 	def __init__(self, **kwargs):
 		kwargs['choices'] = short_days

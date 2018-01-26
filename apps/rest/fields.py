@@ -1,5 +1,8 @@
 from .widgets import VarChar, Integer, Enum, Radio, Checkbox, Date, Time, Price, ForeignKey, ForeignSet, ToggleSet
 from Utils.custom_fields import Bcrypt, PhoneNumber, ZipCode, DayOfWeek
+# from apps.main.models import Family, Parent, Student
+# from apps.program.models import Enrollment
+
 
 FIELDS = {
 	'address'   : [
@@ -94,3 +97,92 @@ FIELDS = {
 		{'field':'role_type' , 'template': Enum(options=['','Chorus','Support','Lead'])},
 	],
 }
+
+
+# ATE_FIELDS = {
+# 	'address'   : {
+# 		'line1'     : FIELDS['address'][0]['template'],
+# 		'line2'     : FIELDS['address'][1]['template'],
+# 		'city'      : FIELDS['address'][2]['template'],
+# 		'state'     : FIELDS['address'][3]['template'],
+# 		'zipcode'   : FIELDS['address'][4]['template'],
+# 	},
+# 	'family'    : {
+# 		'last'      : FIELDS['family'][0]['template'],
+# 		'phone'     : FIELDS['family'][1]['template'],
+# 		'phone_type': FIELDS['family'][2]['template'],
+# 		'email'     : FIELDS['family'][3]['template'],
+# 		'mother'    : FIELDS['family'][4]['template'],
+# 		'father'    : FIELDS['family'][5]['template'],
+# 		'address'   : FIELDS['family'][6]['template'],
+# 		'children'  : FIELDS['family'][7]['template'],
+# 	},
+# 	'parent'    : {
+# 		'first'     : FIELDS['parent'][0]['template'],
+# 		'family'    : FIELDS['parent'][1]['template'],
+# 		'alt_last'  : FIELDS['parent'][2]['template'],
+# 		'sex'       : FIELDS['parent'][3]['template'],
+# 		'alt_phone' : FIELDS['parent'][4]['template'],
+# 		'phone_type': FIELDS['parent'][5]['template'],
+# 		'alt_email' : FIELDS['parent'][6]['template'],
+# 	},
+# 	'student'   : {
+# 		'first'     : FIELDS['student'][ 0]['template'],
+# 		'middle'    : FIELDS['student'][ 1]['template'],
+# 		'alt_first' : FIELDS['student'][ 2]['template'],
+# 		'family'    : FIELDS['student'][ 3]['template'],
+# 		'alt_last'  : FIELDS['student'][ 4]['template'],
+# 		'sex'       : FIELDS['student'][ 5]['template'],
+# 		'current'   : FIELDS['student'][ 6]['template'],
+# 		'birthday'  : FIELDS['student'][ 7]['template'],
+# 		'grad_year' : FIELDS['student'][ 8]['template'],
+# 		'height'    : FIELDS['student'][ 9]['template'],
+# 		'alt_phone' : FIELDS['student'][10]['template'],
+# 		'alt_email' : FIELDS['student'][11]['template'],
+# 		'tshirt'    : FIELDS['student'][12]['template'],
+# 		'courses_toggle_enrollments': FIELDS['student'][13]['template'],
+# 	},
+# 	'coursetrad': {
+# 		'title'     : FIELDS['coursetrad'][ 0]['template'],
+# 		'e'         : FIELDS['coursetrad'][ 1]['template'],
+# 		'day'       : FIELDS['coursetrad'][ 2]['template'],
+# 		'start'     : FIELDS['coursetrad'][ 3]['template'],
+# 		'end'       : FIELDS['coursetrad'][ 4]['template'],
+# 		'nMeets'    : FIELDS['coursetrad'][ 5]['template'],
+# 		'show'      : FIELDS['coursetrad'][ 6]['template'],
+# 		'vs'        : FIELDS['coursetrad'][ 7]['template'],
+# 		'min_age'   : FIELDS['coursetrad'][ 8]['template'],
+# 		'max_age'   : FIELDS['coursetrad'][ 9]['template'],
+# 		'min_grd'   : FIELDS['coursetrad'][10]['template'],
+# 		'max_grd'   : FIELDS['coursetrad'][11]['template'],
+# 		'M'         : FIELDS['coursetrad'][12]['template'],
+# 		'F'         : FIELDS['coursetrad'][13]['template'],
+# 		'C'         : FIELDS['coursetrad'][14]['template'],
+# 		'I'         : FIELDS['coursetrad'][15]['template'],
+# 		'A'         : FIELDS['coursetrad'][16]['template'],
+# 		'tuition'   : FIELDS['coursetrad'][17]['template'],
+# 		'redtuit'   : FIELDS['coursetrad'][18]['template'],
+# 		'vol_hours' : FIELDS['coursetrad'][19]['template'],
+# 		'the_hours' : FIELDS['coursetrad'][20]['template'],
+# 		'prepaid'   : FIELDS['coursetrad'][21]['template'],
+# 		'courses'   : FIELDS['coursetrad'][22]['template'],
+# 	},
+# 	'course'    : {
+# 		'year'      : FIELDS['course'][0]['template'],
+# 		'last_date' : FIELDS['course'][1]['template'],
+# 		'tuition'   : FIELDS['course'][2]['template'],
+# 		'vol_hours' : FIELDS['course'][3]['template'],
+# 		'the_hours' : FIELDS['course'][4]['template'],
+# 		'prepaid'   : FIELDS['course'][5]['template'],
+# 		'teacher'   : FIELDS['course'][6]['template'],
+# 		'tradition' : FIELDS['course'][7]['template'],
+# 		'aud_date'  : FIELDS['course'][8]['template'],
+# 		'students_toggle_enrollments': FIELDS['course'][9]['template'],
+# 	},
+# 	'enrollment': {
+# 		'student'   : FIELDS['enrollment'][ 0]['template'],
+# 		'course'    : FIELDS['enrollment'][ 1]['template'],
+# 		'role'      : FIELDS['enrollment'][ 2]['template'],
+# 		'role_type' : FIELDS['enrollment'][ 3]['template'],
+# 	},
+# }

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>HST | New {{Model}}</title>
+</head>
+<body>
+	<h1>New {{Model}}</h1>
+	<form action="/rest/create/{{model}}/" method="POST"> {% csrf_token %}
+		<table>
+			{% for kvp in display %}
+			<tr>
+				<td>{{kvp.field}}:</td>
+				<td>{{kvp.input|safe}}</td>
+			</tr>
+			{% endfor %}
+		</table>
+		<button type="submit">Create</button>
+		<a href="/rest/show/{{model}}/{{thing.id}}/">Cancel</a>
+	</form>
+</body>
+</html>

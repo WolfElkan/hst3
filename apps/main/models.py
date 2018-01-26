@@ -28,7 +28,7 @@ class Parent(models.Model):
 	alt_last   = models.CharField(null=True, max_length=30)
 	sex        = models.CharField(max_length=1, choices=[('M','Male'),('F','Female')])
 	alt_phone  = custom.PhoneNumberField(null=True)
-	phone_type = sqlmod.EnumField(null=True, choices=['Home','Cell','Work'])
+	phone_type = sqlmod.EnumField(choices=['','Home','Cell','Work'], default='')
 	alt_email  = models.EmailField(null=True)
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
@@ -61,7 +61,7 @@ class Parent(models.Model):
 class Family(models.Model):
 	last       = models.CharField(max_length=30)
 	phone      = custom.PhoneNumberField()
-	phone_type = sqlmod.EnumField(null=True, choices=['Home','Cell','Work'])
+	phone_type = sqlmod.EnumField(choices=['','Home','Cell','Work'], default='')
 	email      = models.EmailField()
 	mother_id  = models.PositiveIntegerField(null=True)
 	father_id  = models.PositiveIntegerField(null=True)
@@ -89,9 +89,15 @@ class Family(models.Model):
 			return super(Family, self).__getattribute__(field)
 	def __setattr__(self, field, value):
 		if field == 'mother' and value.__class__ == Parent:
+			value.family_id = self.id
+			value.save()
+			print 'mother assigned'
 			super(Family, self).__setattr__('mother_id', value.id)
 			return self.save()
 		if field == 'father' and value.__class__ == Parent:
+			value.family_id = self.id
+			value.save()
+			print 'father assigned'
 			super(Family, self).__setattr__('father_id', value.id)
 			return self.save()
 		else:

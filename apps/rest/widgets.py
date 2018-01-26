@@ -1,25 +1,16 @@
-from apps.main.models import Family, Address, Parent, User, Student
-Addresses = Address.objects
-Families  = Family.objects
-Parents   = Parent.objects
-Students  = Student.objects
-Users     = User.objects
-
-from apps.program.models import Venue, CourseTrad, Course, Enrollment
-Venues      = Venue.objects
-CourseTrads = CourseTrad.objects
-Courses     = Course.objects
-Enrollments = Enrollment.objects
-
+from apps.main.managers import Addresses, Families, Parents, Users, Students
+from apps.program.managers import Courses, CourseTrads, Enrollments, Auditions
 
 MODELS = {
 	'address'   : Addresses,
 	'family'    : Families,
 	'parent'    : Parents,
 	'student'   : Students,
+	# 'user'      : Users,
 	'coursetrad': CourseTrads,
 	'course'    : Courses,
 	'enrollment': Enrollments,
+	'audition'  : Auditions,
 }
 
 
@@ -71,8 +62,7 @@ class Enum(object):
 	def __init__(self, **kwargs):
 		self.field = kwargs['field'] if 'field' in kwargs else None
 		self.options = kwargs['options'] if 'options' in kwargs else []
-		if not self.options[0]:
-			self.force = self.options[0]
+		self.force = self.options[0]
 	def widget(self, field, value):
 		html = '<select name="{}">'.format(field)
 		for option in self.options:
@@ -82,7 +72,7 @@ class Enum(object):
 	def static(self, field, value):
 		return value
 	def clean(self, value):
-		return value
+		return self.options[value]
 
 class Radio(object):
 	def __init__(self, **kwargs):
@@ -96,6 +86,7 @@ class Radio(object):
 			html += '<input type="radio" name="{}" value="{}" {}>{}<br>'.format(field, o,' checked' if value == o else '',self.options[o])
 		return html
 	def static(self, field, value):
+		value = value if value else 0
 		return self.options[value]
 	def clean(self, value):
 		return value
@@ -115,6 +106,7 @@ class Checkbox(object):
 class Date(object):
 	def __init__(self, **kwargs):
 		self.field = kwargs['field'] if 'field' in kwargs else None
+		self.force = None
 	def widget(self, field, value):
 		return '<input type="date" name="{}" value="{}">'.format(field, value)
 	def static(self, field, value):
@@ -126,6 +118,7 @@ class Date(object):
 class Time(object):
 	def __init__(self, **kwargs):
 		self.field = kwargs['field'] if 'field' in kwargs else None
+		self.force = None
 	def widget(self, field, value):
 		return '<input type="time" name="{}" value="{}">'.format(field, value)
 	def static(self, field, value):
@@ -156,6 +149,7 @@ class Price(object):
 class ForeignKey(object):
 	def __init__(self, **kwargs):
 		self.field = kwargs['field'] if 'field' in kwargs else None
+		self.force = None
 	def static(self, field, value):
 		self.field = field
 		if value:
@@ -166,8 +160,11 @@ class ForeignKey(object):
 		self.field = field
 		html = '<select name="{}_id">'.format(field)
 		if value:
-			for foreign in MODELS[value.rest_model].all():
-				html += '<option value="{}"{}>{}</option>'.format(foreign.id,' selected' if value == foreign else '',str(foreign))
+			model = value.rest_model
+		else:
+			model = field if field not in ['mother','father'] else 'parent'
+		for foreign in MODELS[model].all():
+			html += '<option value="{}"{}>{}</option>'.format(foreign.id,' selected' if value == foreign else '',str(foreign))
 		html += '</select>'
 		return html
 	def clean(self, value):
@@ -176,6 +173,7 @@ class ForeignKey(object):
 class ForeignSet(object):
 	def __init__(self, **kwargs):
 		self.field = kwargs['field'] if 'field' in kwargs else None
+		self.force = None
 	def static(self, field, qset):
 		return rest_list(qset)
 	def widget(self, field, qset):
@@ -186,6 +184,7 @@ class ForeignSet(object):
 class ToggleSet(object):
 	def __init__(self, **kwargs):
 		self.field = kwargs['field'] if 'field' in kwargs else None
+		self.force = None
 	def static(self, field, qset):
 		display = []
 		for foreign in qset:

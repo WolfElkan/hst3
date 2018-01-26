@@ -7,6 +7,12 @@ def get(obj, key):
 	else:
 		return getattr(obj, key)
 
+def metastr(query):
+	clean = {}
+	for key in query:
+		clean[key] = str(query[key])
+	return clean
+
 def copy(source, keys=False, trunc=0):
 	this = {}
 	if not keys:
