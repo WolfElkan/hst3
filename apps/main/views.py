@@ -88,9 +88,9 @@ def reg_familyinfo_post(request):
 	new_user['permission'] = 2
 	if Families.isValid(new_family) and Users.isValid(new_user):
 		new_user.pop('pw_confm')
-		new_family = Families.create(new_family)
+		new_family = Families.create(**new_family)
 		new_user['owner'] = new_family
-		me = Users.create(new_user)
+		me = Users.create(**new_user)
 		request.session['meid'] = me.id
 		return redirect('/register/parentsinfo')
 	else:
@@ -156,7 +156,7 @@ def reg_parentsinfo_post(request):
 	# May it be many years before we have to change these two lines of code.
 	mother['sex'] = 'F'
 	father['sex'] = 'M'
-	# Assign Parents to Family
+	# Assign Parents to Family 
 	mother['family_id'] = me.owner.id
 	father['family_id'] = me.owner.id
 	# Return sarcastic condescending message if both parents were somehow skipped.
@@ -172,10 +172,10 @@ def reg_parentsinfo_post(request):
 		request.session['e'] = {}
 		# Add parents to Database if they have not been skipped
 		if not mother.pop('skipped'):
-			mother = Parents.create(mother)
+			mother = Parents.create(**mother)
 			me.owner.mother = mother
 		if not father.pop('skipped'):
-			father = Parents.create(father)
+			father = Parents.create(**father)
 			me.owner.father = father
 		return redirect('/register/studentsinfo')
 	else:
@@ -227,7 +227,7 @@ def reg_studentsinfo_post(request):
 			if student.pop('isNew'):
 				student['family'] = me.owner
 				student['current'] = True
-				Students.create(student)
+				Students.create(**student)
 			else:
 				pass
 	return redirect('/')

@@ -48,6 +48,7 @@ FIELDS = {
 		{'field':'courses_toggle_enrollments', 'template': ToggleSet(field='courses')},
 	],
 	'coursetrad': [
+		{'field':'id'        , 'template': VarChar(maxlength=2)},
 		{'field':'title'     , 'template': VarChar(maxlength=50)},
 		{'field':'e'         , 'template': Checkbox(suffix='This is a real (and currently offered) course that may be enrolled in, not a student group for admin purposes')},
 		{'field':'day'       , 'template': DayOfWeek()},

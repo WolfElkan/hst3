@@ -91,13 +91,11 @@ class Family(models.Model):
 		if field == 'mother' and value.__class__ == Parent:
 			value.family_id = self.id
 			value.save()
-			print 'mother assigned'
 			super(Family, self).__setattr__('mother_id', value.id)
 			return self.save()
 		if field == 'father' and value.__class__ == Parent:
 			value.family_id = self.id
 			value.save()
-			print 'father assigned'
 			super(Family, self).__setattr__('father_id', value.id)
 			return self.save()
 		else:

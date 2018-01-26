@@ -47,14 +47,14 @@ def load_post(request):
 	for ct in data['coursetrads']:
 		if 'alias_id' not in ct:
 			print 'Importing '+ct['title'].upper()
-			CourseTrads.create(ct)
+			CourseTrads.create(**ct)
 			nCourseTrads += 1
 	for ct in data['coursetrads']:
 		if 'alias_id' in ct:
 			print 'Importing '+ct['title'].upper()
 			alias = CourseTrads.get(id=ct.pop('alias_id'))
 			ct['alias'] = alias
-			CourseTrads.create(ct)
+			CourseTrads.create(**ct)
 			nCourseTrads += 1
 	for fam in data['families']:
 		print 'Importing '+fam['last']
@@ -62,20 +62,20 @@ def load_post(request):
 		address = copy(fam['address'])
 		if 'zipcode' not in address:
 			address['zipcode'] = 00000
-		address = Addresses.create(address)
+		address = Addresses.create(**address)
 		nAddresses += 1
 		family['address'] = address
-		family = Families.create(family)
+		family = Families.create(**family)
 		nFamilies += 1
 		if 'mother' in fam:
 			mother = copy(fam['mother'])
 			mother['family_id'] = family.id
-			family.mother = Parents.create(mother)
+			family.mother = Parents.create(**mother)
 			nParents += 1
 		if 'father' in fam:
 			father = copy(fam['father'])
 			father['family_id'] = family.id
-			family.father = Parents.create(father)
+			family.father = Parents.create(**father)
 			nParents += 1
 		family.save()
 		for stu in fam['students']:
@@ -83,7 +83,7 @@ def load_post(request):
 			enrollments = student.pop('enrollments')
 			print enrollments
 			student['family'] = family
-			Students.create(student)
+			Students.create(**student)
 			nStudents += 1
 	print 'IMPORT COMPLETE'
 	print 'Users:     ' + str(nUsers).rjust(4)
@@ -94,7 +94,7 @@ def load_post(request):
 	print 'Venues:    ' + str(nVenues).rjust(4)
 	print 'Traditions:' + str(nCourseTrads).rjust(4)
 	print 'Courses:   ' + str(nCourses).rjust(4)
-	print 'Enrollments:'+ str(nCourseTrads).rjust(3)
+	print 'Enrollments:'+ str(nEnrollments).rjust(3)
 
 	return redirect('/seed/load/')
 
@@ -140,6 +140,7 @@ def dump(request):
 				'id': ct.id,
 				'title'    : ct.title,
 				'alias_id' : ct.alias_id,
+				'e'        : False,
 			})
 	FamiliesAll = Families.all()
 	for family in FamiliesAll:
@@ -172,7 +173,7 @@ def dump(request):
 			if family.address.line2:
 				family_obj['address']['line2' ] = family.address.line2
 		family_obj['students'] = []
-		for student in family.children.all():
+		for student in family.children:
 				student_obj = copyatts(student,['first','sex'])
 				if student.birthday:
 					student_obj['birthday']  = str(student.birthday)
@@ -193,6 +194,15 @@ def dump(request):
 				if student.tshirt:
 					student_obj['tshirt']    = student.tshirt
 				student_obj['enrollments'] = []
+				for enrollment in student.enrollments:
+					if enrollment.role or enrollment.role_type:
+						student_obj['enrollments'].append({
+							'course_id': enrollment.course_id,
+							'role'     : enrollment.role,
+							'role_type': enrollment.role_type,
+						})
+					else:
+						student_obj['enrollments'].append(enrollment.course_id)
 				family_obj['students'].append(student_obj)
 		data['families'].append(family_obj)
 	return HttpResponse(json.dumps(data, cls=FriendlyEncoder))

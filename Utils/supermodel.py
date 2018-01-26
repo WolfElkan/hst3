@@ -172,9 +172,9 @@ class SuperManager(models.Manager):
 		for x in self.validations:
 			messages = x.errors(data, messages)
 		return messages
-	def create(self, data):
-		# data = copy(data, self.fields)
-		return super(SuperManager, self).create(**data)
+	# def create(self, data):
+	# 	# data = copy(data, self.fields)
+	# 	return super(SuperManager, self).create(**data)
 	def kreate(self, **kwargs):
 		return self.create(**kwargs)
 	def fetch(self, **kwargs):

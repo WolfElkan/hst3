@@ -128,6 +128,8 @@ class PhoneNumber(object):
 		return '('+self.cod+') '+self.mid+'-'+self.last if self.value else ''
 	def __get__(self):
 		return int(self.value)
+	def __json__(self):
+		return self.value
 	def widget(self, field, value):
 		self.__init__(value)
 		if value:
@@ -210,11 +212,14 @@ class PolymorphicField(poly.MultiColumnField):
 		}
 		this = self
 		old_create = self.manager.create
-		def new_create(self, thing):
-			attr = thing.pop(this.attname)
-			thing[this.attname + '_type'] = attr.__class__.__name__.title()
-			thing[this.attname + '_id'] = attr.id
-			return old_create(self, thing)
+		def new_create(**thing):
+			# thing = list(thing)
+			print '*'*100
+			print thing
+			foreign = thing.pop(this.attname)
+			thing[this.attname + '_type'] = foreign.__class__.__name__.title()
+			thing[this.attname + '_id'] = foreign.id
+			return old_create(**thing)
 		self.manager.create = new_create
 	def __get__(self, thing, model):
 		_type = _(thing , self.attname + '_type').title()

@@ -1,4 +1,5 @@
 from apps.main.managers import Addresses, Families, Parents, Users, Students
+from apps.main.models import Teacher
 from apps.program.managers import Courses, CourseTrads, Enrollments, Auditions
 
 MODELS = {
@@ -6,8 +7,10 @@ MODELS = {
 	'family'    : Families,
 	'parent'    : Parents,
 	'student'   : Students,
-	# 'user'      : Users,
+	'teacher'   : Teacher.objects,
+	'user'      : Users,
 	'coursetrad': CourseTrads,
+	'tradition' : CourseTrads,
 	'course'    : Courses,
 	'enrollment': Enrollments,
 	'audition'  : Auditions,
@@ -41,7 +44,7 @@ class VarChar(object):
 	def static(self, field, value):
 		return value
 	def clean(self, value):
-		return value
+		return str(value)
 
 class Integer(object):
 	def __init__(self, **kwargs):
@@ -100,7 +103,7 @@ class Checkbox(object):
 	def static(self, field, value):
 		return 'Yes' if value else 'No'
 	def clean(self, value):
-		return value == 'on'
+		return str(value) == 'on'
 
 class Date(object):
 	def __init__(self, **kwargs):
@@ -112,7 +115,7 @@ class Date(object):
 		if value:
 			return value.strftime('%B %-d, %Y')
 	def clean(self, value):
-		return value
+		return str(value) if value else '0000-00-00'
 
 class Time(object):
 	def __init__(self, **kwargs):
@@ -124,7 +127,7 @@ class Time(object):
 		if value:
 			return value.strftime('<div>%-I:%M %p</div>')
 	def clean(self, value):
-		return value
+		return str(value) if value else '00:00'
 
 class Price(object):
 	def __init__(self, **kwargs):
@@ -143,7 +146,7 @@ class Price(object):
 		else:
 			return '<div>$0.00</div>'
 	def clean(self, value):
-		return value if value else 0
+		return str(value) if value else 0.00
 
 class ForeignKey(object):
 	def __init__(self, **kwargs):
@@ -166,8 +169,8 @@ class ForeignKey(object):
 			html += '<option value="{}"{}>{}</option>'.format(foreign.id,' selected' if value == foreign else '',str(foreign))
 		html += '</select>'
 		return html
-	def clean(self, value):
-		return value
+	# def clean(self, value):
+	# 	return str(value)
 
 class ForeignSet(object):
 	def __init__(self, **kwargs):
@@ -177,23 +180,25 @@ class ForeignSet(object):
 		return rest_list(qset)
 	def widget(self, field, qset):
 		return rest_list(qset)
-	def clean(self, qset):
-		return qset
+	# def clean(self, qset):
+	# 	return qset
 
 class ToggleSet(object):
 	def __init__(self, **kwargs):
 		self.field = kwargs['field'] if 'field' in kwargs else None
 		self.force = None
 	def static(self, field, qset):
-		display = []
-		for foreign in qset:
-			display.append(foreign['static'])
-		return rest_list(display)
+		if qset:
+			display = []
+			for foreign in qset:
+				display.append(foreign['static'])
+			return rest_list(display)
 	def widget(self, field, qset):
-		display = []
-		for foreign in qset:
-			display.append(foreign['widget'])
-		return rest_list(display)
-	def clean(self, value):
-		return value
+		if qset:
+			display = []
+			for foreign in qset:
+				display.append(foreign['widget'])
+			return rest_list(display)
+	# def clean(self, value):
+	# 	return None
 	

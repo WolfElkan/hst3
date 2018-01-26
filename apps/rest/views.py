@@ -57,19 +57,21 @@ def new(request, model, *relation):
 def create(request, model, *relation):
 	manager = MODELS[model]
 	thing = {}
-	for field in request.POST:
-		if field not in ['csrfmiddlewaretoken']:
-			thing[field] = request.POST[field]
-		# template = ftp['template']
-		# field = ftp['field']
-		# field = template.field if template.field else field
-		# if field in FIELDS[model] and request.POST[field]:
-		# 	value = request.POST[field]
-		# 	value = template.clean(value)
-		# 	thing.__setitem__(field, value)
+	for ftp in FIELDS[model]:
+		# if field not in ['csrfmiddlewaretoken']:
+			# thing[field] = request.POST[field]
+		template = ftp['template']
+		field = ftp['field']
+		field = template.field if template.field else field
+		print field
+		value = request.POST[field] if field in request.POST else template.force
+		if hasattr(template, 'clean'):
+			value = template.clean(value)
+			thing.__setitem__(field, value)
 		# elif hasattr(template,'force'):
 		# 	thing.__setitem__(field, template.force)
-	manager.create(thing)
+	print thing
+	manager.create(**thing)
 	return redirect('/rest/index/{}/'.format(model))
 
 def show(request, model, id):
