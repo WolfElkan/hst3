@@ -53,8 +53,7 @@ class Integer(object):
 			value = int(value)
 		return '<input type="number" name="{}" value="{}"> {}'.format(field, value, self.suffix)
 	def static(self, field, value):
-		if value:
-			return str(value) +' '+ self.suffix
+		return '<div>{} {}</div>'.format(value, self.suffix) if value else '<div>0</div>'
 	def clean(self, value):
 		return value if value else 0
 
@@ -123,7 +122,7 @@ class Time(object):
 		return '<input type="time" name="{}" value="{}">'.format(field, value)
 	def static(self, field, value):
 		if value:
-			return value.strftime('%-I:%M %p')
+			return value.strftime('<div>%-I:%M %p</div>')
 	def clean(self, value):
 		return value
 
@@ -140,9 +139,9 @@ class Price(object):
 	def static(self, field, value):
 		if value:
 			value = float(value)
-			return '${:.2f}'.format(value)
+			return '<div>${:.2f}</div>'.format(value)
 		else:
-			return ''
+			return '<div>$0.00</div>'
 	def clean(self, value):
 		return value if value else 0
 
