@@ -20,18 +20,16 @@
 	<table>
 		<thead>
 			<th>Family</th>
-			<th>ID</th>
 			<th>Students</th>
 			<th>Age</th>
 			<th colspan="6">Enrollments</th>
 		</thead>
 		{% for row in table %}
-		<tr>
+		<tr title="{{row.name}}, #{{row.id}}">
 			{% if row.oldest %}
-			<td rowspan="{{row.rowspan}}">{{row.family}}</td>
+			<td rowspan="{{row.nchild}}">{{row.family}}</td>
 			{% endif %}
-			<td class="right">{{row.id}}</td>
-			<td>{{row.name}}</td>
+			<td><a href="/rest/show/student/{{row.id}}">{{row.prefer}}</a></td>
 			<td class="right">{{row.age}}</td>
 			<td class="enr">{{row.A|safe}}{{row.S|safe}}</td>
 			<td class="enr">{{row.C|safe}}</td>

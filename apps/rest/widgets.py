@@ -43,8 +43,16 @@ class VarChar(object):
 		return '<input type="text" maxlength="{}" name="{}" value="{}">'.format(self.maxlength, field, value)
 	def static(self, field, value):
 		return value
-	def clean(self, value):
-		return str(value)
+	def set(self, thing, field, post, isAttr):
+		if field in post:
+			value = post[field]
+		else:
+			value = self.force
+		if isAttr:
+			thing.__setattr__(field, str(value))
+		else:
+			thing.__setitem__(field, str(value))
+		return thing
 
 class Integer(object):
 	def __init__(self, **kwargs):
@@ -57,8 +65,16 @@ class Integer(object):
 		return '<input type="number" name="{}" value="{}"> {}'.format(field, value, self.suffix)
 	def static(self, field, value):
 		return '<div>{} {}</div>'.format(value, self.suffix) if value else '<div>0</div>'
-	def clean(self, value):
-		return value if value else 0
+	def set(self, thing, field, post, isAttr):
+		if field in post:
+			value = post[field]
+		else:
+			value = self.force
+		if isAttr:
+			thing.__setattr__(field, value if value else 0)
+		else:
+			thing.__setitem__(field, value if value else 0)
+		return thing
 
 class Enum(object):
 	def __init__(self, **kwargs):
@@ -73,8 +89,16 @@ class Enum(object):
 		return html
 	def static(self, field, value):
 		return value
-	def clean(self, value):
-		return str(value)
+	def set(self, thing, field, post, isAttr):
+		if field in post:
+			value = post[field]
+		else:
+			value = self.force
+		if isAttr:
+			thing.__setattr__(field, str(value))
+		else:
+			thing.__setitem__(field, str(value))
+		return thing
 		
 class Radio(object):
 	def __init__(self, **kwargs):
@@ -90,8 +114,16 @@ class Radio(object):
 	def static(self, field, value):
 		value = value if value else 0
 		return self.options[value]
-	def clean(self, value):
-		return value
+	def set(self, thing, field, post, isAttr):
+		if field in post:
+			value = post[field]
+		else:
+			value = self.force
+		if isAttr:
+			thing.__setattr__(field, value)
+		else:
+			thing.__setitem__(field, value)
+		return thing
 
 class Checkbox(object):
 	def __init__(self, **kwargs):
@@ -102,8 +134,16 @@ class Checkbox(object):
 		return '<input type="checkbox" name="{}" {}> {}'.format(field, ' checked' if value else '',self.suffix)
 	def static(self, field, value):
 		return 'Yes' if value else 'No'
-	def clean(self, value):
-		return str(value) == 'on'
+	def set(self, thing, field, post, isAttr):
+		if field in post:
+			value = str(post[field]) == 'on'
+		else:
+			value = self.force
+		if isAttr:
+			thing.__setattr__(field, value)
+		else:
+			thing.__setitem__(field, value)
+		return thing
 
 class Date(object):
 	def __init__(self, **kwargs):
@@ -114,8 +154,16 @@ class Date(object):
 	def static(self, field, value):
 		if value:
 			return value.strftime('%B %-d, %Y')
-	def clean(self, value):
-		return str(value) if value else '0000-00-00'
+	def set(self, thing, field, post, isAttr):
+		if field in post:
+			value = post[field]
+		else:
+			value = self.force
+		if isAttr:
+			thing.__setattr__(field, str(value) if value else '0000-00-00')
+		else:
+			thing.__setitem__(field, str(value) if value else '0000-00-00')
+		return thing
 
 class Time(object):
 	def __init__(self, **kwargs):
@@ -126,8 +174,16 @@ class Time(object):
 	def static(self, field, value):
 		if value:
 			return value.strftime('<div>%-I:%M %p</div>')
-	def clean(self, value):
-		return str(value) if value else '00:00'
+	def set(self, thing, field, post, isAttr):
+		if field in post:
+			value = post[field]
+		else:
+			value = self.force
+		if isAttr:
+			thing.__setattr__(field, str(value) if value else '00:00')
+		else:
+			thing.__setitem__(field, str(value) if value else '00:00')
+		return thing
 
 class Price(object):
 	def __init__(self, **kwargs):
@@ -145,8 +201,16 @@ class Price(object):
 			return '<div>${:.2f}</div>'.format(value)
 		else:
 			return '<div>$0.00</div>'
-	def clean(self, value):
-		return str(value) if value else 0.00
+	def set(self, thing, field, post, isAttr):
+		if field in post:
+			value = post[field]
+		else:
+			value = self.force
+		if isAttr:
+			thing.__setattr__(field, str(value) if value else 0.00)
+		else:
+			thing.__setitem__(field, str(value) if value else 0.00)
+		return thing
 
 class ForeignKey(object):
 	def __init__(self, **kwargs):
@@ -169,8 +233,17 @@ class ForeignKey(object):
 			html += '<option value="{}"{}>{}</option>'.format(foreign.id,' selected' if value == foreign else '',str(foreign))
 		html += '</select>'
 		return html
-	# def clean(self, value):
-	# 	return str(value)
+	def set(self, thing, field, post, isAttr):
+		field += '_id'
+		if field in post:
+			value = post[field]
+		else:
+			value = self.force
+		if isAttr:
+			thing.__setattr__(field, str(value))
+		else:
+			thing.__setitem__(field, str(value))
+		return thing
 
 class ForeignSet(object):
 	def __init__(self, **kwargs):
@@ -180,8 +253,16 @@ class ForeignSet(object):
 		return rest_list(qset)
 	def widget(self, field, qset):
 		return rest_list(qset)
-	# def clean(self, qset):
-	# 	return qset
+	def set(self, thing, field, post, isAttr):
+		if field in post:
+			value = post[field]
+		else:
+			value = self.force
+		# if isAttr:
+		# 	thing.__setattr__(field, value)
+		# else:
+		# 	thing.__setitem__(field, value)
+		return thing
 
 class ToggleSet(object):
 	def __init__(self, **kwargs):
@@ -199,6 +280,14 @@ class ToggleSet(object):
 			for foreign in qset:
 				display.append(foreign['widget'])
 			return rest_list(display)
-	# def clean(self, value):
-	# 	return None
+	def set(self, thing, field, post, isAttr):
+		if field in post:
+			value = post[field]
+		else:
+			value = self.force
+		# if isAttr:
+		# 	thing.__setattr__(field, value)
+		# else:
+		# 	thing.__setitem__(field, value)
+		return thing
 	

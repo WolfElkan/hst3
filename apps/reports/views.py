@@ -25,9 +25,10 @@ def students(request, **kwargs):
 		for student in family.children:
 			row = {}
 			row['family'] = family.last
-			row['rowspan'] = len(family.children)
+			row['nchild'] = len(family.children)
 			row['oldest'] = oldest
-			row['name'] = student.prefer
+			row['name']   = str(student)
+			row['prefer'] = student.prefer
 			row['id']     = student.id
 			row['age']    = student.hst_age
 			oldest = False

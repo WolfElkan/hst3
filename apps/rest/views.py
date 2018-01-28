@@ -62,12 +62,12 @@ def create(request, model, *relation):
 			# thing[field] = request.POST[field]
 		template = ftp['template']
 		field = ftp['field']
-		field = template.field if template.field else field
-		print field
 		value = request.POST[field] if field in request.POST else template.force
-		if hasattr(template, 'clean'):
-			value = template.clean(value)
-			thing.__setitem__(field, value)
+		# print field, value
+		thing = template.set(thing, field, request.POST, False)
+		# value = template.clean(field, value)
+		# field = template.field if template.field else field
+		# thing.__setitem__(field, value)
 		# elif hasattr(template,'force'):
 		# 	thing.__setitem__(field, template.force)
 	print thing
@@ -114,14 +114,20 @@ def update(request, model, id):
 	for ftp in FIELDS[model]:
 		template = ftp['template']
 		field = ftp['field']
-		field = template.field if template.field else field
-		# print field, field in request.POST
-		if field in request.POST and request.POST[field]:
-			value = request.POST[field]
-			# print field, value
-			value = template.clean(value)
-			thing.__setattr__(field, value)
-		elif hasattr(template,'force'):
-			thing.__setattr__(field, template.force)
+		value = request.POST[field] if field in request.POST else template.force
+		# print field, value
+		thing = template.set(thing, field, request.POST, True)
+
+		# template = ftp['template']
+		# field = ftp['field']
+		# field = template.field if template.field else field
+		# # print field, field in request.POST
+		# if field in request.POST and request.POST[field]:
+		# 	value = request.POST[field]
+		#	# print field, value
+		# 	value = template.clean(value)
+		# 	thing.__setattr__(field, value)
+		# elif hasattr(template,'force'):
+		# 	thing.__setattr__(field, template.force)
 	thing.save()
 	return redirect("/rest/show/{}/{}".format(model, thing.id))

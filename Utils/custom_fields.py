@@ -139,9 +139,13 @@ class PhoneNumber(object):
 		self.__init__(value)
 		if value:
 			return str(self)
-	def clean(self, value):
-		self.__init__(value)
-		return self.value
+	def set(self, thing, field, post, isAttr):
+		value = post[field]
+		if isAttr:
+			thing.__setattr__(field, value)
+		else:
+			thing.__setitem__(field, value)
+		return thing
 
 class PhoneNumberField(models.DecimalField):
 	def __init__(self, **kwargs):
@@ -185,9 +189,13 @@ class ZipCode(object):
 	def widget(self, field, value):
 		self.__init__(value)
 		return '<input type="number" name="{}" value="{}" step="0.0001"> (If adding an extra 4 digits, use a decimal point in place of a dash)'.format(field, self.value)
-	def clean(self, value):
-		self.__init__(value)
-		return self.value
+	def set(self, thing, field, post, isAttr):
+		value = post[field]
+		if isAttr:
+			thing.__setattr__(field, value)
+		else:
+			thing.__setitem__(field, value)
+		return thing
 
 class ZipCodeField(models.DecimalField):
 	def __init__(self, **kwargs):
@@ -213,9 +221,6 @@ class PolymorphicField(poly.MultiColumnField):
 		this = self
 		old_create = self.manager.create
 		def new_create(**thing):
-			# thing = list(thing)
-			print '*'*100
-			print thing
 			foreign = thing.pop(this.attname)
 			thing[this.attname + '_type'] = foreign.__class__.__name__.title()
 			thing[this.attname + '_id'] = foreign.id
