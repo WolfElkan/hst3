@@ -34,7 +34,12 @@ def index(request, model):
 	}
 	return render(request, 'rest/index.html', context)
 
-def new(request, model, *relation):
+def new(request, model, **kwargs):
+	if 'foreign_model' in kwargs:
+		old_model = model
+		model = kwargs['foreign_model']
+	else:
+		old_model = None
 	manager = MODELS[model]
 	tempset = FIELDS[model]
 	display = []
@@ -42,6 +47,8 @@ def new(request, model, *relation):
 		field = ftp['field']
 		template = ftp['template']
 		value = template.force if hasattr(template, 'force') else ''
+		if str(field) == str(old_model):
+			value = MODELS[old_model].get(id=kwargs['id'])
 		value = template.widget(field,value)
 		display.append({
 			'field':template.field if template.field else field, 
@@ -54,7 +61,12 @@ def new(request, model, *relation):
 	}
 	return render(request, 'rest/new.html', context)
 
-def create(request, model, *relation):
+def create(request, model, **kwargs):
+	if 'foreign_model' in kwargs:
+		old_model = model
+		model = kwargs['foreign_model']
+	else:
+		old_model = None
 	manager = MODELS[model]
 	thing = {}
 	for ftp in FIELDS[model]:

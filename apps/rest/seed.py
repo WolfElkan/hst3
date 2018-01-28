@@ -122,6 +122,7 @@ def dump(request):
 		'coursetrads':[],
 		'families':[],
 	}
+	years = set()
 	CourseTradsAll = CourseTrads.all()
 	for ct in CourseTradsAll:
 		if not ct.alias_id:
@@ -214,8 +215,10 @@ def dump(request):
 						})
 					else:
 						student_obj['enrollments'].append(enrollment.course_id)
+					years.update([int(enrollment.course.year)])
 				family_obj['students'].append(student_obj)
 		data['families'].append(family_obj)
+		data['years'] = list(years)
 	return HttpResponse(json.dumps(data, cls=FriendlyEncoder))
 
 def nuke(request):

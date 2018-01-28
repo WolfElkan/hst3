@@ -215,6 +215,7 @@ class Price(object):
 class ForeignKey(object):
 	def __init__(self, **kwargs):
 		self.field = kwargs['field'] if 'field' in kwargs else None
+		self.model = kwargs['model'] if 'model' in kwargs else None
 		self.force = None
 	def static(self, field, value):
 		self.field = field
@@ -225,11 +226,13 @@ class ForeignKey(object):
 	def widget(self, field, value):
 		self.field = field
 		html = '<select name="{}_id">'.format(field)
-		if value:
-			model = value.rest_model
-		else:
-			model = field if field not in ['mother','father'] else 'parent'
-		for foreign in MODELS[model].all():
+		if not self.model:
+			self.model = field
+		# if value:
+		# 	model = value.rest_model
+		# else:
+		# 	model = field if field not in ['mother','father'] else 'parent'
+		for foreign in MODELS[self.model].all():
 			html += '<option value="{}"{}>{}</option>'.format(foreign.id,' selected' if value == foreign else '',str(foreign))
 		html += '</select>'
 		return html
@@ -248,11 +251,14 @@ class ForeignKey(object):
 class ForeignSet(object):
 	def __init__(self, **kwargs):
 		self.field = kwargs['field'] if 'field' in kwargs else None
+		self.model = kwargs['model'] if 'model' in kwargs else None
 		self.force = None
 	def static(self, field, qset):
 		return rest_list(qset)
 	def widget(self, field, qset):
-		return rest_list(qset)
+		html = rest_list(qset)
+		html += '<a class="plus" href="add/{}/">+</a>'.format(self.model)
+		return html
 	def set(self, thing, field, post, isAttr):
 		if field in post:
 			value = post[field]
@@ -267,6 +273,7 @@ class ForeignSet(object):
 class ToggleSet(object):
 	def __init__(self, **kwargs):
 		self.field = kwargs['field'] if 'field' in kwargs else None
+		self.model = kwargs['model'] if 'model' in kwargs else None
 		self.force = None
 	def static(self, field, qset):
 		if qset:
@@ -275,11 +282,15 @@ class ToggleSet(object):
 				display.append(foreign['static'])
 			return rest_list(display)
 	def widget(self, field, qset):
+		html = ''
 		if qset:
+			print 286
 			display = []
 			for foreign in qset:
 				display.append(foreign['widget'])
-			return rest_list(display)
+			html += rest_list(display)
+		html += '<a class="plus" href="add/{}/">+</a>'.format(self.model)
+		return html
 	def set(self, thing, field, post, isAttr):
 		if field in post:
 			value = post[field]
