@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>HST | Mass Enroll</title>
+</head>
+<body>
+<h1>Mass Enrollment Interface</h1>
+<form method="POST" action="register/" >{% csrf_token %}
+<select  name="course_id">
+	{% for course in courses %}
+	<option value="{{course.id}}">{{course}}</option>
+	{% endfor %}
+</select>
+<table>
+	<thead>
+		<th>Student</th>
+		<th>Role</th>
+		<th>Role Type</th>
+	</thead>
+{% for student in students %}
+	<tr>
+		<td>{{student}}</td>
+		<td><input type="text" name="role_{{student.id}}"></td>
+		<td>
+			<select name="role_type_{{student.id}}">
+				<option value=""></option>
+				<option value="Lead">Lead</option>
+				<option value="Support">Support</option>
+				<option value="Chorus">Chorus</option>
+			</select>
+		</td>
+	</tr>
+{% endfor %}
+</table>
+<input type="submit">
+</form>
+</body>
+</html>

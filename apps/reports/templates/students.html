@@ -6,8 +6,8 @@
 		td {
 			border: solid black 1px;
 		}
-		.right {
-			text-align: right;
+		.center {
+			text-align: center;
 		}
 		.enr {
 			width: 35px;
@@ -17,28 +17,44 @@
 </head>
 <body>
 	<h1>Students Enrolled in {{year|add:-1}}-{{year}} Year</h1>
+	<form method="POST" action="mass_enroll/">{% csrf_token %}
+		<input type="submit">
 	<table>
 		<thead>
-			<th>Family</th>
-			<th>Students</th>
+			<th><a href="/rest/new/family/">Family</a></th>
+			<th><a href="/rest/new/student/">Students</a></th>
 			<th>Age</th>
-			<th colspan="6">Enrollments</th>
+			<th>Sex</th>
+			<!-- <th colspan="7">Enrollments</th> -->
+			<th>Act</th>
+			<th>Ch.</th>
+			<th>Tap</th>
+			<th>Jazz</th>
+			<th>Irish</th>
+			<th>Hip.</th>
+			<th>Other</th>
 		</thead>
 		{% for row in table %}
-		<tr title="{{row.name}}, #{{row.id}}">
+		<tr title="{{row.student}}, #{{row.student.id}}">
 			{% if row.oldest %}
-			<td rowspan="{{row.nchild}}">{{row.family}}</td>
+			<td rowspan="{{row.nchild}}"><a href="/rest/show/family/{{row.family.id}}">{{row.family.last}}</a></td>
 			{% endif %}
-			<td><a href="/rest/show/student/{{row.id}}">{{row.prefer}}</a></td>
-			<td class="right">{{row.age}}</td>
+			<td>
+				<input type="checkbox" name="{{row.student.id}}">
+				<a href="/rest/show/student/{{row.student.id}}">{{row.student.prefer}}</a>
+			</td>
+			<td class="center">{{row.age}}</td>
+			<td class="center">{{row.student.sex}}</td>
 			<td class="enr">{{row.A|safe}}{{row.S|safe}}</td>
 			<td class="enr">{{row.C|safe}}</td>
 			<td class="enr">{{row.T|safe}}{{row.P|safe}}</td>
 			<td class="enr">{{row.J|safe}}{{row.Z|safe}}</td>
 			<td class="enr">{{row.I|safe}}</td>
 			<td class="enr">{{row.H|safe}}</td>
+			<td>{{row.G|safe}}{{row.W|safe}}{{row.X|safe}}</td>
 		</tr>
 		{% endfor %}
 	</table>
+	</form>
 </body>
 </html>

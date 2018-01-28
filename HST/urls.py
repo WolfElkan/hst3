@@ -55,6 +55,12 @@ urlpatterns = [
 	url(r'^reports/students/?$', reports.students),
 	url(r'^reports/students/(?P<year>\d{4})/?$', reports.students),
 
+	url(r'^reports/students/mass_enroll/?$', reports.mass_enroll),
+	url(r'^reports/students/(?P<year>\d{4})/mass_enroll/?$', reports.mass_enroll),
+
+	url(r'^reports/students/mass_enroll/register/?$', reports.register),
+	url(r'^reports/students/(?P<year>\d{4})/mass_enroll/register/?$', reports.register),
+
 	url(r'^seed/load/?$', seed.load),
 	url(r'^seed/dump/?$', seed.dump),
 	url(r'^seed/nuke/?$', seed.nuke),

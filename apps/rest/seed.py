@@ -56,8 +56,13 @@ def load_post(request):
 			ct['alias'] = alias
 			CourseTrads.create(**ct)
 			nCourseTrads += 1
+	cts = CourseTrads.filter(e=True)
+	for year in data['years']:
+		for ct in cts:
+			ct.make(year)
+			nCourses += 1
 	for fam in data['families']:
-		print 'Importing '+fam['last']
+		print fam['last']
 		family = copy(fam,['last','phone','email'])
 		address = copy(fam['address'])
 		if 'zipcode' not in address:
@@ -79,11 +84,17 @@ def load_post(request):
 			nParents += 1
 		family.save()
 		for stu in fam['students']:
+			print '  '+stu['first']
 			student = copy(stu)
 			enrollments = student.pop('enrollments')
-			print enrollments
 			student['family'] = family
-			Students.create(**student)
+			newStudent = Students.create(**student)
+			for enrollment in enrollments:
+				if type(enrollment) in [str,unicode]:
+					Courses.get(id=enrollment).enroll(newStudent)
+				else:
+					course = Courses.get(id=enrollment['course_id'])
+					Enrollments.create(course=course, student=newStudent, role=enrollment['role'], role_type=enrollment['role_type'])
 			nStudents += 1
 	print 'IMPORT COMPLETE'
 	print 'Users:     ' + str(nUsers).rjust(4)
@@ -216,5 +227,6 @@ def nuke(request):
 	Venues.all().delete()
 	CourseTrads.all().delete()
 	Courses.all().delete()
+	Enrollments.all().delete()
 	print '\n\n'+' '*34+'THE RADIANCE OF A THOUSAND SUNS'+'\n\n'
 	return redirect ('/seed/load')
