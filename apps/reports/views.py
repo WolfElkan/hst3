@@ -21,39 +21,49 @@ def students(request, **kwargs):
 	table = []
 	blank = {'content':'','rowspan':1,'class':'enr'}
 	for family in families:
-		first = True
-		row = []
+		oldest = True
 		for student in family.children:
-			if first:
-				row.append({
-					'content': family.last,
-					'rowspan': len(family.children),
-					'class'  : ''
-				})
-				first = False
-			row.append({
-				'content': student.id,
-				'rowspan': 1,
-				'class'  : 'right'
-			})
-			row.append({
-				'content': student.prefer,
-				'rowspan': 1,
-				'class'  : ''
-			})
-			row.append({
-				'content': student.hst_age,
-				'rowspan': 1,
-				'class'  : 'right'
-			})
-			for x in xrange(6):
-				row.append(blank)
+			row = {}
+			row['family'] = family.last
+			row['rowspan'] = len(family.children)
+			row['oldest'] = oldest
+			row['name'] = student.prefer
+			row['id']     = student.id
+			row['age']    = student.hst_age
+			oldest = False
 			for enrollment in student.enrollments_in(year):
 				ctid = enrollment.course.tradition.id
-				col = genredir[ctid[:1]]
+				row[ctid[:1]] = '<a href="/rest/show/enrollment/{}">{}</a>'.format(enrollment.id, ctid)
+			# if oldest:
+			# 	row.append({
+			# 		'content': family.last,
+			# 		'rowspan': len(family.children),
+			# 		'class'  : ''
+			# 	})
+			# 	oldest = False
+			# row.append({
+			# 	'content': student.id,
+			# 	'rowspan': 1,
+			# 	'class'  : 'right'
+			# })
+			# row.append({
+			# 	'content': student.prefer,
+			# 	'rowspan': 1,
+			# 	'class'  : ''
+			# })
+			# row.append({
+			# 	'content': student.hst_age,
+			# 	'rowspan': 1,
+			# 	'class'  : 'right'
+			# })
+			# for x in xrange(6):
+			# 	row.append(blank)
+			# for enrollment in student.enrollments_in(year):
+			# 	ctid = enrollment.course.tradition.id
+			# 	col = genredir[ctid[:1]]
 
 			table.append(row)
-			row = []
+			# row = []
 	context = {
 		'year'  : year,
 		'table' : table,

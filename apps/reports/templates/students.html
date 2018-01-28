@@ -27,9 +27,18 @@
 		</thead>
 		{% for row in table %}
 		<tr>
-			{% for cell in row %}
-			<td rowspan="{{cell.rowspan}}" class="{{cell.class}}">{{cell.content}}</td>
-			{% endfor %}
+			{% if row.oldest %}
+			<td rowspan="{{row.rowspan}}">{{row.family}}</td>
+			{% endif %}
+			<td class="right">{{row.id}}</td>
+			<td>{{row.name}}</td>
+			<td class="right">{{row.age}}</td>
+			<td class="enr">{{row.A|safe}}{{row.S|safe}}</td>
+			<td class="enr">{{row.C|safe}}</td>
+			<td class="enr">{{row.T|safe}}{{row.P|safe}}</td>
+			<td class="enr">{{row.J|safe}}{{row.Z|safe}}</td>
+			<td class="enr">{{row.I|safe}}</td>
+			<td class="enr">{{row.H|safe}}</td>
 		</tr>
 		{% endfor %}
 	</table>
