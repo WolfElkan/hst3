@@ -93,6 +93,7 @@ def pdir(thing):
 	pretty(dir(thing))
 
 # Return the current HST registration year (This year until May 1, next year thereafter)
+from datetime import datetime
 def year():
 	now = datetime.now()
 	return now.year + (0 if now.month < 5 else 1)

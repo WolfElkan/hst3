@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>HST | Students {{year}}</title>
+	<style type="text/css">
+		td {
+			border: solid black 1px;
+		}
+		.right {
+			text-align: right;
+		}
+		.enr {
+			width: 35px;
+			text-align: center;
+		}
+	</style>
+</head>
+<body>
+	<h1>Students Enrolled in {{year|add:-1}}-{{year}} Year</h1>
+	<table>
+		<thead>
+			<th>Family</th>
+			<th>ID</th>
+			<th>Students</th>
+			<th>Age</th>
+			<th colspan="6">Enrollments</th>
+		</thead>
+		{% for row in table %}
+		<tr>
+			{% for cell in row %}
+			<td rowspan="{{cell.rowspan}}" class="{{cell.class}}">{{cell.content}}</td>
+			{% endfor %}
+		</tr>
+		{% endfor %}
+	</table>
+</body>
+</html>

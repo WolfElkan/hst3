@@ -74,8 +74,8 @@ class Enum(object):
 	def static(self, field, value):
 		return value
 	def clean(self, value):
-		return self.options[value]
-
+		return str(value)
+		
 class Radio(object):
 	def __init__(self, **kwargs):
 		self.field = kwargs['field'] if 'field' in kwargs else None

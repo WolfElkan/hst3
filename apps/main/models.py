@@ -78,7 +78,7 @@ class Family(models.Model):
 	def unique_last(self):
 		return self.last
 	def children(self):
-		return Students.filter(family_id=self.id)
+		return Students.filter(family_id=self.id).order_by('birthday')
 	def __str__(self):
 		return self.last+' Family'
 	def __getattribute__(self, field):
@@ -136,10 +136,10 @@ class Student(models.Model):
 		return course.eligible(self)
 	def audible(self, course):
 		return course.audible(self)
-	def take(self, course):
-		return course.take(self)
-	def saud(self, course):
-		return course.saud(self)
+	def enroll(self, course):
+		return course.enroll(self)
+	def audition(self, course):
+		return course.audition(self)
 	def hst_age_in(self, year):
 		return year - self.birthday.year - 1
 	def hst_age(self):
@@ -154,7 +154,9 @@ class Student(models.Model):
 		year = now.year + (0 if now.month < 5 else 1)
 		return self.grade_in(year)
 	def enrollments(self):
-		return Enrollments.filter(student_id=self.id)
+		return Enrollments.filter(student_id=self.id).order_by('course__year')
+	def enrollments_in(self, year):
+		return Enrollments.filter(student_id=self.id, course__year=year)
 	def courses(self):
 		qset = []
 		for enrollment in self.enrollments:

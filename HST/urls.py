@@ -23,6 +23,7 @@ from django.conf.urls import include
 import apps.main.views as main
 import apps.program.views as program
 import apps.rest.views as rest
+import apps.reports.views as reports
 import apps.rest.seed as seed
 import apps.program.seed as program_seed
 from . import dev_views as dev
@@ -50,6 +51,9 @@ urlpatterns = [
 	url(r'^rest/index/(?P<model>[a-zA-Z]+)/?$', rest.index),
 	url(r'^rest/new/(?P<model>[a-zA-Z]+)/?$', rest.new),
 	url(r'^rest/create/(?P<model>[a-zA-Z]+)/?$', rest.create),
+
+	url(r'^reports/students/?$', reports.students),
+	url(r'^reports/students/(?P<year>\d{4})/?$', reports.students),
 
 	url(r'^seed/load/?$', seed.load),
 	url(r'^seed/dump/?$', seed.dump),

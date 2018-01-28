@@ -21,7 +21,7 @@ class CourseManager(sm.SuperManager):
 			if field not in data:
 				data[field] = data['tradition'].__getattribute__(field)
 		data['id'] = str(int(data['year'])%100).zfill(2)+data['tradition'].id
-		super(CourseManager, self).create(data)
+		super(CourseManager, self).create(**data)
 	def fetch(self, **kwargs):
 		things = self.filter(**kwargs)
 		if things:

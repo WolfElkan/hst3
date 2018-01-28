@@ -80,14 +80,14 @@ class CourseTrad(models.Model):
 		return True
 	def audible(self, student, year):
 		return True
-	def take(self, student, year):
+	def enroll(self, student, year):
 		course = Courses.fetch(tradition=self, year=year)
 		if course:
-			return course.take(student)
-	def saud(self, student, year):
+			return course.enroll(student)
+	def audition(self, student, year):
 		course = Courses.fetch(tradition=self, year=year)
 		if course:
-			return course.saud(student)
+			return course.audition(student)
 	def __getattribute__(self, field):
 		if field in ['courses','genre']:
 			function = super(CourseTrad, self).__getattribute__(field)
@@ -126,12 +126,12 @@ class Course(models.Model):
 		return self.tradition.eligible(student, self.year)
 	def audible(self, student):
 		return self.tradition.audible(student, self.year)
-	def take(self, student):
+	def enroll(self, student):
 		if self.eligible(student):
-			Enrollments.create({'course': self, 'student': student})
-	def saud(self, student):
+			Enrollments.create(course=self, student=student)
+	def audition(self, student):
 		if self.audible(student):
-			Auditions.create({'course': self, 'student': student})
+			Auditions.create(course=self, student=student)
 	def __getattribute__(self, field):
 		if field in ['students_toggle_enrollments','students','enrollments']:
 			call = super(Course, self).__getattribute__(field)
