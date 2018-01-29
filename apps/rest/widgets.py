@@ -6,6 +6,8 @@ MODELS = {
 	'address'   : Addresses,
 	'family'    : Families,
 	'parent'    : Parents,
+	'mother'    : Parents,
+	'father'    : Parents,
 	'student'   : Students,
 	'teacher'   : Teacher.objects,
 	'user'      : Users,
@@ -222,16 +224,12 @@ class ForeignKey(object):
 		if value:
 			return rest_link(value)
 		else:
-			return '<a href="new/{}/">add</a>'.format(field)
+			return '<a href="add/{}/">add</a>'.format(field)
 	def widget(self, field, value):
 		self.field = field
 		html = '<select name="{}_id">'.format(field)
 		if not self.model:
 			self.model = field
-		# if value:
-		# 	model = value.rest_model
-		# else:
-		# 	model = field if field not in ['mother','father'] else 'parent'
 		for foreign in MODELS[self.model].all():
 			html += '<option value="{}"{}>{}</option>'.format(foreign.id,' selected' if value == foreign else '',str(foreign))
 		html += '</select>'
@@ -264,10 +262,6 @@ class ForeignSet(object):
 			value = post[field]
 		else:
 			value = self.force
-		# if isAttr:
-		# 	thing.__setattr__(field, value)
-		# else:
-		# 	thing.__setitem__(field, value)
 		return thing
 
 class ToggleSet(object):
@@ -284,7 +278,6 @@ class ToggleSet(object):
 	def widget(self, field, qset):
 		html = ''
 		if qset:
-			print 286
 			display = []
 			for foreign in qset:
 				display.append(foreign['widget'])
@@ -296,9 +289,5 @@ class ToggleSet(object):
 			value = post[field]
 		else:
 			value = self.force
-		# if isAttr:
-		# 	thing.__setattr__(field, value)
-		# else:
-		# 	thing.__setitem__(field, value)
 		return thing
 	

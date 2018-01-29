@@ -92,6 +92,12 @@ def pretty(arr, level=0):
 def pdir(thing):
 	pretty(dir(thing))
 
+def sub(val, dic):
+	if val in dic:
+		return dic[val]
+	else:
+		return val
+
 # Return the current HST registration year (This year until May 1, next year thereafter)
 from datetime import datetime
 def year():

@@ -47,6 +47,7 @@ class DayOfWeek(object):
 		self.value = self.parse(value)
 		self.short = short_days[self.value]
 		self.long  = long_days [self.value]
+		self.force = 0
 	def parse(self, value):
 		if value:
 			if type(value) is tuple:
@@ -64,8 +65,7 @@ class DayOfWeek(object):
 					return short_days.index(value)
 				elif value in long_days:
 					return long_days.index(value)
-		else:
-			return 0
+		return 0
 	def __str__(self):
 		return self.long
 	def __int__(self):
@@ -84,9 +84,13 @@ class DayOfWeek(object):
 		self.__init__(value)
 		self.field = field
 		return str(self)
-	def clean(self, value):
-		self.__init__(value)
-		return self.short
+	def set(self, thing, field, post, isAttr):
+		value = post[field]
+		if isAttr:
+			thing.__setattr__(field, value)
+		else:
+			thing.__setitem__(field, value)
+		return thing
 
 class DayOfWeekField(sqlmod.EnumField):
 	def __init__(self, **kwargs):
@@ -162,23 +166,40 @@ class PhoneNumberField(models.DecimalField):
 class ZipCode(object):
 	def __init__(self, *value):
 		self.field = None
+		self.value = self.parse(value)
+		self.force = 00000
+		# if value:
+		# 	print value
+		# 	if type(value) is tuple:
+		# 		self.value = value[0]
+		# 	elif type(value) is ZipCode:
+		# 		self.value = value.value
+		# 	elif type(value) is str:
+		# 		self.value = float(value.replace('-','.'))
+		# 	else:
+		# 		self.value = value
+		# 	self.value = float(self.value)
+		# else:
+		# 	self.value = 00000.0000
+	def parse(self, value):
 		if value:
 			if type(value) is tuple:
-				self.value = value[0]
-			elif type(value) is ZipCode:
-				self.value = value.value
-			elif type(value) is str:
-				self.value = float(value.replace('-','.'))
-			else:
-				self.value = value
-			self.value = float(self.value)
-		else:
-			self.value = 00000.0000
+				return self.parse(value[0])
+			elif type(value) is int:
+				return value
+			elif type(value) is float:
+				return value
+			elif type(value) in [str,unicode] and re.match(r'^\d{,5}(-\d{,4})?$', value):
+				return float(value.replace('-','.'))
+		return 0
 	def __str__(self):
-		result = str(int(self.value)).zfill(5)
-		if self.value % 1:
-			result += '-' + str(self.value)[-4:]
-		return result
+		if self.value:
+			result = str(int(self.value)).zfill(5)
+			if self.value % 1:
+				result += '-' + str(self.value)[-4:]
+			return result
+		else:
+			return ''
 	def __float__(self):
 		return self.value
 	def __int__(self):

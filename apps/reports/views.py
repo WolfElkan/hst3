@@ -3,11 +3,8 @@ from apps.main.managers import Addresses, Families, Parents, Users, Students
 from apps.main.models import Teacher
 Teachers = Teacher.objects
 from apps.program.managers import Courses, CourseTrads, Enrollments, Auditions
-from Utils.hacks import year as getyear
+from Utils.hacks import year as getyear, sub
 import re
-
-
-# Create your views here.
 
 def make(request, year):
 	cts = CourseTrads.filter(e=True)
@@ -18,9 +15,10 @@ def make(request, year):
 
 def students(request, **kwargs):
 	year = int(kwargs['year']) if 'year' in kwargs else getyear()
-	families = Families.all()
+	families = Families.all().order_by('last')
 	table = []
 	blank = {'content':'','rowspan':1,'class':'enr'}
+	ctids = {'SB':'TT','SG':'GB','SJ':'JR'}
 	for family in families:
 		oldest = True
 		for student in family.children:
@@ -34,7 +32,7 @@ def students(request, **kwargs):
 			oldest = False
 			for enrollment in student.enrollments_in(year):
 				ctid = enrollment.course.tradition.id
-				row[ctid[:1]] = '<a href="/rest/show/enrollment/{}">{}</a>'.format(enrollment.id, ctid)
+				row[ctid[:1]] = '<a href="/rest/show/enrollment/{}/">{}</a>'.format(enrollment.id, sub(ctid, ctids))
 			table.append(row)
 	context = {
 		'year'  : year,
@@ -44,7 +42,6 @@ def students(request, **kwargs):
 
 def mass_enroll(request, **kwargs):
 	year = kwargs['year'] if 'year' in kwargs else getyear()
-	# courses = Courses.filter(year=year)
 	courses = Courses.all()
 	students = []
 	for x in request.POST:
@@ -74,7 +71,6 @@ def register(request, **kwargs):
 				new_enrollments[student_id] = {}
 			new_enrollments[student_id]['role_type'] = request.POST[x]
 	for x in new_enrollments:
-		# print x, new_enrollments[x]
 		student = Students.fetch(id=int(x))
 		print student
 		Enrollments.create(student=student, course=course, role=new_enrollments[x]['role'], role_type=new_enrollments[x]['role_type'])

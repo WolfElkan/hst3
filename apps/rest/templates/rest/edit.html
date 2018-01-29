@@ -23,7 +23,7 @@
 <body>
 	<h1>{{thing}}</h1>
 	<h2>{{Model}}</h2>
-	<form action="/rest/update/{{model}}/{{thing.id}}" method="POST"> {% csrf_token %}
+	<form action="/rest/update/{{model}}/{{thing.id}}/" method="POST"> {% csrf_token %}
 		<table>
 			<tr>
 				<td>id:</td>
@@ -39,5 +39,6 @@
 		<button type="submit">Update</button>
 		<a href="/rest/show/{{model}}/{{thing.id}}/">Cancel</a>
 	</form>
+	<a href="/rest/delete/{{model}}/{{thing.id}}">Delete</a>
 </body>
 </html>

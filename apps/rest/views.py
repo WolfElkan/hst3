@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, HttpResponse
 from datetime import datetime
-from Utils.hacks import copy, getme, seshinit, forminit, first, copyatts, pretty, pdir, metastr
+from Utils.hacks import copy, getme, seshinit, forminit, first, copyatts, pretty, pdir, metastr, sub
 import re
 from .fields import FIELDS
 from .widgets import MODELS
@@ -15,7 +15,7 @@ def index(request, model):
 		field = ftp['field']
 		columns.append(field)
 	query = metastr(request.GET)
-	qset = MODELS[model].filter(**query)
+	qset = MODELS[model].filter(**query).order_by('-id')
 	display = []
 	for thing in qset:
 		dthing = ['<a href="/rest/show/{}/{}">{}</a>'.format(model, thing.id, thing.id)]
@@ -30,7 +30,7 @@ def index(request, model):
 		'columns' : columns,
 		'display' : display,
 		'model'   : model,
-		'Model'   : 'Course Tradition' if model == 'coursetrad' else model.title(),
+		'Model'   : sub(model,{'coursetrad':'Course Tradition'}).title()
 	}
 	return render(request, 'rest/index.html', context)
 
@@ -41,14 +41,18 @@ def new(request, model, **kwargs):
 	else:
 		old_model = None
 	manager = MODELS[model]
-	tempset = FIELDS[model]
+	neutral = sub(model,{'mother':'parent','father':'parent'})
+	tempset = FIELDS[neutral]
 	display = []
 	for ftp in tempset:
 		field = ftp['field']
 		template = ftp['template']
-		value = template.force if hasattr(template, 'force') else ''
+		value = template.force
+		if str(model) == 'mother' and field == 'sex':
+			value = 'F'
 		if str(field) == str(old_model):
 			value = MODELS[old_model].get(id=kwargs['id'])
+		# print kwargs
 		value = template.widget(field,value)
 		display.append({
 			'field':template.field if template.field else field, 
@@ -57,7 +61,8 @@ def new(request, model, **kwargs):
 	context = {
 		'display' : display,
 		'model'   : model,
-		'Model'   : 'Course Tradition' if model == 'coursetrad' else model.title(),
+		'neutral' : neutral,
+		'Model'   : sub(neutral,{'coursetrad':'Course Tradition'}).title()
 	}
 	return render(request, 'rest/new.html', context)
 
@@ -70,21 +75,19 @@ def create(request, model, **kwargs):
 	manager = MODELS[model]
 	thing = {}
 	for ftp in FIELDS[model]:
-		# if field not in ['csrfmiddlewaretoken']:
-			# thing[field] = request.POST[field]
 		template = ftp['template']
 		field = ftp['field']
 		value = request.POST[field] if field in request.POST else template.force
-		# print field, value
 		thing = template.set(thing, field, request.POST, False)
-		# value = template.clean(field, value)
-		# field = template.field if template.field else field
-		# thing.__setitem__(field, value)
-		# elif hasattr(template,'force'):
-		# 	thing.__setitem__(field, template.force)
-	print thing
-	manager.create(**thing)
-	return redirect('/rest/index/{}/'.format(model))
+	thing = manager.create(**thing)
+	print kwargs
+	if old_model:
+		old = MODELS[old_model].fetch(id=kwargs['id'])
+		print old
+		if old and hasattr(old, model):
+			old.__setattr__(model, thing)
+			old.save()
+	return redirect('/rest/show/{}/{}/'.format(old_model,kwargs['id']) if old_model else '/rest/index/{}/'.format(model))
 
 def show(request, model, id):
 	return show_or_edit(request, model, id, False)
@@ -116,7 +119,7 @@ def show_or_edit(request, model, id, isEdit):
 		'thing'   : thing,
 		'display' : display,
 		'model'   : model,
-		'Model'   : 'Course Tradition' if model == 'coursetrad' else model.title(),
+		'Model'   : sub(model,{'coursetrad':'Course Tradition'}).title()
 	}
 	return render(request, 'rest/edit.html' if isEdit else 'rest/show.html', context)
 
@@ -127,19 +130,12 @@ def update(request, model, id):
 		template = ftp['template']
 		field = ftp['field']
 		value = request.POST[field] if field in request.POST else template.force
-		# print field, value
 		thing = template.set(thing, field, request.POST, True)
-
-		# template = ftp['template']
-		# field = ftp['field']
-		# field = template.field if template.field else field
-		# # print field, field in request.POST
-		# if field in request.POST and request.POST[field]:
-		# 	value = request.POST[field]
-		#	# print field, value
-		# 	value = template.clean(value)
-		# 	thing.__setattr__(field, value)
-		# elif hasattr(template,'force'):
-		# 	thing.__setattr__(field, template.force)
 	thing.save()
 	return redirect("/rest/show/{}/{}".format(model, thing.id))
+
+def delete(request, model, id):
+	manager = MODELS[model]
+	thing = manager.get(id=id)
+	thing.delete()
+	return redirect('/reports/students/2017/')

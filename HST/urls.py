@@ -50,6 +50,7 @@ urlpatterns = [
 	url(r'^rest/update/(?P<model>[a-zA-Z]+)/(?P<id>\d+|(\d\d)?\w\w)/?$', rest.update),
 	url(r'^rest/index/(?P<model>[a-zA-Z]+)/?$', rest.index),
 	url(r'^rest/new/(?P<model>[a-zA-Z]+)/?$', rest.new),
+	url(r'^rest/new/(?P<model>[a-zA-Z]+)/create/?$', rest.create),
 	url(r'^rest/create/(?P<model>[a-zA-Z]+)/?$', rest.create),
 
 	url(r'^reports/students/?$', reports.students),
@@ -61,8 +62,9 @@ urlpatterns = [
 	url(r'^reports/students/mass_enroll/register/?$', reports.register),
 	url(r'^reports/students/(?P<year>\d{4})/mass_enroll/register/?$', reports.register),
 
-	url(r'^rest/edit/(?P<model>[a-zA-Z]+)/(?P<id>\d+|(\d\d)?\w\w)/add/(?P<foreign_model>[a-zA-Z]+)/?$', rest.new),
-
+	url(r'^rest/(show|edit)/(?P<model>[a-zA-Z]+)/(?P<id>\d+|(\d\d)?\w\w)/add/(?P<foreign_model>[a-zA-Z]+)/?$', rest.new),
+	url(r'^rest/(show|edit)/(?P<model>[a-zA-Z]+)/(?P<id>\d+|(\d\d)?\w\w)/add/(?P<foreign_model>[a-zA-Z]+)/create/?$', rest.create),
+	url(r'^rest/delete/(?P<model>[a-zA-Z]+)/(?P<id>\d+|(\d\d)?\w\w)/?$', rest.delete),
 	url(r'^seed/load/?$', seed.load),
 	url(r'^seed/dump/?$', seed.dump),
 	url(r'^seed/nuke/?$', seed.nuke),

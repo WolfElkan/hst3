@@ -1,8 +1,6 @@
 main
 	Make registration landing page redirect to appropriate step if family has partially registered.
 
-	What did we decide about login by email?
-
 	Student Interface
 		(eventually) Support loading existing students from database for editing, track by internal id's
 		Make titles of required fields bold automatically
@@ -11,14 +9,27 @@ main
 		Make validations work
 		Make titles of required fields bold automatically
 		If someone tries to create parents that have already been created, update the existing parents.
+	create NameClash table
+	create PolyRole table
 
 program
 	Models
 		CourseTrad
 			Provide validation to make infinite aliasing impossible
 
-seed
-	Modularize
+rest
+	support /add/[mo|fa]ther
+
+reports
+	students
+		create timeless version
+		show only current students in annual version
 
 namecase
 family.children gets them in age order
+
+
+Questions:
+	What did we decide about login by email?
+	Antimony protocol?
+	Broadway dance courses? (JB or Z2)
