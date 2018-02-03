@@ -98,7 +98,7 @@ class DayOfWeekField(sqlmod.EnumField):
 		kwargs['choices'] = short_days
 		super(DayOfWeekField, self).__init__(**kwargs)
 	def from_db_value(self, value, col, wrapper, options):
-		print '->', value
+		# print '->', value
 		return DayOfWeek(value)
 
 

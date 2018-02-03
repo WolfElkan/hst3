@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, HttpResponse
 from .models import Family, Address, Parent, User, Student
 from Utils.custom_fields import Bcrypt, PhoneNumber
 from datetime import datetime
-from Utils.hacks import copy, seshinit, forminit, first, getme, numero, metanumero, json
+from Utils.hacks import copy, copyatts, seshinit, forminit, first, getme, numero, metanumero, json, copy_items_to_attrs
 import json as JSON
 from io import StringIO
 from trace import TRACE
@@ -27,7 +27,8 @@ def index(request):
 		print '@ main.views.index'
 	me = getme(request)
 	context = {
-		'name':me.owner if me else None
+		'name':me.owner if me else None,
+		'incomplete_registration': me and not me.owner.children
 	}
 	return render(request, 'main/index.html', context)
 
@@ -91,6 +92,7 @@ def reg_familyinfo(request):
 		print '@ main.views.reg_familyinfo'
 	forminit(request,'family',['last','phone','email'])
 	forminit(request,'user',['username','password','pw_confm'])
+	seshinit(request,'password_set',False)
 	if request.method == 'GET':
 		return reg_familyinfo_get(request)
 	elif request.method == 'POST':
@@ -102,21 +104,56 @@ def reg_familyinfo(request):
 def reg_familyinfo_get(request):
 	if TRACE:
 		print '@ main.views.reg_familyinfo_get'
-	context = copy(request.session, ['p','e'])
+	me = getme(request)
+	if me and me.owner:
+		request.session['p']['family'].update(copyatts(me.owner, ['last','phone_type','email']))
+		request.session['p']['family']['phone'] = str(me.owner.phone)
+		request.session['p']['user']['username'] = me.username
+		request.session['password_set'] = True
+	context = copy(request.session, ['p','e','password_set'])
 	return render(request, 'register/familyinfo.html', context)
 
 def reg_familyinfo_post(request):
 	if TRACE:
 		print '@ main.views.reg_familyinfo_post'
+	me = getme(request)
+	if me:
+		me.username = request.POST['username']
+		if me.owner:
+			# me.owner.last = request.
+			# copy_items_to_attrs(me.owner, request.POST, ['last','phone','phone_type','email'])
+			me.owner.save()
 	new_family = copy(request.POST,['last','phone','phone_type','email'])
 	new_user = copy(request.POST,['username','password','pw_confm'])
-	new_family['reg_status'] = 1
 	new_user['permission'] = 2
-	if Families.isValid(new_family) and Users.isValid(new_user):
+	ouu = me and str(new_user['username']) == str(me.username)
+	if Families.isValid(new_family) and Users.isValid(new_user, override_unique_username=ouu):
 		new_user.pop('pw_confm')
-		new_family = Families.create(**new_family)
-		new_user['owner'] = new_family
-		me = Users.create(**new_user)
+		if not me:
+			print 'not me'
+			new_family = Families.create(**new_family)
+			new_user['owner'] = new_family
+			print new_user
+			me = Users.create(**new_user)
+		elif me and not me.owner:
+			print 'me and not me.owner'
+			me.username = new_user['username']
+			new_family = Families.create(**new_family)
+			me.owner = new_family
+			me.save()
+		elif me and me.owner:
+			print 'me and me.owner'
+			me.username = new_user['username']
+			family = me.owner
+			family.last  = new_family['last']
+			family.phone = new_family['phone']
+			family.email = new_family['email']
+			family.phone_type = new_family['phone_type']
+			print new_family['email']
+			print family.email
+			family.save()
+			me.save()
+		request.session['e'] = {}
 		request.session['meid'] = me.id
 		return redirect('/register/parentsinfo')
 	else:
@@ -150,6 +187,24 @@ def reg_parentsinfo_get(request):
 	if TRACE:
 		print '@ main.views.reg_parentsinfo_get'
 	me = getme(request)
+	if not me or not me.owner:
+		return redirect('/register/familyinfo')
+	if me and me.owner.mother:
+		request.session['p']['mom'].update({
+			'mom_first'     : me.owner.mother.first,
+			'mom_alt_last'  : me.owner.mother.alt_last,
+			'mom_alt_phone' : me.owner.mother.alt_phone,
+			'mom_alt_email' : me.owner.mother.alt_email,
+			'mom_alt_phone_type' : me.owner.mother.phone_type,
+		})
+	if me and me.owner.father:
+		request.session['p']['dad'].update({
+			'dad_first'     : me.owner.father.first,
+			'dad_alt_last'  : me.owner.father.alt_last,
+			'dad_alt_phone' : me.owner.father.alt_phone,
+			'dad_alt_email' : me.owner.father.alt_email,
+			'dad_alt_phone_type' : me.owner.father.phone_type,
+		})
 	context = {
 		'last'  : me.owner.last,
 		'phone' : me.owner.phone,
@@ -204,11 +259,29 @@ def reg_parentsinfo_post(request):
 		request.session['e'] = {}
 		# Add parents to Database if they have not been skipped
 		if not mother.pop('skipped'):
-			mother = Parents.create(**mother)
-			me.owner.mother = mother
+			if me.owner.mother:
+				mother_proxy = me.owner.mother
+				mother_proxy.first     = mother['first']
+				mother_proxy.alt_last  = mother['alt_last']
+				mother_proxy.alt_phone = mother['alt_phone']
+				mother_proxy.alt_email = mother['alt_email']
+				mother_proxy.save()
+			else:
+				family = me.owner
+				family.mother = Parents.create(**mother)
+				family.save()
 		if not father.pop('skipped'):
-			father = Parents.create(**father)
-			me.owner.father = father
+			if me.owner.father:
+				father_proxy = me.owner.father
+				father_proxy.first     = father['first']
+				father_proxy.alt_last  = father['alt_last']
+				father_proxy.alt_phone = father['alt_phone']
+				father_proxy.alt_email = father['alt_email']
+				father_proxy.save()
+			else:
+				family = me.owner
+				family.father = Parents.create(**father)
+				family.save()
 		return redirect('/register/studentsinfo')
 	else:
 		request.session['p'] = {
@@ -239,6 +312,8 @@ def reg_studentsinfo_get(request):
 	if TRACE:
 		print '@ main.views.reg_studentsinfo_get'
 	me = getme(request)
+	if not me or not me.owner or not (me.owner.mother and me.owner.father):
+		return redirect('/register')
 	# Every year on May 1, registration switches to the following year.
 	now = datetime.now()
 	next_year = 0 if now.month < 5 else 1

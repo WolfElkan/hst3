@@ -5,6 +5,7 @@ X	Give Widgets a default= kwarg
 
 main
 X	Make registration landing page redirect to appropriate step if family has partially registered.
+	Add Change Password route
 
 	Student Interface
 X		(eventually) Support loading existing students from database for editing, track by internal id's
@@ -13,7 +14,7 @@ X		(eventually) Support loading existing students from database for editing, tra
 	Parent Interface
 		Make validations work
 		Make titles of required fields bold automatically
-		If someone tries to create parents that have already been created, update the existing parents.
+	X	If someone tries to create parents that have already been created, update the existing parents.
 	create NameClash table
 	create PolyRole table
 

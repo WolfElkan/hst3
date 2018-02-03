@@ -27,7 +27,8 @@ def hot(request):
 	me = getme(request)
 	seshinit(request,'command')
 	context = {
-		'command': request.session['command']
+		'command': request.session['command'],
+		# 'session': pretty(request.session.dict)
 	}
 	return render(request, 'main/hot.html', context)
 

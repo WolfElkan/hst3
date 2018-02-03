@@ -36,6 +36,13 @@ def copyatts(source, keys):
 			this[key] = None
 	return this
 
+def copy_items_to_attrs(this, source, *keys):
+	if not keys:
+		keys = source.keys()
+	for key in keys:
+		this.__setattr__(key, source[key])
+	return this
+
 # Function for initializing session variables.
 def seshinit(request, sesh, val=''):
 	if sesh not in request.session:
@@ -84,15 +91,16 @@ def json(obj):
 	result = result.replace('>','')
 	return result
 
-def pretty(arr, level=0):
+def pretty(arr, delim='  ', indent='', level=0, printout=''):
 	for thing in arr:
 		if type(thing) is list:
-			pretty(thing, level+1)
+			printout = pretty(thing, delim, indent+'['+delim, level+1, printout)
 		else:
-			print '  '*level + str(thing)
+			printout += indent + str(thing) + '\n'
+	return printout if level else printout[:-1]
 
 def pdir(thing):
-	pretty(dir(thing))
+	return pretty(dir(thing))
 
 def sub(val, dic):
 	if val in dic:

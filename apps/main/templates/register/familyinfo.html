@@ -52,6 +52,10 @@
 					</tr>
 					<tr>
 						<td>Password:</td>
+						{% if password_set %}
+						<td><a href="/changepassword">Change</a></td>
+						<td></td>
+						{% else %}
 						<td><input type="password" name="password" value="{{p.user.password}}"></td>
 						<td class="error">{{e.user.password}}</td>
 					</tr>
@@ -59,6 +63,7 @@
 						<td>Confirm Password:</td>
 						<td><input type="password" name="pw_confm" value="{{p.user.pw_confm}}"></td>
 						<td class="error">{{e.user.pw_confm}}</td>
+						{% endif %}
 					</tr>
 				</table>
 			<button>Next >></button>

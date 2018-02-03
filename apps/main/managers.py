@@ -68,8 +68,11 @@ class UserManager(sm.SuperManager):
 			sm.Present('pw_confm','Please confirm your password'),
 			sm.Confirmation('pw_confm','password','Passwords do not match.')
 		]
+	def isValid(self, data, **kwargs):
+		if 'override_unique_username' in kwargs and kwargs['override_unique_username']:
+			del self.validations[1]
+		return super(UserManager, self).isValid(data)
 	def filter(self, **kwargs):
-		print 73
 		if 'owner' in kwargs:
 			owner = kwargs.pop('owner')
 			kwargs['owner_id'] = owner.id
