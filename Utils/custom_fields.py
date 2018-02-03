@@ -5,6 +5,7 @@ from django_mysql import models as sqlmod
 from .hacks import get as _
 from . import gistfile1 as poly
 from datetime import datetime
+from decimal import Decimal
 
 class Bcrypt(object):
 	def __init__(self, char60):
@@ -38,7 +39,7 @@ class BcryptField(models.Field):
 		return hashed
 
 
-short_days = ['','Mon','Tue','Wed','Thu','Fri','Sat','Sun']
+short_days = ['-','Mon','Tue','Wed','Thu','Fri','Sat','Sun']
 long_days = ['N/A','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
 
 class DayOfWeek(object):
@@ -47,7 +48,7 @@ class DayOfWeek(object):
 		self.value = self.parse(value)
 		self.short = short_days[self.value]
 		self.long  = long_days [self.value]
-		self.force = 0
+		self.default = 0
 	def parse(self, value):
 		if value:
 			if type(value) is tuple:
@@ -85,7 +86,7 @@ class DayOfWeek(object):
 		self.field = field
 		return str(self)
 	def set(self, thing, field, post, isAttr):
-		value = post[field]
+		value = self.parse(post[field]) + 1 # I cannot for the life of me figure out why the +1 is necessary.  But for now, it works.
 		if isAttr:
 			thing.__setattr__(field, value)
 		else:
@@ -97,13 +98,14 @@ class DayOfWeekField(sqlmod.EnumField):
 		kwargs['choices'] = short_days
 		super(DayOfWeekField, self).__init__(**kwargs)
 	def from_db_value(self, value, col, wrapper, options):
+		print '->', value
 		return DayOfWeek(value)
 
 
 class PhoneNumber(object):
 	def __init__(self, *value):
 		self.field = None
-		self.force = False
+		self.default = False
 		if value:
 			if type(value) is tuple:
 				value = value[0]
@@ -162,28 +164,18 @@ class PhoneNumberField(models.DecimalField):
 	def from_db_value(self, value, col, wrapper, options):
 		return PhoneNumber(value)
 
-
 class ZipCode(object):
 	def __init__(self, *value):
 		self.field = None
 		self.value = self.parse(value)
-		self.force = 00000
-		# if value:
-		# 	print value
-		# 	if type(value) is tuple:
-		# 		self.value = value[0]
-		# 	elif type(value) is ZipCode:
-		# 		self.value = value.value
-		# 	elif type(value) is str:
-		# 		self.value = float(value.replace('-','.'))
-		# 	else:
-		# 		self.value = value
-		# 	self.value = float(self.value)
-		# else:
-		# 	self.value = 00000.0000
+		self.default = 00000
 	def parse(self, value):
 		if value:
-			if type(value) is tuple:
+			if type(value) is ZipCode:
+				return value.value
+			elif type(value) is Decimal:
+				return float(value)
+			elif type(value) is tuple:
 				return self.parse(value[0])
 			elif type(value) is int:
 				return value
@@ -201,7 +193,7 @@ class ZipCode(object):
 		else:
 			return ''
 	def __float__(self):
-		return self.value
+		return float(self.value)
 	def __int__(self):
 		return int(self.value)
 	def static(self, field, value):
@@ -237,7 +229,7 @@ class PolymorphicField(poly.MultiColumnField):
 			self.relatable_names += [rel.__name__.title()]
 		self.fields = {
 			'type': sqlmod.EnumField(null=True, choices=self.relatable_names),
-			'id'  : models.PositiveIntegerField(null=True, rel=True),
+			'id'  : models.PositiveIntegerField(null=True),
 		}
 		this = self
 		old_create = self.manager.create

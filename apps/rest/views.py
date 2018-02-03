@@ -4,18 +4,24 @@ from Utils.hacks import copy, getme, seshinit, forminit, first, copyatts, pretty
 import re
 from .fields import FIELDS
 from .widgets import MODELS
+from trace import TRACE
 
 def home(request):
+	if TRACE:
+		print '@ rest.views.home'
 	context = {}
 	return render(request, 'rest/home.html', context)
 
 def index(request, model):
+	if TRACE:
+		print '@ rest.views.index'
 	columns = []
 	for ftp in FIELDS[model]:
 		field = ftp['field']
 		columns.append(field)
 	query = metastr(request.GET)
-	qset = MODELS[model].filter(**query).order_by('-id')
+	qset = MODELS[model].filter(**query)
+	# qset.order_by('-updated_at')
 	display = []
 	for thing in qset:
 		dthing = ['<a href="/rest/show/{}/{}">{}</a>'.format(model, thing.id, thing.id)]
@@ -23,7 +29,7 @@ def index(request, model):
 			field = ftp['field']
 			value = thing.__getattribute__(field)
 			template = ftp['template']
-			value = value if value else (template.force if hasattr(template, 'force') else '')
+			value = value if value else template.default
 			dthing.append(template.static(field,value))
 		display.append(dthing)
 	context = {
@@ -35,6 +41,8 @@ def index(request, model):
 	return render(request, 'rest/index.html', context)
 
 def new(request, model, **kwargs):
+	if TRACE:
+		print '@ rest.views.new'
 	if 'foreign_model' in kwargs:
 		old_model = model
 		model = kwargs['foreign_model']
@@ -47,7 +55,7 @@ def new(request, model, **kwargs):
 	for ftp in tempset:
 		field = ftp['field']
 		template = ftp['template']
-		value = template.force
+		value = template.default
 		if str(model) == 'mother' and field == 'sex':
 			value = 'F'
 		if str(field) == str(old_model):
@@ -67,6 +75,8 @@ def new(request, model, **kwargs):
 	return render(request, 'rest/new.html', context)
 
 def create(request, model, **kwargs):
+	if TRACE:
+		print '@ rest.views.create'
 	if 'foreign_model' in kwargs:
 		old_model = model
 		model = kwargs['foreign_model']
@@ -77,10 +87,9 @@ def create(request, model, **kwargs):
 	for ftp in FIELDS[model]:
 		template = ftp['template']
 		field = ftp['field']
-		value = request.POST[field] if field in request.POST else template.force
+		value = request.POST[field] if field in request.POST else template.default
 		thing = template.set(thing, field, request.POST, False)
 	thing = manager.create(**thing)
-	print kwargs
 	if old_model:
 		old = MODELS[old_model].fetch(id=kwargs['id'])
 		print old
@@ -90,12 +99,18 @@ def create(request, model, **kwargs):
 	return redirect('/rest/show/{}/{}/'.format(old_model,kwargs['id']) if old_model else '/rest/index/{}/'.format(model))
 
 def show(request, model, id):
+	if TRACE:
+		print '@ rest.views.show'
 	return show_or_edit(request, model, id, False)
 
 def edit(request, model, id):
+	if TRACE:
+		print '@ rest.views.edit'
 	return show_or_edit(request, model, id, True)
 
 def show_or_edit(request, model, id, isEdit):
+	if TRACE:
+		print '@ rest.views.show_or_edit'
 	manager = MODELS[model]
 	thing = manager.get(id=id)
 	tempset = FIELDS[model]
@@ -124,17 +139,21 @@ def show_or_edit(request, model, id, isEdit):
 	return render(request, 'rest/edit.html' if isEdit else 'rest/show.html', context)
 
 def update(request, model, id):
+	if TRACE:
+		print '@ rest.views.update'
 	manager = MODELS[model]
 	thing = manager.get(id=id)
 	for ftp in FIELDS[model]:
 		template = ftp['template']
 		field = ftp['field']
-		value = request.POST[field] if field in request.POST else template.force
+		value = request.POST[field] if field in request.POST else template.default
 		thing = template.set(thing, field, request.POST, True)
 	thing.save()
 	return redirect("/rest/show/{}/{}".format(model, thing.id))
 
 def delete(request, model, id):
+	if TRACE:
+		print '@ rest.views.delete'
 	manager = MODELS[model]
 	thing = manager.get(id=id)
 	thing.delete()

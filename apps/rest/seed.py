@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, HttpResponse
 from datetime import datetime
 from Utils.hacks import copy, getme, seshinit, forminit, first, copyatts, pretty, pdir
 import json
+from trace import TRACE
 
 from apps.main.models import Family, Address, Parent, User, Student
 Addresses = Address.objects
@@ -17,6 +18,8 @@ Courses     = Course.objects
 Enrollments = Enrollment.objects
 
 def load(request):
+	if TRACE:
+		print '@ rest.seed.load'
 	if request.method == 'GET':
 		return load_get(request)
 	elif request.method == 'POST':
@@ -25,6 +28,8 @@ def load(request):
 		return HttpResponse("Unrecognized HTTP Verb")
 
 def load_get(request):
+	if TRACE:
+		print '@ rest.seed.load_get'
 	seshinit(request,'json_dump')
 	context = {
 		'json_dump': request.session['json_dump']
@@ -32,6 +37,8 @@ def load_get(request):
 	return render(request, 'json/seed.html', context)
 
 def load_post(request):
+	if TRACE:
+		print '@ rest.seed.load_post'
 	nUsers = 0
 	nFamilies = 0
 	nStudents = 0
@@ -56,20 +63,21 @@ def load_post(request):
 			ct['alias'] = alias
 			CourseTrads.create(**ct)
 			nCourseTrads += 1
-	cts = CourseTrads.filter(e=True)
-	for year in data['years']:
-		for ct in cts:
-			ct.make(year)
-			nCourses += 1
+	# cts = CourseTrads.filter(e=True)
+	# for year in data['years']:
+	# 	for ct in cts:
+	# 		ct.make(year)
+	# 		nCourses += 1
 	for fam in data['families']:
 		print fam['last']
 		family = copy(fam,['last','phone','email'])
-		address = copy(fam['address'])
-		if 'zipcode' not in address:
-			address['zipcode'] = 00000
-		address = Addresses.create(**address)
-		nAddresses += 1
-		family['address'] = address
+		if 'address' in fam:
+			address = copy(fam['address'])
+			if 'zipcode' not in address:
+				address['zipcode'] = 00000
+			address = Addresses.create(**address)
+			nAddresses += 1
+			family['address'] = address
 		family = Families.create(**family)
 		nFamilies += 1
 		if 'mother' in fam:
@@ -86,15 +94,27 @@ def load_post(request):
 		for stu in fam['students']:
 			print '  '+stu['first']
 			student = copy(stu)
-			enrollments = student.pop('enrollments')
+			enrollments = student.pop('enrollments') if 'enrollments' in student else []
 			student['family'] = family
 			newStudent = Students.create(**student)
 			for enrollment in enrollments:
-				if type(enrollment) in [str,unicode]:
-					Courses.get(id=enrollment).enroll(newStudent)
-				else:
-					course = Courses.get(id=enrollment['course_id'])
-					Enrollments.create(course=course, student=newStudent, role=enrollment['role'], role_type=enrollment['role_type'])
+				rolled = type(enrollment) in [object,dict]
+				course_id = enrollment['course_id'] if rolled else enrollment
+				print '    '+course_id
+				course = Courses.get_or_create_by_id(course_id)
+				enrollment_kwargs = {
+					'student': newStudent,
+					'course' : course,
+				}
+				if rolled:
+					enrollment_kwargs['role']      = enrollment['role']
+					enrollment_kwargs['role_type'] = enrollment['role_type']
+				Enrollments.create(**enrollment_kwargs)
+				# if type(enrollment) in [str,unicode]:
+				# 	Courses.get(id=enrollment).sudo_enroll(newStudent)
+				# else:
+				# 	course = Courses.get(id=enrollment['course_id'])
+				# 	Enrollments.create(course=course, student=newStudent, role=enrollment['role'], role_type=enrollment['role_type'])
 			nStudents += 1
 	print 'IMPORT COMPLETE'
 	print 'Users:     ' + str(nUsers).rjust(4)
@@ -111,12 +131,16 @@ def load_post(request):
 
 class FriendlyEncoder(json.JSONEncoder):
 	def default(self, obj):
+		if TRACE:
+			print '@ rest.seed.default'
 		if hasattr(obj,'__json__'):
 			return obj.__json__()
 		else:
 			return str(obj)
 
 def dump(request):
+	if TRACE:
+		print '@ rest.seed.dump'
 	data = {
 		'venues':[],
 		'coursetrads':[],
@@ -154,7 +178,7 @@ def dump(request):
 				'alias_id' : ct.alias_id,
 				'e'        : False,
 			})
-	FamiliesAll = Families.all()
+	FamiliesAll = Families.all().order_by('last')
 	for family in FamiliesAll:
 		family_obj = {
 			'last':family.last,
@@ -166,7 +190,7 @@ def dump(request):
 			family_obj['mother'] = copyatts(family.mother,['first','sex'])
 			if family.mother.alt_last:
 				family_obj['mother']['alt_last' ] = family.mother.alt_last
-			if family.mother.alt_phone:
+			if int(family.mother.alt_phone):
 				family_obj['mother']['alt_phone'] = family.mother.alt_phone
 			if family.mother.alt_email:
 				family_obj['mother']['alt_email'] = family.mother.alt_email
@@ -174,7 +198,7 @@ def dump(request):
 			family_obj['father'] = copyatts(family.father,['first','sex'])
 			if family.father.alt_last:
 				family_obj['father']['alt_last' ] = family.father.alt_last
-			if family.father.alt_phone:
+			if int(family.father.alt_phone):
 				family_obj['father']['alt_phone'] = family.father.alt_phone
 			if family.father.alt_email:
 				family_obj['father']['alt_email'] = family.father.alt_email
@@ -199,29 +223,33 @@ def dump(request):
 					student_obj['grad_year'] = student.grad_year
 				if student.height:
 					student_obj['height']    = student.height
-				if student.alt_phone:
+				if int(student.alt_phone):
 					student_obj['alt_phone'] = student.alt_phone
 				if student.alt_email:
 					student_obj['alt_email'] = student.alt_email
 				if student.tshirt:
 					student_obj['tshirt']    = student.tshirt
-				student_obj['enrollments'] = []
-				for enrollment in student.enrollments:
-					if enrollment.role or enrollment.role_type:
-						student_obj['enrollments'].append({
-							'course_id': enrollment.course_id,
-							'role'     : enrollment.role,
-							'role_type': enrollment.role_type,
-						})
-					else:
-						student_obj['enrollments'].append(enrollment.course_id)
-					years.update([int(enrollment.course.year)])
+				enrollments = student.enrollments
+				if enrollments:
+					student_obj['enrollments'] = []
+					for enrollment in enrollments:
+						if enrollment.role or enrollment.role_type:
+							student_obj['enrollments'].append({
+								'course_id': enrollment.course_id,
+								'role'     : enrollment.role,
+								'role_type': enrollment.role_type,
+							})
+						else:
+							student_obj['enrollments'].append(enrollment.course_id)
+						years.update([int(enrollment.course.year)])
 				family_obj['students'].append(student_obj)
 		data['families'].append(family_obj)
 		data['years'] = list(years)
 	return HttpResponse(json.dumps(data, cls=FriendlyEncoder))
 
 def nuke(request):
+	if TRACE:
+		print '@ rest.seed.nuke'
 	Users.all().delete()
 	Families.all().delete()
 	Students.all().delete()

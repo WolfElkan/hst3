@@ -5,6 +5,7 @@ from datetime import datetime
 from Utils.hacks import copy, seshinit, forminit, first, getme, numero, metanumero, json
 import json as JSON
 from io import StringIO
+from trace import TRACE
 
 Addresses = Address.objects
 Families  = Family.objects
@@ -15,11 +16,15 @@ Users     = User.objects
 # - - - - - SECURITY FUNCTIONS - - - - -
 
 def authorized(request):
+	if TRACE:
+		print '# main.views.authorized'
 	return 'meid' in request.session
 
 # - - - - - APPLICATION VIEWS - - - - -
 
 def index(request):
+	if TRACE:
+		print '@ main.views.index'
 	me = getme(request)
 	context = {
 		'name':me.owner if me else None
@@ -27,6 +32,8 @@ def index(request):
 	return render(request, 'main/index.html', context)
 
 def login(request):
+	if TRACE:
+		print '@ main.views.login'
 	forminit(request,'login',['username','password'])
 	if request.method == 'GET':
 		return login_get(request)
@@ -37,10 +44,14 @@ def login(request):
 		return index(request)
 
 def login_get(request):
+	if TRACE:
+		print '@ main.views.login_get'
 	context = copy(request.session, ['p','e'])
 	return render(request, 'main/login.html', context)
 
 def login_post(request):
+	if TRACE:
+		print '@ main.views.login_post'
 	me = first(Users.filter(username=request.POST['username']))
 	persist = copy(request.POST, ['username','password'])
 	if not me:
@@ -56,17 +67,28 @@ def login_post(request):
 		return redirect('/')
 
 def logout(request):
+	if TRACE:
+		print '@ main.views.logout'
 	request.session.clear()
 	return redirect ('/')
 
 #   - - - - NEW FAMILY REGISTRATION - - - -
 
 def reg(request):
+	if TRACE:
+		print '@ main.views.reg'
 	me = getme(request)
-	# TODO: Detect if family has partially registered, redirect to appropriate step.
-	return redirect('/register/familyinfo')
+	if not me or not me.owner:
+		return redirect('/register/familyinfo')
+	elif not me.owner.mother and not me.owner.father:
+		return redirect('/register/parentsinfo')
+	else:
+		return redirect('/register/studentsinfo')
+
 
 def reg_familyinfo(request):
+	if TRACE:
+		print '@ main.views.reg_familyinfo'
 	forminit(request,'family',['last','phone','email'])
 	forminit(request,'user',['username','password','pw_confm'])
 	if request.method == 'GET':
@@ -78,10 +100,14 @@ def reg_familyinfo(request):
 		return index(request)
 
 def reg_familyinfo_get(request):
+	if TRACE:
+		print '@ main.views.reg_familyinfo_get'
 	context = copy(request.session, ['p','e'])
 	return render(request, 'register/familyinfo.html', context)
 
 def reg_familyinfo_post(request):
+	if TRACE:
+		print '@ main.views.reg_familyinfo_post'
 	new_family = copy(request.POST,['last','phone','phone_type','email'])
 	new_user = copy(request.POST,['username','password','pw_confm'])
 	new_family['reg_status'] = 1
@@ -104,8 +130,10 @@ def reg_familyinfo_post(request):
 		}
 		return redirect('/register/familyinfo')
 
-
+# if me.owner
 def reg_parentsinfo(request):
+	if TRACE:
+		print '@ main.views.reg_parentsinfo'
 	if not authorized(request):
 		return redirect('/')
 	forminit(request,'mom',['mom_skipped','mom_first','mom_alt_last','mom_alt_phone','mom_alt_email'])
@@ -119,6 +147,8 @@ def reg_parentsinfo(request):
 		return index(request)
 
 def reg_parentsinfo_get(request):
+	if TRACE:
+		print '@ main.views.reg_parentsinfo_get'
 	me = getme(request)
 	context = {
 		'last'  : me.owner.last,
@@ -130,6 +160,8 @@ def reg_parentsinfo_get(request):
 	return render(request, 'register/parentsinfo.html', context)
 
 def reg_parentsinfo_post(request):
+	if TRACE:
+		print '@ main.views.reg_parentsinfo_post'
 	me = getme(request)
 	# Create new Parent objects
 	mom = copy(request.POST, [
@@ -189,8 +221,10 @@ def reg_parentsinfo_post(request):
 		}
 		return redirect('/register/parentsinfo')        
 
-
+# if me.owner.mother or me.owner.father
 def reg_studentsinfo(request):
+	if TRACE:
+		print '@ main.views.reg_studentsinfo'
 	if not authorized(request):
 		return redirect('/')
 	elif request.method == 'GET':
@@ -202,6 +236,8 @@ def reg_studentsinfo(request):
 		return index(request)
 
 def reg_studentsinfo_get(request):
+	if TRACE:
+		print '@ main.views.reg_studentsinfo_get'
 	me = getme(request)
 	# Every year on May 1, registration switches to the following year.
 	now = datetime.now()
@@ -220,6 +256,8 @@ def reg_studentsinfo_get(request):
 	return render(request, 'register/studentsinfo.html', context)
 
 def reg_studentsinfo_post(request):
+	if TRACE:
+		print '@ main.views.reg_studentsinfo_post'
 	me = getme(request)
 	students = JSON.loads(request.POST['students'])
 	for student in students:

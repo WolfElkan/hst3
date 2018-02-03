@@ -2,9 +2,10 @@ from __future__ import unicode_literals
 from django.db import models
 from Utils import custom_fields as custom
 from Utils import supermodel as sm
+from Utils.hacks import sub
 from django_mysql import models as sqlmod
 from .managers import CourseTrads, Courses, Enrollments, Auditions
-
+Q = models.Q
 from apps.main.managers import Students
 
 class Venue(models.Model):
@@ -42,7 +43,39 @@ class CourseTrad(models.Model):
 	F = models.BooleanField(default=True)  # Girls may enroll
 	C = models.BooleanField(default=False) # Only current students may enroll
 	I = models.BooleanField(default=False) # 1 year IS or T* or P* required
-	A = custom.TinyIntegerField(default=0) # Audition Required
+	A_levels = [
+		(0, 'No audition or acting class required'),
+		(1, 'Students must pass a skills assessment (or have already taken this class) to enroll'),
+		(2, '1 year of Acting A or B required to enroll'),
+		(3, '1 year of Acting A or B required to audition'),
+		(4, '1 year of Acting and 1 year of Troupe required to audition'),
+	]
+	eL = [
+		lambda self, past, auds: 
+			True,
+		lambda self, past, auds: 
+			auds.filter(course__tradition=self, success=True) or past.filter(course__tradition=self),
+		lambda self, past, auds: 
+			past.filter(id__startswith='A'),
+		lambda self, past, auds: 
+			auds.filter(course__tradition=self, success=True),
+		lambda self, past, auds: 
+			auds.filter(course__tradition=self, success=True),
+	]
+	aL = {
+		0: lambda self, past: 
+			True,
+		1: lambda self, past: past.filter(
+			id__startswith=sub(self.id[:1],{'P':'T','Z':'J'}), id__endswith=int(self.id[1:])-1),
+		2: lambda self, past: 
+			False,
+		3: lambda self, past: 
+			past.filter(id__startswith='A'),
+		4: lambda self, past: 
+			past.filter(id__startswith='A') and past.filter(id__startswith='S'),
+	}
+
+	A = custom.TinyIntegerField(default=0, choices=A_levels) # Audition Required
 	# Cost
 	tuition    = models.DecimalField(max_digits=6, decimal_places=2, default=0)
 	redtuit    = models.DecimalField(max_digits=6, decimal_places=2, default=0)
@@ -77,16 +110,62 @@ class CourseTrad(models.Model):
 		if code in genre_codes:
 			return genre_codes[code]
 	def eligible(self, student, year):
-		return True
+		if student.hst_age_in(year) < self.min_age:
+			return False  # Too young
+		if student.hst_age_in(year) > self.max_age:
+			return False  # Too old
+		if student.grad_year and student.grade_in(year) < self.min_grd:
+			return False  # Too young academically
+		if student.grad_year and student.grade_in(year) > self.max_grd:
+			return False  # Too old academically
+		if str(student.sex) == 'M' and not self.M:
+			return False  # No boys allowed
+		if str(student.sex) == 'F' and not self.F:
+			return False  # No girls allowed
+		if self.C and not student.enrollments_in(year):
+			return False  # Current students only
+		tpi = Q(
+			Q(course__tradition__id__startswith='T') | # Tap Courses
+			Q(course__tradition__id__startswith='P') | # Broadway Tap Courses
+			Q(course__tradition__id__startswith='I')   # Irish Dance Courses
+		)
+		if self.I and not student.enrollments.filter(tpi, course__year__lt=year):
+			return False  # Irish or Tap required
+		print self.A
+		if self.A == 0:
+			return True
+		elif self.A == 1:
+			return bool(
+				student.auditions_in(year).filter(course__tradition=self, success=True) or 
+				student.enrollments_before(year).filter(course__tradition=self)
+			)
+		elif self.A == 2:
+			return bool(student.enrollments_before(year).filter(id__startswith='A'))
+		elif self.A >= 3:
+			return bool(student.auditions_in(year).filter(course__tradition=self, success=True))
+		# return bool(self.eL[self.A](self,student.enrollments_before(year),student.auditions_in(year)))
 	def audible(self, student, year):
-		return True
+			if self.A == 0:
+				return True
+			elif self.A == 1:
+				return student.enrollments_before(year).filter(
+					id__startswith=sub(self.id[:1],{'P':'T','Z':'J'}), 
+					id__endswith=int(self.id[1:])-1
+				)
+			elif self.A == 2:
+				return False
+			elif self.A == 3:
+				return student.enrollments_before(year).filter(id__startswith='A')
+			elif self.A == 4:
+				return student.enrollments_before(year).filter(id__startswith='A') and student.enrollments_before(year).filter(id__startswith='S')
+		# return bool(self.aL[self.A](self,student.enrollments_before(year)))
 	def enroll(self, student, year):
 		course = Courses.fetch(tradition=self, year=year)
-		if course:
+		if course and course.eligible(student):
 			return course.enroll(student)
 	def audition(self, student, year):
 		course = Courses.fetch(tradition=self, year=year)
-		if course:
+		if course and course.audible(student):
 			return course.audition(student)
 	def __getattribute__(self, field):
 		if field in ['courses','genre']:
@@ -128,10 +207,12 @@ class Course(models.Model):
 		return self.tradition.audible(student, self.year)
 	def enroll(self, student):
 		if self.eligible(student):
-			Enrollments.create(course=self, student=student)
+			return Enrollments.create(course=self, student=student)
+	def sudo_enroll(self, student):
+		return Enrollments.create(course=self, student=student)
 	def audition(self, student):
 		if self.audible(student):
-			Auditions.create(course=self, student=student)
+			return Auditions.create(course=self, student=student)
 	def __getattribute__(self, field):
 		if field in ['students_toggle_enrollments','students','enrollments']:
 			call = super(Course, self).__getattribute__(field)
@@ -145,6 +226,7 @@ class Enrollment(models.Model):
 	role       = models.TextField(null=True)
 	role_type  = sqlmod.EnumField(choices=['','Chorus','Support','Lead'])
 	created_at = models.DateTimeField(auto_now_add=True)
+	updated_at = models.DateTimeField(auto_now=True)
 	rest_model = "enrollment"
 	objects = Enrollments
 	def __str__(self):

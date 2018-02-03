@@ -68,4 +68,11 @@ class UserManager(sm.SuperManager):
 			sm.Present('pw_confm','Please confirm your password'),
 			sm.Confirmation('pw_confm','password','Passwords do not match.')
 		]
+	def filter(self, **kwargs):
+		print 73
+		if 'owner' in kwargs:
+			owner = kwargs.pop('owner')
+			kwargs['owner_id'] = owner.id
+			kwargs['owner_type'] = owner.__class__.__name__.title()
+		return super(UserManager, self).filter(**kwargs)
 Users = UserManager()

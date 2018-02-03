@@ -13,10 +13,11 @@
 		{% if name %}
 		<p>Hello {{name}}!</p>
 		<a href="/logout">Log Out</a>
+		<a href="#">Account</a>
 		{% else %}
 		<a href="/login">Returning User Login</a>
+		<a href="/register">First-Time Registration</a>
 		{% endif %}<br>
-		<a href="/register">First-Time Registration</a><br>
 		<br><br><br><br><!-- spacing with <br> tags because YOLO -->
 		<a href="/rest/">REST Framework</a>
 		<a href="/seed/load/">JSON Bulk Data Interface</a>

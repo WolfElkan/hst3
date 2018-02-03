@@ -1,7 +1,8 @@
 from django.shortcuts import render, redirect, HttpResponse
 from Utils.custom_fields import Bcrypt, PhoneNumber, DayOfWeek
 from datetime import datetime
-from Utils.hacks import copy, getme, seshinit, first, pretty, pdir
+from Utils.hacks import copy, getme, seshinit, first, pretty, pdir, Each, Funky
+import re
 
 from apps.main.models import Family, Address, Parent, User, Student
 Addresses = Address.objects
@@ -15,6 +16,12 @@ Venues      = Venue.objects
 CourseTrads = CourseTrad.objects
 Courses     = Course.objects
 Enrollments = Enrollment.objects
+
+def check_en(student, course):
+	print '{} is {}eligible for {}'.format(student,'' if student.eligible(course) else 'not ',course)
+
+def check_aud(student, course):
+	print '{} may {}audition for {}'.format(student,'' if student.audible(course) else 'not ',course)
 
 def hot(request):
 	me = getme(request)

@@ -31,8 +31,8 @@
 			<th>Tap</th>
 			<th>Jazz</th>
 			<th>Irish</th>
-			<th>Hip.</th>
-			<th>Other</th>
+			<!-- <th>Hip.</th> -->
+			<!-- <th>Other</th> -->
 		</thead>
 		{% for row in table %}
 		<tr title="{{row.student}}, #{{row.student.id}}">
@@ -48,10 +48,10 @@
 			<td class="enr">{{row.A|safe}}{{row.S|safe}}{{row.O|safe}}</td>
 			<td class="enr">{{row.C|safe}}</td>
 			<td class="enr">{{row.T|safe}}{{row.P|safe}}</td>
-			<td class="enr">{{row.J|safe}}{{row.Z|safe}}</td>
+			<td class="enr">{{row.J|safe}}{{row.Z|safe}}{{row.H|safe}}</td>
 			<td class="enr">{{row.I|safe}}</td>
-			<td class="enr">{{row.H|safe}}</td>
-			<td>{{row.G|safe}}{{row.W|safe}}{{row.X|safe}}</td>
+			<!-- <td class="enr">{{row.H|safe}}</td> -->
+			<!-- <td>{{row.G|safe}}{{row.W|safe}}{{row.X|safe}}</td> -->
 		</tr>
 		{% endfor %}
 	</table>

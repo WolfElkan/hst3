@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 from django.db import models
 from Utils import custom_fields as custom
 from Utils import supermodel as sm
+from Utils.hacks import safe_delete
 from django_mysql import models as sqlmod
 from .managers import Addresses, Families, Parents, Students, Users
 from datetime import datetime
@@ -65,7 +66,6 @@ class Family(models.Model):
 	email      = models.EmailField()
 	mother_id  = models.PositiveIntegerField(null=True)
 	father_id  = models.PositiveIntegerField(null=True)
-	reg_status = models.PositiveSmallIntegerField(default=0)
 	address    = models.OneToOneField(Address, null=True, primary_key=False, rel=True)
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
@@ -79,6 +79,12 @@ class Family(models.Model):
 		return self.last
 	def children(self):
 		return Students.filter(family_id=self.id).order_by('birthday')
+	def delete(self):
+		safe_delete(self.mother)
+		safe_delete(self.father)
+		safe_delete(self.address)
+		Users.filter(owner=self).delete()
+		return super(Family, self).delete()
 	def __str__(self):
 		return self.last+' Family'
 	def __getattribute__(self, field):
@@ -154,10 +160,16 @@ class Student(models.Model):
 		year = now.year + (0 if now.month < 5 else 1)
 		return self.grade_in(year)
 	def enrollments(self):
-		return Enrollments.filter(student_id=self.id).order_by('course__year')
+		return Enrollments.filter(student=self).order_by('course__year')
 	def enrollments_in(self, year):
-		return Enrollments.filter(student_id=self.id, course__year=year)
-	def courses(self):
+		return Enrollments.filter(student=self, course__year=year)
+	def enrollments_before(self, year):
+		return self.enrollments.filter(course__year__lt=year)
+	def auditions(self):
+		return Auditions.filter(student=self)
+	def auditions_in(self, year):
+		return Auditions.filter(student=self, course__year=year)
+	def courses(self): # TODO: Use a DB join statement instead
 		qset = []
 		for enrollment in self.enrollments:
 			qset.append(Courses.get(id=enrollment.course_id))
@@ -184,7 +196,7 @@ class Student(models.Model):
 	def __str__(self):
 		return self.prefer+' '+self.last
 	def __getattribute__(self, field):
-		if field in ['hst_age','grade','enrollments','courses','courses_toggle_enrollments','prefer','last','phone','email','full_name','mother','father']:
+		if field in ['hst_age','grade','enrollments','courses','courses_toggle_enrollments','auditions','prefer','last','phone','email','full_name','mother','father']:
 			call = super(Student, self).__getattribute__(field)
 			return call()
 		else:

@@ -1,8 +1,13 @@
+Today:
+X	Fix Family.delete cascade
+	Check all REST routes
+X	Give Widgets a default= kwarg
+
 main
-	Make registration landing page redirect to appropriate step if family has partially registered.
+X	Make registration landing page redirect to appropriate step if family has partially registered.
 
 	Student Interface
-		(eventually) Support loading existing students from database for editing, track by internal id's
+X		(eventually) Support loading existing students from database for editing, track by internal id's
 		Make titles of required fields bold automatically
 
 	Parent Interface
@@ -12,6 +17,9 @@ main
 	create NameClash table
 	create PolyRole table
 
+X	family.children gets them in age order
+	add HIDs
+
 program
 	Models
 		CourseTrad
@@ -19,14 +27,15 @@ program
 
 rest
 	support /add/[mo|fa]ther
+x	BUG: DayOfWeek saves 1 day earlier
 
 reports
 	students
 		create timeless version
 		show only current students in annual version
 
-namecase
-family.children gets them in age order
+Utils
+	namecase
 
 
 Questions:

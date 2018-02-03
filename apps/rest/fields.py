@@ -1,6 +1,8 @@
 from .widgets import VarChar, Integer, Enum, Radio, Checkbox, Date, Time, Price, ForeignKey, ForeignSet, ToggleSet
 from Utils.custom_fields import Bcrypt, PhoneNumber, ZipCode, DayOfWeek
-
+from trace import TRACE
+if TRACE:
+	print '~ FIELDS'
 FIELDS = {
 	'address'   : [
 		{'field':'line1'     , 'template': VarChar(maxlength=50)},
@@ -54,12 +56,12 @@ FIELDS = {
 		{'field':'nMeets'    , 'template': Integer()},
 		{'field':'show'      , 'template': VarChar(maxlength=2)},
 		{'field':'vs'        , 'template': Checkbox(suffix='This class performs in the Variety Show')},
-		{'field':'min_age'   , 'template': Integer()},
-		{'field':'max_age'   , 'template': Integer()},
-		{'field':'min_grd'   , 'template': Integer()},
-		{'field':'max_grd'   , 'template': Integer()},
-		{'field':'M'         , 'template': Checkbox(suffix='Boys may enroll')},
-		{'field':'F'         , 'template': Checkbox(suffix='Girls may enroll')},
+		{'field':'min_age'   , 'template': Integer(default= 9)},
+		{'field':'max_age'   , 'template': Integer(default=18)},
+		{'field':'min_grd'   , 'template': Integer(default= 3)},
+		{'field':'max_grd'   , 'template': Integer(default=12)},
+		{'field':'M'         , 'template': Checkbox(suffix='Boys may enroll', default=True)},
+		{'field':'F'         , 'template': Checkbox(suffix='Girls may enroll', default=True)},
 		{'field':'C'         , 'template': Checkbox(suffix='Only current students may enroll')},
 		{'field':'I'         , 'template': Checkbox(suffix='Students must complete 1 year of Tap or Irish Soft Shoe to enroll')},
 		{'field':'A'         , 'template': Radio(options=[

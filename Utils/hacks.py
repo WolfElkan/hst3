@@ -1,3 +1,5 @@
+from trace import TRACE
+
 def get(obj, key):
 	key = str(key)
 	if type(obj) == dict:
@@ -104,11 +106,43 @@ def year():
 	now = datetime.now()
 	return now.year + (0 if now.month < 5 else 1)
 
+class Funky(object):
+	def __init__(self, callback):
+		self.callback = callback
+	def __call__(self, *args, **kwargs):
+		return self.callback(*args, **kwargs)
+		
+# class PunchingBag(object):
+# 	def __init__(self, *args, **kwargs):
+# 		super(PunchingBag, self).__init__()
+# 	def __getattribute__(self, other):
+# 		return Funky(other)
+# 	def __setattr__(self, other, value):
+# 		print 'PUNCH: {} = {}'.format(other, value)
+
+class Each(object):
+	def __init__(self, arr):
+		self.arr = list(arr)
+	def __getattribute__(self, attr):
+		new = []
+		for x in super(Each,self).__getattribute__('arr'):
+			new.append(x.__getattribute__(attr))
+		return new
+		
+
+def safe_delete(thing):
+	if thing and hasattr(thing,'delete'):
+		thing.delete()
+
 # Find User object for current logged-in user, without causing errors.
 # me is always a User, never a Family, Student, or Teacher
 import apps
 def getme(request):
-	if 'meid' not in request.session:
-		return None
-	else:
-		return first(apps.main.models.User.objects.filter(id=request.session['meid']))
+	if TRACE:
+		print '# hacks.getme'
+	if 'meid' in request.session:
+		me = apps.main.managers.Users.fetch(id=request.session['meid'])
+		if me:
+			return me
+		else:
+			request.session.pop('meid')

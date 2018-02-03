@@ -10,6 +10,11 @@ class CourseTradManager(sm.SuperManager):
 	def get(self, **kwargs):
 		thing = super(CourseTradManager, self).get(**kwargs)
 		return thing.alias if thing.alias else thing
+	def fetch(self, **kwargs):
+		qset = self.filter(**kwargs)
+		if qset:
+			q = qset[0]
+			return q.alias if q.alias else q
 CourseTrads = CourseTradManager()
 
 class CourseManager(sm.SuperManager):
@@ -21,14 +26,38 @@ class CourseManager(sm.SuperManager):
 			if field not in data:
 				data[field] = data['tradition'].__getattribute__(field)
 		data['id'] = str(int(data['year'])%100).zfill(2)+data['tradition'].id
-		super(CourseManager, self).create(**data)
+		return super(CourseManager, self).create(**data)
 	def fetch(self, **kwargs):
-		things = self.filter(**kwargs)
-		if things:
-			alias_id = things[0].alias_id
-			if alias_id:
-				return self.fetch(id=alias_id)
-	# TODO: Figure out inheritance
+		qset = self.filter(**kwargs)
+		if qset and not qset[0].tradition.alias:
+			return qset[0]
+		elif 'id' in kwargs:
+			split = self.split_id(kwargs.pop('id'))
+			if split:
+				kwargs.update(split)
+				return self.fetch(**kwargs)
+	def get_or_create_by_id(self, course_id):
+		course = self.fetch(id=course_id)
+		if course:
+			return course
+		else:
+			split = self.split_id(course_id)
+			if split:
+				return split['tradition'].make(split['year'])
+	def split_id(self, course_id):
+		course_id = str(course_id)
+		year = course_id[:2]
+		if year.isdigit():
+			year = int(year)
+			year += 2000 if year < 95 else 1900
+			trad_id = course_id[2:]
+			tradition = CourseTrads.fetch(id=trad_id)
+			# print year, tradition
+			if tradition:
+				return {
+					'year':year,
+					'tradition':tradition
+				}
 Courses = CourseManager()
 
 class EnrollmentManager(sm.SuperManager):
