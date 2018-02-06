@@ -27,11 +27,13 @@ def copy(source, keys=False, trunc=0):
 			this[trunckey] = None
 	return this
 
-def copyatts(source, keys):
+def copyatts(source, keys, ifnull=True):
 	this = {}
 	for key in keys:
 		if hasattr(source, key):
-			this[key] = source.__getattribute__(key)
+			val = source.__getattribute__(key)
+			if val or type(val) is bool or ifnull:
+				this[key] = val
 		else:
 			this[key] = None
 	return this
@@ -78,6 +80,16 @@ def metanumero(obj):
 	for x in obj:
 		result += [numero(x)]
 	return result
+
+import json
+class FriendlyEncoder(json.JSONEncoder):
+	def default(self, obj):
+		if TRACE:
+			print '@ rest.seed.default'
+		if hasattr(obj,'__json__'):
+			return obj.__json__()
+		else:
+			return str(obj)
 
 def json(obj):
 	result = []

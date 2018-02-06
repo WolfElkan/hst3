@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, HttpResponse
 from .models import Family, Address, Parent, User, Student
 from Utils.custom_fields import Bcrypt, PhoneNumber
 from datetime import datetime
-from Utils.hacks import copy, copyatts, seshinit, forminit, first, getme, numero, metanumero, json, copy_items_to_attrs
+from Utils.hacks import copy, copyatts, seshinit, forminit, first, getme, numero, metanumero, json, copy_items_to_attrs, year, FriendlyEncoder
 import json as JSON
 from io import StringIO
 from trace import TRACE
@@ -312,12 +312,9 @@ def reg_studentsinfo_get(request):
 	if TRACE:
 		print '@ main.views.reg_studentsinfo_get'
 	me = getme(request)
-	if not me or not me.owner or not (me.owner.mother and me.owner.father):
+	if not me or not me.owner or not (me.owner.mother or me.owner.father):
 		return redirect('/register')
-	# Every year on May 1, registration switches to the following year.
-	now = datetime.now()
-	next_year = 0 if now.month < 5 else 1
-	reg_year = now.year + next_year
+	reg_year = year()
 	grades = []
 	for x in range(1,13):
 		grades += [{'grade':x,'grad_year':reg_year - x + 12}]
@@ -327,6 +324,7 @@ def reg_studentsinfo_get(request):
 		'family'  : me.owner,
 		't_shirt_sizes': metanumero(Student.t_shirt_sizes),
 		'validations'  : json(Students.validations),
+		'students': JSON.dumps(list(me.owner.children), cls=FriendlyEncoder) if me.owner.children else [],
 	}
 	return render(request, 'register/studentsinfo.html', context)
 
@@ -336,11 +334,19 @@ def reg_studentsinfo_post(request):
 	me = getme(request)
 	students = JSON.loads(request.POST['students'])
 	for student in students:
-		if student.pop('exists'):
-			if student.pop('isNew'):
-				student['family'] = me.owner
-				student['current'] = True
-				Students.create(**student)
-			else:
-				pass
+		current = student.pop('exists')
+		if student.pop('isNew'):
+			student['family'] = me.owner
+			student['current'] = True
+			Students.create(**student)
+		else:
+			student_proxy = Students.fetch(id=student['id'])
+			if student_proxy:
+				if current:
+					for key in ['first','middle','alt_last','alt_first','sex','grad_year','height','alt_phone','alt_email','tshirt']:
+						if key in student:
+							student_proxy.__setattr__(key, student[key])
+				else:
+					student_proxy.current = False
+				student_proxy.save()
 	return redirect('/')

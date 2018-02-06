@@ -21,3 +21,7 @@ function custom_parse(json) {
 		// json = JSON.stringify(json)
 		return JSON.parse(json)
 }
+
+function type(thing) {
+	return thing.__proto__.constructor
+}

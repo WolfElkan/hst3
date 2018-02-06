@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 from django.db import models
 from Utils import custom_fields as custom
 from Utils import supermodel as sm
-from Utils.hacks import safe_delete
+from Utils.hacks import safe_delete, copyatts
 from django_mysql import models as sqlmod
 from .managers import Addresses, Families, Parents, Students, Users
 from datetime import datetime
@@ -11,9 +11,9 @@ from apps.program.managers import CourseTrads, Courses, Enrollments, Auditions
 
 class Address(models.Model):
 	line1      = models.CharField(null=False, max_length=50)
-	line2      = models.CharField(null=True, max_length=50)
-	city       = models.CharField(null=True, max_length=25)
-	state      = models.CharField(null=True, max_length=2)
+	line2      = models.CharField(default='', max_length=50)
+	city       = models.CharField(default='', max_length=25)
+	state      = models.CharField(default='', max_length=2)
 	zipcode    = custom.ZipCodeField()
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
@@ -26,11 +26,11 @@ class Address(models.Model):
 class Parent(models.Model):
 	first      = models.CharField(max_length=20)
 	family_id  = models.PositiveIntegerField()
-	alt_last   = models.CharField(null=True, max_length=30)
+	alt_last   = models.CharField(default='', max_length=30)
 	sex        = models.CharField(max_length=1, choices=[('M','Male'),('F','Female')])
 	alt_phone  = custom.PhoneNumberField(null=True)
 	phone_type = sqlmod.EnumField(choices=['','Home','Cell','Work'], default='')
-	alt_email  = models.EmailField(null=True)
+	alt_email  = models.EmailField(default='')
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
 	rest_model = "parent"
@@ -109,9 +109,9 @@ class Family(models.Model):
 
 class Student(models.Model):
 	first     = models.CharField(max_length=20)
-	alt_first = models.CharField(max_length=20, null=True)
-	middle    = models.CharField(max_length=20, null=True)
-	alt_last  = models.CharField(max_length=30, null=True)
+	alt_first = models.CharField(max_length=20, default='')
+	middle    = models.CharField(max_length=20, default='')
+	alt_last  = models.CharField(max_length=30, default='')
 	family    = models.ForeignKey(Family)
 	sex       = models.CharField(max_length=1, choices=[('M','Male'),('F','Female')])
 	current   = models.BooleanField(default=True)
@@ -119,7 +119,7 @@ class Student(models.Model):
 	grad_year = models.DecimalField(max_digits=4, decimal_places=0, null=True)
 	height    = models.FloatField(null=True)
 	alt_phone = custom.PhoneNumberField(null=True)
-	alt_email = models.EmailField(null=True)
+	alt_email = models.EmailField(default='')
 	rest_model = "student"
 	t_shirt_sizes = [
 		('YS','Youth Small'),
@@ -195,6 +195,13 @@ class Student(models.Model):
 		return self.family.father
 	def __str__(self):
 		return self.prefer+' '+self.last
+	def __json__(self):
+		obj = copyatts(self,['first','sex','id','alt_first','middle','alt_last','grad_year','height','alt_email','tshirt','current'], False)
+		if self.birthday:
+			obj['birthday']  = str(self.birthday)
+		if int(self.alt_phone):
+			obj['alt_phone'] = self.alt_phone
+		return obj 
 	def __getattribute__(self, field):
 		if field in ['hst_age','grade','enrollments','courses','courses_toggle_enrollments','auditions','prefer','last','phone','email','full_name','mother','father']:
 			call = super(Student, self).__getattribute__(field)

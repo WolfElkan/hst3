@@ -86,3 +86,11 @@ Y*	- not used -
 Z*	Dance Class Genre: Broadway Jazz [ See note at P* ]
 	Z1: Broadway Jazz 1
 	Z2: Broadway Jazz 2 -->
+<!-- 
+#name = 'mAcdonald'
+#regex = r'(mac)(.+)'
+#foo = re.match(regex,name,flags=re.IGNORECASE)
+# bar = Each(foo.groups()).title()
+# bar = ''.join(bar)
+#print bar
+print Each([1,2,3,4,5]).__int__ -->

@@ -41,6 +41,7 @@
 		var reg_year = Number('{{reg_year}}')
 
 		validations = custom_parse("{{validations}}")
+		students_from_db = custom_parse("{{students}}")
 
 		function zeropad(num, places) {
 			num = Math.floor(num)
@@ -58,34 +59,49 @@
 			return `(${cod}) ${mid}-${last}`
 		}
 
-		function Student(sid) {
-			this.sid = sid
-			this.isNew = true
-			this.exists = true
-			for (var i = 0; i < fields.length; i++) {
-				var field = fields[i]
-				this[field] = $$('#'+field).value
-			}
-			this.height = Number($$('#height_ft').value) * 12 + Number($$('#height_in').value)
-			this.height_ft = Math.floor(this.height / 12)
-			this.height_in = this.height % 12
-			this.height_tr = this.height ? `${this.height_ft}' ${this.height_in}"` : ``
-			if (this.birthday) {
-				this.birthday = {
-					'year' : Number(this.birthday.substr(0,4)),
-					'month': Number(this.birthday.substr(5,2)),
-					'date' : Number(this.birthday.substr(8,2)),
+		function Student(arg) {
+			var isNew = type(arg) == Number
+			this.id  = isNew ? arg : arg.id
+			this.pre = isNew ? 'n' : 'd'
+			this.sid = this.pre + this.id
+			this.exists = arg.current || isNew
+			this.isNew = isNew
+			this.update = function() {
+				if (this.isNew) {
+					for (var i = 0; i < fields.length; i++) {
+						var field = fields[i]
+						this[field] = $$('#'+field).value
+					}
+					this.height = Number($$('#height_ft').value) * 12 + Number($$('#height_in').value)
+				} else {
+					for (var i = 0; i < fields.length; i++) {
+						var field = fields[i]
+						this[field] = arg[field] ? arg[field] : ''
+					}
+					this.height = Number(arg.height ? arg.height : 0)
 				}
-				if (this.birthday.year < reg_year % 100) {
-					this.birthday.year += Math.floor(reg_year / 100) * 100
-				} else if (this.birthday.year < 100) {
-					this.birthday.year += Math.floor(reg_year / 100) * 100 - 100
+				this.height_ft = Math.floor(this.height / 12)
+				this.height_in = this.height % 12
+				this.height_tr = this.height ? `${this.height_ft}' ${this.height_in}"` : ``
+				if (this.birthday) {
+					this.birthday = {
+						'year' : Number(this.birthday.substr(0,4)),
+						'month': Number(this.birthday.substr(5,2)),
+						'date' : Number(this.birthday.substr(8,2)),
+					}
+					if (this.birthday.year < reg_year % 100) {
+						this.birthday.year += Math.floor(reg_year / 100) * 100
+					} else if (this.birthday.year < 100) {
+						this.birthday.year += Math.floor(reg_year / 100) * 100 - 100
+					}
+					// this.birthday.js = new Date(this.birthday.year, this.birthday.month-1, this.birthday.date)
+					this.birthday.db = `${zeropad(this.birthday.year,4)}-${zeropad(this.birthday.month,2)}-${zeropad(this.birthday.date,2)}`
 				}
-				this.birthday.js = new Date(this.birthday.year, this.birthday.month-1, this.birthday.date)
-				this.birthday.db = `${zeropad(this.birthday.year,4)}-${zeropad(this.birthday.month,2)}-${zeropad(this.birthday.date,2)}`
+				this.grade = this.grad_year ? reg_year - this.grad_year + 12 : ''
+				this.hst_age = reg_year - this.birthday.year - 1
+
 			}
-			this.grade = this.grad_year ? reg_year - this.grad_year + 12 : ''
-			this.hst_age = reg_year - this.birthday.year - 1
+			this.update()
 			this.cur_age = function() {
 				var now = new Date()
 				var c_month = now.getMonth() + 1
@@ -99,6 +115,7 @@
 				return age
 			}
 			this.isValid = function(validations) {
+				console.log(this)
 				for (var i = 0; i < validations.length; i++) {
 					var regex = new RegExp(validations[i].regex)
 					var field = validations[i].field
@@ -130,16 +147,19 @@
 				$$('#height_in').value = this.height_in
 				$$('#birthday').value = this.birthday.db
 			}
-			this.tr = function(index) {
-				return `<tr id="s${index}"><td>${this.alt_first ? this.alt_first : this.first} ${this.alt_last ? this.alt_last : family_last}</td><td>${this.birthday ? this.hst_age : ''}${this.hst_age == this.cur_age() ? '' : '*'}</td><td>${this.sex}</td><td>${this.grade}</td><td>${this.height_tr}</td><td>${this.tshirt}</td><td>${this.alt_phone ? phone_format(this.alt_phone) : ''}</td><td>${this.alt_email ? this.alt_email : ''}</td><td><button class="edit">Edit</button><button class="delete">Delete</button></td></tr>`
-			}
+			this.tr = function() {
+				return `<tr id="${this.sid}"><td>${this.alt_first ? this.alt_first : this.first} ${this.alt_last ? this.alt_last : family_last}</td><td>${this.birthday ? this.hst_age : ''}${this.hst_age == this.cur_age() ? '' : '*'}</td><td>${this.sex}</td><td>${this.grade}</td><td>${this.height_tr}</td><td>${this.tshirt}</td><td>${this.alt_phone ? phone_format(this.alt_phone) : ''}</td><td>${this.alt_email ? this.alt_email : ''}</td><td><button class="edit">Edit</button><button class="delete">Delete</button></td></tr>`
+			} 
 			this.json = function() {
-				var columns = ['first','middle','alt_last','alt_first','sex','grad_year','height','alt_phone','alt_email','tshirt','exists','isNew']
+				var columns = ['first','middle','alt_last','alt_first','sex','grad_year','height','alt_phone','alt_email','tshirt','isNew','exists']
 				json_obj = {}
 				for (var i = 0; i < columns.length; i++) {
 					var col = columns[i]
 					if (this[col] || this[col] === false) {
 						json_obj[col] = this[col]
+					}
+					if (!this.isNew) {
+						json_obj.id = this.id
 					}
 				}
 				json_obj.birthday = this.birthday.db
@@ -186,16 +206,18 @@
 			}
 		}
 
-		function save_student(sid, student) {
+		function save_student(student) {
+			student.update()
 			if (form_type == 1) {
 				student_bank.push(student)
-				$('#student_list').append(student.tr(sid))
+				$('#student_list').append(student.tr())
 			} else if (form_type == 2) {
-				$$('#s'+sid).outerHTML = student.tr(sid)
-				x = find_student(sid).index
+				console.log(student)
+				$$('#'+student.sid).outerHTML = student.tr()
+				x = find_student(student.sid).index
 				student_bank[x] = student
 			}
-			dynamic(sid)
+			dynamic(student.sid)
 			form_display(0)
 			clear_form()
 		}
@@ -203,6 +225,7 @@
 		function edit_student(sid) {
 			current_sid = sid
 			var student = find_student(sid)
+			// console.log(student)
 			student.populate_form()
 			form_display(2)
 		}
@@ -212,12 +235,12 @@
 			if (sid == current_sid) {
 				form_display(0)
 			}
-			$('#s'+sid).hide()
+			$('#'+sid).hide()
 		}
 
 		// Add functionality to dynamically created Edit and Delete buttons
 		function dynamic(sid) {
-			trid = $('#s'+sid)
+			trid = $('#'+sid)
 			trid.find('.edit').click(function() {
 				edit_student(sid)
 			})
@@ -226,29 +249,47 @@
 			})
 		}
 
-		// Array to hold the students until page is submitted
-		var student_bank = []
+		function new_current_sid_increment() {
+			var max = 0
+			for (var i = 0; i < student_bank.length; i++) {
+				student = student_bank[i]
+				if (student.isNew && student.id > max) {
+					max = student.id
+				}
+			}
+			max += 1
+			return max
+		}
 
 		// Which student is currently being created or edited
-		var current_sid = 0
+		var current_sid = ''
 
 		// 0 = Form Hidden, 1 = New Student, 2 = Edit Student
 		var form_type = 0
+
+		// Array to hold the students until page is submitted
+		var student_bank = []
 
 		$(document).ready(function() {
 
 			$('#add_student').click(function() {
 				clear_form()
 				if (form_type == 0) {
-					current_sid++
+					current_sid = new_current_sid_increment()
+					console.log(current_sid)
 					form_display(1)
 				}
 			})
 
 			$('#save_student').click(function() {
-				var student = new Student(current_sid)
+				if (form_type == 1) {
+					var student = new Student(current_sid)
+				} else if (form_type == 2) {
+					var student = find_student(current_sid)
+				}
 				if (student.isValid(validations)) {
-					save_student(current_sid, student)
+					student.id = current_sid
+					save_student(student)
 					$('#submit').show()
 				} else {
 					student.show_errors(validations)
@@ -267,14 +308,27 @@
 			$('#submit').click(function() {
 				students_json = []
 				for (var i = 0; i < student_bank.length; i++) {
+					student = student_bank[i]
+					if (student.exists || !student.isNew) {}
 					students_json.push(student_bank[i].json())
 				}
 				$$('#data').value = JSON.stringify(students_json)
-				// console.log(students_json)
 				$('#submission').submit()
 			})
 
+			// console.log(students_from_db)
+			for (var i = 0; i < students_from_db.length; i++) {
+				student = new Student(students_from_db[i])
+				if (student.exists) {
+					student_bank.push(student)
+					$('#student_list').append(student.tr())
+					dynamic(student.sid)
+					$('#submit').show()
+				}
+			}
+
 		})
+
 
 	</script>
 
@@ -381,6 +435,6 @@
 	<form id="submission" style="display: none;" method="post">{% csrf_token %}
 		<input id="data" type="hidden" name="students" value="">
 	</form>
-	<button style="display: none;" id="submit">Next >></button>
+	<button style="display: none;" id="submit">Save &amp; Continue</button>
 </body>
 </html>

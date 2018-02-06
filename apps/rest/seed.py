@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, HttpResponse
 from datetime import datetime
-from Utils.hacks import copy, getme, seshinit, forminit, first, copyatts, pretty, pdir
+from Utils.hacks import copy, getme, seshinit, forminit, first, copyatts, pretty, pdir, FriendlyEncoder
 import json
 from trace import TRACE
 
@@ -129,15 +129,6 @@ def load_post(request):
 
 	return redirect('/seed/load/')
 
-class FriendlyEncoder(json.JSONEncoder):
-	def default(self, obj):
-		if TRACE:
-			print '@ rest.seed.default'
-		if hasattr(obj,'__json__'):
-			return obj.__json__()
-		else:
-			return str(obj)
-
 def dump(request):
 	if TRACE:
 		print '@ rest.seed.dump'
@@ -210,25 +201,8 @@ def dump(request):
 				family_obj['address']['line2' ] = family.address.line2
 		family_obj['students'] = []
 		for student in family.children:
-				student_obj = copyatts(student,['first','sex'])
-				if student.birthday:
-					student_obj['birthday']  = str(student.birthday)
-				if student.alt_first:
-					student_obj['alt_first'] = student.alt_first
-				if student.middle:
-					student_obj['middle']    = student.middle
-				if student.alt_last:
-					student_obj['alt_last']  = student.alt_last
-				if student.grad_year:
-					student_obj['grad_year'] = student.grad_year
-				if student.height:
-					student_obj['height']    = student.height
-				if int(student.alt_phone):
-					student_obj['alt_phone'] = student.alt_phone
-				if student.alt_email:
-					student_obj['alt_email'] = student.alt_email
-				if student.tshirt:
-					student_obj['tshirt']    = student.tshirt
+				student_obj = student.__json__()
+				student_obj.pop('id')
 				enrollments = student.enrollments
 				if enrollments:
 					student_obj['enrollments'] = []

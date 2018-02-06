@@ -132,6 +132,8 @@ class PhoneNumber(object):
 		return self.value
 	def __str__(self):
 		return '('+self.cod+') '+self.mid+'-'+self.last if self.value else ''
+	def __repr__(self):
+		return str(self.value)
 	def __get__(self):
 		return int(self.value)
 	def __json__(self):
