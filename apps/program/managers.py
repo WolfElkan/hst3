@@ -36,7 +36,7 @@ class CourseManager(sm.SuperManager):
 			if split:
 				kwargs.update(split)
 				return self.fetch(**kwargs)
-	def get_or_create_by_id(self, course_id):
+	def create_by_id(self, course_id):
 		course = self.fetch(id=course_id)
 		if course:
 			return course

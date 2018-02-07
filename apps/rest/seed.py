@@ -54,6 +54,7 @@ def load_post(request):
 	for ct in data['coursetrads']:
 		if 'alias_id' not in ct:
 			print 'Importing '+ct['title'].upper()
+			print ct
 			CourseTrads.create(**ct)
 			nCourseTrads += 1
 	for ct in data['coursetrads']:
@@ -101,7 +102,10 @@ def load_post(request):
 				rolled = type(enrollment) in [object,dict]
 				course_id = enrollment['course_id'] if rolled else enrollment
 				print '    '+course_id
-				course = Courses.get_or_create_by_id(course_id)
+				course = Courses.fetch(course_id)
+				if not course:
+					course = Courses.create_by_id(course_id)
+					nCourses += 1
 				enrollment_kwargs = {
 					'student': newStudent,
 					'course' : course,
@@ -110,6 +114,7 @@ def load_post(request):
 					enrollment_kwargs['role']      = enrollment['role']
 					enrollment_kwargs['role_type'] = enrollment['role_type']
 				Enrollments.create(**enrollment_kwargs)
+				nEnrollments += 1
 				# if type(enrollment) in [str,unicode]:
 				# 	Courses.get(id=enrollment).sudo_enroll(newStudent)
 				# else:
