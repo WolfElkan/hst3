@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 from django.db import models
 from Utils import custom_fields as custom
 from Utils import supermodel as sm
-from Utils.hacks import safe_delete, copyatts
+from Utils.hacks import safe_delete, copyatts, year
 from django_mysql import models as sqlmod
 from .managers import Addresses, Families, Parents, Students, Users
 from datetime import datetime
@@ -146,19 +146,14 @@ class Student(models.Model):
 		return course.enroll(self)
 	def audition(self, course):
 		return course.audition(self)
-	def hst_age_in(self, year):
-		return year - self.birthday.year - 1
+	def hst_age_in(self, in_year):
+		return in_year - self.birthday.year - 1
 	def hst_age(self):
-		now = datetime.now()
-		year = now.year + (0 if now.month < 5 else 1)
-		return self.hst_age_in(year)
-	def grade_in(self, year):
-		return year - self.grad_year + 12
+		return self.hst_age_in(year())
+	def grade_in(self, in_year):
+		return in_year - self.grad_year + 12
 	def grade(self):
-		now = datetime.now()
-		# Switch to the following year on May 1
-		year = now.year + (0 if now.month < 5 else 1)
-		return self.grade_in(year)
+		return self.grade_in(year())
 	def enrollments(self):
 		return Enrollments.filter(student=self).order_by('course__year')
 	def enrollments_in(self, year):
@@ -167,8 +162,8 @@ class Student(models.Model):
 		return self.enrollments.filter(course__year__lt=year)
 	def auditions(self):
 		return Auditions.filter(student=self)
-	def auditions_in(self, year):
-		return Auditions.filter(student=self, course__year=year)
+	def auditions_in(self, in_year):
+		return Auditions.filter(student=self, course__year=in_year)
 	def courses(self): # TODO: Use a DB join statement instead
 		qset = []
 		for enrollment in self.enrollments:

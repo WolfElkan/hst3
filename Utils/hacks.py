@@ -127,28 +127,49 @@ def year():
 	return now.year + (0 if now.month < 5 else 1)
 
 class Funky(object):
-	def __init__(self, callback):
-		self.callback = callback
+	def __init__(self, arr, fx):
+		self.arr = arr
+		self.fx = fx
+	def __str__(self):
+		new = []
+		for x in self.arr:
+			new.append(x.__getattribute__(self.fx))
+		return str(new)
+	def __repr__(self):
+		return '<Funky: {} @{}>'.format(self.arr,self.fx)
+	def __iter__(self):
+		for x in self.arr:
+			yield x.__getattribute__(self.fx)
 	def __call__(self, *args, **kwargs):
-		return self.callback(*args, **kwargs)
-		
-# class PunchingBag(object):
-# 	def __init__(self, *args, **kwargs):
-# 		super(PunchingBag, self).__init__()
-# 	def __getattribute__(self, other):
-# 		return Funky(other)
-# 	def __setattr__(self, other, value):
-# 		print 'PUNCH: {} = {}'.format(other, value)
+		new = []
+		for x in self.arr:
+			new.append(x.__getattribute__(self.fx).__call__(*args, **kwargs))
+		return new
 
-class Each(object):
+class Collect(object):
 	def __init__(self, arr):
 		self.arr = list(arr)
+	def __str__(self):
+		return '<'+str(super(Collect,self).__getattribute__('arr'))+'>'
+	def __repr__(self):
+		return '<Collect: {}>'.format(str(super(Collect,self).__getattribute__('arr')))
 	def __getattribute__(self, attr):
-		new = []
-		for x in super(Each,self).__getattribute__('arr'):
-			new.append(x.__getattribute__(attr))
-		return new
-		
+		return Funky(super(Collect,self).__getattribute__('arr'), attr)
+	def __iter__(self):
+		for x in super(Collect,self).__getattribute__('arr'):
+			yield x
+
+import re
+def namecase(name):
+	if re.match(r'^[A-Z][a-z]+[A-Z][a-z]*$',name):
+		return name
+	regex = r'(m[a]?c|d[ei])(.+)'
+	match = re.match(regex,name,flags=re.I)
+	if match:
+		group = match.groups()
+		return ''.join(Collect(group).title())
+	else:
+		return name.title()
 
 def safe_delete(thing):
 	if thing and hasattr(thing,'delete'):

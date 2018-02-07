@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, HttpResponse
 from .models import Family, Address, Parent, User, Student
 from Utils.custom_fields import Bcrypt, PhoneNumber
 from datetime import datetime
-from Utils.hacks import copy, copyatts, seshinit, forminit, first, getme, numero, metanumero, json, copy_items_to_attrs, year, FriendlyEncoder
+from Utils.hacks import copy, copyatts, seshinit, forminit, first, getme, numero, metanumero, json, copy_items_to_attrs, year, FriendlyEncoder, namecase
 import json as JSON
 from io import StringIO
 from trace import TRACE
@@ -124,6 +124,7 @@ def reg_familyinfo_post(request):
 			# copy_items_to_attrs(me.owner, request.POST, ['last','phone','phone_type','email'])
 			me.owner.save()
 	new_family = copy(request.POST,['last','phone','phone_type','email'])
+	new_family['last'] = namecase(new_family['last'])
 	new_user = copy(request.POST,['username','password','pw_confm'])
 	new_user['permission'] = 2
 	ouu = me and str(new_user['username']) == str(me.username)
