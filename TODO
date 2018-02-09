@@ -36,9 +36,12 @@ reports
 		show only current students in annual version
 
 Utils
-	namecase
+X	namecase
 	Clean up hacks.py
 
+Remove Unnecessary imports
+
+Delete Auditions table.  Integrate with Enrollments
 
 Questions:
 	What did we decide about login by email?

@@ -38,6 +38,7 @@ urlpatterns = [
 	url(r'^register/familyinfo/?$', main.reg_familyinfo),
 	url(r'^register/parentsinfo/?$', main.reg_parentsinfo),
 	url(r'^register/studentsinfo/?$', main.reg_studentsinfo),
+	url(r'^register/student/(?P<id>\d+)/?$', main.reg_courses),
 	
 	url(r'^hot/?$', dev.hot),
 	url(r'^run/?$', dev.run),

@@ -92,11 +92,10 @@ def create(request, model, **kwargs):
 	thing = manager.create(**thing)
 	if old_model:
 		old = MODELS[old_model].fetch(id=kwargs['id'])
-		print old
 		if old and hasattr(old, model):
 			old.__setattr__(model, thing)
 			old.save()
-	return redirect('/rest/show/{}/{}/'.format(old_model,kwargs['id']) if old_model else '/rest/index/{}/'.format(model))
+	return redirect('/rest/show/{}/{}/'.format(old_model,kwargs['id']) if old_model else '/rest/show/{}/{}/'.format(thing.rest_model,thing.id))
 
 def show(request, model, id):
 	if TRACE:

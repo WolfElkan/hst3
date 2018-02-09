@@ -16,9 +16,9 @@ FIELDS = {
 		{'field':'phone'     , 'template': PhoneNumber()},
 		{'field':'phone_type', 'template': Enum(options=['','Home','Cell','Work'])},
 		{'field':'email'     , 'template': VarChar(maxlength=254)},
-		{'field':'mother'    , 'template': ForeignKey(model='parent')},
-		{'field':'father'    , 'template': ForeignKey(model='parent')},
-		{'field':'address'   , 'template': ForeignKey(model='address')},
+		{'field':'mother'    , 'template': ForeignKey(model='parent', null=True)},
+		{'field':'father'    , 'template': ForeignKey(model='parent', null=True)},
+		{'field':'address'   , 'template': ForeignKey(model='address', null=True)},
 		{'field':'children'  , 'template': ForeignSet(model='student')},
 	],
 	'parent'    : [

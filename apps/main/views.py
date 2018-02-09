@@ -1,11 +1,12 @@
 from django.shortcuts import render, redirect, HttpResponse
 from .models import Family, Address, Parent, User, Student
+from apps.program.managers import CourseTrads, Courses, Enrollments, Auditions
 from Utils.custom_fields import Bcrypt, PhoneNumber
 from datetime import datetime
-from Utils.hacks import copy, copyatts, seshinit, forminit, first, getme, numero, metanumero, json, copy_items_to_attrs, year, FriendlyEncoder, namecase
+from Utils.hacks import copy, copyatts, seshinit, forminit, first, getme, numero, metanumero, json, copy_items_to_attrs, year, FriendlyEncoder, namecase, Each, equip
 import json as JSON
 from io import StringIO
-from trace import TRACE
+from trace import TRACE, DEV
 
 Addresses = Address.objects
 Families  = Family.objects
@@ -15,7 +16,7 @@ Users     = User.objects
 
 # - - - - - SECURITY FUNCTIONS - - - - -
 
-def authorized(request):
+def authorized(request, level=0):
 	if TRACE:
 		print '# main.views.authorized'
 	return 'meid' in request.session
@@ -56,9 +57,18 @@ def login_post(request):
 	me = first(Users.filter(username=request.POST['username']))
 	persist = copy(request.POST, ['username','password'])
 	if not me:
-		request.session['e'] = {'login':{'username': "You do not have an account.  Please register."}}
-		request.session['p'] = {'login':persist}
-		return redirect('/login')
+		family = Families.fetch(last=namecase(request.POST['username']))
+		if DEV and family:
+			new_user = copy(request.POST,['username','password'])
+			new_user['owner'] = family
+			new_user['permission'] = 7
+			Users.create(**new_user)
+			request.session['meid'] = new_user['id']
+			return redirect('/')
+		else:
+			request.session['e'] = {'login':{'username': "You do not have an account.  Please register."}}
+			request.session['p'] = {'login':persist}
+			return redirect('/login')
 	elif not me.pw(request.POST['password']):
 		request.session['e'] = {'login':{'password': "Your password is incorrect"}}
 		request.session['p'] = {'login':persist}
@@ -134,7 +144,6 @@ def reg_familyinfo_post(request):
 			print 'not me'
 			new_family = Families.create(**new_family)
 			new_user['owner'] = new_family
-			print new_user
 			me = Users.create(**new_user)
 		elif me and not me.owner:
 			print 'me and not me.owner'
@@ -350,4 +359,42 @@ def reg_studentsinfo_post(request):
 				else:
 					student_proxy.current = False
 				student_proxy.save()
+	return redirect('/register/student/{}/'.format(me.owner.children[0].id))
+
+
+def reg_courses(request, **kwargs):
+	if request.method == 'GET':
+		return reg_courses_get(request, **kwargs)
+	elif request.method == 'POST':
+		return reg_courses_post(request, **kwargs)
+	else:
+		return HttpResponse("Unrecognized HTTP Verb")
+
+def reg_courses_get(request, **kwargs):
+	me = getme(request)
+	if not me or not me.owner or not me.owner.children:
+		return redirect('/register')
+	current_id = kwargs['id'] if 'id' in kwargs else 0
+	if 'id' in kwargs:
+		current_id = kwargs['id']
+		current_student = me.owner.student_set.fetch(id=current_id)
+		if not current_student:
+			return redirect('/')
+	reg_year = 2017
+	courses = Courses.filter(year=reg_year).order_by('tradition__order')
+	context = {
+		'reg_year': reg_year,
+		'family'  : me.owner,
+		'students': me.owner.children,
+		# 'current_id' : current_id,
+		'current_student' : current_student,
+		'courses' : courses,
+		'eligcss' : equip(courses, lambda course: course.eligcss(current_student), attr='cureligcss'),
+		'cart'    : equip(me.owner.enrollments_in(reg_year), lambda enr: enr.course.eligcss(enr.student), attr='eligcss'),
+		'tuition_total':me.owner.tuition_total_in(reg_year),
+		'volunteer_total':me.owner.volunteer_total_in(reg_year),
+	}
+	return render(request, 'register/toggle_courses.html', context)
+
+def reg_courses_post(request):
 	return redirect('/')

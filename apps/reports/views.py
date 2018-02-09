@@ -72,7 +72,6 @@ def register(request, **kwargs):
 			new_enrollments[student_id]['role_type'] = request.POST[x]
 	for x in new_enrollments:
 		student = Students.fetch(id=int(x))
-		print student
 		Enrollments.create(student=student, course=course, role=new_enrollments[x]['role'], role_type=new_enrollments[x]['role_type'])
-	return redirect('/reports/students/')
+	return redirect('/reports/students/2016/')
 	

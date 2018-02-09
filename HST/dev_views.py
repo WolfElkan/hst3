@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, HttpResponse
 from Utils.custom_fields import Bcrypt, PhoneNumber, DayOfWeek
 from datetime import datetime
-from Utils.hacks import copy, getme, seshinit, first, pretty, pdir, Collect, namecase
+from Utils.hacks import copy, getme, seshinit, first, pretty, pdir, Each, namecase
 import re
 
 from apps.main.models import Family, Address, Parent, User, Student

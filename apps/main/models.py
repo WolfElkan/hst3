@@ -2,12 +2,12 @@ from __future__ import unicode_literals
 from django.db import models
 from Utils import custom_fields as custom
 from Utils import supermodel as sm
-from Utils.hacks import safe_delete, copyatts, year
+from Utils.hacks import safe_delete, copyatts, year, equip, Each, collect
 from django_mysql import models as sqlmod
 from .managers import Addresses, Families, Parents, Students, Users
 from datetime import datetime
 
-from apps.program.managers import CourseTrads, Courses, Enrollments, Auditions
+from apps.program.managers import CourseTrads, Courses, Enrollments
 
 class Address(models.Model):
 	line1      = models.CharField(null=False, max_length=50)
@@ -79,6 +79,12 @@ class Family(models.Model):
 		return self.last
 	def children(self):
 		return Students.filter(family_id=self.id).order_by('birthday')
+	def enrollments_in(self, in_year):
+		return Enrollments.filter(student__family=self, course__year=in_year).order_by('created_at')
+	def volunteer_total_in(self, in_year):
+		return max(collect(self.enrollments_in(in_year), lambda enr: enr.course.tradition.vol_hours))
+	def tuition_total_in(self, in_year):
+		return sum(collect(self.enrollments_in(in_year), lambda enr: enr.course.tradition.tuition))
 	def delete(self):
 		safe_delete(self.mother)
 		safe_delete(self.father)
@@ -88,7 +94,7 @@ class Family(models.Model):
 	def __str__(self):
 		return self.last+' Family'
 	def __getattribute__(self, field):
-		if field in ['mother','father','unique_last','children']:
+		if field in ['mother','father','unique_last','children','enrollments']:
 			function = super(Family, self).__getattribute__(field)
 			return function()
 		else:
@@ -161,9 +167,9 @@ class Student(models.Model):
 	def enrollments_before(self, year):
 		return self.enrollments.filter(course__year__lt=year)
 	def auditions(self):
-		return Auditions.filter(student=self)
+		return Enrollments.filter(student=self, isAudition=True)
 	def auditions_in(self, in_year):
-		return Auditions.filter(student=self, course__year=in_year)
+		return Enrollments.filter(student=self, isAudition=True, course__year=in_year)
 	def courses(self): # TODO: Use a DB join statement instead
 		qset = []
 		for enrollment in self.enrollments:
@@ -226,7 +232,8 @@ class User(models.Model):
 		(3,'Captain'),
 		(4,'Teacher'),
 		(5,'Founder'),
-		(6,'Admin')
+		(6,'Admin'),
+		(7,'Demo')
 	]
 	permission = models.PositiveSmallIntegerField(default=0, choices=perm_levels)
 	created_at = models.DateTimeField(auto_now_add=True)

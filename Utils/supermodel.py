@@ -247,15 +247,6 @@ class SuperManager(models.Manager):
 		for x in self.validations:
 			messages = x.errors(data, messages)
 		return messages
-	# def create(self, data):
-	# 	if TRACE:
-	# 		print '# Utils.supermodel.SuperManager.create'
-	# 	data = copy(data, self.fields)
-	# 	return super(SuperManager, self).create(**data)
-	def kreate(self, **kwargs):
-		if TRACE:
-			print '# Utils.supermodel.SuperManager.kreate'
-		return self.create(**kwargs)
 	def fetch(self, **kwargs):
 		if TRACE:
 			print '# Utils.supermodel.SuperManager.fetch'

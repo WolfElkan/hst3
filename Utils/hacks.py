@@ -144,20 +144,44 @@ class Funky(object):
 		new = []
 		for x in self.arr:
 			new.append(x.__getattribute__(self.fx).__call__(*args, **kwargs))
+		return Each(new)
+	def __getattr__(self, attr):
+		new = []
+		for x in self.arr:
+			new.append(x.__getattribute__(attr))
 		return new
 
-class Collect(object):
+class Each(object):
 	def __init__(self, arr):
 		self.arr = list(arr)
 	def __str__(self):
-		return '<'+str(super(Collect,self).__getattribute__('arr'))+'>'
+		return '<'+str(super(Each,self).__getattribute__('arr'))+'>'
 	def __repr__(self):
-		return '<Collect: {}>'.format(str(super(Collect,self).__getattribute__('arr')))
+		return '<Each: {}>'.format(str(super(Each,self).__getattribute__('arr')))
 	def __getattribute__(self, attr):
-		return Funky(super(Collect,self).__getattribute__('arr'), attr)
+		if attr == '_':
+			return super(Each,self).__getattribute__('arr')
+		else:
+			return Funky(super(Each,self).__getattribute__('arr'), attr)
 	def __iter__(self):
-		for x in super(Collect,self).__getattribute__('arr'):
+		for x in super(Each,self).__getattribute__('arr'):
 			yield x
+	def __len__(self):
+		return len(super(Each,self).__getattribute__('arr'))
+
+def collect(arr, lam):
+	new = []
+	for x in arr:
+		new.append(lam(x))
+	return new
+
+def equip(arr, lam, **kwargs):
+	for x in arr:
+		if 'item' in kwargs:
+			x.__setitem__(kwargs['item'],lam(x))
+		if 'attr' in kwargs:
+			x.__setattr__(kwargs['attr'],lam(x))
+	return list(arr)
 
 import re
 def namecase(name):
@@ -167,7 +191,7 @@ def namecase(name):
 	match = re.match(regex,name,flags=re.I)
 	if match:
 		group = match.groups()
-		return ''.join(Collect(group).title())
+		return ''.join(Each(group).title())
 	else:
 		return name.title()
 

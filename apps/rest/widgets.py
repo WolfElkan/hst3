@@ -289,6 +289,7 @@ class ForeignKey(object):
 			print '* rest.widgets.ForeignKey'
 		self.field = kwargs['field'] if 'field' in kwargs else None
 		self.model = kwargs['model'] if 'model' in kwargs else None
+		self.null  = kwargs['null']  if 'null'  in kwargs else False
 		self.default = kwargs['default'] if 'default' in kwargs else None
 	def widget(self, field, value):
 		if TRACE:
@@ -297,6 +298,8 @@ class ForeignKey(object):
 		html = '<select name="{}_id">'.format(field)
 		if not self.model:
 			self.model = field
+		if self.null:
+			html += '<option value="0"{}>- select -</option>'.format(' selected' if not value else '')
 		for foreign in MODELS[self.model].all():
 			html += '<option value="{}"{}>{}</option>'.format(foreign.id,' selected' if value == foreign else '',foreign)
 		html += '</select>'
@@ -317,6 +320,8 @@ class ForeignKey(object):
 			value = post[field]
 		else:
 			value = self.default
+		if str(value) == '0':
+			return thing
 		if isAttr:
 			thing.__setattr__(field, str(value))
 		else:

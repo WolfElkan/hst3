@@ -4,7 +4,7 @@ from Utils import custom_fields as custom
 from Utils import supermodel as sm
 from Utils.hacks import sub
 from django_mysql import models as sqlmod
-from .managers import CourseTrads, Courses, Enrollments, Auditions
+from .managers import CourseTrads, Courses, Enrollments
 Q = models.Q
 from apps.main.managers import Students
 
@@ -25,6 +25,7 @@ class CourseTrad(models.Model):
 	id         = models.CharField(max_length=2, primary_key=True)
 	title      = models.CharField(max_length=50)
 	alias      = models.ForeignKey('self', null=True)
+	order      = models.FloatField(null=True)
 	e          = models.BooleanField(default=True)
 	# Commitment:
 	day        = custom.DayOfWeekField(default='')
@@ -94,17 +95,30 @@ class CourseTrad(models.Model):
 		code = self.id[0]
 		genre_codes = {
 			'A':'Acting',
+			# 'B':'',
 			'C':'Choir',
-			'F':'Finale Group',
+			# 'D':'',
+			# 'E':'',
+			'F':'Finale',
 			'G':'General Audition',
-			'H':'Hip-Hop',
+			'H':'Jazz/Hip-Hop',
 			'I':'Irish',
 			'J':'Jazz',
+			# 'K':'',
+			# 'L':'',
+			# 'M':'',
+			# 'N':'',
+			'O':'Overture',
 			'P':'Tap',
+			# 'Q':'',
+			# 'R':'',
 			'S':'Troupe',
 			'T':'Tap',
+			# 'U':'',
+			# 'V':'',
 			'W':'Workshop',
 			'X':'Tech',
+			# 'Y':'',
 			'Z':'Jazz',
 		}
 		if code in genre_codes:
@@ -131,7 +145,6 @@ class CourseTrad(models.Model):
 		)
 		if self.I and not student.enrollments.filter(tpi, course__year__lt=year):
 			return False  # Irish or Tap required
-		print self.A
 		if self.A == 0:
 			return True
 		elif self.A == 1:
@@ -200,11 +213,39 @@ class Course(models.Model):
 			qset.append({'widget':enrollment,'static':Students.get(id=enrollment.student_id)})
 		return qset
 	def __str__(self):
-		return self.tradition.title+' ('+str(self.year)+')'
+		return self.title+' ('+str(self.year)+')'
 	def eligible(self, student):
 		return self.tradition.eligible(student, self.year)
 	def audible(self, student):
 		return self.tradition.audible(student, self.year)
+	def eligcss(self, student):
+		enrollment = Enrollments.fetch(course=self, student=student)
+		if enrollment:
+			if enrollment.isAudition:
+				return "audition" # The student has scheduled an audition for this class
+			elif enrollment.paid:
+				return "enrolled" # The student is registered for this class and has paid
+			else:
+				return "need_pay" # This class has been added to the cart, pending tuition payment
+		overlapQ = Q(
+			Q(course__tradition__start__gte=self.start, course__tradition__end__lte=self.end) |
+			Q(course__tradition__start__lte=self.end, course__tradition__end__gte=self.start) |
+			Q(course__tradition__start__gte=self.start, course__tradition__start__lte=self.end) 
+		)
+		conflicts = Enrollments.filter(
+			overlapQ,
+			student=student,
+			course__year=self.year,
+			course__tradition__day=self.day,
+		)
+		if conflicts:
+			return "conflict" # The student is registered for another class at the same time as this one
+		elif self.eligible(student):
+			return "eligible" # The student may register for this class, but has not yet
+		elif self.audible(student):
+			return "need_aud" # An audition is required for this class for which student is eligible
+		else:
+			return "not_elig" # The student does not meet the requirements to enroll in or audition for this class
 	def enroll(self, student):
 		if self.eligible(student):
 			return Enrollments.create(course=self, student=student)
@@ -212,19 +253,27 @@ class Course(models.Model):
 		return Enrollments.create(course=self, student=student)
 	def audition(self, student):
 		if self.audible(student):
-			return Auditions.create(course=self, student=student)
+			return Enrollments.create(course=self, student=student, isAudition=True)
 	def __getattribute__(self, field):
 		if field in ['students_toggle_enrollments','students','enrollments']:
 			call = super(Course, self).__getattribute__(field)
 			return call()
+		elif '_' not in field and field not in ['audible','clean','delete','eligible','enroll','id','objects','pk','save'] and hasattr(CourseTrad, field):
+			return super(Course, self).__getattribute__('tradition').__getattribute__(field)
 		else:
 			return super(Course, self).__getattribute__(field)
 
 class Enrollment(models.Model):
 	student    = models.ForeignKey('main.Student')
 	course     = models.ForeignKey(Course)
+	isAudition = models.BooleanField(default=False)
 	role       = models.TextField(null=True)
 	role_type  = sqlmod.EnumField(choices=['','Chorus','Support','Lead'])
+	paid       = models.BooleanField(default=False)
+	auto       = models.BooleanField(default=False)
+	ret_status = models.BooleanField(default=False)
+	happened   = models.BooleanField(default=False)
+	success    = models.NullBooleanField()	
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
 	rest_model = "enrollment"
@@ -237,23 +286,3 @@ class Enrollment(models.Model):
 	# 		return function()
 	# 	else:
 	# 		return super(Enrollment, self).__getattribute__(field)
-
-class Audition(models.Model):
-	student    = models.ForeignKey('main.Student')
-	course     = models.ForeignKey(Course)
-	date       = models.DateField(null=True)
-	auto       = models.BooleanField(default=False)
-	ret_status = models.BooleanField(default=False)
-	happened   = models.BooleanField(default=False)
-	success    = models.NullBooleanField()
-	created_at = models.DateTimeField(auto_now_add=True)
-	updated_at = models.DateTimeField(auto_now=True)	
-	rest_model = "audition"	
-	objects = Auditions
-	# def __getattribute__(self, field):
-	# 	if field in []:
-	# 		function = super(Audition, self).__getattribute__(field)
-	# 		return function()
-	# 	else:
-	# 		return super(Audition, self).__getattribute__(field)
-
