@@ -2,6 +2,7 @@
 <html>
 <head>
 	<title>HST | Sign Up</title>
+	{% load staticfiles %}
 </head>
 <style type="text/css">
 	* {
@@ -42,7 +43,7 @@
 	.course_menu {
 		border: solid;
 		border-top: none;
-		padding: 0px 2px;
+		padding: 2px;
 		margin: 0 5px 5px 5px;
 	}
 	table {
@@ -64,24 +65,34 @@
 	.center {
 		text-align: center;
 	}
-	/*button.enroll, button.drop, button.aud, button:disabled {*/
 	button {
 		display: none;
 	}
-	.eligible {}
-		.eligible button.enroll {display: inline;}
+	.eligible td:nth-child(2) {font-weight: bold;}
+		.eligible form.enroll button {display: inline;}
 	.audition {background-color: #8af}
-		.audition button.drop {display: inline;}
+		.audition form.drop button {display: inline;}
 	.enrolled {background-color: #8f8}
-		.enrolled button.drop {display: inline;}
+		.enrolled form.drop button {display: inline;}
 	.need_pay {background-color: #ff8}
-		.need_pay button.drop {display: inline;}
+		.need_pay form.drop button {display: inline;}
+	.need_aud {color: blue;}
+		.need_aud form.aud button {display: inline;}
+	.need_cur {background-color: #aaa}
+		.need_cur button:disabled {display: inline;}
+	.not_elig {background-color: #777}
+		.not_elig button:disabled {display: inline;}
 	.conflict {background-color: #a88}
 		.conflict button:disabled {display: inline;}
-	.need_aud {color: blue;}
-		.need_aud button.aud {display: inline;}
-	.not_elig {background-color: gray}
-		.not_elig button:disabled {display: inline;}
+
+	.invoice {
+		margin: 15px auto;
+		display: block;
+	}
+
+	.legend td:nth-child(2) {
+		font-family: monospace;
+	}
 </style>
 <body>
 	<div class="pane">
@@ -93,7 +104,6 @@
 			{% endfor %}
 		</div>
 		<div class="course_menu">
-		<!-- <h2>{{reg_year}} HST Class Offerings</h2> -->
 		<table>
 			<thead>
 				<th>{{reg_year}}</th>
@@ -105,17 +115,26 @@
 			</thead>
 			{% for course in courses %}
 			<tr class="{{course.cureligcss}}">
-				<td class="center">
-					<button class="enroll">Enroll</button>
-					<button disabled>Enroll</button>
-					<button class="aud">Audition</button>
-					<button class="drop">Drop</button>
-				</td>
-				<td class="center">{{course.title}}</td>
-				<td>{{course.day.short}}</td>
-				<td>{{course.start}} - {{course.end}}</td>
-				<td class="right">${{course.tuition}}</td>
-				<td class="right">{{course.vol_hours}}</td>
+					<td class="center">
+						<form class="enroll" action="enroll/">
+							<input type="hidden" name="course_id" value="{{course.id}}">
+							<button>Enroll</button>
+						</form>
+						<form class="aud" action="audition/">
+							<input type="hidden" name="course_id" value="{{course.id}}">
+							<button>Audition</button>
+						</form>
+						<form class="drop" action="drop/">
+							<input type="hidden" name="course_id" value="{{course.id}}">
+							<button>Drop</button>
+						</form>
+						<button disabled>Enroll</button>
+					</td>
+					<td class="center">{{course.title}}</td>
+					<td>{{course.day.short}}</td>
+					<td>{{course.start}} - {{course.end}}</td>
+					<td class="right">${{course.tuition}}</td>
+					<td class="right">{{course.vol_hours}}</td>
 			</tr>
 			{% endfor %}
 		</table>
@@ -157,9 +176,9 @@
 			<td class="right">$0.00</td>
 		</tr>
 	</table>
-	<button style="display: block;">Generate Invoice</button>
+	<button {% if not cart %} disabled {% endif %} class="invoice">Generate Invoice</button>
 </div>
-<table>
+<table class="legend">
 	<tr class="audition">
 		<td class="center">
 			<button class="enroll">Enroll</button>
@@ -167,6 +186,7 @@
 			<button class="aud">Audition</button>
 			<button class="drop">Drop</button>
 		</td>
+		<td>audition</td>
 		<td>Student has scheduled an audition for this class</td>
 	</tr>
 	<tr class="enrolled">
@@ -176,6 +196,7 @@
 			<button class="aud">Audition</button>
 			<button class="drop">Drop</button>
 		</td>
+		<td>enrolled</td>
 		<td>Student is registered for this class and has paid</td>
 	</tr>
 	<tr class="need_pay">
@@ -185,6 +206,7 @@
 			<button class="aud">Audition</button>
 			<button class="drop">Drop</button>
 		</td>
+		<td>need_pay</td>
 		<td>This class has been added to the cart, pending tuition payment</td>
 	</tr>
 	<tr class="conflict">
@@ -194,6 +216,7 @@
 			<button class="aud">Audition</button>
 			<button class="drop">Drop</button>
 		</td>
+		<td>conflict</td>
 		<td>Student is registered for another class at the same time</td>
 	</tr>
 	<tr class="eligible">
@@ -203,6 +226,7 @@
 			<button class="aud">Audition</button>
 			<button class="drop">Drop</button>
 		</td>
+		<td>eligible</td>
 		<td>Student may register for this class, but has not yet</td>
 	</tr>
 	<tr class="need_aud">
@@ -212,7 +236,18 @@
 			<button class="aud">Audition</button>
 			<button class="drop">Drop</button>
 		</td>
+		<td>need_aud</td>
 		<td>An audition is required for this class for which student is eligible</td>
+	</tr>
+	<tr class="need_cur">
+		<td class="center">
+			<button class="enroll">Enroll</button>
+			<button disabled>Enroll</button>
+			<button class="aud">Audition</button>
+			<button class="drop">Drop</button>
+		</td>
+		<td>need_cur</td>
+		<td>Student will be eligible once they enroll in at least 1 other class</td>
 	</tr>
 	<tr class="not_elig">
 		<td class="center">
@@ -221,6 +256,7 @@
 			<button class="aud">Audition</button>
 			<button class="drop">Drop</button>
 		</td>
+		<td>not_elig</td>
 		<td>Student is not eligible to enroll in or audition for this class</td>
 	</tr>
 </table>

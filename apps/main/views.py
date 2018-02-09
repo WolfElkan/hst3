@@ -386,7 +386,6 @@ def reg_courses_get(request, **kwargs):
 		'reg_year': reg_year,
 		'family'  : me.owner,
 		'students': me.owner.children,
-		# 'current_id' : current_id,
 		'current_student' : current_student,
 		'courses' : courses,
 		'eligcss' : equip(courses, lambda course: course.eligcss(current_student), attr='cureligcss'),
@@ -395,6 +394,30 @@ def reg_courses_get(request, **kwargs):
 		'volunteer_total':me.owner.volunteer_total_in(reg_year),
 	}
 	return render(request, 'register/toggle_courses.html', context)
+
+def reg_courses_enroll(request, **kwargs):
+	student_id = kwargs['id'] if 'id' in kwargs else 0
+	student = Students.fetch(id=student_id)
+	course = Courses.fetch(id=request.GET['course_id'])
+	if course.eligible(student):
+		Enrollments.create(course=course, student=student)
+	return redirect('/register/student/{}/'.format(student_id))
+
+def reg_courses_audition(request, **kwargs):
+	student_id = kwargs['id'] if 'id' in kwargs else 0
+	student = Students.fetch(id=student_id)
+	course = Courses.fetch(id=request.GET['course_id'])
+	if course.audible(student):
+		Enrollments.create(course=course, student=student, isAudition=True)
+	return redirect('/register/student/{}/'.format(student_id))
+
+def reg_courses_drop(request, **kwargs):
+	student_id = kwargs['id'] if 'id' in kwargs else 0
+	student = Students.fetch(id=student_id)
+	course = Courses.fetch(id=request.GET['course_id'])
+	Enrollments.filter(course=course, student=student).delete()
+	return redirect('/register/student/{}/'.format(student_id))
+
 
 def reg_courses_post(request):
 	return redirect('/')

@@ -7,6 +7,9 @@ from django_mysql import models as sqlmod
 from .managers import CourseTrads, Courses, Enrollments
 Q = models.Q
 from apps.main.managers import Students
+from trace import TRACE, DEV
+
+ELG = False
 
 class Venue(models.Model):
 	id   = models.CharField(max_length=3, primary_key=True)
@@ -45,11 +48,11 @@ class CourseTrad(models.Model):
 	C = models.BooleanField(default=False) # Only current students may enroll
 	I = models.BooleanField(default=False) # 1 year IS or T* or P* required
 	A_levels = [
-		(0, 'No audition or acting class required'),
-		(1, 'Students must pass a skills assessment (or have already taken this class) to enroll'),
-		(2, '1 year of Acting A or B required to enroll'),
-		(3, '1 year of Acting A or B required to audition'),
-		(4, '1 year of Acting and 1 year of Troupe required to audition'),
+		(0, 'needs no audition to enroll in'),
+		(1, 'must pass a skills assessment (or have already taken this class) to enroll in'),
+		(2, 'must take 1 year of Acting A or B required to enroll in'),
+		(3, 'must take 1 year of Acting A or B required to audition for'),
+		(4, 'must take 1 year of Acting and 1 year of Troupe required to audition for'),
 	]
 	eL = [
 		lambda self, past, auds: 
@@ -123,20 +126,34 @@ class CourseTrad(models.Model):
 		}
 		if code in genre_codes:
 			return genre_codes[code]
-	def eligible(self, student, year):
+	def eligible(self, student, year, check_C=True):
 		if student.hst_age_in(year) < self.min_age:
+			if ELG:
+				print '{} is too young for {}'.format(student, self)
 			return False  # Too young
 		if student.hst_age_in(year) > self.max_age:
+			if ELG:
+				print '{} is too old for {}'.format(student, self)
 			return False  # Too old
 		if student.grad_year and student.grade_in(year) < self.min_grd:
+			if ELG:
+				print '{} is too young academically for {}'.format(student, self)
 			return False  # Too young academically
 		if student.grad_year and student.grade_in(year) > self.max_grd:
+			if ELG:
+				print '{} is too old academically for {}'.format(student, self)
 			return False  # Too old academically
 		if str(student.sex) == 'M' and not self.M:
+			if ELG:
+				print '{} is a boy and not allowed in {}'.format(student, self)
 			return False  # No boys allowed
 		if str(student.sex) == 'F' and not self.F:
+			if ELG:
+				print '{} is a girl and not allowed in {}'.format(student, self)
 			return False  # No girls allowed
-		if self.C and not student.enrollments_in(year):
+		if check_C and self.C and not student.enrollments_in(year):
+			if ELG:
+				print '{} is not a current students for {}'.format(student, self)
 			return False  # Current students only
 		tpi = Q(
 			Q(course__tradition__id__startswith='T') | # Tap Courses
@@ -144,8 +161,12 @@ class CourseTrad(models.Model):
 			Q(course__tradition__id__startswith='I')   # Irish Dance Courses
 		)
 		if self.I and not student.enrollments.filter(tpi, course__year__lt=year):
+			if ELG:
+				print '{} has not taken Irish or Tap required for {}'.format(student, self)
 			return False  # Irish or Tap required
 		if self.A == 0:
+			if ELG:
+				print '{} is eligible for {}!'.format(student, self)
 			return True
 		elif self.A == 1:
 			return bool(
@@ -158,8 +179,10 @@ class CourseTrad(models.Model):
 			return bool(student.auditions_in(year).filter(course__tradition=self, success=True))
 		# return bool(self.eL[self.A](self,student.enrollments_before(year),student.auditions_in(year)))
 	def audible(self, student, year):
+			if ELG:
+				print student, self.get_A_display(), self, year
 			if self.A == 0:
-				return True
+				return self.eligible(student, year)
 			elif self.A == 1:
 				return student.enrollments_before(year).filter(
 					id__startswith=sub(self.id[:1],{'P':'T','Z':'J'}), 
@@ -168,7 +191,7 @@ class CourseTrad(models.Model):
 			elif self.A == 2:
 				return False
 			elif self.A == 3:
-				return student.enrollments_before(year).filter(id__startswith='A')
+				return student.enrollments_before(year).filter(id__startswith='A') or (DEV and student.enrollments_before(year).filter(id__startswith='S'))
 			elif self.A == 4:
 				return student.enrollments_before(year).filter(id__startswith='A') and student.enrollments_before(year).filter(id__startswith='S')
 		# return bool(self.aL[self.A](self,student.enrollments_before(year)))
@@ -222,10 +245,16 @@ class Course(models.Model):
 		enrollment = Enrollments.fetch(course=self, student=student)
 		if enrollment:
 			if enrollment.isAudition:
+				if ELG:
+					print '{} has scheduled an audition for {}'.format(student, self)
 				return "audition" # The student has scheduled an audition for this class
 			elif enrollment.paid:
+				if ELG:
+					print '{} has successfully enrolled in {}'.format(student, self)
 				return "enrolled" # The student is registered for this class and has paid
 			else:
+				if ELG:
+					print '{} is registered for {} but needs to pay'.format(student, self)
 				return "need_pay" # This class has been added to the cart, pending tuition payment
 		overlapQ = Q(
 			Q(course__tradition__start__gte=self.start, course__tradition__end__lte=self.end) |
@@ -239,11 +268,15 @@ class Course(models.Model):
 			course__tradition__day=self.day,
 		)
 		if conflicts:
+			if ELG:
+				print '{} is in another class at the same time as {}'.format(student, self)
 			return "conflict" # The student is registered for another class at the same time as this one
 		elif self.eligible(student):
 			return "eligible" # The student may register for this class, but has not yet
 		elif self.audible(student):
 			return "need_aud" # An audition is required for this class for which student is eligible
+		elif self.tradition.eligible(student, self.year, False):
+			return "need_cur" # Student will be eligible once they enroll in at least 1 other class
 		else:
 			return "not_elig" # The student does not meet the requirements to enroll in or audition for this class
 	def enroll(self, student):
@@ -258,7 +291,7 @@ class Course(models.Model):
 		if field in ['students_toggle_enrollments','students','enrollments']:
 			call = super(Course, self).__getattribute__(field)
 			return call()
-		elif '_' not in field and field not in ['audible','clean','delete','eligible','enroll','id','objects','pk','save'] and hasattr(CourseTrad, field):
+		elif '_' not in field and field not in ['audible','clean','delete','eligible','enroll','id','objects','pk','save','tradition'] and hasattr(CourseTrad, field):
 			return super(Course, self).__getattribute__('tradition').__getattribute__(field)
 		else:
 			return super(Course, self).__getattribute__(field)

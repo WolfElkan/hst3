@@ -6,6 +6,7 @@ from Utils.hacks import safe_delete, copyatts, year, equip, Each, collect
 from django_mysql import models as sqlmod
 from .managers import Addresses, Families, Parents, Students, Users
 from datetime import datetime
+from trace import DEV
 
 from apps.program.managers import CourseTrads, Courses, Enrollments
 
@@ -82,7 +83,7 @@ class Family(models.Model):
 	def enrollments_in(self, in_year):
 		return Enrollments.filter(student__family=self, course__year=in_year).order_by('created_at')
 	def volunteer_total_in(self, in_year):
-		return max(collect(self.enrollments_in(in_year), lambda enr: enr.course.tradition.vol_hours))
+		return max([0]+collect(self.enrollments_in(in_year), lambda enr: enr.course.tradition.vol_hours))
 	def tuition_total_in(self, in_year):
 		return sum(collect(self.enrollments_in(in_year), lambda enr: enr.course.tradition.tuition))
 	def delete(self):

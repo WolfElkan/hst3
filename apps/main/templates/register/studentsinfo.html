@@ -32,6 +32,10 @@
 		#student_list td:nth-child(1) {
 			text-align: left;
 		}
+		#birthday_static {
+			font-family: sans-serif;
+			font-size: 14px;
+		}
 	</style>
 	<script type="text/javascript">
 
@@ -57,6 +61,11 @@
 			var mid  = zeropad(num % 10**7 / 10**4, 3)
 			var last = zeropad(num % 10**4, 4)
 			return `(${cod}) ${mid}-${last}`
+		}
+
+		function date_format(date) {
+			months = ['Jan','Feb','March','April','May','June','July','Aug','Sep','Oct','Nov','Dec']
+			return `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`
 		}
 
 		function Student(arg) {
@@ -94,7 +103,7 @@
 					} else if (this.birthday.year < 100) {
 						this.birthday.year += Math.floor(reg_year / 100) * 100 - 100
 					}
-					// this.birthday.js = new Date(this.birthday.year, this.birthday.month-1, this.birthday.date)
+					this.birthday.js = new Date(this.birthday.year, this.birthday.month-1, this.birthday.date)
 					this.birthday.db = `${zeropad(this.birthday.year,4)}-${zeropad(this.birthday.month,2)}-${zeropad(this.birthday.date,2)}`
 				}
 				this.grade = this.grad_year ? reg_year - this.grad_year + 12 : ''
@@ -146,6 +155,14 @@
 				$$('#height_ft').value = this.height_ft
 				$$('#height_in').value = this.height_in
 				$$('#birthday').value = this.birthday.db
+				$$('#birthday_static').innerText = date_format(this.birthday.js)
+				if (this.isNew) {
+					$('#birthday').show()
+					$('#birthday_static').hide()
+				} else {
+					$('#birthday_static').show()
+					$('#birthday').hide()
+				}
 			}
 			this.tr = function() {
 				return `<tr id="${this.sid}"><td>${this.alt_first ? this.alt_first : this.first} ${this.alt_last ? this.alt_last : family_last}</td><td>${this.birthday ? this.hst_age : ''}${this.hst_age == this.cur_age() ? '' : '*'}</td><td>${this.sex}</td><td>${this.grade}</td><td>${this.height_tr}</td><td>${this.tshirt}</td><td>${this.alt_phone ? phone_format(this.alt_phone) : ''}</td><td>${this.alt_email ? this.alt_email : ''}</td><td><button class="edit">Edit</button><button class="delete">Delete</button></td></tr>`
@@ -386,7 +403,10 @@
 					<td class="error" id="sex_error"></td>
 				</tr>
 				<tr><td><b>Birthday:</b></td>
-					<td><input type="date" name="birthday" id="birthday"></td>
+					<td>
+						<input type="date" name="birthday" id="birthday">
+						<span id="birthday_static" title="Student birthdays cannot be edited.  Please email HST if you have entered it incorrectly."></span>
+					</td>
 					<td class="error" id="birthday_error"></td>
 				</tr>
 				<tr><td>Grade:</td>
