@@ -380,7 +380,7 @@ def reg_courses_get(request, **kwargs):
 		current_student = me.owner.student_set.fetch(id=current_id)
 		if not current_student:
 			return redirect('/')
-	reg_year = 2017 if DEV else year()
+	reg_year = year()
 	courses = Courses.filter(year=reg_year,tradition__e=True).order_by('tradition__order')
 	context = {
 		'reg_year': reg_year,
