@@ -159,21 +159,21 @@
 		{% endfor %}
 		<tr class="total">
 			<td><b>Total:</b></td>
-			<td class="center">0</td>
+			<td class="center">{{cart|length}}</td>
 			<td class="right">{{volunteer_total}}</td>
-			<td class="right">${{tuition_total}}</td>
+			<td class="right">${{tuition.total}}</td>
 		</tr>
 		<tr class="total">
 			<td><b>Paid:</b></td>
 			<td class="center">0</td>
 			<td class="right">0.0</td>
-			<td class="right">$0.00</td>
+			<td class="right">${{tuition.paid}}</td>
 		</tr>
 		<tr class="total">
 			<td><b>Due:</b></td>
 			<td class="center">0</td>
 			<td class="right">0.0</td>
-			<td class="right">$0.00</td>
+			<td class="right">${{tuition.unpaid}}</td>
 		</tr>
 	</table>
 	<button {% if not cart %} disabled {% endif %} class="invoice">Generate Invoice</button>

@@ -70,6 +70,7 @@ FIELDS = {
 			'1 year of Acting A or B required to enroll',
 			'1 year of Acting A or B required to audition',
 			'1 year of Acting and 1 year of Troupe required to audition',
+			'Current students may audition'
 		])},
 		{'field':'tuition'   , 'template': Price()},
 		{'field':'redtuit'   , 'template': Price()},

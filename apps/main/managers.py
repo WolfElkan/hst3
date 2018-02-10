@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 from django.db import models
 from Utils import custom_fields as custom
+from Utils.hacks import namecase
 from Utils import supermodel as sm
 from django_mysql import models as sqlmod
 from datetime import datetime
@@ -23,6 +24,10 @@ class FamilyManager(sm.SuperManager):
 			sm.Present('email','Please enter an email address.'),
 			sm.Regular('email',r'^$|(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)','Please enter a valid email address.'),
 		]
+	def create(self, **kwargs):
+		if 'last' in kwargs:
+			kwargs['last'] = namecase(kwargs['last'])
+		return super(FamilyManager, self).create(**kwargs)
 Families = FamilyManager()
 
 class ParentManager(sm.SuperManager):
@@ -50,9 +55,15 @@ class StudentManager(sm.SuperManager):
 			sm.Regular('alt_first',r'^.{0,20}$','This name is too long.  The maximum is 20 characters.'),
 			sm.Present('sex','Please select a sex.'),
 			sm.Present('birthday','Please enter a date of birth.'),
+			# sm.Regular('birthday',r'^$|^\d{4}-\d{2}-\d{2}$','Please enter the date as YYYY-MM-DD'),
 			sm.Regular('alt_phone',r'^$|^[^\d]*(\d[^\d]*){10}$','Please enter a valid 10-digit phone number, or leave blank to use family phone.'),
 			sm.Regular('alt_email',r'^$|(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)','Please enter a valid email address, or leave blank to use family email.'),
 		]
+	def create(self, **kwargs):
+		for field in ['first','middle','alt_first','alt_last']:
+			if field in kwargs:
+				kwargs[field] = namecase(kwargs[field])
+		return super(StudentManager, self).create(**kwargs)
 Students = StudentManager()
 
 class UserManager(sm.SuperManager):

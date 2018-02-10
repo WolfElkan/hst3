@@ -82,10 +82,18 @@ class Family(models.Model):
 		return Students.filter(family_id=self.id).order_by('birthday')
 	def enrollments_in(self, in_year):
 		return Enrollments.filter(student__family=self, course__year=in_year).order_by('created_at')
+	def paid_enrollments_in(self, in_year):
+		return self.enrollments_in(in_year).filter(paid=True)
+	def unpaid_enrollments_in(self, in_year):
+		return self.enrollments_in(in_year).filter(paid=False)
 	def volunteer_total_in(self, in_year):
-		return max([0]+collect(self.enrollments_in(in_year), lambda enr: enr.course.tradition.vol_hours))
-	def tuition_total_in(self, in_year):
-		return sum(collect(self.enrollments_in(in_year), lambda enr: enr.course.tradition.tuition))
+		return max([0.0]+collect(self.enrollments_in(in_year), lambda enr: enr.course.vol_hours))
+	def total_tuition_in(self, in_year):
+		return sum(collect(self.enrollments_in(in_year), lambda enr: enr.course.tuition))
+	def paid_tuition_in(self, in_year):
+		return 0
+	def unpaid_tuition_in(self, in_year):
+		return self.total_tuition_in(in_year) - self.paid_tuition_in(in_year)
 	def delete(self):
 		safe_delete(self.mother)
 		safe_delete(self.father)

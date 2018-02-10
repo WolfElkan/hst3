@@ -10,6 +10,7 @@ X	Make registration landing page redirect to appropriate step if family has part
 	Student Interface
 X		(eventually) Support loading existing students from database for editing, track by internal id's
 		Make titles of required fields bold automatically
+		Support date field on other browsers
 
 	Parent Interface
 		Make validations work
@@ -20,6 +21,9 @@ X		(eventually) Support loading existing students from database for editing, tra
 
 X	family.children gets them in age order
 	add HIDs
+
+	Course Interface
+		Click anywhere on a tab
 
 program
 	Models
@@ -39,9 +43,11 @@ Utils
 X	namecase
 	Clean up hacks.py
 
+Add audition level for audition required, but no prereqs for audition, assign C2 that level
+
 Remove Unnecessary imports
 
-Delete Auditions table.  Integrate with Enrollments
+X	Delete Auditions table.  Integrate with Enrollments
 
 Questions:
 	What did we decide about login by email?

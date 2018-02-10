@@ -53,6 +53,7 @@ class CourseTrad(models.Model):
 		(2, 'must take 1 year of Acting A or B required to enroll in'),
 		(3, 'must take 1 year of Acting A or B required to audition for'),
 		(4, 'must take 1 year of Acting and 1 year of Troupe required to audition for'),
+		(5, 'must audition for')
 	]
 	eL = [
 		lambda self, past, auds: 
@@ -98,17 +99,17 @@ class CourseTrad(models.Model):
 		code = self.id[0]
 		genre_codes = {
 			'A':'Acting',
-			# 'B':'',
+			# 'B':'Ballet',
 			'C':'Choir',
-			# 'D':'',
+			# 'D':'Dance Intensive',
 			# 'E':'',
 			'F':'Finale',
 			'G':'General Audition',
 			'H':'Jazz/Hip-Hop',
 			'I':'Irish',
 			'J':'Jazz',
-			# 'K':'',
-			# 'L':'',
+			# 'K':'Tickets',
+			# 'L':'Sign Language',
 			# 'M':'',
 			# 'N':'',
 			'O':'Overture',
@@ -153,7 +154,7 @@ class CourseTrad(models.Model):
 			return False  # No girls allowed
 		if check_C and self.C and not student.enrollments_in(year):
 			if ELG:
-				print '{} is not a current students for {}'.format(student, self)
+				print '{} is not a current student for {}'.format(student, self)
 			return False  # Current students only
 		tpi = Q(
 			Q(course__tradition__id__startswith='T') | # Tap Courses
@@ -175,8 +176,10 @@ class CourseTrad(models.Model):
 			)
 		elif self.A == 2:
 			return bool(student.enrollments_before(year).filter(id__startswith='A'))
-		elif self.A >= 3:
+		elif self.A in [3,4]:
 			return bool(student.auditions_in(year).filter(course__tradition=self, success=True))
+		elif self.A == 5:
+			return True
 		# return bool(self.eL[self.A](self,student.enrollments_before(year),student.auditions_in(year)))
 	def audible(self, student, year):
 			if ELG:
@@ -194,6 +197,8 @@ class CourseTrad(models.Model):
 				return student.enrollments_before(year).filter(id__startswith='A') or (DEV and student.enrollments_before(year).filter(id__startswith='S'))
 			elif self.A == 4:
 				return student.enrollments_before(year).filter(id__startswith='A') and student.enrollments_before(year).filter(id__startswith='S')
+			elif self.A == 5:
+				return student.enrollments_in(year)
 		# return bool(self.aL[self.A](self,student.enrollments_before(year)))
 	def enroll(self, student, year):
 		course = Courses.fetch(tradition=self, year=year)

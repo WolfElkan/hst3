@@ -86,7 +86,7 @@ class DayOfWeek(object):
 		self.field = field
 		return str(self)
 	def set(self, thing, field, post, isAttr):
-		value = self.parse(post[field]) + 1 # I cannot for the life of me figure out why the +1 is necessary.  But for now, it works.
+		value = self.parse(post[field]) # I cannot for the life of me figure out why the +1 is necessary.  But for now, it works.
 		if isAttr:
 			thing.__setattr__(field, value)
 		else:

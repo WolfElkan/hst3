@@ -63,6 +63,12 @@ Courses = CourseManager()
 class EnrollmentManager(sm.SuperManager):
 	def __init__(self):
 		super(EnrollmentManager, self).__init__('program_enrollment')
+	def create(self, **kwargs):
+		already = self.fetch(**kwargs)
+		if already:
+			return already
+		else:
+			return super(EnrollmentManager, self).create(**kwargs)
 Enrollments = EnrollmentManager()
 
 class AuditionManager(sm.SuperManager):

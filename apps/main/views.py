@@ -380,8 +380,8 @@ def reg_courses_get(request, **kwargs):
 		current_student = me.owner.student_set.fetch(id=current_id)
 		if not current_student:
 			return redirect('/')
-	reg_year = 2017
-	courses = Courses.filter(year=reg_year).order_by('tradition__order')
+	reg_year = 2017 if DEV else year()
+	courses = Courses.filter(year=reg_year,tradition__e=True).order_by('tradition__order')
 	context = {
 		'reg_year': reg_year,
 		'family'  : me.owner,
@@ -390,7 +390,11 @@ def reg_courses_get(request, **kwargs):
 		'courses' : courses,
 		'eligcss' : equip(courses, lambda course: course.eligcss(current_student), attr='cureligcss'),
 		'cart'    : equip(me.owner.enrollments_in(reg_year), lambda enr: enr.course.eligcss(enr.student), attr='eligcss'),
-		'tuition_total':me.owner.tuition_total_in(reg_year),
+		'tuition' : {
+			'total' : me.owner.total_tuition_in(reg_year),
+			'paid'  : me.owner.paid_tuition_in(reg_year),
+			'unpaid': me.owner.unpaid_tuition_in(reg_year),
+		},
 		'volunteer_total':me.owner.volunteer_total_in(reg_year),
 	}
 	return render(request, 'register/toggle_courses.html', context)
@@ -400,6 +404,13 @@ def reg_courses_enroll(request, **kwargs):
 	student = Students.fetch(id=student_id)
 	course = Courses.fetch(id=request.GET['course_id'])
 	if course.eligible(student):
+		if course.prepaid:
+			Ktrad = CourseTrads.fetch(id__startswith='K',id__endswith=course.show[1])
+			Kid = course.id[0:2]+Ktrad.id
+			K = Courses.create_by_id(Kid)
+			prepaid = Enrollments.fetch(student__family=student.family, course=K)
+			if not prepaid:
+				Enrollments.create(student=student, course=K)
 		Enrollments.create(course=course, student=student)
 	return redirect('/register/student/{}/'.format(student_id))
 
@@ -416,6 +427,18 @@ def reg_courses_drop(request, **kwargs):
 	student = Students.fetch(id=student_id)
 	course = Courses.fetch(id=request.GET['course_id'])
 	Enrollments.filter(course=course, student=student).delete()
+	if course.prepaid:
+		other = Enrollments.filter(
+			student__family=student.family, 
+			course__tradition__prepaid=True, 
+			course__tradition__show=course.show
+		)
+		if not other:
+			Ktrad = CourseTrads.fetch(id__startswith='K',id__endswith=course.show[1])
+			K = Courses.fetch(year=course.year, tradition=Ktrad)
+			prepaid = Enrollments.fetch(student__family=student.family, course=K)
+			if prepaid:
+				prepaid.delete()
 	return redirect('/register/student/{}/'.format(student_id))
 
 
