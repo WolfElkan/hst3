@@ -416,8 +416,8 @@ def reg_courses_enroll(request, **kwargs):
 	student_id = kwargs['id'] if 'id' in kwargs else 0
 	student = Students.fetch(id=student_id)
 	course = Courses.fetch(id=request.GET['course_id'])
-	if course.eligible(student):
-		if course.prepaid:
+	if course.eligible(student)['now']:
+		if course.prepaid and not DEV:
 			Ktrad = CourseTrads.fetch(id__startswith='K',id__endswith=course.show[1])
 			Kid = course.id[0:2]+Ktrad.id
 			K = Courses.create_by_id(Kid)
@@ -431,7 +431,7 @@ def reg_courses_audition(request, **kwargs):
 	student_id = kwargs['id'] if 'id' in kwargs else 0
 	student = Students.fetch(id=student_id)
 	course = Courses.fetch(id=request.GET['course_id'])
-	if course.audible(student):
+	if course.eligible(student)['aud']:
 		Enrollments.create(course=course, student=student, isAudition=True)
 	return redirect('/register/student/{}/'.format(student_id))
 

@@ -213,17 +213,9 @@ class Course(models.Model):
 	def __str__(self):
 		return self.title+' ('+str(self.year)+')'
 	def eligible(self, student):
-		# elig = self.tradition.eligible(student, self.year)
-		# elig['css'] = 'eligible'
-		# return "conflict"
-		# return "eligible"
-		# return "need_aud"
-		# return "need_cur"
-		# return "not_elig"
 		elig = {
 			'now':False,
 			'aud':False,
-			'cur':False,
 		}
 		enrollment = Enrollments.fetch(course=self, student=student)
 		if enrollment:
@@ -236,25 +228,51 @@ class Course(models.Model):
 			else:
 				elig['reason'] = '{} is registered for {} pending tuition payment'
 				elig['css'] = "need_pay"
+
+		# Check if not eligible under any circumstances
+		elif not self.tradition.check_eligex(student, self.year, aud=True, cur=True):
+			
+			# not_elig
+			elig['reason'] = '{} is not eligible for {}'
+			elig['css'] = "not_elig"
+
+		# Check for conflicts
 		elif any(Each(student.courses_in(self.year)).conflicts_with(self)):
+
+			# conflict
 			elig['reason'] = '{} is in another class at the same time as {}'
 			elig['css'] = "conflict"
+		
+		# Check if eligible now
 		elif self.tradition.check_eligex(student, self.year):
+
+			# eligible
 			elig['reason'] = '{} is eligible to register for {}'
 			elig['css'] = "eligible"
 			elig['now'] = True
+
+		# Check if eligible with audition
 		elif self.tradition.check_eligex(student, self.year, aud=True):
+
+			# need_aud
 			elig['reason'] = '{} is eligible to audition for {}'
 			elig['css'] = "need_aud"
 			elig['aud'] = True
-		elif self.tradition.check_eligex(student, self.year, aud=True, cur=True):
+
+		# Check if eligible with current enrollment
+		elif self.tradition.check_eligex(student, self.year, cur=True):
+
+			# need_cur
 			elig['reason'] = '{} will be eligible for {} once {} enrolls in at least 1 other class'
 			elig['css'] = "need_cur" 
-			elig['cur'] = True
-		else:
-			elig['reason'] = '{} is {} for {}'.format(student, 'not eligible', self.title)
-			elig['css'] = "not_elig"
-		elig['reason'] = elig['reason'].format(student, self.title, 'he' if student.sex is 'M' else 'she')
+
+		elif self.tradition.check_eligex(student, self.year, cur=True):
+
+			# need_cur (Same css, only reason is different)
+			elig['reason'] = '{} will be eligible to audition for {} once {} enrolls in at least 1 other class'
+			elig['css'] = "need_cur" 
+
+		elig['reason'] = elig['reason'].format(student, self.title, 'he' if student.sex == 'M' else 'she')
 		return elig
 	def enroll(self, student):
 		if self.eligible(student):
