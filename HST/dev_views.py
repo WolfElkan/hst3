@@ -17,6 +17,8 @@ CourseTrads = CourseTrad.objects
 Courses     = Course.objects
 Enrollments = Enrollment.objects
 
+from Utils.snippets import order_coursetrads
+
 def check_en(student, course):
 	print '{} is {}eligible for {}'.format(student,'' if student.eligible(course) else 'not ',course)
 

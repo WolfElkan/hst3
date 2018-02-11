@@ -13,7 +13,9 @@ def route_get(request):
 	return render(request, 'route.html', context)
 def route_post(request):
 	return redirect('/route')
-	
+
+from apps.program.managers import CourseTrads
+
 orders = [
 	{'id':"AA",'order': 10},
 	{'id':"AB",'order': 20},
@@ -76,9 +78,9 @@ orders = [
 	{'id':"WN",'order':153},
 	{'id':"WW",'order':154},
 ]
-
-for o in orders:
-	q = CourseTrads.fetch(id=o['id'])
-	if q:
-		q.order = o['order']
-		q.save()
+def order_coursetrads():
+	for o in orders:
+		q = CourseTrads.fetch(id=o['id'])
+		if q:
+			q.order = o['order']
+			q.save()

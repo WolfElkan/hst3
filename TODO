@@ -24,6 +24,10 @@ X	family.children gets them in age order
 
 	Course Interface
 		Click anywhere on a tab
+		ELIGEX:
+			Conflicts
+			J1 should only need audition for 8-year-olds
+			C2 cur kwarg is buggy
 
 program
 	Models
@@ -42,6 +46,8 @@ reports
 Utils
 X	namecase
 	Clean up hacks.py
+
+Replace equip() with .annotate() (https://docs.djangoproject.com/en/2.0/ref/models/querysets/#annotate)
 
 Add audition level for audition required, but no prereqs for audition, assign C2 that level
 

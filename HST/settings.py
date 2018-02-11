@@ -98,6 +98,7 @@ DATABASES = {
             'charset': 'utf8mb4'
         },
     },
+    # 'postgres': {},
 }
 
 # Password validation

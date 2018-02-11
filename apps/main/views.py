@@ -370,6 +370,9 @@ def reg_courses(request, **kwargs):
 	else:
 		return HttpResponse("Unrecognized HTTP Verb")
 
+def hours_worked(family):
+	return 0
+
 def reg_courses_get(request, **kwargs):
 	me = getme(request)
 	if not me or not me.owner or not me.owner.children:
@@ -382,20 +385,30 @@ def reg_courses_get(request, **kwargs):
 			return redirect('/')
 	reg_year = year()
 	courses = Courses.filter(year=reg_year,tradition__e=True).order_by('tradition__order')
+	cart = me.owner.enrollments_in(reg_year)
+	volunteer_total = me.owner.volunteer_total_in(reg_year)
 	context = {
 		'reg_year': reg_year,
 		'family'  : me.owner,
-		'students': me.owner.children,
+		'students': equip(me.owner.children, lambda student: student.hst_age_in(reg_year), attr='age'),
 		'current_student' : current_student,
-		'courses' : courses,
-		'eligcss' : equip(courses, lambda course: course.eligcss(current_student), attr='cureligcss'),
-		'cart'    : equip(me.owner.enrollments_in(reg_year), lambda enr: enr.course.eligcss(enr.student), attr='eligcss'),
+		'courses' : equip(courses, lambda course: course.eligible(current_student), attr='elig'),
+		'cart'    : equip(cart, lambda enr: enr.course.eligible(enr.student), attr='elig'),
+		'nCourses': {
+			'total' : len(cart),
+			'paid'  : len(cart.filter(paid=True)),
+			'unpaid': len(cart.filter(paid=False)),
+		},
+		'hours' : {
+			'total' : volunteer_total,
+			'paid'  : hours_worked(me.owner),
+			'unpaid': volunteer_total - hours_worked(me.owner),
+		},
 		'tuition' : {
 			'total' : me.owner.total_tuition_in(reg_year),
 			'paid'  : me.owner.paid_tuition_in(reg_year),
 			'unpaid': me.owner.unpaid_tuition_in(reg_year),
 		},
-		'volunteer_total':me.owner.volunteer_total_in(reg_year),
 	}
 	return render(request, 'register/toggle_courses.html', context)
 

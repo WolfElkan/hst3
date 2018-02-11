@@ -179,7 +179,7 @@ class Student(models.Model):
 		return Enrollments.filter(student=self, isAudition=True)
 	def auditions_in(self, in_year):
 		return Enrollments.filter(student=self, isAudition=True, course__year=in_year)
-	def courses(self): # TODO: Use a DB join statement instead
+	def courses(self): # TODO: Use a DB join statement instead # As if I know how to do that
 		qset = []
 		for enrollment in self.enrollments:
 			qset.append(Courses.get(id=enrollment.course_id))

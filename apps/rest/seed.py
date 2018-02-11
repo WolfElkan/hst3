@@ -159,12 +159,12 @@ def dump(request):
 				'max_age'  : ct.max_age,
 				'min_grd'  : ct.min_grd,
 				'max_grd'  : ct.max_grd,
+				'prereqs'  : ct.prereqs,
 				'tuition'  : float(ct.tuition),
 				'redtuit'  : float(ct.redtuit),
 				'vol_hours': ct.vol_hours,
 				'the_hours': ct.the_hours,
 				'prepaid'  : ct.prepaid,
-				'M': ct.M, 'F': ct.F, 'C': ct.C, 'I': ct.I, 'A': ct.A,
 			})
 		else:
 			data['coursetrads'].append({
