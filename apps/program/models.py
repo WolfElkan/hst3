@@ -102,11 +102,11 @@ class CourseTrad(models.Model):
 		for x in matches:
 			if x[1]:
 				kwargs['eligex'] = x[1]
-				kwargs['conj'] = True
 				result = self.check_eligex(student, year, **kwargs)
 				result = not result if x[0] else result
 			elif x[3]:
 				kwargs['eligex'] = x[3]
+				kwargs['conj'] = False
 				result = self.check_eligex(student, year, **kwargs)
 				result = not result if x[2] else result
 			elif x[5]:
@@ -140,9 +140,9 @@ class CourseTrad(models.Model):
 			}
 			if '*' not in word:
 				query['course__tradition__id'] = word[0:2]
-			elif word[0] is not '*':
+			elif word[0] != '*':
 				query['course__tradition__id__startswith'] = word[0]
-			elif word[1] is not '*':
+			elif word[1] != '*':
 				query['course__tradition__id__endswith'] = word[1]
 			if 'c' in word:
 				if kwargs['cur']:
@@ -274,6 +274,8 @@ class Course(models.Model):
 
 		elig['reason'] = elig['reason'].format(student, self.title, 'he' if student.sex == 'M' else 'she')
 		return elig
+	def check_eligex(self, student, **kwargs):
+		return self.tradition.check_eligex(student, self.year, **kwargs)
 	def enroll(self, student):
 		if self.eligible(student):
 			return Enrollments.create(course=self, student=student)
@@ -287,9 +289,9 @@ class Course(models.Model):
 			return False
 		elif self.day != other.day:
 			return False
-		elif self.end < other.start:
+		elif self.end <= other.start:
 			return False
-		elif self.start > other.end:
+		elif self.start >= other.end:
 			return False
 		else:
 			return True

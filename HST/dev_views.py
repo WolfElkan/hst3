@@ -47,6 +47,7 @@ def clearthedatabaselikeanuclearbombandthisnameisverylongsoyoudontcallitbymistak
 	Students.all().delete()
 	Parents.all().delete()
 	Addresses.all().delete()
+	Courses.all().delete()
 	# request.session.clear()
 	print '\n\n'+' '*34+'THE RADIANCE OF A THOUSAND SUNS'+'\n\n'
 	return redirect ('/hot')

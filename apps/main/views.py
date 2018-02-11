@@ -371,7 +371,7 @@ def reg_courses(request, **kwargs):
 		return HttpResponse("Unrecognized HTTP Verb")
 
 def hours_worked(family):
-	return 0
+	return 0.0
 
 def reg_courses_get(request, **kwargs):
 	me = getme(request)

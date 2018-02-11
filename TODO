@@ -11,6 +11,7 @@ X	Make registration landing page redirect to appropriate step if family has part
 X		(eventually) Support loading existing students from database for editing, track by internal id's
 		Make titles of required fields bold automatically
 		Support date field on other browsers
+		BUG: Dynamic methods not being applied when elements are saved
 
 	Parent Interface
 		Make validations work
@@ -26,8 +27,9 @@ X	family.children gets them in age order
 		Click anywhere on a tab
 		ELIGEX:
 		X	Conflicts
-			J1 should only need audition for 8-year-olds
-			C2 cur kwarg is buggy
+		X	J1 should only need audition for 8-year-olds
+		X	C2 cur kwarg is buggy
+		X	Troupes should not let students audition if they haven't taken actinf
 
 program
 	Models
@@ -59,3 +61,4 @@ Questions:
 	What did we decide about login by email?
 	Antimony protocol?
 	Broadway dance courses? (JB or Z2)
+	Do you want to be able to schedule when enrollment for a course opens?

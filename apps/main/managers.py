@@ -60,9 +60,8 @@ class StudentManager(sm.SuperManager):
 			sm.Regular('alt_email',r'^$|(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)','Please enter a valid email address, or leave blank to use family email.'),
 		]
 	def create(self, **kwargs):
-		for field in ['first','middle','alt_first','alt_last']:
-			if field in kwargs:
-				kwargs[field] = namecase(kwargs[field])
+		if 'alt_last' in kwargs:
+			kwargs['alt_last'] = namecase(kwargs['alt_last'])
 		return super(StudentManager, self).create(**kwargs)
 Students = StudentManager()
 

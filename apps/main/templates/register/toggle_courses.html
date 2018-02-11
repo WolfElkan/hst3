@@ -99,7 +99,7 @@
 		<div class="student_menu">
 			{% for student in students %}
 			<div class="tab{% if student.id|add:0 == current_student.id|add:0 %} selected_tab {% endif %}">
-				<a href="/register/student/{{student.id}}/">{{student.prefer}} ({{student.age}})</a>
+				<a href="/register/student/{{student.id}}/">{{student.prefer}} <!-- ({{student.age}}) --></a>
 			</div>
 			{% endfor %}
 		</div>
