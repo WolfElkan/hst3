@@ -184,6 +184,11 @@ class Student(models.Model):
 		for enrollment in self.enrollments:
 			qset.append(Courses.get(id=enrollment.course_id))
 		return qset
+	def courses_in(self, in_year): 
+		qset = []
+		for enrollment in self.enrollments_in(in_year):
+			qset.append(Courses.get(id=enrollment.course_id))
+		return qset
 	def courses_toggle_enrollments(self):
 		qset = []
 		for enrollment in self.enrollments:

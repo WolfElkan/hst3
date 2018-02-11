@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 from django.db import models
 from Utils import custom_fields as custom
 from Utils import supermodel as sm
-from Utils.hacks import sub
+from Utils.hacks import sub, Each
 from django_mysql import models as sqlmod
 from .managers import CourseTrads, Courses, Enrollments
 Q = models.Q
@@ -234,38 +234,27 @@ class Course(models.Model):
 				elig['reason'] = '{} has successfully enrolled in {}'.format(student, self)
 				elig['css'] = "enrolled"
 			else:
-				elig['reason'] = '{} is registered for {} pending tuition payment'.format(student, self)
+				elig['reason'] = '{} is registered for {} pending tuition payment'
 				elig['css'] = "need_pay"
-			return elig
-		# overlapQ = Q(
-		# 	Q(course__tradition__start__gte=self.start, course__tradition__end__lte=self.end) |
-		# 	Q(course__tradition__start__lte=self.end, course__tradition__end__gte=self.start) |
-		# 	Q(course__tradition__start__gte=self.start, course__tradition__start__lte=self.end) 
-		# )
-		# conflicts = Enrollments.filter(
-		# 	overlapQ,
-		# 	student=student,
-		# 	course__year=self.year,
-		# 	course__tradition__day=self.day,
-		# )
-		# if conflicts:
-		# 	if ELG:
-		# 		print '{} is in another class at the same time as {}'.format(student, self)
-			# return "conflict" # The student is registered for another class at the same time as this one
+		elif any(Each(student.courses_in(self.year)).conflicts_with(self)):
+			elig['reason'] = '{} is in another class at the same time as {}'
+			elig['css'] = "conflict"
 		elif self.tradition.check_eligex(student, self.year):
 			elig['reason'] = '{} is eligible to register for {}'
-			elig['css'] = "eligible" 
+			elig['css'] = "eligible"
+			elig['now'] = True
 		elif self.tradition.check_eligex(student, self.year, aud=True):
 			elig['reason'] = '{} is eligible to audition for {}'
 			elig['css'] = "need_aud"
 			elig['aud'] = True
 		elif self.tradition.check_eligex(student, self.year, aud=True, cur=True):
-			elig['reason'] = '{} will be eligible for {} once they enroll in at least 1 other class'
+			elig['reason'] = '{} will be eligible for {} once {} enrolls in at least 1 other class'
 			elig['css'] = "need_cur" 
 			elig['cur'] = True
 		else:
-			elig['reason'] = '{} does not meet the requirements for {}'
-			elig['css'] = "not_elig" 
+			elig['reason'] = '{} is {} for {}'.format(student, 'not eligible', self.title)
+			elig['css'] = "not_elig"
+		elig['reason'] = elig['reason'].format(student, self.title, 'he' if student.sex is 'M' else 'she')
 		return elig
 	def enroll(self, student):
 		if self.eligible(student):
@@ -275,6 +264,17 @@ class Course(models.Model):
 	def audition(self, student):
 		if self.audible(student):
 			return Enrollments.create(course=self, student=student, isAudition=True)
+	def conflicts_with(self, other):
+		if self.year != other.year:
+			return False
+		elif self.day != other.day:
+			return False
+		elif self.end < other.start:
+			return False
+		elif self.start > other.end:
+			return False
+		else:
+			return True
 	def __getattribute__(self, field):
 		if field in ['students_toggle_enrollments','students','enrollments']:
 			call = super(Course, self).__getattribute__(field)

@@ -71,6 +71,10 @@ class DayOfWeek(object):
 		return self.long
 	def __int__(self):
 		return self.value
+	def __eq__(self, other):
+		return type(other) is DayOfWeek and self.value == other.value
+	def __ne__(self, other):
+		return type(other) is not DayOfWeek or self.value != other.value
 	def __json__(self):
 		return self.short
 	def widget(self, field, value):

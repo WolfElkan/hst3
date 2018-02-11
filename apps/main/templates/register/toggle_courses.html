@@ -114,7 +114,7 @@
 				<th>Hours</th>
 			</thead>
 			{% for course in courses %}
-			<tr class="{{course.elig.css}}">
+			<tr class="{{course.elig.css}}" title="{{course.elig.reason}}">
 					<td class="center">
 						<form class="enroll" action="enroll/">
 							<input type="hidden" name="course_id" value="{{course.id}}">
