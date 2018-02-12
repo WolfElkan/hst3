@@ -192,6 +192,11 @@ class Checkbox(object):
 			thing.__setitem__(field, value)
 		return thing
 
+class NullBoolean(Enum):
+	def __init__(self):
+		super(NullBoolean, self).__init__(options=['-','No','Yes'])
+		
+
 class Date(object):
 	def __init__(self, **kwargs):
 		if TRACE:
@@ -248,15 +253,15 @@ class Time(object):
 			thing.__setitem__(field, str(value) if value else '00:00')
 		return thing
 
-class Price(object):
+class Dollar(object):
 	def __init__(self, **kwargs):
 		if TRACE:
-			print '* rest.widgets.Price'
+			print '* rest.widgets.Dollar'
 		self.field = kwargs['field'] if 'field' in kwargs else None
 		self.default = kwargs['default'] if 'default' in kwargs else 0.00
 	def widget(self, field, value):
 		if TRACE:
-			print '# rest.widgets.Price:widget'
+			print '# rest.widgets.Dollar:widget'
 		if value:
 			value = float(value)
 		else:
@@ -264,7 +269,7 @@ class Price(object):
 		return '<input type="number" step="0.01" name="{}" value="{:.2f}">'.format(field, value)
 	def static(self, field, value):
 		if TRACE:
-			print '# rest.widgets.Price:static'
+			print '# rest.widgets.Dollar:static'
 		if value:
 			value = float(value)
 			return '<div>${:.2f}</div>'.format(value)
@@ -272,7 +277,7 @@ class Price(object):
 			return '<div>$0.00</div>'
 	def set(self, thing, field, post, isAttr):
 		if TRACE:
-			print '# rest.widgets.Price:set'
+			print '# rest.widgets.Dollar:set'
 		if field in post:
 			value = post[field]
 		else:

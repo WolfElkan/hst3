@@ -407,7 +407,7 @@ def reg_courses_get(request, **kwargs):
 		'tuition' : {
 			'total' : me.owner.total_tuition_in(reg_year),
 			'paid'  : me.owner.paid_tuition_in(reg_year),
-			'unpaid': me.owner.unpaid_tuition_in(reg_year),
+			'unpaid': me.owner.total_tuition_in(reg_year) - me.owner.paid_tuition_in(reg_year),
 		},
 	}
 	return render(request, 'register/toggle_courses.html', context)
@@ -417,7 +417,7 @@ def reg_courses_enroll(request, **kwargs):
 	student = Students.fetch(id=student_id)
 	course = Courses.fetch(id=request.GET['course_id'])
 	if course.eligible(student)['now']:
-		if course.prepaid and not DEV:
+		if course.prepaid:
 			Ktrad = CourseTrads.fetch(id__startswith='K',id__endswith=course.show[1])
 			Kid = course.id[0:2]+Ktrad.id
 			K = Courses.create_by_id(Kid)
@@ -444,7 +444,8 @@ def reg_courses_drop(request, **kwargs):
 		other = Enrollments.filter(
 			student__family=student.family, 
 			course__tradition__prepaid=True, 
-			course__tradition__show=course.show
+			course__tradition__show=course.show,
+			course__year=year()
 		)
 		if not other:
 			Ktrad = CourseTrads.fetch(id__startswith='K',id__endswith=course.show[1])

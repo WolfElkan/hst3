@@ -29,7 +29,12 @@ X	family.children gets them in age order
 		X	Conflicts
 		X	J1 should only need audition for 8-year-olds
 		X	C2 cur kwarg is buggy
-		X	Troupes should not let students audition if they haven't taken actinf
+		X	Troupes should not let students audition if they haven't taken acting
+
+admin
+	figure out a name for admin app that doesn't clash with django
+	Audition Result Interface
+		GA is weird
 
 program
 	Models
@@ -45,6 +50,11 @@ reports
 		create timeless version
 		show only current students in annual version
 
+payment
+	create app
+	Invoice payment
+	~Link with PayPal
+
 Utils
 X	namecase
 	Clean up hacks.py
@@ -54,6 +64,7 @@ Replace equip() with .annotate() (https://docs.djangoproject.com/en/2.0/ref/mode
 Add audition level for audition required, but no prereqs for audition, assign C2 that level
 
 Remove Unnecessary imports
+Track down phantom print statements
 
 X	Delete Auditions table.  Integrate with Enrollments
 

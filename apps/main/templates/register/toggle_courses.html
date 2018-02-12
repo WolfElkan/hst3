@@ -22,22 +22,22 @@
 		border: solid black 1px;
 		border-top-left-radius: 10px;
 		border-top-right-radius: 10px;
-		border-bottom: solid;
+		border-bottom: solid black;
 		text-align: center;
 		padding: 5px;
+		text-decoration: none;
 		width: calc(100% / {{students|length}} - 12px)
 	}
-	.tab a {
+	.tab div {
 		color: black;
-		text-decoration: none;
 	}
 	.selected_tab {
 		border-bottom: solid white;
+		text-decoration: none;
 	}
-	.selected_tab a {
+	.selected_tab div {
 		font-weight: bold;
 		color: black;
-		text-decoration: none;
 	}
 	.course_menu {
 		border: solid;
@@ -71,6 +71,10 @@
 		.eligible form.enroll button {display: inline;}
 	.audition {background-color: #8af}
 		.audition form.drop button {display: inline;}
+		#cart .audition td:nth-child(4) {
+			color: gray;
+			font-style: italic;
+		}
 	.enrolled {background-color: #8f8}
 		/*.enrolled form.drop button {display: inline;}*/
 	.need_pay {background-color: #ff8}
@@ -90,6 +94,7 @@
 		display: block;
 	}
 
+	.legend {display: none;}
 	.legend td:nth-child(2) {
 		font-family: monospace;
 	}
@@ -98,9 +103,9 @@
 	<div class="pane">
 		<div class="student_menu">
 			{% for student in students %}
-			<div class="tab{% if student.id|add:0 == current_student.id|add:0 %} selected_tab {% endif %}">
-				<a href="/register/student/{{student.id}}/">{{student.prefer}} <!-- ({{student.age}}) --></a>
-			</div>
+			<a href="/register/student/{{student.id}}/" class="tab{% if student.id|add:0 == current_student.id|add:0 %} selected_tab {% endif %}">
+			<div>{{student.prefer}} <!-- ({{student.age}}) --></div>
+			</a>
 			{% endfor %}
 		</div>
 		<div class="course_menu">

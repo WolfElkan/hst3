@@ -247,7 +247,7 @@ class Course(models.Model):
 		elif self.tradition.check_eligex(student, self.year):
 
 			# eligible
-			elig['reason'] = '{} is eligible to register for {}'
+			elig['reason'] = '{} is eligible for {}'
 			elig['css'] = "eligible"
 			elig['now'] = True
 
@@ -323,7 +323,7 @@ class Enrollment(models.Model):
 		return str(self.student) + (' as '+self.role if self.role else '') + ' in ' + str(self.course)
 	# def __getattribute__(self, field):
 	# 	if field in []:
-	# 		function = super(Enrollment, self).__getattribute__(field)
-	# 		return function()
+	# 		call = super(Enrollment, self).__getattribute__(field)
+	# 		return call()
 	# 	else:
 	# 		return super(Enrollment, self).__getattribute__(field)

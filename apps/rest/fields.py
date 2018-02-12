@@ -1,4 +1,4 @@
-from .widgets import VarChar, Integer, Enum, Radio, Checkbox, Date, Time, Price, ForeignKey, ForeignSet, ToggleSet
+from .widgets import VarChar, Integer, Enum, Radio, Checkbox, Date, Time, Dollar, ForeignKey, ForeignSet, ToggleSet, NullBoolean
 from Utils.custom_fields import Bcrypt, PhoneNumber, ZipCode, DayOfWeek
 from trace import TRACE
 if TRACE:
@@ -51,8 +51,8 @@ FIELDS = {
 		{'field':'title'     , 'template': VarChar(maxlength=50)},
 		# {'field':'e'         , 'template': Checkbox(suffix='This is a real (and currently offered) course that may be enrolled in, not a student group for admin purposes')},
 		# {'field':'day'       , 'template': DayOfWeek()},
-		# {'field':'start'     , 'template': Time()},
-		# {'field':'end'       , 'template': Time()},
+		{'field':'start'     , 'template': Time()},
+		{'field':'end'       , 'template': Time()},
 		# {'field':'nMeets'    , 'template': Integer()},
 		# {'field':'show'      , 'template': VarChar(maxlength=2)},
 		# {'field':'vs'        , 'template': Checkbox(suffix='This class performs in the Variety Show')},
@@ -61,8 +61,8 @@ FIELDS = {
 		{'field':'min_grd'   , 'template': Integer(default= 3)},
 		{'field':'max_grd'   , 'template': Integer(default=12)},
 		{'field':'prereqs'   , 'template': VarChar()},
-		# {'field':'tuition'   , 'template': Price()},
-		# {'field':'redtuit'   , 'template': Price()},
+		# {'field':'tuition'   , 'template': Dollar()},
+		# {'field':'redtuit'   , 'template': Dollar()},
 		# {'field':'vol_hours' , 'template': Integer()},
 		# {'field':'the_hours' , 'template': Integer()},
 		# {'field':'prepaid'   , 'template': Checkbox(suffix='Families must purchase 10 prepaid tickets for $100, not included in tuition')},
@@ -71,7 +71,7 @@ FIELDS = {
 	'course'    : [
 		{'field':'year'      , 'template': Integer()},
 		{'field':'last_date' , 'template': Date()},
-		{'field':'tuition'   , 'template': Price()},
+		{'field':'tuition'   , 'template': Dollar()},
 		{'field':'vol_hours' , 'template': Integer()},
 		{'field':'the_hours' , 'template': Integer()},
 		{'field':'prepaid'   , 'template': Checkbox()},
@@ -85,5 +85,7 @@ FIELDS = {
 		{'field':'course'    , 'template': ForeignKey(model='course')},
 		{'field':'role'      , 'template': VarChar()},
 		{'field':'role_type' , 'template': Enum(options=['','Chorus','Support','Lead'])},
+		{'field':'isAudition', 'template': Checkbox()},
+		{'field':'success'   , 'template': NullBoolean()},
 	],
 }

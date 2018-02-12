@@ -27,6 +27,8 @@ class BcryptField(models.Field):
 	def db_type(self, connection):
 		if connection.settings_dict['ENGINE'] == 'django.db.backends.mysql':
 			return 'CHAR(60)'
+		elif connection.settings_dict['ENGINE'] == 'django.db.backends.postgresql':
+			return 'CHARACTER(60)'
 		else:
 			return 'CHAR(60)' # TODO: Figure out equivalent field in other db softwares
 	def pre_save(self, model_instance, add):
@@ -172,6 +174,7 @@ class PhoneNumberField(models.DecimalField):
 	def from_db_value(self, value, col, wrapper, options):
 		return PhoneNumber(value)
 
+
 class ZipCode(object):
 	def __init__(self, *value):
 		self.field = None
@@ -226,6 +229,51 @@ class ZipCodeField(models.DecimalField):
 	def from_db_value(self, value, col, wrapper, options):
 		return ZipCode(value)
 
+
+class Dollar(object):
+	def __init__(self, **kwargs):
+		if TRACE:
+			print '* rest.widgets.Dollar'
+		self.field = kwargs['field'] if 'field' in kwargs else None
+		self.default = kwargs['default'] if 'default' in kwargs else 0.00
+	def widget(self, field, value):
+		if TRACE:
+			print '# rest.widgets.Dollar:widget'
+		if value:
+			value = float(value)
+		else:
+			value = 0
+		return '<input type="number" step="0.01" name="{}" value="{:.2f}">'.format(field, value)
+	def static(self, field, value):
+		if TRACE:
+			print '# rest.widgets.Dollar:static'
+		if value:
+			value = float(value)
+			return '<div>${:.2f}</div>'.format(value)
+		else:
+			return '<div>$0.00</div>'
+	def set(self, thing, field, post, isAttr):
+		if TRACE:
+			print '# rest.widgets.Dollar:set'
+		if field in post:
+			value = post[field]
+		else:
+			value = self.default
+		if isAttr:
+			thing.__setattr__(field, str(value) if value else 0.00)
+		else:
+			thing.__setitem__(field, str(value) if value else 0.00)
+		return thing
+
+class DollarField(models.DecimalField):
+	def __init__(self):
+		super(DollarField, self).__init__()
+	def db_type(self, connection):
+		if connection.settings_dict['ENGINE'] == 'django.db.backends.postgresql':
+			return 'MONEY'
+		else:
+			return super(DollarField, self).db_type(connection)
+		
 
 class PolymorphicField(poly.MultiColumnField):
 	def __init__(self, attname, manager, relatables):

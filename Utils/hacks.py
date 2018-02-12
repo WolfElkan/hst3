@@ -124,7 +124,7 @@ def sub(val, dic):
 from datetime import datetime
 def year():
 	if DEV:
-		return 2018
+		return 2007
 	now = datetime.now()
 	return now.year + (0 if now.month < 5 else 1)
 
