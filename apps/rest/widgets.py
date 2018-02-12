@@ -253,41 +253,6 @@ class Time(object):
 			thing.__setitem__(field, str(value) if value else '00:00')
 		return thing
 
-class Dollar(object):
-	def __init__(self, **kwargs):
-		if TRACE:
-			print '* rest.widgets.Dollar'
-		self.field = kwargs['field'] if 'field' in kwargs else None
-		self.default = kwargs['default'] if 'default' in kwargs else 0.00
-	def widget(self, field, value):
-		if TRACE:
-			print '# rest.widgets.Dollar:widget'
-		if value:
-			value = float(value)
-		else:
-			value = 0
-		return '<input type="number" step="0.01" name="{}" value="{:.2f}">'.format(field, value)
-	def static(self, field, value):
-		if TRACE:
-			print '# rest.widgets.Dollar:static'
-		if value:
-			value = float(value)
-			return '<div>${:.2f}</div>'.format(value)
-		else:
-			return '<div>$0.00</div>'
-	def set(self, thing, field, post, isAttr):
-		if TRACE:
-			print '# rest.widgets.Dollar:set'
-		if field in post:
-			value = post[field]
-		else:
-			value = self.default
-		if isAttr:
-			thing.__setattr__(field, str(value) if value else 0.00)
-		else:
-			thing.__setitem__(field, str(value) if value else 0.00)
-		return thing
-
 class ForeignKey(object):
 	def __init__(self, **kwargs):
 		if TRACE:

@@ -1,5 +1,5 @@
-from .widgets import VarChar, Integer, Enum, Radio, Checkbox, Date, Time, Dollar, ForeignKey, ForeignSet, ToggleSet, NullBoolean
-from Utils.custom_fields import Bcrypt, PhoneNumber, ZipCode, DayOfWeek
+from .widgets import VarChar, Integer, Enum, Radio, Checkbox, Date, Time, ForeignKey, ForeignSet, ToggleSet, NullBoolean
+from Utils.custom_fields import Bcrypt, PhoneNumber, ZipCode, DayOfWeek, Dollar
 from trace import TRACE
 if TRACE:
 	print '~ FIELDS'

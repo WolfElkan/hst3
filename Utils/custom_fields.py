@@ -6,6 +6,7 @@ from .hacks import get as _
 from . import gistfile1 as poly
 from datetime import datetime
 from decimal import Decimal
+from trace import TRACE
 
 class Bcrypt(object):
 	def __init__(self, char60):
