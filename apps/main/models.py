@@ -253,11 +253,12 @@ class User(models.Model):
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
 	rest_model = "user"
+	hid = NotImplemented
 	objects = Users
 	def __str__(self):
 		return self.username
-	def __getattribute__(self, field):
-		if field == 'pw':
-			return custom.Bcrypt(super(User, self).__getattribute__('password'))
-		else:
-			return super(User, self).__getattribute__(field)
+	# def __getattribute__(self, field):
+	# 	if field == 'pw':
+	# 		return custom.Bcrypt(super(User, self).__getattribute__('password'))
+	# 	else:
+	# 		return super(User, self).__getattribute__(field)

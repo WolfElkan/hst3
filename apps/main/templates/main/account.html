@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>HST | My Account</title>
+	<style type="text/css">
+		.mono {
+			font-family: monospace;
+			font-size: 120%;
+		}
+	</style>
+</head>
+<body>
+	<h1>Account Info</h1>
+	<table>
+		<tr>
+			<td>Username:</td>
+			<td class="mono">{{me.username}}</td>
+		</tr>
+		<tr>
+			<td>User ID:</td>
+			<td class="mono">{{me.id}}</td>
+		</tr>
+		<tr>
+			<td>User HID:</td>
+			<td class="mono">{{me.hid}}</td>
+		</tr>
+		<tr>
+			<td>Password:</td>
+			<td>{{password|safe}} <a href="/changepassword">Change</a></td>
+		</tr>
+		<tr>
+			<td>Account Type:</td>
+			<td>{{me.owner.rest_model|title}}</td>
+		</tr>
+		<tr>
+			<td>Permission Level:</td>
+			<td>{{me.get_permission_display}}</td>
+		</tr>
+		<tr>
+			<td>Account Owner:</td>
+			<td>{{me.owner}}</td>
+		</tr>
+	</table>
+</body>
+</html>

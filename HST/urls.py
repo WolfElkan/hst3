@@ -33,6 +33,9 @@ urlpatterns = [
 
 	url(r'^login/?$', main.login),
 	url(r'^logout/?$', main.logout),
+	url(r'^myaccount/?$', main.account),
+
+	url(r'^changepassword/?$', main.changepassword),
 	
 	url(r'^register/?$', main.reg),
 	url(r'^register/familyinfo/?$', main.reg_familyinfo),

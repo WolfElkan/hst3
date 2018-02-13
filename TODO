@@ -73,5 +73,8 @@ Questions:
 	Student height?
 	Antimony protocol?
 	Broadway dance courses? (JB or Z2)
-	Do you want to be able to schedule when enrollment for a course opens?
 	Migrate to Postgres?
+
+Optional Features:
+	Do you want to be able to schedule when enrollment for a course opens?
+	Hover over course to see why student is not eligible

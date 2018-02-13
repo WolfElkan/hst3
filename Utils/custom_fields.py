@@ -3,6 +3,7 @@ import bcrypt, re
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django_mysql import models as sqlmod
 from .hacks import get as _
+from .hacks import pdir
 from . import gistfile1 as poly
 from datetime import datetime
 from decimal import Decimal
@@ -10,17 +11,19 @@ from trace import TRACE
 
 class Bcrypt(object):
 	def __init__(self, char60):
+		self.char60 = char60.char60 if type(char60) is Bcrypt else char60
 		self.field = None
-		self.char60 = char60
 		self.full = char60 if char60[0] == '$' else char60[1:]
+		self.html = u'<span title="{}">&#x1f512;</span>'.format(self.full)
 	def __call__(self, pw):
 		return bcrypt.checkpw(bytes(pw), bytes(self.full))
 	def __str__(self):
 		return self.full[:7]+self.full[55:]
-	def widget(self):
-		pass
+	def widget(self, field, value, **kwargs):
+		user_id = kwargs['id'] if 'id' in kwargs else 0
+		return '{} <a href="/user/{}/sudochangepassword/">Change</a>'.format(self.html, user_id)
 	def static(self):
-		return '<span title='+self.full+'>&#x1f512;</span>'
+		return self.html
 
 class BcryptField(models.Field):
 	def __init__(self):
@@ -40,6 +43,9 @@ class BcryptField(models.Field):
 		if len(hashed) == 59:
 			hashed = '+' + hashed
 		return hashed
+	def from_db_value(self, value, col, wrapper, options):
+		# return 'hello'
+		return Bcrypt(value)
 
 
 short_days = ['','Mon','Tue','Wed','Thu','Fri','Sat','Sun']
@@ -80,7 +86,7 @@ class DayOfWeek(object):
 		return type(other) is not DayOfWeek or self.value != other.value
 	def __json__(self):
 		return self.short
-	def widget(self, field, value):
+	def widget(self, field, value, **kwargs):
 		self.__init__(value)
 		self.field = field
 		html = '<select name="{}">'.format(field)
@@ -147,7 +153,7 @@ class PhoneNumber(object):
 		return int(self.value)
 	def __json__(self):
 		return self.value
-	def widget(self, field, value):
+	def widget(self, field, value, **kwargs):
 		self.__init__(value)
 		if value:
 			value = int(value)
@@ -211,7 +217,7 @@ class ZipCode(object):
 	def static(self, field, value):
 		self.__init__(value)
 		return str(self)
-	def widget(self, field, value):
+	def widget(self, field, value, **kwargs):
 		self.__init__(value)
 		return '<input type="number" name="{}" value="{}" step="0.0001"> (If adding an extra 4 digits, use a decimal point in place of a dash)'.format(field, self.value)
 	def set(self, thing, field, post, isAttr):
@@ -237,7 +243,7 @@ class Dollar(object):
 			print '* rest.widgets.Dollar'
 		self.field = kwargs['field'] if 'field' in kwargs else None
 		self.default = kwargs['default'] if 'default' in kwargs else 0.00
-	def widget(self, field, value):
+	def widget(self, field, value, **kwargs):
 		if TRACE:
 			print '# rest.widgets.Dollar:widget'
 		if value:

@@ -76,12 +76,12 @@ class UserManager(sm.SuperManager):
 			sm.Regular('password', r'^$|^.{8,}$','Password is too short. It should be at least 8 characters.'),
 			sm.Regular('password', r'^$|^[^$].*$','Password may not begin with a dollar sign ($).'),
 			sm.Present('pw_confm','Please confirm your password'),
-			sm.Confirmation('pw_confm','password','Passwords do not match.')
+			sm.Confirm('pw_confm','password','Passwords do not match.')
 		]
 	def isValid(self, data, **kwargs):
 		if 'override_unique_username' in kwargs and kwargs['override_unique_username']:
 			del self.validations[1]
-		return super(UserManager, self).isValid(data)
+		return super(UserManager, self).isValid(data, **kwargs)
 	def filter(self, **kwargs):
 		if 'owner' in kwargs:
 			owner = kwargs.pop('owner')

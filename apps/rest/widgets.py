@@ -48,7 +48,7 @@ class VarChar(object):
 		self.field = kwargs['field'] if 'field' in kwargs else None		
 		self.default = kwargs['default'] if 'default' in kwargs else ''
 		self.maxlength = kwargs['maxlength'] if 'maxlength' in kwargs else None		
-	def widget(self, field, value):
+	def widget(self, field, value, **kwargs):
 		if TRACE:
 			print '# rest.widgets.VarChar:widget'
 		return '<input type="text" maxlength="{}" name="{}" value="{}">'.format(self.maxlength, field, value)
@@ -76,7 +76,7 @@ class Integer(object):
 		self.field = kwargs['field'] if 'field' in kwargs else None
 		self.suffix = kwargs['suffix'] if 'suffix' in kwargs else ''
 		self.default = kwargs['default'] if 'default' in kwargs else 0
-	def widget(self, field, value):
+	def widget(self, field, value, **kwargs):
 		if TRACE:
 			print '# rest.widgets.Integer:widget'
 		if value:
@@ -106,7 +106,7 @@ class Enum(object):
 		self.field = kwargs['field'] if 'field' in kwargs else None
 		self.options = kwargs['options'] if 'options' in kwargs else []
 		self.default = kwargs['default'] if 'default' in kwargs else self.options[0]
-	def widget(self, field, value):
+	def widget(self, field, value, **kwargs):
 		if TRACE:
 			print '# rest.widgets.Enum:widget'
 		html = '<select name="{}">'.format(field)
@@ -138,7 +138,7 @@ class Radio(object):
 		self.field = kwargs['field'] if 'field' in kwargs else None
 		self.options = kwargs['options'] if 'options' in kwargs else []
 		self.default = kwargs['default'] if 'default' in kwargs else 0
-	def widget(self, field, value):
+	def widget(self, field, value, **kwargs):
 		if TRACE:
 			print '# rest.widgets.Radio:widget'
 		value = value if value else 0
@@ -171,7 +171,7 @@ class Checkbox(object):
 		self.field = kwargs['field'] if 'field' in kwargs else None
 		self.suffix = kwargs['suffix'] if 'suffix' in kwargs else ''
 		self.default = kwargs['default'] if 'default' in kwargs else False
-	def widget(self, field, value):
+	def widget(self, field, value, **kwargs):
 		if TRACE:
 			print '# rest.widgets.Checkbox:widget'
 		return '<input type="checkbox" name="{}" {}> {}'.format(field, ' checked' if value else '',self.suffix)
@@ -203,7 +203,7 @@ class Date(object):
 			print '* rest.widgets.Date'
 		self.field = kwargs['field'] if 'field' in kwargs else None
 		self.default = kwargs['default'] if 'default' in kwargs else None
-	def widget(self, field, value):
+	def widget(self, field, value, **kwargs):
 		if TRACE:
 			print '# rest.widgets.Date:widget'
 		return '<input type="date" name="{}" value="{}">'.format(field, value)
@@ -231,7 +231,7 @@ class Time(object):
 			print '* rest.widgets.Time'
 		self.field = kwargs['field'] if 'field' in kwargs else None
 		self.default = kwargs['default'] if 'default' in kwargs else None
-	def widget(self, field, value):
+	def widget(self, field, value, **kwargs):
 		if TRACE:
 			print '# rest.widgets.Time:widget'
 		return '<input type="time" name="{}" value="{}">'.format(field, value)
@@ -261,7 +261,7 @@ class ForeignKey(object):
 		self.model = kwargs['model'] if 'model' in kwargs else None
 		self.null  = kwargs['null']  if 'null'  in kwargs else False
 		self.default = kwargs['default'] if 'default' in kwargs else None
-	def widget(self, field, value):
+	def widget(self, field, value, **kwargs):
 		if TRACE:
 			print '# rest.widgets.ForeignKey:widget'
 		self.field = field
@@ -305,7 +305,7 @@ class ForeignSet(object):
 		self.field = kwargs['field'] if 'field' in kwargs else None
 		self.model = kwargs['model'] if 'model' in kwargs else None
 		self.default = kwargs['default'] if 'default' in kwargs else None
-	def widget(self, field, qset):
+	def widget(self, field, qset, **kwargs):
 		if TRACE:
 			print '# rest.widgets.ForeignSet:widget'
 		html = rest_list(qset)
@@ -331,7 +331,7 @@ class ToggleSet(object):
 		self.field = kwargs['field'] if 'field' in kwargs else None
 		self.model = kwargs['model'] if 'model' in kwargs else None
 		self.default = kwargs['default'] if 'default' in kwargs else None
-	def widget(self, field, qset):
+	def widget(self, field, qset, **kwargs):
 		if TRACE:
 			print '# rest.widgets.ToggleSet:widget'
 		html = ''
