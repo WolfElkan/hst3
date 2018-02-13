@@ -208,6 +208,12 @@ def safe_delete(thing):
 	if thing and hasattr(thing,'delete'):
 		thing.delete()
 
+
+def authorized(request, level=0):
+	if TRACE:
+		print '# main.views.authorized'
+	return 'meid' in request.session
+
 # Find User object for current logged-in user, without causing errors.
 # me is always a User, never a Family, Student, or Teacher
 import apps
@@ -215,7 +221,7 @@ def getme(request):
 	if TRACE:
 		print '# hacks.getme'
 	if 'meid' in request.session:
-		me = apps.main.managers.Users.fetch(id=request.session['meid'])
+		me = apps.people.managers.Users.fetch(id=request.session['meid'])
 		if me:
 			return me
 		else:

@@ -36,6 +36,7 @@ ALLOWED_HOSTS = [
 
 INSTALLED_APPS = [
     'apps.main',
+    'apps.people',
     'apps.program',
     'apps.rest',
     'apps.reports',

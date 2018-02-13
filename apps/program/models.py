@@ -6,7 +6,7 @@ from Utils.hacks import sub, Each
 from django_mysql import models as sqlmod
 from .managers import CourseTrads, Courses, Enrollments
 Q = models.Q
-from apps.main.managers import Students
+from apps.people.managers import Students
 from trace import TRACE, DEV
 import re
 
@@ -15,7 +15,7 @@ ELG = False
 class Venue(models.Model):
 	id   = models.CharField(max_length=3, primary_key=True)
 	name = models.CharField(max_length=30)
-	address = models.ForeignKey('main.Address', null=True)
+	address = models.ForeignKey('people.Address', null=True)
 	rest_model = "venue"
 	# def __getattribute__(self, field):
 	# 	if field in []:
@@ -195,7 +195,7 @@ class Course(models.Model):
 	tradition  = models.ForeignKey(CourseTrad, unique_for_year=True, db_column='trad_id')
 	last_date  = models.DateField(null=True)
 	aud_date   = models.DateField(null=True)
-	teacher    = models.ForeignKey('main.Teacher', null=True)
+	teacher    = models.ForeignKey('people.Teacher', null=True)
 	tuition    = models.DecimalField(max_digits=6, decimal_places=2)
 	vol_hours  = models.FloatField()
 	the_hours  = models.FloatField()
@@ -292,7 +292,7 @@ class Course(models.Model):
 			return super(Course, self).__getattribute__(field)
 
 class Enrollment(models.Model):
-	student    = models.ForeignKey('main.Student')
+	student    = models.ForeignKey('people.Student')
 	course     = models.ForeignKey(Course)
 	isAudition = models.BooleanField(default=False)
 	role       = models.TextField(null=True)

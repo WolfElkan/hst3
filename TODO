@@ -3,7 +3,7 @@ X	Fix Family.delete cascade
 	Check all REST routes
 X	Give Widgets a default= kwarg
 
-main
+people
 X	Make registration landing page redirect to appropriate step if family has partially registered.
 	Add Change Password route
 

@@ -4,7 +4,7 @@ from Utils.hacks import copy, getme, seshinit, forminit, first, copyatts, pretty
 import json
 from trace import TRACE
 
-from apps.main.models import Family, Address, Parent, User, Student
+from apps.people.models import Family, Address, Parent, User, Student
 Addresses = Address.objects
 Families  = Family.objects
 Parents   = Parent.objects

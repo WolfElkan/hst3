@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, HttpResponse
-from apps.main.managers import Addresses, Families, Parents, Users, Students
-from apps.main.models import Teacher
+from apps.people.managers import Addresses, Families, Parents, Users, Students
+from apps.people.models import Teacher
 Teachers = Teacher.objects
 from apps.program.managers import Courses, CourseTrads, Enrollments, Auditions
 from Utils.hacks import year as getyear, sub

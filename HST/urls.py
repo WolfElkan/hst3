@@ -21,6 +21,7 @@ urlpatterns = [
 ]
 from django.conf.urls import include
 import apps.main.views as main
+import apps.people.views as people
 import apps.program.views as program
 import apps.rest.views as rest
 import apps.reports.views as reports
@@ -36,18 +37,19 @@ urlpatterns = [
 	url(r'^myaccount/?$', main.account),
 	url(r'^myaccount/changepassword/?$', main.changepassword),
 	
-	url(r'^register/?$', main.reg),
-	url(r'^register/familyinfo/?$', main.reg_familyinfo),
+	url(r'^register/?$', people.reg),
+	url(r'^register/familyinfo/?$', people.familyinfo),
 	url(r'^register/familyinfo/changepassword/?$', main.changepassword),
-	url(r'^myaccount/parents/?$', main.reg_parentsinfo),
-	url(r'^register/parentsinfo/?$', main.reg_parentsinfo),
-	url(r'^myaccount/students/?$', main.reg_studentsinfo),
-	url(r'^register/studentsinfo/?$', main.reg_studentsinfo),
-	url(r'^myaccount/courses/?$', main.reg_courses),
-	url(r'^register/student/(?P<id>\d+)/?$', main.reg_courses),
-	url(r'^register/student/(?P<id>\d+)/enroll/?$', main.reg_courses_enroll),
-	url(r'^register/student/(?P<id>\d+)/audition/?$', main.reg_courses_audition),
-	url(r'^register/student/(?P<id>\d+)/drop/?$', main.reg_courses_drop),
+	url(r'^myaccount/parents/?$', people.parentsinfo),
+	url(r'^register/parentsinfo/?$', people.parentsinfo),
+	url(r'^myaccount/students/?$', people.studentsinfo),
+	url(r'^register/studentsinfo/?$', people.studentsinfo),
+
+	url(r'^myaccount/courses/?$', program.courses),
+	url(r'^register/student/(?P<id>\d+)/?$', program.courses),
+	url(r'^register/student/(?P<id>\d+)/enroll/?$', program.courses_enroll),
+	url(r'^register/student/(?P<id>\d+)/audition/?$', program.courses_audition),
+	url(r'^register/student/(?P<id>\d+)/drop/?$', program.courses_drop),
 	
 	url(r'^hot/?$', dev.hot),
 	url(r'^run/?$', dev.run),
