@@ -12,14 +12,14 @@
 		<h1>HST Homepage</h1>
 		{% if name %}
 		<p>Hello {{name}}!</p>
-		<a href="/logout">Log Out</a>
-		<a href="/myaccount">My Account</a>
+		<a href="/logout/">Log Out</a>
+		<a href="/myaccount/">My Account</a>
 		{% else %}
 		<a href="/login">Returning User Login</a>
-		<a href="/register">First-Time Registration</a>
+		<a href="/register/">First-Time Registration</a>
 		{% endif %}
 		{% if incomplete_registration %}
-		<a href="/register">Continue Registration</a>
+		<a href="/register/">Continue Registration</a>
 		{% endif %}
 		<br><br><br><br><!-- spacing with <br> tags because YOLO -->
 		<a href="/rest/">REST Framework</a>

@@ -34,11 +34,11 @@ urlpatterns = [
 	url(r'^login/?$', main.login),
 	url(r'^logout/?$', main.logout),
 	url(r'^myaccount/?$', main.account),
-
-	url(r'^changepassword/?$', main.changepassword),
+	url(r'^myaccount/changepassword/?$', main.changepassword),
 	
 	url(r'^register/?$', main.reg),
 	url(r'^register/familyinfo/?$', main.reg_familyinfo),
+	url(r'^register/familyinfo/changepassword/?$', main.changepassword),
 	url(r'^register/parentsinfo/?$', main.reg_parentsinfo),
 	url(r'^register/studentsinfo/?$', main.reg_studentsinfo),
 	url(r'^register/student/(?P<id>\d+)/?$', main.reg_courses),

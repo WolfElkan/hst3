@@ -30,6 +30,7 @@ X	family.children gets them in age order
 		X	J1 should only need audition for 8-year-olds
 		X	C2 cur kwarg is buggy
 		X	Troupes should not let students audition if they haven't taken acting
+		Delete unecessary _get route
 
 admin
 	figure out a name for admin app that doesn't clash with django

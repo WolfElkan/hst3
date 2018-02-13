@@ -3,10 +3,11 @@ from .models import Family, Address, Parent, User, Student
 from apps.program.managers import CourseTrads, Courses, Enrollments, Auditions
 from Utils.custom_fields import Bcrypt, PhoneNumber
 from datetime import datetime
-from Utils.hacks import copy, copyatts, seshinit, forminit, first, getme, numero, metanumero, json, copy_items_to_attrs, year, FriendlyEncoder, namecase, Each, equip, find_all
+from Utils.hacks import copy, copyatts, seshinit, forminit, first, getme, numero, metanumero, json, copy_items_to_attrs, year, FriendlyEncoder, namecase, Each, equip, find_all, pretty
 import json as JSON
 from io import StringIO
 from trace import TRACE, DEV
+import re
 
 Addresses = Address.objects
 Families  = Family.objects
@@ -126,9 +127,9 @@ def changepassword_post(request):
 		request.session['e'] = {}
 		me.password = request.POST['password']
 		me.save()
-		return redirect('/myaccount')
+		return redirect(re.match(r'^.*/',request.META['HTTP_REFERER']).group())
 	else:
-		return redirect('/changepassword')
+		return redirect(request.META['HTTP_REFERER'])
 
 #   - - - - NEW FAMILY REGISTRATION - - - -
 
