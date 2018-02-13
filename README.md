@@ -5,7 +5,7 @@ The website is meant to be operable from the client side by someone with only ba
 
 However, there are a few functions on the admin side that are a little tricky.
 
-##Eligex
+## Eligex
 
 This web application can determine whether a given student is eligible for a given course in a given year.  However, due to the complicated nature of the eligibility requirements for many of HST's classes, it was necessary to develop an expression language to determine eligibility of students.  Eligex is a language that in which any requirements and prerequisites for an HST class can be written and will be understood by the server.  It also enables requirements to be written for future classes HST may offer, or to modify the requirements for existing classes, without rewriting the internal code of the website.  It may look daunting, but it's really just boolean algebra (True and False statements).
 
