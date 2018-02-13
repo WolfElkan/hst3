@@ -13,7 +13,7 @@ A line of Eligex is case-sensitive and contains one or more "words", separated b
 
 ### Single-Letter Words
 Glyph | Meaning
---- | ---
+:---: | ---
 `#` | Always returns True
 `~` | Always returns False
 `a` | Returns whether the student meets the age requirements
@@ -23,7 +23,7 @@ Glyph | Meaning
 `@` | Searches for a *successful* audition or skill assessment for the class by the student
 ### Single-Letter Modifiers
 Glyph | Meaning
---- | ---
+:---: | ---
 `y` | Younger: may be appended to `a` or `g` to relax the *minimum* age or grade requirement by one year for each appended glyph (E. g., If a class is for ages 9-12, `ayy` will return True for 7-12 year olds and False otherwise)
 `o` | Older: just like `y` but relaxes the *maximum* age or grade requirement
 ### Enrollment Search
@@ -31,7 +31,7 @@ To require that a student have taken another HST class in order to be eligible f
 To further refine these searches, the following modifiers may be appended *after* the class's ID:
 
 Glyph | Meaning
---- | ---
+:---: | ---
 `c` | Will match only *current* enrollments
 `p` | Will match only *past* enrollments
 `$` | Will match only enrollments for which tuition has been paid
@@ -40,9 +40,10 @@ Glyph | Meaning
 
 ### Boolean Operators
 
-Glyph | Meaning
---- | ---
 Eligex is compiled conjunctively by default.  All words in an expression must be True for the expression to return True.  To modify this, use the following symbols:
+
+Glyph | Meaning
+:---: | ---
 `<` `>` | Words within trackets will be evaluated disjunctively, or OR'ed.  The compiler will first evaluate the expression within the trackets to see if *any* of them are true, and if so the entire tracketed expression will be treated as a single True value in the outer expression.  If all of the enclosed words evaluate as False, the tracketed expression will be evaluated as a single False value.
 `{` `}` | Braces are evaluated just like trackets, but words within them are AND'ed.  These are useful for nesting inside of trackets (AND within an OR within an AND).  Note that enclosing symbols may not be nested within symbols of the same type.  `< a { T3p @ < P2p T2p > } >` is an invalid expression because it contains trackets within trackets.
 `!` | Not: May be appended before a word to return the opposite value
@@ -50,7 +51,7 @@ Eligex is compiled conjunctively by default.  All words in an expression must be
 ### Examples
 
 Expression | Description
---- | ---
+:---: | ---
 `a g`| Student must meet age and grade requirements.  (Most HST classes have this Eligex)
 `a g f` | Student must meet age and grade requirements, and be a girl (This is the eligex for Broadway Choir)
 `< J* Z* >` | Student must be enrolled (either now or formerly) an a Jazz or Broadway Jazz Class
