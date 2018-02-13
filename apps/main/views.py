@@ -408,18 +408,18 @@ def reg_studentsinfo_post(request):
 	return redirect('/register/student/{}/'.format(me.owner.children[0].id))
 
 
-def reg_courses(request, **kwargs):
-	if request.method == 'GET':
-		return reg_courses_get(request, **kwargs)
-	elif request.method == 'POST':
-		return reg_courses_post(request, **kwargs)
-	else:
-		return HttpResponse("Unrecognized HTTP Verb")
-
 def hours_worked(family):
 	return 0.0
 
-def reg_courses_get(request, **kwargs):
+def reg_courses(request, **kwargs):
+# 	if request.method == 'GET':
+# 		return reg_courses_get(request, **kwargs)
+# 	elif request.method == 'POST':
+# 		return reg_courses_post(request, **kwargs)
+# 	else:
+# 		return HttpResponse("Unrecognized HTTP Verb")
+
+# def reg_courses_get(request, **kwargs):
 	me = getme(request)
 	if not me or not me.owner or not me.owner.children:
 		return redirect('/register')
@@ -429,6 +429,8 @@ def reg_courses_get(request, **kwargs):
 		current_student = me.owner.student_set.fetch(id=current_id)
 		if not current_student:
 			return redirect('/')
+	else:
+		current_student = me.owner.children[0]
 	reg_year = year()
 	courses = Courses.filter(year=reg_year,tradition__e=True).order_by('tradition__order')
 	cart = me.owner.enrollments_in(reg_year)
