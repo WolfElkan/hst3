@@ -124,11 +124,11 @@ def sub(val, dic):
 from datetime import datetime
 def year():
 	if DEV:
-		return 2007
+		return 2018
 	now = datetime.now()
 	return now.year + (0 if now.month < 5 else 1)
 
-class Funky(object):
+class Caller(object):
 	def __init__(self, arr, fx):
 		self.arr = arr
 		self.fx = fx
@@ -138,7 +138,7 @@ class Funky(object):
 			new.append(x.__getattribute__(self.fx))
 		return str(new)
 	def __repr__(self):
-		return '<Funky: {} @{}>'.format(self.arr,self.fx)
+		return '<Caller: {} @{}>'.format(self.arr,self.fx)
 	def __iter__(self):
 		for x in self.arr:
 			yield x.__getattribute__(self.fx)
@@ -164,7 +164,7 @@ class Each(object):
 		if attr == '_':
 			return super(Each,self).__getattribute__('arr')
 		else:
-			return Funky(super(Each,self).__getattribute__('arr'), attr)
+			return Caller(super(Each,self).__getattribute__('arr'), attr)
 	def __iter__(self):
 		for x in super(Each,self).__getattribute__('arr'):
 			yield x
@@ -175,6 +175,13 @@ def collect(arr, lam):
 	new = []
 	for x in arr:
 		new.append(lam(x))
+	return new
+
+def find_all(arr, lam):
+	new = []
+	for x in arr:
+		if lam(x):
+			new.append(x)
 	return new
 
 def equip(arr, lam, **kwargs):

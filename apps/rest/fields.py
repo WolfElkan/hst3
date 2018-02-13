@@ -60,7 +60,7 @@ FIELDS = {
 		{'field':'max_age'   , 'template': Integer(default=18)},
 		{'field':'min_grd'   , 'template': Integer(default= 3)},
 		{'field':'max_grd'   , 'template': Integer(default=12)},
-		{'field':'prereqs'   , 'template': VarChar()},
+		{'field':'eligex'    , 'template': VarChar()},
 		# {'field':'tuition'   , 'template': Dollar()},
 		# {'field':'redtuit'   , 'template': Dollar()},
 		# {'field':'vol_hours' , 'template': Integer()},

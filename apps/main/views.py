@@ -3,7 +3,7 @@ from .models import Family, Address, Parent, User, Student
 from apps.program.managers import CourseTrads, Courses, Enrollments, Auditions
 from Utils.custom_fields import Bcrypt, PhoneNumber
 from datetime import datetime
-from Utils.hacks import copy, copyatts, seshinit, forminit, first, getme, numero, metanumero, json, copy_items_to_attrs, year, FriendlyEncoder, namecase, Each, equip
+from Utils.hacks import copy, copyatts, seshinit, forminit, first, getme, numero, metanumero, json, copy_items_to_attrs, year, FriendlyEncoder, namecase, Each, equip, find_all
 import json as JSON
 from io import StringIO
 from trace import TRACE, DEV
@@ -436,17 +436,26 @@ def reg_courses_audition(request, **kwargs):
 	return redirect('/register/student/{}/'.format(student_id))
 
 def reg_courses_drop(request, **kwargs):
+	# Safely get student id
 	student_id = kwargs['id'] if 'id' in kwargs else 0
+	# Safely fetch student
 	student = Students.fetch(id=student_id)
+	# Safely fetch course
 	course = Courses.fetch(id=request.GET['course_id'])
+	# Find the enrollment and delete it
 	Enrollments.filter(course=course, student=student).delete()
+	# Check for any other enrollments that student is now ineligible for
+	now_inelig = find_all(Enrollments.filter(student=student), lambda enr: not enr.eligible())
+	# If course comes with prepaid tickets...
 	if course.prepaid:
+		# ...make sure some student in family is enrolled in another course that needs them
 		other = Enrollments.filter(
 			student__family=student.family, 
 			course__tradition__prepaid=True, 
 			course__tradition__show=course.show,
 			course__year=year()
 		)
+		# Otherwise, delete the prepaid tickets from the cart
 		if not other:
 			Ktrad = CourseTrads.fetch(id__startswith='K',id__endswith=course.show[1])
 			K = Courses.fetch(year=course.year, tradition=Ktrad)

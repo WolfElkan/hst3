@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>HST | Sign Up</title>
+	<title>HST | Registration</title>
 </head>
 <style type="text/css">
 	* {
@@ -104,7 +104,7 @@
 		<div class="student_menu">
 			{% for student in students %}
 			<a href="/register/student/{{student.id}}/" class="tab{% if student.id|add:0 == current_student.id|add:0 %} selected_tab {% endif %}">
-			<div>{{student.prefer}} <!-- ({{student.age}}) --></div>
+			<div title="{{student}}, age {{student.age}}">{{student.prefer}}</div>
 			</a>
 			{% endfor %}
 		</div>

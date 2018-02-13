@@ -44,7 +44,7 @@ class CourseTrad(models.Model):
 	max_age = models.PositiveIntegerField(default=18)
 	min_grd = models.PositiveIntegerField(default=1)
 	max_grd = models.PositiveIntegerField(default=12)
-	prereqs = models.TextField(default="{ a g }")
+	eligex  = models.TextField(default="{ a g }")
 	# Cost
 	tuition    = models.DecimalField(max_digits=6, decimal_places=2, default=0)
 	redtuit    = models.DecimalField(max_digits=6, decimal_places=2, default=0)
@@ -92,26 +92,32 @@ class CourseTrad(models.Model):
 		if code in self.genre_codes:
 			return self.genre_codes[code]
 	def check_eligex(self, student, year, **kwargs):
-		if re.match(r'<[^>]*<|{[^}]*{',self.prereqs):
+		if re.match(r'<[^>]*<|{[^}]*{',self.eligex):
 			print 'Nested clauses of the same type are not currently supported.  Call Wolf if you need this changed.'
-		eligex = kwargs.pop('eligex') if 'eligex' in kwargs else self.prereqs
+		eligex = kwargs.pop('eligex') if 'eligex' in kwargs else self.eligex
 		conj   = kwargs.pop('conj')   if 'conj'   in kwargs else True
 		kwargs['aud'] = kwargs['aud'] if 'aud' in kwargs else False
 		kwargs['cur'] = kwargs['cur'] if 'cur' in kwargs else False
 		matches = re.findall(r'(!?){([^}]*)}|(!?)<([^>]*)>|(!?)([^<>{} ]*)', eligex)
 		for x in matches:
 			if x[1]:
+				# AND
 				kwargs['eligex'] = x[1]
 				result = self.check_eligex(student, year, **kwargs)
 				result = not result if x[0] else result
+				# print x[1], result
 			elif x[3]:
+				# OR
 				kwargs['eligex'] = x[3]
 				kwargs['conj'] = False
 				result = self.check_eligex(student, year, **kwargs)
 				result = not result if x[2] else result
+				# print x[3], result
 			elif x[5]:
+				# WORD
 				result = self.check_word(student, year, x[5], **kwargs)
 				result = not result if x[4] else result
+				# print x[5], result
 			else:
 				result = conj
 			if result != conj:
@@ -120,6 +126,8 @@ class CourseTrad(models.Model):
 	def check_word(self, student, year, word, **kwargs):
 		if '#' in word:
 			return True
+		elif '~' in word:
+			return False
 		elif 'm' in word:
 			return student.sex == 'M'
 		elif 'f' in word:
@@ -138,15 +146,18 @@ class CourseTrad(models.Model):
 				'student':student,
 				'isAudition':False,
 			}
+			if word == '@':
+				query['isAudition'] = True
+				query['course__tradition'] = self
+				query['course__year'] = year
+				return bool(Enrollments.filter(**query))
 			if '*' not in word:
 				query['course__tradition__id'] = word[0:2]
 			elif word[0] != '*':
 				query['course__tradition__id__startswith'] = word[0]
 			elif word[1] != '*':
 				query['course__tradition__id__endswith'] = word[1]
-			if 'c' in word:
-				if kwargs['cur']:
-					return True
+			if 'c' in word and not kwargs['cur']:
 				query['course__year'] = year
 			if 'p' in word:
 				query['course__year__lt'] = year
@@ -154,22 +165,15 @@ class CourseTrad(models.Model):
 				if kwargs['aud']:
 					return True
 				query['isAudition'] = True
-				query['success'] = True
+				if '@@' in word:
+					query['success'] = True
 			if '$' in word:
 				query['paid'] = True
 			return bool(Enrollments.filter(**query))
-	# def eligible(self, student, year):
-	# 	self.check_eligex(student, year)
-	# 	return {
-	# 		# Whether student is eligible under current actual circumstances
-	# 		'now' : self.check_eligex(student, year), 
-	# 		# Whether student is eligible ignoring all audition requirements
-	# 		'aud' : self.check_eligex(student, year, aud=True), 
-	# 		# Whether student is eligible ignoring audition and current enrollment requirements
-	# 		'cur' : self.check_eligex(student, year, aud=True, cur=True), 
-	# 		'reason': '{} is eligible for {} in {}'.format(student, self.title, year),
-	# 		'css': '',
-	# 	}
+	def eligible(self, student, year):
+		course = Courses.fetch(tradition=self, year=year)
+		if course:
+			return course.eligible(student)
 	def enroll(self, student, year):
 		course = Courses.fetch(tradition=self, year=year)
 		if course and course.eligible(student):
@@ -228,50 +232,33 @@ class Course(models.Model):
 			else:
 				elig['reason'] = '{} is registered for {} pending tuition payment'
 				elig['css'] = "need_pay"
-
-		# Check if not eligible under any circumstances
+		# Fast fail: Student is not eligible under any circumstances
 		elif not self.tradition.check_eligex(student, self.year, aud=True, cur=True):
-			
-			# not_elig
-			elig['reason'] = '{} is not eligible for {}'
+			elig['reason'] = '{} is not eligible for {}' 
 			elig['css'] = "not_elig"
-
 		# Check for conflicts
 		elif any(Each(student.courses_in(self.year)).conflicts_with(self)):
-
-			# conflict
 			elig['reason'] = '{} is in another class at the same time as {}'
 			elig['css'] = "conflict"
-		
 		# Check if eligible now
 		elif self.tradition.check_eligex(student, self.year):
-
-			# eligible
 			elig['reason'] = '{} is eligible for {}'
 			elig['css'] = "eligible"
 			elig['now'] = True
-
 		# Check if eligible with audition
 		elif self.tradition.check_eligex(student, self.year, aud=True):
-
-			# need_aud
 			elig['reason'] = '{} is eligible to audition for {}'
 			elig['css'] = "need_aud"
 			elig['aud'] = True
-
 		# Check if eligible with current enrollment
 		elif self.tradition.check_eligex(student, self.year, cur=True):
-
-			# need_cur
 			elig['reason'] = '{} will be eligible for {} once {} enrolls in at least 1 other class'
-			elig['css'] = "need_cur" 
-
-		elif self.tradition.check_eligex(student, self.year, cur=True):
-
-			# need_cur (Same css, only reason is different)
+			elig['css'] = "need_cur"
+		# Check if eligible with audition AND current enrollment
+		elif self.tradition.check_eligex(student, self.year, aud=True, cur=True):
 			elig['reason'] = '{} will be eligible to audition for {} once {} enrolls in at least 1 other class'
 			elig['css'] = "need_cur" 
-
+		# Format reason with student's name and course
 		elig['reason'] = elig['reason'].format(student, self.title, 'he' if student.sex == 'M' else 'she')
 		return elig
 	def check_eligex(self, student, **kwargs):
@@ -321,6 +308,10 @@ class Enrollment(models.Model):
 	objects = Enrollments
 	def __str__(self):
 		return str(self.student) + (' as '+self.role if self.role else '') + ' in ' + str(self.course)
+	def eligible(self, **kwargs):
+		course  = kwargs['course']  if 'course'  in kwargs else self.course
+		student = kwargs['student'] if 'student' in kwargs else self.student
+		return course.eligible(student)
 	# def __getattribute__(self, field):
 	# 	if field in []:
 	# 		call = super(Enrollment, self).__getattribute__(field)

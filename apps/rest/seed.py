@@ -159,7 +159,7 @@ def dump(request):
 				'max_age'  : ct.max_age,
 				'min_grd'  : ct.min_grd,
 				'max_grd'  : ct.max_grd,
-				'prereqs'  : ct.prereqs,
+				'eligex'   : ct.eligex,
 				'tuition'  : float(ct.tuition),
 				'redtuit'  : float(ct.redtuit),
 				'vol_hours': ct.vol_hours,

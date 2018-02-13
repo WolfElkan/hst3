@@ -24,7 +24,7 @@ X	family.children gets them in age order
 	add HIDs
 
 	Course Interface
-		Click anywhere on a tab
+	X	Click anywhere on a tab
 		ELIGEX:
 		X	Conflicts
 		X	J1 should only need audition for 8-year-olds
@@ -61,7 +61,7 @@ X	namecase
 
 Replace equip() with .annotate() (https://docs.djangoproject.com/en/2.0/ref/models/querysets/#annotate)
 
-Add audition level for audition required, but no prereqs for audition, assign C2 that level
+X	Add audition level for audition required, but no prereqs for audition, assign C2 that level (solved with eligex)
 
 Remove Unnecessary imports
 Track down phantom print statements
@@ -70,6 +70,8 @@ X	Delete Auditions table.  Integrate with Enrollments
 
 Questions:
 	What did we decide about login by email?
+	Student height?
 	Antimony protocol?
 	Broadway dance courses? (JB or Z2)
 	Do you want to be able to schedule when enrollment for a course opens?
+	Migrate to Postgres?
