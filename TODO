@@ -5,7 +5,7 @@ X	Give Widgets a default= kwarg
 
 people
 X	Make registration landing page redirect to appropriate step if family has partially registered.
-	Add Change Password route
+X	Add Change Password route
 
 	Student Interface
 X		(eventually) Support loading existing students from database for editing, track by internal id's
@@ -30,7 +30,7 @@ X	family.children gets them in age order
 		X	J1 should only need audition for 8-year-olds
 		X	C2 cur kwarg is buggy
 		X	Troupes should not let students audition if they haven't taken acting
-		Delete unecessary _get route
+	X	Delete unecessary _get route
 
 admin
 	figure out a name for admin app that doesn't clash with django
@@ -68,6 +68,9 @@ Remove Unnecessary imports
 Track down phantom print statements
 
 X	Delete Auditions table.  Integrate with Enrollments
+	Delete auditions link in REST homepage
+
+Fix nuke.sh
 
 Questions:
 	What did we decide about login by email?

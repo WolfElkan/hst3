@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 from django.db import models, connection
 from datetime import datetime
 import re
-from .hacks import get, copy
+# from .hacks import get
 from trace import TRACE
 
 # - - - - - CLASSES - - - - -

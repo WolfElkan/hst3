@@ -1,20 +1,35 @@
 from trace import TRACE, DEV
 
+
+from inspect import getargspec # Update getargspec -> signature in Python3
+
+def collect(thing, lam):
+	if type(thing) is dict or hasattr(thing, '__dict__'):
+		new = {}
+		for key in thing:
+			new[key] = lam(thing[key])
+	elif type(thing) is list or hasattr(thing, '__iter__'):
+		new = []
+		nargs = len(getargspec(lam).args)
+		if nargs == 1:
+			for x in thing:
+				new.append(lam(x))
+		elif nargs == 2:
+			for t in range(len(thing)):
+				new.append(lam(thing[t],t))
+	else:
+		new = thing.copy()
+	return new
+
+# Utils/custom_fields.py
+# Utils/supermodel.py
 def get(obj, key):
 	key = str(key)
-	if type(obj) == dict:
-		for kvp in obj.items():
-			if kvp[0] == key:
-				return kvp[1]
-	else:
-		return getattr(obj, key)
+	return obj.get(key) if hasattr(obj, 'get') else getattr(obj, key)
 
-def metastr(query):
-	clean = {}
-	for key in query:
-		clean[key] = str(query[key])
-	return clean
 
+
+# use .copy or collect
 def copy(source, keys=False, trunc=0):
 	this = {}
 	if not keys:
@@ -26,6 +41,7 @@ def copy(source, keys=False, trunc=0):
 		else:
 			this[trunckey] = None
 	return this
+
 
 def copyatts(source, keys, ifnull=True):
 	this = {}
@@ -61,26 +77,35 @@ def forminit(request, form_name, fields):
 					request.session[pe][form_name][f] = ''
 
 # Select the first element in a query, without causing errors
-def first(arr):
-	if len(arr) == 0:
-		return None
-	else:
-		return arr[0]
+# Obsolete.  Use .fetch()
+# def first(arr):
+# 	if len(arr) == 0:
+# 		return None
+# 	else:
+# 		return arr[0]
 
 # Convert a list to a dict object, so it can be parsed correctly on front end
-def numero(obj):
-	result = {}
-	for x in range(len(obj)):
-		result['no'+str(x)] = obj[x]
-	return result
+# might be able to use collect() with range()
+# def numero(obj):
+	# return dict(collect(obj,lambda val, index: ['no'+str(index),val]))
+	# new = {}
+	# for x in range(len(obj)):
+	# 	new['no'+str(x)] = obj[x]
+	# return new
+
+# numero(arr) => collect(arr, lambda :[,])
 
 # Just like numero, but meta
-def metanumero(obj):
-	result = []
-	for x in obj:
-		result += [numero(x)]
-	return result
+# Use collect()
+# def metanumero(obj):
+# 	result = []
+# 	for x in obj:
+# 		result += [numero(x)]
+# 	return result
 
+# metanumero(obj) => collect(obj, numero)
+
+# Necessary, but should be its own file
 import json
 class FriendlyEncoder(json.JSONEncoder):
 	def default(self, obj):
@@ -91,6 +116,7 @@ class FriendlyEncoder(json.JSONEncoder):
 		else:
 			return str(obj)
 
+# Same
 def json(obj):
 	result = []
 	for x in obj:
@@ -103,6 +129,7 @@ def json(obj):
 	result = result.replace('>','')
 	return result
 
+# Use IceCream?
 def pretty(arr, delim='  ', indent='', level=0, printout=''):
 	for thing in arr:
 		if type(thing) is list:
@@ -111,9 +138,11 @@ def pretty(arr, delim='  ', indent='', level=0, printout=''):
 			printout += indent + str(thing) + '\n'
 	return printout if level else printout[:-1]
 
+# I guess this one can stay.
 def pdir(thing):
 	return pretty(dir(thing))
 
+# There might be a Python built-in method for this
 def sub(val, dic):
 	if val in dic:
 		return dic[val]
@@ -121,6 +150,7 @@ def sub(val, dic):
 		return val
 
 # Return the current HST registration year (This year until May 1, next year thereafter)
+# This, we need.  But maybe modularize?
 from datetime import datetime
 def year():
 	if DEV:
@@ -128,6 +158,7 @@ def year():
 	now = datetime.now()
 	return now.year + (0 if now.month < 5 else 1)
 
+# Maybe this too?
 class Caller(object):
 	def __init__(self, arr, fx):
 		self.arr = arr
@@ -153,6 +184,7 @@ class Caller(object):
 			new.append(x.__getattribute__(attr))
 		return new
 
+# Obviously this one would go with Caller
 class Each(object):
 	def __init__(self, arr):
 		self.arr = list(arr)
@@ -171,11 +203,10 @@ class Each(object):
 	def __len__(self):
 		return len(super(Each,self).__getattribute__('arr'))
 
-def collect(arr, lam):
-	new = []
-	for x in arr:
-		new.append(lam(x))
-	return new
+# Ruby-Style Enumerators
+
+
+
 
 def find_all(arr, lam):
 	new = []
@@ -204,10 +235,12 @@ def namecase(name):
 	else:
 		return name.title()
 
+# Sure
 def safe_delete(thing):
 	if thing and hasattr(thing,'delete'):
 		thing.delete()
 
+# Modularize to 'security' or something
 
 def authorized(request, level=0):
 	if TRACE:

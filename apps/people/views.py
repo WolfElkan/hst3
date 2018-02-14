@@ -3,7 +3,7 @@ from .models import Family, Address, Parent, User, Student
 from apps.program.managers import CourseTrads, Courses, Enrollments, Auditions
 from Utils.custom_fields import Bcrypt, PhoneNumber
 from datetime import datetime
-from Utils.hacks import copy, copyatts, seshinit, forminit, first, getme, numero, metanumero, json, copy_items_to_attrs, year, FriendlyEncoder, namecase, Each, equip, find_all, pretty, authorized
+from Utils.hacks import copy, copyatts, seshinit, forminit, getme, json, copy_items_to_attrs, year, FriendlyEncoder, namecase, Each, equip, find_all, pretty, authorized, collect
 import json as JSON
 from io import StringIO
 from trace import TRACE, DEV
@@ -260,7 +260,7 @@ def studentsinfo_get(request):
 		'reg_year': reg_year,
 		'grades'  : grades,
 		'family'  : me.owner,
-		't_shirt_sizes': metanumero(Student.t_shirt_sizes),
+		't_shirt_sizes': collect(Students.model.t_shirt_sizes, lambda obj: dict(collect(obj,lambda val, index: ['no'+str(index),val]))),
 		'validations'  : json(Students.validations),
 		'students': JSON.dumps(list(me.owner.children), cls=FriendlyEncoder) if me.owner.children else [],
 	}

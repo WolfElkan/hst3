@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, HttpResponse
 from datetime import datetime
-from Utils.hacks import copy, getme, seshinit, forminit, first, copyatts, pretty, pdir, FriendlyEncoder
+from Utils.hacks import copy, getme, seshinit, forminit, copyatts, pretty, pdir, FriendlyEncoder
 import json
 from trace import TRACE
 

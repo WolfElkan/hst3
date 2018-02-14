@@ -87,7 +87,7 @@ class Family(models.Model):
 	def unpaid_enrollments_in(self, in_year):
 		return self.enrollments_in(in_year).filter(paid=False)
 	def volunteer_total_in(self, in_year):
-		return max([0.0]+collect(self.enrollments_in(in_year), lambda enr: enr.course.vol_hours))
+		return max([0.0]+list(collect(self.enrollments_in(in_year), lambda enr: enr.course.vol_hours)))
 	def total_tuition_in(self, in_year):
 		return sum(collect(self.enrollments_in(in_year), lambda enr: 0 if enr.isAudition else enr.course.tuition))
 	def paid_tuition_in(self, in_year):

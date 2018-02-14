@@ -26,9 +26,10 @@ SECRET_KEY = 'ek3r@s77wcfxr#ipt7py@8=h-nyf6yu%wv*r6ohdb-e9)*#*-h'
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    '192.168.1.6',
-    '127.0.0.1',
     u'localhost',
+    '127.0.0.1',
+    '192.168.1.6',
+    '192.168.13.242',
 ]
 
 

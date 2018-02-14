@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, HttpResponse
 from datetime import datetime
-from Utils.hacks import copy, getme, seshinit, forminit, first, copyatts, pretty, pdir, metastr, sub
+from Utils.hacks import copy, getme, seshinit, forminit, copyatts, pretty, pdir, sub, collect
 import re
 from .fields import FIELDS
 from .widgets import MODELS
@@ -19,7 +19,7 @@ def index(request, model):
 	for ftp in FIELDS[model]:
 		field = ftp['field']
 		columns.append(field)
-	query = metastr(request.GET)
+	query = collect(request.GET, str)
 	qset = MODELS[model].filter(**query)
 	# qset.order_by('-updated_at')
 	display = []
@@ -148,7 +148,7 @@ def update(request, model, id):
 		value = request.POST[field] if field in request.POST else template.default
 		thing = template.set(thing, field, request.POST, True)
 	thing.save()
-	# return redirect("/rest/index/coursetrad?e=True")
+	return redirect("/rest/index/coursetrad?e=True")
 	return redirect("/rest/show/{}/{}".format(model, thing.id))
 
 def delete(request, model, id):
