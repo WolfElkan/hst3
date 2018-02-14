@@ -51,7 +51,7 @@ Glyph | Meaning
 ### Examples
 
 Expression | Description
-:---: | ---
+:------: | ---
 `a g`| Student must meet age and grade requirements.  (Most HST classes have this Eligex)
 `a g f` | Student must meet age and grade requirements, and be a girl (This is the eligex for Broadway Choir)
 `< J* Z* >` | Student must be enrolled (either now or formerly) an a Jazz or Broadway Jazz Class

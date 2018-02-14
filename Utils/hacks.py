@@ -1,14 +1,11 @@
 from trace import TRACE, DEV
+from django.db.models.query import QuerySet
 
 
 from inspect import getargspec # Update getargspec -> signature in Python3
 
 def collect(thing, lam):
-	if type(thing) is dict or hasattr(thing, '__dict__'):
-		new = {}
-		for key in thing:
-			new[key] = lam(thing[key])
-	elif type(thing) is list or hasattr(thing, '__iter__'):
+	if type(thing) in [list, QuerySet]:
 		new = []
 		nargs = len(getargspec(lam).args)
 		if nargs == 1:
@@ -17,6 +14,11 @@ def collect(thing, lam):
 		elif nargs == 2:
 			for t in range(len(thing)):
 				new.append(lam(thing[t],t))
+	elif hasattr(thing, '__dict__'):
+		print '*'*100
+		new = {}
+		for key in thing:
+			new[key] = lam(thing[key])
 	else:
 		new = thing.copy()
 	return new
