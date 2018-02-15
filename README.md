@@ -32,11 +32,11 @@ To further refine these searches, the following modifiers may be appended *after
 
 Glyph | Meaning
 :---: | ---
-`c` | Will match only *current* enrollments
-`p` | Will match only *past* enrollments
+`c` | Will match only enrollments in the *current* year
+`p` | Will match only enrollments in *past* years.
 `$` | Will match only enrollments for which tuition has been paid
-`@` | Will match an audition or skill assessment for the specified course, even if the audition was failed.  (If omitted, word will match only actual enrollments. Not auditions)
-`@@`| Will match only a *successful* audition
+`@` | Will match an audition or skill assessment for the specified course, even if the audition was failed.  If omitted, word will match only actual enrollments, not auditions.
+`@@`| Will match only a *successful* audition.  A student is considered eligible to audition for a course if they would be eligible to enroll in it, should they pass an audition.
 
 ### Boolean Operators
 
@@ -50,14 +50,75 @@ Glyph | Meaning
 
 ### Examples
 
-Expression | Description
-:------: | ---
-`a g`| Student must meet age and grade requirements.  (Most HST classes have this Eligex)
-`a g f` | Student must meet age and grade requirements, and be a girl (This is the eligex for Broadway Choir)
-`< J* Z* >` | Student must be enrolled (either now or formerly) an a Jazz or Broadway Jazz Class
-`< a { ay @ } >` | Students who meet the age requirement may enroll immediately, but students who are 1 year too young may audition.
-`a g < I*p T*p P*p >` | Students must meet age and grade requirements and have formerly taken either an Irish class, or a Tap or Broadway Tap class. (This is the eligex for Irish Hard Shoe)
-`a g A*p @` |  Students must meet age and grade requirements, and have taken an Acting class in order to audition (Senior and Shakespeare Troupe)
+Eligex | Class | Description
+:------: | :---: | ------------
+`a g` | All classes not listed here | Student must meet age and grade requirements.  
+`a g f`<br>`a g m`|Broadway Choir<br>Boys Jazz &amp; Hip Hop| Student must meet age and grade requirements, <br>and be a girl or boy respectively.
+`a g @ **c`|A Capella Choir| Students must meet age and grade requirements, <br>pass an audition, and be currently enrolled in at <br>least 1 other class.
+`< a { ay @ } >`|Jazz 1| Students who meet the age requirement <br>may enroll immediately, but students who <br>are 1 year too young may audition.
+`a g @`|Broadway Tap 2<br>Broadway Jazz 2|Students must meet age and grade requirements<br>and pass a skill assessment.
+`a g < T2p { @ T1p } >`<br>`a g < T4p { @ T3p } >`<br>`a g < J2p { @ J1p } >`<br>`a g < J4p { @ J3p } >`|Tap 2<br>Tap 4<br>Jazz 2<br>Jazz 4<br>|In addition to age and grade, students<br>either have taken the class one level <br>below this and pass a skill assessment, <br>or have already taken this class.
+`a g < T3p { @ T2p } { @ P2p } >`||
+`a g < I*p T*p P*p >` || Students must meet age and grade requirements <br>and have formerly taken either an Irish class, or a <br>Tap or Broadway Tap class. 
+`a g A*p @`           ||  Students must meet age and grade requirements, <br>and have taken an Acting class in order to audition 
+
+<!-- ## Antimony Protocol -->
+
+## HST Class Traditions
+
+`CourseTrad`
+
+### Enrollable Classes
+ ID  | Title                   | Ages    | Grades | Eligex                           | Note
+:---:|-------------------------|:-------:|:------:|:--------------------------------:|-----:
+`AA` | Acting A                |  9 - 11 | 1 - 12 | `a`                              | 1
+`AB` | Acting B                | 12 - 18 | 1 - 12 | `a`                              | 1
+`C1` | Broadway Choir          | 10 - 18 | 1 - 12 | `a f`                            | 2
+`C2` | A Cappella Choir        | 14 - 18 | 1 - 12 | `a c @@`                         | 4
+`J1` | Jazz 1                  |  9 - 12 | 1 - 12 | `< a { ay @@ } >`                | 5
+`J2` | Jazz 2                  | 11 - 12 | 1 - 12 | `a < J2p { @@ J1p } >`           | 6
+`J3` | Jazz 3                  | 14 - 18 | 1 - 12 | `a < J3p { @@ J2p } { @@ Z2p } >`| 7
+`J4` | Jazz 4                  | 16 - 18 | 1 - 12 | `a < J4p { @@ J3p } >`           | 6
+`Z1` | Broadway Jazz 1         | 13 - 18 | 1 - 12 | `a`                              | 1
+`Z2` | Broadway Jazz 2         | 13 - 18 | 1 - 12 | `a @@`                           | 3
+`T1` | Tap 1                   |  9 - 12 | 1 - 12 | `a`                              | 1
+`T2` | Tap 2                   | 11 - 12 | 1 - 12 | `a < T2p { @@ T1p } >`           | 6
+`T3` | Tap 3                   | 14 - 18 | 1 - 12 | `a < T3p { @@ T2p } { @@ P2p } >`| 7
+`T4` | Tap 4                   | 16 - 18 | 1 - 12 | `a < T4p { @@ T3p } >`           | 6
+`P1` | Broadway Tap 1          | 13 - 18 | 1 - 12 | `a`                              | 1
+`P2` | Broadway Tap 2          | 13 - 18 | 1 - 12 | `a @@`                           | 3
+`IS` | Irish Dance Soft Shoe   |  9 - 18 | 1 - 12 | `a`                              | 1
+`IH` | Irish Dance Hard Shoe   | 11 - 18 | 1 - 12 | `a < I*p T*p P*p >`              | 8
+`HB` | Boys Jazz &amp; Hip-Hop |  9 - 12 | 1 - 12 | `a m`                            | 2
+`HJ` | Jazz &amp; Hip-Hop      | 13 - 18 | 1 - 12 | `a`                              | 1
+`GA` | JR/GB General Audition  | 10 - 13 | 4 -  8 | `a g A*p !S*p @@`                |10
+`SG` | Gaithersburg Troupe     | 10 - 13 | 4 -  8 | `a g A*p S*p @@`                 | 9
+`SJ` | Junior Troupe           | 10 - 13 | 4 -  8 | `a g A*p S*p @@`                 | 9
+`SB` | Travel Troupe           | 14 - 18 | 1 - 12 | `a A*p`                          |11
+`SH` | Shakespeare Troupe      | 14 - 18 | 9 - 12 | `a g A*p @@`                     |12
+`SR` | Senior Troupe           | 14 - 18 | 9 - 12 | `a g A*p @@`                     |12
+`WN` | Painting Workshop       | 14 - 18 | 1 - 12 | `a`                              | 1
+`WP` | Prop Workshop           | 14 - 18 | 1 - 12 | `a`                              | 1
+`WW` | Wig Workshop            | 14 - 18 | 1 - 12 | `a`                              | 1
+`WX` | Tech Crew Workshop      | 12 - 18 | 1 - 12 | `a`                              | 1
+`XA` | Tech Apps               | 12 - 18 | 1 - 12 | `a`                              | 1
+`XM` | Makeup Team             | 14 - 18 | 1 - 12 | `a`                              | 1
+`XX` | Tech Team               | 12 - 18 | 1 - 12 | `a WX`                           |13
+
+#### Notes:
+1. Students need only meet age requirements for Acting classes, Level 1 Tap, Broadway Tap or Broadway Jazz classes, Irish Soft Shoe, Co-ed Jazz &amp; Hip-Hop, Workshops, Tech Apps, or Makeup Team,
+2. Students must meet age requirements, and be a girl or boy to be in Broadway Choir or Boy's Jazz &amp; Hip-Hop respectively.
+3. Students must meet age requirements, and pass an audition or skill assessment for Level 2 Broadway Tap and Jazz classes.
+4. Students must meet age requirements, and be enrolled in at least 1 other class concurrently in order to audition for A Capella Choir.
+5. Students who meet age requirements may enroll in Jazz 1 immediately, but students who are 1 year too young may still audition.
+6. All students must meet age requirements.  Students who have already taken this class may enroll immediately.  Students who have taken the class 1 level below in the same genre may enroll if they pass an audition.
+7. Same as note 6, but previous enrollment in the preceding class's Broadway counterpart is also accepted.
+8. Students must meet age requirements, and have taken any Tap, Broadway Tap, or Irish class in the past.
+9. Students who meet age and grade requirements, have taken an acting class, and have already been in a troupe, may audition directly for Junior or Gaithersburg Troupe.
+10. Students who meet age and grade requirements, and have taken an acting class, but have not been a troupe, may audition jointly for both Junior and Gaithersburg Troupe.
+11. Students who meet age requirements, and have taken an Acting class, may enroll in Travel Troupe with no audition necessary.
+12. Students who meet age and grade requirements, and have taken an acting class, may audition for Senior or Shakespeare Troupes.
+13. Students who meet the age requirements and have taken the Tech Crew Workshop (either this year or in the past) may sign up for the Tech Team.
 
 <!-- `a g A*p S*p @` | Students must meet age and grade requirements, have taken an Acting class, *and* must have already been in a troupe in order to audition for this class.  This is the eligex
 `a g A*p !S*p @` | Students must meet age and grade requirements, and have taken an Acting class, but *not* yet been in a troupe

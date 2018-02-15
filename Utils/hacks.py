@@ -1,6 +1,6 @@
 from trace import TRACE, DEV
 from django.db.models.query import QuerySet
-
+from django.http.request import QueryDict
 
 from inspect import getargspec # Update getargspec -> signature in Python3
 
@@ -15,7 +15,6 @@ def collect(thing, lam):
 			for t in range(len(thing)):
 				new.append(lam(thing[t],t))
 	elif hasattr(thing, '__dict__'):
-		print '*'*100
 		new = {}
 		for key in thing:
 			new[key] = lam(thing[key])

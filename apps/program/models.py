@@ -93,7 +93,7 @@ class CourseTrad(models.Model):
 			return self.genre_codes[code]
 	def check_eligex(self, student, year, **kwargs):
 		if re.match(r'<[^>]*<|{[^}]*{',self.eligex):
-			print 'Nested clauses of the same type are not currently supported.  Call Wolf if you need this changed.'
+			raise Exception('Nested clauses of the same type are not currently supported.  \nCall Wolf if you need this changed: (267) 380-0597')
 		eligex = kwargs.pop('eligex') if 'eligex' in kwargs else self.eligex
 		conj   = kwargs.pop('conj')   if 'conj'   in kwargs else True
 		kwargs['aud'] = kwargs['aud'] if 'aud' in kwargs else False
