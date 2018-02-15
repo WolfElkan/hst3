@@ -1,26 +1,19 @@
 from django.shortcuts import render, redirect, HttpResponse
-from apps.people.models import Family, Address, Parent, User, Student
-from apps.program.managers import CourseTrads, Courses, Enrollments, Auditions
-from Utils.custom_fields import Bcrypt, PhoneNumber
-from datetime import datetime
-from Utils.hacks import copy, copyatts, seshinit, forminit, getme, json, copy_items_to_attrs, year, FriendlyEncoder, namecase, Each, equip, find_all, pretty, authorized
-import json as JSON
-from io import StringIO
-from trace import TRACE, DEV
+
+from apps.people.managers import Families, Addresses, Parents, Users, Students
+from apps.program.managers import CourseTrads, Courses, Enrollments
+
+from Utils.data  import collect, copy, copyatts, Each, equip, find, find_all, sub
+from Utils.debug import pretty, pdir
+from Utils.fjson import FriendlyEncoder
+from Utils.misc  import namecase, safe_delete
+from Utils.security import authorized, getme, getyear
+from Utils.seshinit import seshinit, forminit
+
 import re
 
-Addresses = Address.objects
-Families  = Family.objects
-Parents   = Parent.objects
-Students  = Student.objects
-Users     = User.objects
-
-
-# - - - - - APPLICATION VIEWS - - - - -
-
 def index(request):
-	if TRACE:
-		print '@ main.views.index'
+	print type(request)
 	me = getme(request)
 	context = {
 		'name':me.owner if me else None,
@@ -30,8 +23,6 @@ def index(request):
 
 
 def login(request):
-	if TRACE:
-		print '@ main.views.login'
 	forminit(request,'login',['username','password'])
 	if request.method == 'GET':
 		return login_get(request)
@@ -42,14 +33,10 @@ def login(request):
 		return index(request)
 
 def login_get(request):
-	if TRACE:
-		print '@ main.views.login_get'
 	context = copy(request.session, ['p','e'])
 	return render(request, 'main/login.html', context)
 
 def login_post(request):
-	if TRACE:
-		print '@ main.views.login_post'
 	me = Users.fetch(username=request.POST['username'])
 	persist = copy(request.POST, ['username','password'])
 	if not me:
@@ -75,15 +62,11 @@ def login_post(request):
 
 
 def logout(request):
-	if TRACE:
-		print '@ main.views.logout'
 	request.session.clear()
 	return redirect ('/')
 
 
 def account(request):
-	if TRACE:
-		print '@ main.views.account'
 	me = getme(request)
 	password = unicode(me.password.html)
 	context = {
@@ -128,8 +111,6 @@ def changepassword_post(request):
 #   - - - - NEW FAMILY REGISTRATION - - - -
 
 # def reg(request):
-# 	if TRACE:
-# 		print '@ main.views.reg'
 # 	me = getme(request)
 # 	if not me or not me.owner:
 # 		return redirect('/register/familyinfo')
@@ -140,8 +121,6 @@ def changepassword_post(request):
 
 
 # def reg_familyinfo(request):
-# 	if TRACE:
-# 		print '@ main.views.reg_familyinfo'
 # 	forminit(request,'family',['last','phone','email'])
 # 	forminit(request,'user',['username','password','pw_confm'])
 # 	seshinit(request,'password_set',False)
@@ -154,8 +133,6 @@ def changepassword_post(request):
 # 		return index(request)
 
 # def reg_familyinfo_get(request):
-# 	if TRACE:
-# 		print '@ main.views.reg_familyinfo_get'
 # 	me = getme(request)
 # 	if me and me.owner:
 # 		request.session['p']['family'].update(copyatts(me.owner, ['last','phone_type','email']))
@@ -166,8 +143,6 @@ def changepassword_post(request):
 # 	return render(request, 'register/familyinfo.html', context)
 
 # def reg_familyinfo_post(request):
-# 	if TRACE:
-# 		print '@ main.views.reg_familyinfo_post'
 # 	me = getme(request)
 # 	if me:
 # 		me.username = request.POST['username']
@@ -219,8 +194,6 @@ def changepassword_post(request):
 
 # # if me.owner
 # def reg_parentsinfo(request):
-# 	if TRACE:
-# 		print '@ main.views.reg_parentsinfo'
 # 	if not authorized(request):
 # 		return redirect('/')
 # 	forminit(request,'mom',['mom_skipped','mom_first','mom_alt_last','mom_alt_phone','mom_alt_email'])
@@ -234,8 +207,6 @@ def changepassword_post(request):
 # 		return index(request)
 
 # def reg_parentsinfo_get(request):
-# 	if TRACE:
-# 		print '@ main.views.reg_parentsinfo_get'
 # 	me = getme(request)
 # 	if not me or not me.owner:
 # 		return redirect('/register/familyinfo')
@@ -265,8 +236,6 @@ def changepassword_post(request):
 # 	return render(request, 'register/parentsinfo.html', context)
 
 # def reg_parentsinfo_post(request):
-# 	if TRACE:
-# 		print '@ main.views.reg_parentsinfo_post'
 # 	me = getme(request)
 # 	# Create new Parent objects
 # 	mom = copy(request.POST, [
@@ -346,8 +315,6 @@ def changepassword_post(request):
 
 # # if me.owner.mother or me.owner.father
 # def reg_studentsinfo(request):
-# 	if TRACE:
-# 		print '@ main.views.reg_studentsinfo'
 # 	if not authorized(request):
 # 		return redirect('/')
 # 	elif request.method == 'GET':
@@ -359,8 +326,6 @@ def changepassword_post(request):
 # 		return index(request)
 
 # def reg_studentsinfo_get(request):
-# 	if TRACE:
-# 		print '@ main.views.reg_studentsinfo_get'
 # 	me = getme(request)
 # 	if not me or not me.owner or not (me.owner.mother or me.owner.father):
 # 		return redirect('/register')
@@ -379,8 +344,6 @@ def changepassword_post(request):
 # 	return render(request, 'register/studentsinfo.html', context)
 
 # def reg_studentsinfo_post(request):
-# 	if TRACE:
-# 		print '@ main.views.reg_studentsinfo_post'
 # 	me = getme(request)
 # 	students = JSON.loads(request.POST['students'])
 # 	for student in students:

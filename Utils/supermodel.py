@@ -1,13 +1,8 @@
-# - - - - - DEPENDENCIES - - - - -
-
 from __future__ import unicode_literals
 from django.db import models, connection
 from datetime import datetime
 import re
-# from .hacks import get
-from trace import TRACE
-
-# - - - - - CLASSES - - - - -
+from .data import find
 
 class Validation(object):
 	def __init__(self, field, error):
@@ -28,6 +23,12 @@ class Validation(object):
 			else:
 				messages[self.field] += ' ' + self.error
 		return messages
+	def __json__(self):
+		return {
+			'field':self.field,
+			'regex':self.regex,
+			'error':self.error,
+		}
 
 class Regular(Validation):
 	def __init__(self, field, regex, error):
@@ -37,7 +38,7 @@ class Regular(Validation):
 	def __mistype(self, data):
 		return type(data[self.field]) not in self.types
 	def __valid(self, data):
-		datum = get(data, self.field)
+		datum = find(data, self.field)
 		return self.__mistype(data) or re.match(self.regex, datum)
 	def isValid(self, data, **kwargs):
 		andLast = kwargs['andLast'] if 'andLast' in kwargs else True
@@ -56,7 +57,7 @@ class Present(Regular):
 	def __mistype(self, data):
 		return type(data[self.field]) not in self.types
 	def __valid(self, data):
-		datum = get(data, self.field)
+		datum = find(data, self.field)
 		return self.__mistype(data) or re.match(self.regex, datum)
 	def isValid(self, data, **kwargs):
 		andLast = kwargs['andLast'] if 'andLast' in kwargs else True

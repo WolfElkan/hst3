@@ -1,20 +1,18 @@
 from django.shortcuts import render, redirect, HttpResponse
+
+from Utils.data  import collect, sub
+
 from datetime import datetime
-from Utils.hacks import copy, getme, seshinit, forminit, copyatts, pretty, pdir, sub, collect
 import re
+
 from .fields import FIELDS
 from .widgets import MODELS
-from trace import TRACE
 
 def home(request):
-	if TRACE:
-		print '@ rest.views.home'
 	context = {}
 	return render(request, 'rest/home.html', context)
 
 def index(request, model):
-	if TRACE:
-		print '@ rest.views.index'
 	columns = []
 	for ftp in FIELDS[model]:
 		field = ftp['field']
@@ -41,8 +39,6 @@ def index(request, model):
 	return render(request, 'rest/index.html', context)
 
 def new(request, model, **kwargs):
-	if TRACE:
-		print '@ rest.views.new'
 	if 'foreign_model' in kwargs:
 		old_model = model
 		model = kwargs['foreign_model']
@@ -75,8 +71,6 @@ def new(request, model, **kwargs):
 	return render(request, 'rest/new.html', context)
 
 def create(request, model, **kwargs):
-	if TRACE:
-		print '@ rest.views.create'
 	if 'foreign_model' in kwargs:
 		old_model = model
 		model = kwargs['foreign_model']
@@ -98,18 +92,12 @@ def create(request, model, **kwargs):
 	return redirect('/rest/show/{}/{}/'.format(old_model,kwargs['id']) if old_model else '/rest/show/{}/{}/'.format(thing.rest_model,thing.id))
 
 def show(request, model, id):
-	if TRACE:
-		print '@ rest.views.show'
 	return show_or_edit(request, model, id, False)
 
 def edit(request, model, id):
-	if TRACE:
-		print '@ rest.views.edit'
 	return show_or_edit(request, model, id, True)
 
 def show_or_edit(request, model, id, isEdit):
-	if TRACE:
-		print '@ rest.views.show_or_edit'
 	manager = MODELS[model]
 	thing = manager.get(id=id)
 	tempset = FIELDS[model]
@@ -138,8 +126,6 @@ def show_or_edit(request, model, id, isEdit):
 	return render(request, 'rest/edit.html' if isEdit else 'rest/show.html', context)
 
 def update(request, model, id):
-	if TRACE:
-		print '@ rest.views.update'
 	manager = MODELS[model]
 	thing = manager.get(id=id)
 	for ftp in FIELDS[model]:
@@ -152,8 +138,6 @@ def update(request, model, id):
 	return redirect("/rest/show/{}/{}".format(model, thing.id))
 
 def delete(request, model, id):
-	if TRACE:
-		print '@ rest.views.delete'
 	manager = MODELS[model]
 	thing = manager.get(id=id)
 	thing.delete()

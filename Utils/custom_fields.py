@@ -2,8 +2,7 @@ from django.db import models
 import bcrypt, re
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django_mysql import models as sqlmod
-from .hacks import get as _
-from .hacks import pdir
+from .data import find as _
 from . import gistfile1 as poly
 from datetime import datetime
 from decimal import Decimal

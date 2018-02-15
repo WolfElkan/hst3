@@ -1,23 +1,19 @@
 from django.shortcuts import render, redirect, HttpResponse
+
+from apps.people.managers import Families, Addresses, Parents, Users, Students
+from apps.program.managers import CourseTrads, Courses, Enrollments
+
 from Utils.custom_fields import Bcrypt, PhoneNumber, DayOfWeek
-from datetime import datetime
-from Utils.hacks import copy, getme, seshinit, pretty, pdir, Each, namecase, year
-import re
-
-from apps.people.models import Family, Address, Parent, User, Student
-Addresses = Address.objects
-Families  = Family.objects
-Parents   = Parent.objects
-Students  = Student.objects
-Users     = User.objects
-
-from apps.program.models import Venue, CourseTrad, Course, Enrollment
-Venues      = Venue.objects
-CourseTrads = CourseTrad.objects
-Courses     = Course.objects
-Enrollments = Enrollment.objects
-
+from Utils.data  import collect, copy, copyatts, Each, equip, find, find_all, sub
+from Utils.debug import pretty, pdir
+from Utils.fjson import FriendlyEncoder
+from Utils.misc  import namecase, safe_delete
+from Utils.security import authorized, getme, getyear
+from Utils.seshinit import seshinit, forminit
 from Utils.snippets import order_coursetrads
+
+from datetime import datetime
+import re
 
 def check_en(student, course):
 	print '{} is {}eligible for {}'.format(student,'' if student.eligible(course) else 'not ',course)

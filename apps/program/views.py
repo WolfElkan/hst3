@@ -1,22 +1,10 @@
 from django.shortcuts import render, redirect, HttpResponse
-from apps.people.models import Family, Address, Parent, User, Student
+
+from apps.people.managers import Families, Addresses, Parents, Users, Students
 from .managers import CourseTrads, Courses, Enrollments, Auditions
-from Utils.custom_fields import Bcrypt, PhoneNumber
-from datetime import datetime
-from Utils.hacks import copy, copyatts, seshinit, forminit, getme, json, copy_items_to_attrs, year, FriendlyEncoder, namecase, Each, equip, find_all, pretty
-import json as JSON
-from io import StringIO
-from trace import TRACE, DEV
-import re
 
-Addresses = Address.objects
-Families  = Family.objects
-Parents   = Parent.objects
-Students  = Student.objects
-Users     = User.objects
-
-def hours_worked(family):
-	return 0.0
+from Utils.data  import equip, find_all
+from Utils.security import authorized, getme, getyear
 
 def courses(request, **kwargs):
 	me = getme(request)
@@ -30,7 +18,7 @@ def courses(request, **kwargs):
 			return redirect('/')
 	else:
 		current_student = me.owner.children[0]
-	reg_year = year()
+	reg_year = getyear()
 	courses = Courses.filter(year=reg_year,tradition__e=True).order_by('tradition__order')
 	cart = me.owner.enrollments_in(reg_year)
 	volunteer_total = me.owner.volunteer_total_in(reg_year)
@@ -48,8 +36,8 @@ def courses(request, **kwargs):
 		},
 		'hours' : {
 			'total' : volunteer_total,
-			'paid'  : hours_worked(me.owner),
-			'unpaid': volunteer_total - hours_worked(me.owner),
+			'paid'  : me.owner.hours_worked,
+			'unpaid': volunteer_total - me.owner.hours_worked,
 		},
 		'tuition' : {
 			'total' : me.owner.total_tuition_in(reg_year),
@@ -100,7 +88,7 @@ def courses_drop(request, **kwargs):
 			student__family=student.family, 
 			course__tradition__prepaid=True, 
 			course__tradition__show=course.show,
-			course__year=year()
+			course__year=getyear()
 		)
 		# Otherwise, delete the prepaid tickets from the cart
 		if not other:
@@ -110,7 +98,3 @@ def courses_drop(request, **kwargs):
 			if prepaid:
 				prepaid.delete()
 	return redirect('/register/student/{}/'.format(student_id))
-
-
-def courses_post(request):
-	return redirect('/')

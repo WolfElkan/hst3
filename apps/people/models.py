@@ -1,14 +1,17 @@
-from __future__ import unicode_literals
 from django.db import models
+
+from .managers import Addresses, Families, Parents, Students, Users
+from apps.program.managers import CourseTrads, Courses, Enrollments
+
 from Utils import custom_fields as custom
 from Utils import supermodel as sm
-from Utils.hacks import safe_delete, copyatts, year, equip, Each, collect
+from Utils.data import collect, copyatts
+from Utils.misc import namecase, safe_delete
+
 from django_mysql import models as sqlmod
-from .managers import Addresses, Families, Parents, Students, Users
 from datetime import datetime
 from trace import DEV
 
-from apps.program.managers import CourseTrads, Courses, Enrollments
 
 class Address(models.Model):
 	line1      = models.CharField(null=False, max_length=50)
@@ -80,20 +83,22 @@ class Family(models.Model):
 		return self.last
 	def children(self):
 		return Students.filter(family_id=self.id).order_by('birthday')
-	def enrollments_in(self, in_year):
-		return Enrollments.filter(student__family=self, course__year=in_year).order_by('created_at')
-	def paid_enrollments_in(self, in_year):
-		return self.enrollments_in(in_year).filter(paid=True)
-	def unpaid_enrollments_in(self, in_year):
-		return self.enrollments_in(in_year).filter(paid=False)
-	def volunteer_total_in(self, in_year):
-		return max([0.0]+list(collect(self.enrollments_in(in_year), lambda enr: enr.course.vol_hours)))
-	def total_tuition_in(self, in_year):
-		return sum(collect(self.enrollments_in(in_year), lambda enr: 0 if enr.isAudition else enr.course.tuition))
-	def paid_tuition_in(self, in_year):
+	def enrollments_in(self, year):
+		return Enrollments.filter(student__family=self, course__year=year).order_by('created_at')
+	def paid_enrollments_in(self, year):
+		return self.enrollments_in(year).filter(paid=True)
+	def unpaid_enrollments_in(self, year):
+		return self.enrollments_in(year).filter(paid=False)
+	def volunteer_total_in(self, year):
+		return max([0.0]+list(collect(self.enrollments_in(year), lambda enr: enr.course.vol_hours)))
+	def hours_worked(self):
+		return 0.0
+	def total_tuition_in(self, year):
+		return sum(collect(self.enrollments_in(year), lambda enr: 0 if enr.isAudition else enr.course.tuition))
+	def paid_tuition_in(self, year):
 		return 0
-	def unpaid_tuition_in(self, in_year):
-		return self.total_tuition_in(in_year) - self.paid_tuition_in(in_year)
+	def unpaid_tuition_in(self, year):
+		return self.total_tuition_in(year) - self.paid_tuition_in(year)
 	def delete(self):
 		safe_delete(self.mother)
 		safe_delete(self.father)
@@ -103,9 +108,9 @@ class Family(models.Model):
 	def __str__(self):
 		return self.last+' Family'
 	def __getattribute__(self, field):
-		if field in ['mother','father','unique_last','children','enrollments']:
-			function = super(Family, self).__getattribute__(field)
-			return function()
+		if field in ['mother','father','unique_last','children','enrollments','hours_worked']:
+			call = super(Family, self).__getattribute__(field)
+			return call()
 		else:
 			return super(Family, self).__getattribute__(field)
 	def __setattr__(self, field, value):
@@ -161,14 +166,14 @@ class Student(models.Model):
 		return course.enroll(self)
 	def audition(self, course):
 		return course.audition(self)
-	def hst_age_in(self, in_year):
-		return in_year - self.birthday.year - 1
+	def hst_age_in(self, year):
+		return year - self.birthday.year - 1
 	def hst_age(self):
-		return self.hst_age_in(year())
-	def grade_in(self, in_year):
-		return in_year - self.grad_year + 12
+		return self.hst_age_in(getyear())
+	def grade_in(self, year):
+		return year - self.grad_year + 12
 	def grade(self):
-		return self.grade_in(year())
+		return self.grade_in(getyear())
 	def enrollments(self):
 		return Enrollments.filter(student=self).order_by('course__year')
 	def enrollments_in(self, year):
@@ -177,16 +182,16 @@ class Student(models.Model):
 		return self.enrollments.filter(course__year__lt=year)
 	def auditions(self):
 		return Enrollments.filter(student=self, isAudition=True)
-	def auditions_in(self, in_year):
-		return Enrollments.filter(student=self, isAudition=True, course__year=in_year)
+	def auditions_in(self, year):
+		return Enrollments.filter(student=self, isAudition=True, course__year=year)
 	def courses(self): # TODO: Use a DB join statement instead # As if I know how to do that
 		qset = []
 		for enrollment in self.enrollments:
 			qset.append(Courses.get(id=enrollment.course_id))
 		return qset
-	def courses_in(self, in_year): 
+	def courses_in(self, year): 
 		qset = []
-		for enrollment in self.enrollments_in(in_year):
+		for enrollment in self.enrollments_in(year):
 			qset.append(Courses.get(id=enrollment.course_id))
 		return qset
 	def courses_toggle_enrollments(self):

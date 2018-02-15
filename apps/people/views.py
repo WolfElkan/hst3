@@ -1,23 +1,20 @@
 from django.shortcuts import render, redirect, HttpResponse
-from .models import Family, Address, Parent, User, Student
-from apps.program.managers import CourseTrads, Courses, Enrollments, Auditions
-from Utils.custom_fields import Bcrypt, PhoneNumber
-from datetime import datetime
-from Utils.hacks import copy, copyatts, seshinit, forminit, getme, json, copy_items_to_attrs, year, FriendlyEncoder, namecase, Each, equip, find_all, pretty, authorized, collect
-import json as JSON
-from io import StringIO
-from trace import TRACE, DEV
-import re
 
-Addresses = Address.objects
-Families  = Family.objects
-Parents   = Parent.objects
-Students  = Student.objects
-Users     = User.objects
+from .managers import Families, Addresses, Parents, Users, Students
+from apps.program.managers import CourseTrads, Courses, Enrollments, Auditions
+
+from Utils.custom_fields import Bcrypt, PhoneNumber
+from Utils.data  import collect, copy, copyatts
+from Utils.fjson import FriendlyEncoder, json
+from Utils.misc  import namecase
+from Utils.security import authorized, getme, getyear
+from Utils.seshinit import seshinit, forminit
+
+import re
+from datetime import datetime
+import json as JSON
 
 def reg(request):
-	if TRACE:
-		print '@ main.views.reg'
 	me = getme(request)
 	if not me or not me.owner:
 		return redirect('/register/familyinfo')
@@ -28,8 +25,6 @@ def reg(request):
 
 
 def familyinfo(request):
-	if TRACE:
-		print '@ main.views.familyinfo'
 	forminit(request,'family',['last','phone','email'])
 	forminit(request,'user',['username','password','pw_confm'])
 	seshinit(request,'password_set',False)
@@ -42,8 +37,6 @@ def familyinfo(request):
 		return index(request)
 
 def familyinfo_get(request):
-	if TRACE:
-		print '@ main.views.familyinfo_get'
 	me = getme(request)
 	if me and me.owner:
 		request.session['p']['family'].update(copyatts(me.owner, ['last','phone_type','email']))
@@ -54,8 +47,6 @@ def familyinfo_get(request):
 	return render(request, 'familyinfo.html', context)
 
 def familyinfo_post(request):
-	if TRACE:
-		print '@ main.views.familyinfo_post'
 	me = getme(request)
 	if me:
 		me.username = request.POST['username']
@@ -107,8 +98,6 @@ def familyinfo_post(request):
 
 # if me.owner
 def parentsinfo(request):
-	if TRACE:
-		print '@ main.views.parentsinfo'
 	if not authorized(request):
 		return redirect('/')
 	forminit(request,'mom',['mom_skipped','mom_first','mom_alt_last','mom_alt_phone','mom_alt_email'])
@@ -122,8 +111,6 @@ def parentsinfo(request):
 		return index(request)
 
 def parentsinfo_get(request):
-	if TRACE:
-		print '@ main.views.parentsinfo_get'
 	me = getme(request)
 	if not me or not me.owner:
 		return redirect('/register/familyinfo')
@@ -153,8 +140,6 @@ def parentsinfo_get(request):
 	return render(request, 'parentsinfo.html', context)
 
 def parentsinfo_post(request):
-	if TRACE:
-		print '@ main.views.parentsinfo_post'
 	me = getme(request)
 	# Create new Parent objects
 	mom = copy(request.POST, [
@@ -234,8 +219,6 @@ def parentsinfo_post(request):
 
 # if me.owner.mother or me.owner.father
 def studentsinfo(request):
-	if TRACE:
-		print '@ main.views.studentsinfo'
 	if not authorized(request):
 		return redirect('/')
 	elif request.method == 'GET':
@@ -247,12 +230,10 @@ def studentsinfo(request):
 		return index(request)
 
 def studentsinfo_get(request):
-	if TRACE:
-		print '@ main.views.studentsinfo_get'
 	me = getme(request)
 	if not me or not me.owner or not (me.owner.mother or me.owner.father):
 		return redirect('/register')
-	reg_year = year()
+	reg_year = getyear()
 	grades = []
 	for x in range(1,13):
 		grades += [{'grade':x,'grad_year':reg_year - x + 12}]
@@ -261,14 +242,12 @@ def studentsinfo_get(request):
 		'grades'  : grades,
 		'family'  : me.owner,
 		't_shirt_sizes': collect(Students.model.t_shirt_sizes, lambda obj: dict(collect(obj,lambda val, index: ['no'+str(index),val]))),
-		'validations'  : json(Students.validations),
+		'validations'  : JSON.dumps(Students.validations, cls=FriendlyEncoder),
 		'students': JSON.dumps(list(me.owner.children), cls=FriendlyEncoder) if me.owner.children else [],
 	}
 	return render(request, 'studentsinfo.html', context)
 
 def studentsinfo_post(request):
-	if TRACE:
-		print '@ main.views.studentsinfo_post'
 	me = getme(request)
 	students = JSON.loads(request.POST['students'])
 	for student in students:

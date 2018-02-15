@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 from django.db import models
 from Utils import custom_fields as custom
 from Utils import supermodel as sm
-from Utils.hacks import sub, Each
+from Utils.data import sub, Each
 from django_mysql import models as sqlmod
 from .managers import CourseTrads, Courses, Enrollments
 Q = models.Q
@@ -63,7 +63,7 @@ class CourseTrad(models.Model):
 		'H':'Jazz/Hip-Hop',
 		'I':'Irish',
 		'J':'Jazz',
-		# 'K':'Prepaid Tickets',
+		'K':'Prepaid Tickets',
 		# 'L':'Sign Language',
 		# 'M':'',
 		# 'N':'',
@@ -301,7 +301,7 @@ class Enrollment(models.Model):
 	auto       = models.BooleanField(default=False)
 	ret_status = models.BooleanField(default=False)
 	happened   = models.BooleanField(default=False)
-	success    = models.NullBooleanField()	
+	success    = models.NullBooleanField()
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
 	rest_model = "enrollment"
