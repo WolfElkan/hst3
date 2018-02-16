@@ -20,14 +20,16 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
 ]
 from django.conf.urls import include
-import apps.main.views as main
-import apps.people.views as people
+
+from . import dev_views   as dev
+import apps.main.views    as main
+import apps.payment.views as payment
+import apps.people.views  as people
 import apps.program.views as program
-import apps.rest.views as rest
+import apps.radmin.views  as radmin
+import apps.rest.views    as rest
 import apps.reports.views as reports
-import apps.rest.seed as seed
-import apps.program.seed as program_seed
-from . import dev_views as dev
+import apps.rest.seed     as seed
 
 urlpatterns = [
 	url(r'^$', main.index),

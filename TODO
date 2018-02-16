@@ -60,7 +60,7 @@ payment
 
 Utils
 X	namecase
-	Clean up hacks.py
+X	Clean up hacks.py
 	__json__ -> _json_
 
 Clean Up Inheritance

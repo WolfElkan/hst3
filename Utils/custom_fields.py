@@ -8,6 +8,8 @@ from datetime import datetime
 from decimal import Decimal
 from trace import TRACE
 
+EnumField = sqlmod.EnumField
+
 class Bcrypt(object):
 	def __init__(self, char60):
 		self.char60 = char60.char60 if type(char60) is Bcrypt else char60
@@ -105,7 +107,7 @@ class DayOfWeek(object):
 			thing.__setitem__(field, value)
 		return thing
 
-class DayOfWeekField(sqlmod.EnumField):
+class DayOfWeekField(EnumField):
 	def __init__(self, **kwargs):
 		kwargs['choices'] = short_days
 		super(DayOfWeekField, self).__init__(**kwargs)
@@ -290,7 +292,7 @@ class PolymorphicField(poly.MultiColumnField):
 		for rel in relatables:
 			self.relatable_names += [rel.__name__.title()]
 		self.fields = {
-			'type': sqlmod.EnumField(null=True, choices=self.relatable_names),
+			'type': EnumField(null=True, choices=self.relatable_names),
 			'id'  : models.PositiveIntegerField(null=True),
 		}
 		this = self

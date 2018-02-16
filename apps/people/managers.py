@@ -9,12 +9,12 @@ from datetime import datetime
 
 class AddressManager(sm.SuperManager):
 	def __init__(self):
-		super(AddressManager, self).__init__('address_family')
+		super(AddressManager, self).__init__('people.address')
 Addresses = AddressManager()
 
 class FamilyManager(sm.SuperManager):
 	def __init__(self):
-		super(FamilyManager, self).__init__('main_family')
+		super(FamilyManager, self).__init__('people.family')
 		self.fields = ['last','phone','email','phone_type']
 		self.validations = [
 			sm.Present('last' ,'Please enter the family surname, as used by the children.'),
@@ -32,7 +32,7 @@ Families = FamilyManager()
 
 class ParentManager(sm.SuperManager):
 	def __init__(self):
-		super(ParentManager, self).__init__('main_parent')
+		super(ParentManager, self).__init__('people.parent')
 		self.fields = ['first','alt_last','sex','alt_phone','alt_email','phone_type']
 		self.validations = [
 			sm.Present('first','Please enter a first name or skip this parent'),
@@ -45,7 +45,7 @@ Parents = ParentManager()
 
 class StudentManager(sm.SuperManager):
 	def __init__(self):
-		super(StudentManager, self).__init__('main_student')
+		super(StudentManager, self).__init__('people.student')
 		self.fields = ['first','middle','alt_last','alt_first','sex','birthday','grad_year','height','alt_phone','alt_email','tshirt']
 		self.validations = [
 			sm.Present('first','Please enter a first name.'),
@@ -67,7 +67,7 @@ Students = StudentManager()
 
 class UserManager(sm.SuperManager):
 	def __init__(self):
-		super(UserManager, self).__init__('main_user')
+		super(UserManager, self).__init__('people.user')
 		self.fields = ['username','password','owner_type','owner_id']
 		self.validations = [
 			sm.Present('username','Please enter a username.'),

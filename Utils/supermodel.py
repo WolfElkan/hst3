@@ -156,7 +156,7 @@ class SuperManager(models.Manager):
 		self.name = 'objects'
 		self._db = None
 		self._hints = {}
-		self.table_name = table_name
+		self.table_name = table_name.replace('.','_')
 		self.fields = []
 		self.validations = []
 	def isValid(self, data, **kwargs):

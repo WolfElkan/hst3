@@ -44,7 +44,7 @@ class CourseTrad(models.Model):
 	max_age = models.PositiveIntegerField(default=18)
 	min_grd = models.PositiveIntegerField(default=1)
 	max_grd = models.PositiveIntegerField(default=12)
-	eligex  = models.TextField(default="{ a g }")
+	eligex  = models.TextField(default="a")
 	# Cost
 	tuition    = models.DecimalField(max_digits=6, decimal_places=2, default=0)
 	redtuit    = models.DecimalField(max_digits=6, decimal_places=2, default=0)
@@ -297,7 +297,7 @@ class Enrollment(models.Model):
 	isAudition = models.BooleanField(default=False)
 	role       = models.TextField(null=True)
 	role_type  = sqlmod.EnumField(choices=['','Chorus','Support','Lead'])
-	paid       = models.BooleanField(default=False)
+	invoice    = models.ForeignKey('payment.Invoice', null=True)
 	auto       = models.BooleanField(default=False)
 	ret_status = models.BooleanField(default=False)
 	happened   = models.BooleanField(default=False)
@@ -312,9 +312,11 @@ class Enrollment(models.Model):
 		course  = kwargs['course']  if 'course'  in kwargs else self.course
 		student = kwargs['student'] if 'student' in kwargs else self.student
 		return course.eligible(student)
-	# def __getattribute__(self, field):
-	# 	if field in []:
-	# 		call = super(Enrollment, self).__getattribute__(field)
-	# 		return call()
-	# 	else:
-	# 		return super(Enrollment, self).__getattribute__(field)
+	def paid(self):
+		return self.invoice.paid if self.invoice else False
+	def __getattribute__(self, field):
+		if field in ['paid']:
+			call = super(Enrollment, self).__getattribute__(field)
+			return call()
+		else:
+			return super(Enrollment, self).__getattribute__(field)

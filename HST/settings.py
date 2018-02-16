@@ -37,8 +37,10 @@ ALLOWED_HOSTS = [
 
 INSTALLED_APPS = [
     'apps.main',
+    'apps.payment',
     'apps.people',
     'apps.program',
+    'apps.radmin',
     'apps.rest',
     'apps.reports',
     'django.contrib.admin',
