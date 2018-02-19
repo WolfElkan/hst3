@@ -10,6 +10,8 @@ from Utils.misc  import namecase, safe_delete
 from Utils.security import authorized, getme, getyear
 from Utils.seshinit import seshinit, forminit
 
+from trace import DEV
+
 import re
 
 def index(request):

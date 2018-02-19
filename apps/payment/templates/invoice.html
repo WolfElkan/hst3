@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>HST | Invoice</title>
+	<style type="text/css">
+		table {
+			border-spacing: 0px;
+		}
+		td, th {
+			padding: 2px;
+		}
+		div {
+			margin: 16px;
+		}
+		.money {
+			text-align: right;
+		}
+		.sum th {
+			padding-top: 3px;
+			border-top: solid black 1px;
+		}
+		.cancelled td {
+			color: darkgray;
+			text-decoration: line-through;
+			font-style: italic;
+		}
+	</style>
+</head>
+<body>
+	<center>
+		<h1>HST Cultural Arts, Inc.</h1>
+		<h2>{{invoice.year|add:-1}}-{{invoice.year}} Tuition Invoice</h2>
+		<table>
+			<tr>
+				<td>Invoice ID:</td>
+				<td>#{{invoice.id}}</td>
+			</tr>
+			<tr>
+				<td>Family:</td>
+				<td>{{family.last}}</td>
+			</tr>
+			<tr>
+				<td>Date:</td>
+				<td>{{invoice.created_at|date}}</td>
+			</tr>
+			<tr>
+				<td>Amount:</td>
+				<td>${{invoice.amount|floatformat:2}}</td>
+			</tr>
+			<tr>
+				<td>Status:</td>
+				<td>{{invoice.get_status_display}}</td>
+			</tr>
+		</table>
+		<h2>Items</h2>
+		<table>
+			<thead>
+				<th>Student</th>
+				<th>Class</th>
+				<th>Amount</th>
+			</thead>
+			{% for item in invoice.items %}
+			<tr{% if not item.exists %} class="cancelled"{% endif %}>
+				<td>{{item.display_student}}</td>
+				<td>{{item.course}}</td>
+				<td class="money">${{item.course.tuition}}</td>
+			</tr>
+			{% endfor %}
+			<thead class="sum">
+				<th>Total:</th>
+				<th><!-- {{invoice.items|length}} items --></th>
+				<th class="money">${{invoice.amount|floatformat:2}}</th>
+			</thead>
+		</table>
+		<div><a href="#">Pay invoice now with PayPal</a></div>
+	</center>
+	If you would prefer to pay this invoice by check, please print this page, enclose the check, and mail to:
+	<p>HST Cultural Arts, Inc.<br>P.O. BOX 150<br>ROCKVILLE, MD<br>20848</p>
+	Invoice Code: {{invoice.code}}
+</body>
+</html>

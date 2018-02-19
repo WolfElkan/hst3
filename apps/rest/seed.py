@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, HttpResponse
 
 from apps.people.managers import Families, Addresses, Parents, Users, Students
-from apps.program.managers import CourseTrads, Courses, Enrollments
+from apps.program.managers import CourseTrads, Courses, Enrollments, Venues
 
 from Utils.data  import copy, copyatts
 from Utils.fjson import FriendlyEncoder
@@ -11,8 +11,6 @@ from datetime import datetime
 import json
 
 def load(request):
-	if TRACE:
-		print '@ rest.seed.load'
 	if request.method == 'GET':
 		return load_get(request)
 	elif request.method == 'POST':
@@ -21,8 +19,6 @@ def load(request):
 		return HttpResponse("Unrecognized HTTP Verb")
 
 def load_get(request):
-	if TRACE:
-		print '@ rest.seed.load_get'
 	seshinit(request,'json_dump')
 	context = {
 		'json_dump': request.session['json_dump']
@@ -30,8 +26,6 @@ def load_get(request):
 	return render(request, 'json/seed.html', context)
 
 def load_post(request):
-	if TRACE:
-		print '@ rest.seed.load_post'
 	nUsers = 0
 	nFamilies = 0
 	nStudents = 0
@@ -127,8 +121,6 @@ def load_post(request):
 	return redirect('/seed/load/')
 
 def dump(request):
-	if TRACE:
-		print '@ rest.seed.dump'
 	data = {
 		'venues':[],
 		'coursetrads':[],
@@ -219,8 +211,6 @@ def dump(request):
 	return HttpResponse(json.dumps(data, cls=FriendlyEncoder))
 
 def nuke(request):
-	if TRACE:
-		print '@ rest.seed.nuke'
 	Users.all().delete()
 	Families.all().delete()
 	Students.all().delete()

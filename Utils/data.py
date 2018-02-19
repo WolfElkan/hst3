@@ -25,7 +25,15 @@ class Caller(object):
 		new = []
 		for x in self.arr:
 			new.append(x.__getattribute__(attr))
-		return new
+		return Caller(new, None)
+	def setattr(self, attr, value):
+		new = []
+		for x in self.arr:
+			x.__setattr__(attr, value)
+			if type(x) is QuerySet:
+				x.save()
+			new.append(x)
+		return Each(new)
 
 def collect(thing, lam):
 	if type(thing) in [list, tuple, QuerySet]:
@@ -72,11 +80,7 @@ def copyatts(source, keys, ifnull=True):
 
 class Each(object):
 	def __init__(self, arr):
-		self.arr = list(arr)
-	def __str__(self):
-		return '<'+str(super(Each,self).__getattribute__('arr'))+'>'
-	def __repr__(self):
-		return '<Each: {}>'.format(str(super(Each,self).__getattribute__('arr')))
+		self.arr = arr
 	def __getattribute__(self, attr):
 		if attr == '_':
 			return super(Each,self).__getattribute__('arr')
@@ -85,8 +89,19 @@ class Each(object):
 	def __iter__(self):
 		for x in super(Each,self).__getattribute__('arr'):
 			yield x
+	def __str__(self):
+		return '<'+str(super(Each,self).__getattribute__('arr'))+'>'
+	def __repr__(self):
+		return '<Each: {}>'.format(str(super(Each,self).__getattribute__('arr')))
 	def __len__(self):
 		return len(super(Each,self).__getattribute__('arr'))
+	# def __setattr__(self, attr, value):
+	# 	for x in super(Each,self).__getattribute__('arr'):
+	# 		x.__setattr__(attr, value)
+	# 		print type(x)
+	# 		if type(x) is QuerySet:
+	# 			x.save()
+	# 	return self
 
 def equip(arr, lam, **kwargs):
 	for x in arr:

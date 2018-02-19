@@ -177,3 +177,5 @@ class SuperManager(models.Manager):
 		qset = self.filter(**kwargs)
 		if qset:
 			return qset[0]
+	def gid(self, id):
+		return self.fetch(id=id)

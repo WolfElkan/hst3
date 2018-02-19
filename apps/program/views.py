@@ -2,9 +2,17 @@ from django.shortcuts import render, redirect, HttpResponse
 
 from apps.people.managers import Families, Addresses, Parents, Users, Students
 from .managers import CourseTrads, Courses, Enrollments, Auditions
+from apps.payment.managers import Invoices
 
-from Utils.data  import equip, find_all
+from Utils.data  import equip, find_all, Each
 from Utils.security import authorized, getme, getyear
+
+def from_myaccount(request, **kwargs):
+	me = getme(request)
+	if me.owner.children:
+		return redirect('/register/student/{}/'.format(me.owner.children[0].id))
+	else:
+		return redirect('/myaccount/')
 
 def courses(request, **kwargs):
 	me = getme(request)
@@ -31,8 +39,8 @@ def courses(request, **kwargs):
 		'cart'    : equip(cart, lambda enr: enr.course.eligible(enr.student), attr='elig'),
 		'nCourses': {
 			'total' : len(cart),
-			'paid'  : len(cart.filter(paid=True)),
-			'unpaid': len(cart.filter(paid=False)),
+			'paid'  : len(cart.filter(invoice__status='P')),
+			'unpaid': len(cart.filter(invoice__status='N')),
 		},
 		'hours' : {
 			'total' : volunteer_total,
@@ -77,10 +85,14 @@ def courses_drop(request, **kwargs):
 	student = Students.fetch(id=student_id)
 	# Safely fetch course
 	course = Courses.fetch(id=request.GET['course_id'])
-	# Find the enrollment and delete it
-	Enrollments.filter(course=course, student=student).delete()
+	# Find the enrollment
+	enrollment = Enrollments.fetch(course=course, student=student)
+	# Find the invoice to which enrollment has been added, (if it has been added to an invoice)
+	invoices = set([enrollment.invoice])
+	# Delete enrollment
+	enrollment.delete()
 	# Check for any other enrollments that student is now ineligible for
-	now_inelig = find_all(Enrollments.filter(student=student), lambda enr: not enr.eligible())
+	now_inelig = find_all(Enrollments.filter(student=student), lambda enr: not enr.eligible['now'])
 	# If course comes with prepaid tickets...
 	if course.prepaid:
 		# ...make sure some student in family is enrolled in another course that needs them
@@ -96,5 +108,8 @@ def courses_drop(request, **kwargs):
 			K = Courses.fetch(year=course.year, tradition=Ktrad)
 			prepaid = Enrollments.fetch(student__family=student.family, course=K)
 			if prepaid:
+				if prepaid.invoice:
+					invoices.add(prepaid.invoice)
 				prepaid.delete()
+	Each(invoices).update_amount()
 	return redirect('/register/student/{}/'.format(student_id))

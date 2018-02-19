@@ -7,6 +7,7 @@ from django_mysql import models as sqlmod
 class CourseTradManager(sm.SuperManager):
 	def __init__(self):
 		super(CourseTradManager, self).__init__('program_coursetrad')
+		self.fields = ['year','tradition','last_date','aud_date','teacher','tuition','vol_hours','the_hours','prepaid',]
 	def get(self, **kwargs):
 		thing = super(CourseTradManager, self).get(**kwargs)
 		return thing.alias if thing.alias else thing
@@ -69,9 +70,16 @@ class EnrollmentManager(sm.SuperManager):
 			return already
 		else:
 			return super(EnrollmentManager, self).create(**kwargs)
+	def filter(self, **kwargs):
+		if 'phantom' not in kwargs or not kwargs.pop('phantom'):
+			kwargs['exists'] = True
+		return super(EnrollmentManager, self).filter(**kwargs)
 Enrollments = EnrollmentManager()
 
 class AuditionManager(sm.SuperManager):
 	def __init__(self):
 		super(AuditionManager, self).__init__('program_audition')
 Auditions = AuditionManager()
+
+from .models import Venue
+Venues = Venue.objects

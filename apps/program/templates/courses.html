@@ -2,6 +2,7 @@
 <html>
 <head>
 	<title>HST | Registration</title>
+	{% load staticfiles %}
 </head>
 <style type="text/css">
 	* {
@@ -67,7 +68,7 @@
 	button {
 		display: none;
 	}
-	.eligible td:nth-child(2) {font-weight: bold;}
+	.eligible td:nth-child(2), .legend .eligible td:nth-child(1) {font-weight: bold;}
 		.eligible form.enroll button {display: inline;}
 	.audition {background-color: #8af}
 		.audition form.drop button {display: inline;}
@@ -75,12 +76,14 @@
 			color: gray;
 			font-style: italic;
 		}
+	.invoiced {background-color: #fb8}
+		.invoiced form.view button {display: inline;}
 	.enrolled {background-color: #8f8}
 		/*.enrolled form.drop button {display: inline;}*/
 	.need_pay {background-color: #ff8}
 		.need_pay form.drop button {display: inline;}
 	.need_aud {color: blue;}
-	.need_aud td:nth-child(2) {font-weight: bold;}
+	.need_aud td:nth-child(2), .legend .need_aud td:nth-child(1) {font-weight: bold;}
 		.need_aud form.aud button {display: inline;}
 	.need_cur {background-color: #aaa}
 		.need_cur button:disabled {display: inline;}
@@ -88,6 +91,7 @@
 		.not_elig button:disabled {display: inline;}
 	.conflict {background-color: #a88}
 		.conflict button:disabled {display: inline;}
+	.ispurple {background-color: #b8f}
 
 	.invoice {
 		margin: 15px auto;
@@ -99,6 +103,24 @@
 		font-family: monospace;
 	}
 </style>
+<script src="{% static 'main/js/jquery.js' %}" charset="utf-8"></script>
+<script type="text/javascript">
+	$(document).ready(function() {
+
+		$('.show_leg').click(function() {
+			$('.show_leg').hide()
+			$('.hide_leg').show()
+			$('.legend').show()
+		})
+
+		$('.hide_leg').click(function() {
+			$('.show_leg').show()
+			$('.hide_leg').hide()
+			$('.legend').hide()
+		})
+
+	})
+</script>
 <body>
 	<div class="pane">
 		<div class="student_menu">
@@ -133,6 +155,9 @@
 							<input type="hidden" name="course_id" value="{{course.id}}">
 							<button>Drop</button>
 						</form>
+						<form class="view" action="/register/invoice/{{course.elig.invoice_id}}">
+							<button>View</button>
+						</form>
 						<button disabled>Enroll</button>
 					</td>
 					<td class="center">{{course.title}}</td>
@@ -143,7 +168,7 @@
 			</tr>
 			{% endfor %}
 		</table>
-	</div>
+	</div><button style="display: inline;" class="show_leg">Show Legend</button><button class="hide_leg">Hide Legend</button>
 </div>
 <div id="cart" class="pane">
 	{{family.enrollments}}
@@ -181,90 +206,42 @@
 			<td class="right">${{tuition.unpaid}}</td>
 		</tr>
 	</table>
-	<button {% if not cart %} disabled {% endif %} class="invoice">Generate Invoice</button>
+	<form method="POST" action="/register/process/">{% csrf_token %}
+		<button {% if not cart %} disabled {% endif %} class="invoice">Generate Invoice</button>
+	</form>
 </div>
 <table class="legend">
-	<tr class="audition">
-		<td class="center">
-			<button class="enroll">Enroll</button>
-			<button disabled>Enroll</button>
-			<button class="aud">Audition</button>
-			<button class="drop">Drop</button>
-		</td>
-		<td>audition</td>
-		<td>Student has scheduled an audition for this class</td>
-	</tr>
-	<tr class="enrolled">
-		<td class="center">
-			<button class="enroll">Enroll</button>
-			<button disabled>Enroll</button>
-			<button class="aud">Audition</button>
-			<button class="drop">Drop</button>
-		</td>
-		<td>enrolled</td>
-		<td>Student is registered for this class and has paid</td>
-	</tr>
-	<tr class="need_pay">
-		<td class="center">
-			<button class="enroll">Enroll</button>
-			<button disabled>Enroll</button>
-			<button class="aud">Audition</button>
-			<button class="drop">Drop</button>
-		</td>
-		<td>need_pay</td>
-		<td>This class has been added to the cart, pending tuition payment</td>
-	</tr>
-	<tr class="conflict">
-		<td class="center">
-			<button class="enroll">Enroll</button>
-			<button disabled>Enroll</button>
-			<button class="aud">Audition</button>
-			<button class="drop">Drop</button>
-		</td>
-		<td>conflict</td>
-		<td>Student is registered for another class at the same time</td>
-	</tr>
 	<tr class="eligible">
-		<td class="center">
-			<button class="enroll">Enroll</button>
-			<button disabled>Enroll</button>
-			<button class="aud">Audition</button>
-			<button class="drop">Drop</button>
-		</td>
-		<td>eligible</td>
-		<td>Student may register for this class, but has not yet</td>
-	</tr>
-	<tr class="need_aud">
-		<td class="center">
-			<button class="enroll">Enroll</button>
-			<button disabled>Enroll</button>
-			<button class="aud">Audition</button>
-			<button class="drop">Drop</button>
-		</td>
-		<td>need_aud</td>
-		<td>An audition is required for this class for which student is eligible</td>
-	</tr>
-	<tr class="need_cur">
-		<td class="center">
-			<button class="enroll">Enroll</button>
-			<button disabled>Enroll</button>
-			<button class="aud">Audition</button>
-			<button class="drop">Drop</button>
-		</td>
-		<td>need_cur</td>
-		<td>Student will be eligible once they enroll in at least 1 other class</td>
+		<td>Student is eligible for this class.</td>
 	</tr>
 	<tr class="not_elig">
-		<td class="center">
-			<button class="enroll">Enroll</button>
-			<button disabled>Enroll</button>
-			<button class="aud">Audition</button>
-			<button class="drop">Drop</button>
-		</td>
-		<td>not_elig</td>
-		<td>Student is not eligible to enroll in or audition for this class</td>
+		<td>Student is not eligible for this class.</td>
 	</tr>
-</table>
+	<tr class="enrolled">
+		<td>Student is successfully enrolled this class.</td>
+	</tr>
+	<tr class="need_aud">
+		<td>Student is eligible for an audition or skill assessment for this class.</td>
+	</tr>
+	<tr class="audition">
+		<td>Student has scheduled an audition or skill assessment for this class.</td>
+	</tr>
+	<tr class="need_cur">
+		<td>Student will be eligible, but must enroll in at least 1 other class first.</td>
+	</tr>
+	<tr class="need_pay">
+		<td>This class has been added to the cart, pending tuition payment.</td>
+	</tr>
+	<tr class="conflict">
+		<td>Student is registered for another class at the same time as this.</td>
+	</tr>
+	<tr class="invoiced">
+		<td>Student's registration for this class is on an unpaid invoice.</td>
+	</tr>
+<!-- 	<tr class="ispurple">
+		<td>This class is purple.  This means nothing, but I like purple!</td>
+	</tr>
+ --></table>
 
 </body>
 </html>

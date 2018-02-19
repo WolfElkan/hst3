@@ -42,6 +42,7 @@ program
 	Models
 		CourseTrad
 			Provide validation to make infinite aliasing impossible
+			Add semester fields. Update conflict method accordingly
 
 rest
 	support /add/[mo|fa]ther

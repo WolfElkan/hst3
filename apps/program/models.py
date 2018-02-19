@@ -54,21 +54,21 @@ class CourseTrad(models.Model):
 	rest_model = "coursetrad"
 	genre_codes = {
 		'A':'Acting',
-		# 'B':'Ballet',
+		'B':'Ballet', # Historical
 		'C':'Choir',
-		# 'D':'Dance Intensive',
+		'D':'Dance Intensive', # Historical
 		# 'E':'',
 		'F':'Finale',
 		'G':'General Audition',
 		'H':'Jazz/Hip-Hop',
 		'I':'Irish',
 		'J':'Jazz',
-		'K':'Prepaid Tickets',
-		# 'L':'Sign Language',
-		# 'M':'',
+		'K':'Prepaid Tickets', # Admin
+		'L':'Sign Language', # Historical
+		# 'M':'', # Merchandise? Makeup kits?
 		# 'N':'',
-		'O':'Overture',
-		'P':'Tap',
+		'O':'Overture', # Historical
+		'P':'Tap', # Broadway (Older Beginners)
 		# 'Q':'',
 		# 'R':'',
 		'S':'Troupe',
@@ -78,7 +78,7 @@ class CourseTrad(models.Model):
 		'W':'Workshop',
 		'X':'Tech',
 		# 'Y':'',
-		'Z':'Jazz',
+		'Z':'Jazz', # Broadway (Older Beginners)
 	}
 	objects = CourseTrads
 	def __str__(self):
@@ -132,10 +132,10 @@ class CourseTrad(models.Model):
 			return student.sex == 'M'
 		elif 'f' in word:
 			return student.sex == 'F'
+		elif word == '%':
+			return DEV
 		elif 'a' in word:
-			# print word, student.hst_age_in(year)
 			result = student.hst_age_in(year) >= self.min_age - word.count('y') and student.hst_age_in(year) <= self.max_age + word.count('o')
-			# print result
 			return result
 		elif 'g' in word:
 			if not student.grad_year:
@@ -147,8 +147,14 @@ class CourseTrad(models.Model):
 				'isAudition':False,
 			}
 			if word == '@':
-				query['isAudition'] = True
-				query['course__tradition'] = self
+				query.update({
+					'isAudition': True,
+					'success': True,
+					'course__tradition': self,
+					'course__year': year,
+				})
+				return bool(Enrollments.filter(**query))
+			if word == 'c' and not kwargs['cur']:
 				query['course__year'] = year
 				return bool(Enrollments.filter(**query))
 			if '*' not in word:
@@ -165,7 +171,7 @@ class CourseTrad(models.Model):
 				if kwargs['aud']:
 					return True
 				query['isAudition'] = True
-				if '@@' in word:
+				if '?' not in word:
 					query['success'] = True
 			if '$' in word:
 				query['paid'] = True
@@ -220,6 +226,7 @@ class Course(models.Model):
 		elig = {
 			'now':False,
 			'aud':False,
+			'invoice_id':0,
 		}
 		enrollment = Enrollments.fetch(course=self, student=student)
 		if enrollment:
@@ -229,6 +236,10 @@ class Course(models.Model):
 			elif enrollment.paid:
 				elig['reason'] = '{} has successfully enrolled in {}'.format(student, self)
 				elig['css'] = "enrolled"
+			elif enrollment.invoice:
+				elig['reason'] = "{}'s enrollment in {} has been added to invoice #{}".format(student, self, enrollment.invoice.id)
+				elig['css'] = "invoiced"
+				elig['invoice_id'] = enrollment.invoice.id
 			else:
 				elig['reason'] = '{} is registered for {} pending tuition payment'
 				elig['css'] = "need_pay"
@@ -301,6 +312,7 @@ class Enrollment(models.Model):
 	auto       = models.BooleanField(default=False)
 	ret_status = models.BooleanField(default=False)
 	happened   = models.BooleanField(default=False)
+	exists     = models.BooleanField(default=True)
 	success    = models.NullBooleanField()
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
@@ -314,9 +326,15 @@ class Enrollment(models.Model):
 		return course.eligible(student)
 	def paid(self):
 		return self.invoice.paid if self.invoice else False
+	def display_student(self):
+		return self.student.prefer if self.course.tradition.id[0] != 'K' else ''
 	def __getattribute__(self, field):
-		if field in ['paid']:
+		if field in ['paid','eligible','display_student']:
 			call = super(Enrollment, self).__getattribute__(field)
 			return call()
+		elif field in Students.fields:
+			return self.student.__getattribute__(field)
+		elif field in Courses.fields:
+			return self.course.__getattribute__(field)
 		else:
 			return super(Enrollment, self).__getattribute__(field)

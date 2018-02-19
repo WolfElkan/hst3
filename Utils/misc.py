@@ -1,4 +1,5 @@
 import re
+from .data import Each
 def namecase(name):
 	if re.match(r'^[A-Z][a-z]+[A-Z][a-z]*$',name):
 		return name

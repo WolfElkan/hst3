@@ -1,17 +1,24 @@
 # HST Website Django Backend
 *Technical Documentation & User Guide*
 
-The website is meant to be operable from the client side by someone with only basic computer skills without any User Guide or assistance.  Even so, I'll probably put a general summary as well as some idiosyncracies here.
+## Objectives
 
-However, there are a few functions on the admin side that are a little tricky.
+This web application is built with the following objectives in mind:
+
+1. To provide an intuitive, easy-to-use platform which users of varying computer skills can use to complete various functions necessary to the operation of HST,
+1. To allow HST to change, adapt and grow over the coming years, without requiring modification of the internal code of the application,
+1. To reduce the opportunity for human error, by automating any processes possible without causing undue complications,
+1. To reduce required volunteer time and allow HST to take full advantage of the digital age by streamlining data management processes wherever helpful,
+1. To be a blessing and an expression of God's love and providence to HST's staff, students and families as they have been to the developer.
 
 ## Eligex
 
 This web application can determine whether a given student is eligible for a given course in a given year.  However, due to the complicated nature of the eligibility requirements for many of HST's classes, it was necessary to develop an expression language to determine eligibility of students.  Eligex is a language that in which any requirements and prerequisites for an HST class can be written and will be understood by the server.  It also enables requirements to be written for future classes HST may offer, or to modify the requirements for existing classes, without rewriting the internal code of the website.  It may look daunting, but it's really just boolean algebra (True and False statements).
 
-A line of Eligex is case-sensitive and contains one or more "words", separated by spaces which are converted into True or False values.  Unless trackets (< >) are used, these values will be compiled conjunctively, or AND'ed.  That is to say, if any of the words is False, the expression will return False, and the student will not be eligible for the class.  Only if all the words are True, will the expression return True and the student will be eligible for the class.
+A line of Eligex is case-sensitive and contains one or more "words", separated by spaces which are converted into True or False values.  Unless trackets (`<` `>`) are used, these values will be compiled conjunctively, or AND'ed.  That is to say, if any of the words is False, the expression will return False, and the student will not be eligible for the class.  Only if all the words are True, will the expression return True and the student will be eligible for the class.
 
 ### Single-Letter Words
+Note: Letters with special meanings are lowercase to avoid clashing with capital letters which refer to `CourseTrad` id's.
 Glyph | Meaning
 :---: | ---
 `#` | Always returns True
@@ -21,13 +28,14 @@ Glyph | Meaning
 `m` | Male: returns true for boys and false for girls
 `f` | Female: returns true for girls and false for boys
 `@` | Searches for a *successful* audition or skill assessment for the class by the student
+`%` | Returns the value of the global variable `DEV`.  (True in development &amp; testing, False in production.)
 ### Single-Letter Modifiers
 Glyph | Meaning
 :---: | ---
 `y` | Younger: may be appended to `a` or `g` to relax the *minimum* age or grade requirement by one year for each appended glyph (E. g., If a class is for ages 9-12, `ayy` will return True for 7-12 year olds and False otherwise)
 `o` | Older: just like `y` but relaxes the *maximum* age or grade requirement
 ### Enrollment Search
-To require that a student have taken another HST class in order to be eligible for this one, the two-letter ID of the class may be used as an Eligex word (E. g., `J2` will return True for students who are now, or have ever been, enrolled in Jazz 2).  The glyph `*` may be substituted for either character in the ID, and will match any character.  E. g., `*4` will match any Level 4 class and `T*` will match any Tap class (Note: under the current system, `T*` will *not* match Broadway Tap classes, as these begin with `P`)
+To require that a student have taken another HST class in order to be eligible for this one, the two-letter ID of the class may be used as an Eligex word (E. g., `J2` will return True for students who are now, or have ever been, enrolled in Jazz 2).  The glyph `*` may be substituted for either character in the ID, and will match any character.  E. g., `*4` will match any Level 4 class and `T*` will match any Tap class (Note: under the current system, `T*` will *not* match Broadway Tap classes, as these begin with `P`.  Likewise, `J*` will match Jazz classes, but not Broadway Jazz classes which are matched with `Z*`)
 To further refine these searches, the following modifiers may be appended *after* the class's ID:
 
 Glyph | Meaning
@@ -35,8 +43,8 @@ Glyph | Meaning
 `c` | Will match only enrollments in the *current* year
 `p` | Will match only enrollments in *past* years.
 `$` | Will match only enrollments for which tuition has been paid
-`@` | Will match an audition or skill assessment for the specified course, even if the audition was failed.  If omitted, word will match only actual enrollments, not auditions.
-`@@`| Will match only a *successful* audition.  A student is considered eligible to audition for a course if they would be eligible to enroll in it, should they pass an audition.
+`@?` | Will match an audition or skill assessment for the specified course, even if the audition was failed.  If no `@` is included, word will match only actual enrollments, not auditions.
+Note: A student is considered eligible to audition for a course if they would be eligible to enroll in it, should they pass an audition.
 
 ### Boolean Operators
 
@@ -66,7 +74,7 @@ Eligex | Class | Description
 
 ## HST Class Traditions
 
-`CourseTrad`
+All HST classes are referred to as "courses" in the internal code of the site, to avoid clashing with the Python reserved word `class`.  `CourseTrad`
 
 ### Enrollable Classes
  ID  | Title                   | Ages    | Grades | Eligex                           | Note
