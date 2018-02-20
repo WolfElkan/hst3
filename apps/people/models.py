@@ -40,21 +40,22 @@ class Parent(models.Model):
 	updated_at = models.DateTimeField(auto_now=True)
 	rest_model = "parent"
 	objects = Parents
+	def last(self):
+		if super(Parent, self).__getattribute__('alt_last'):
+			return super(Parent, self).__getattribute__('alt_last')
+		else: 
+			return self.family.last
+	def phone(self):
+		return self.alt_phone if self.alt_phone > 0 else self.family.phone
+	def email(self):
+		return self.alt_email if self.alt_email else self.family.email
+	def family(self):
+		family_id = super(Parent, self).__getattribute__('family_id')
+		return Families.get(id=family_id)
 	def __getattribute__(self, field):
-		if field == '':
-			pass
-		elif field == 'last':
-			if super(Parent, self).__getattribute__('alt_last'):
-				return super(Parent, self).__getattribute__('alt_last')
-			else: 
-				return self.family.last
-		elif field == 'phone':
-			return custom.PhoneNumber(self.alt_phone if self.alt_phone else self.family.phone)
-		elif field == 'email':
-			return self.alt_email if self.alt_email else self.family.email
-		elif field == 'family':
-			family_id = super(Parent, self).__getattribute__('family_id')
-			return Families.get(id=family_id)
+		if field in ['last','phone','email','family']:
+			call = super(Parent, self).__getattribute__(field)
+			return call()
 		else:
 			return super(Parent, self).__getattribute__(field)
 	def __str__(self):

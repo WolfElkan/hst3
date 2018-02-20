@@ -7,7 +7,7 @@ people
 X	Make registration landing page redirect to appropriate step if family has partially registered.
 X	Add Change Password route
 
-	Refactor Parent model, callable attributes
+X	Refactor Parent model, callable attributes
 
 	Student Interface
 X		(eventually) Support loading existing students from database for editing, track by internal id's

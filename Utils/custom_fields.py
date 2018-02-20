@@ -152,6 +152,8 @@ class PhoneNumber(object):
 		return str(self.value)
 	def __get__(self):
 		return int(self.value)
+	def __gt__(self, other):
+		return self.value > other
 	def __json__(self):
 		return self.value
 	def widget(self, field, value, **kwargs):
