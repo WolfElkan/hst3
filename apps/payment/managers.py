@@ -21,7 +21,11 @@ class InvoiceManager(sm.SuperManager):
 		kwargs.setdefault('id',max([year0000]+list(Each(qset).id)) + 1)
 		# kwargs.setdefault('amount', kwargs['family'].total_tuition_in(kwargs['year']))
 		this = super(InvoiceManager, self).create(**kwargs)
-		qset = Enrollments.filter(student__family=kwargs['family'],invoice=None,course__year=kwargs['year'])
+		qset = Enrollments.filter(
+			student__family=kwargs['family'],
+			invoice=None,
+			course__year=kwargs['year'],
+			isAudition=False)
 		for q in qset:
 			q.invoice = this
 			q.save()

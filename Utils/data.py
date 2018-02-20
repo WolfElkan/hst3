@@ -19,7 +19,10 @@ class Caller(object):
 	def __call__(self, *args, **kwargs):
 		new = []
 		for x in self.arr:
-			new.append(x.__getattribute__(self.fx).__call__(*args, **kwargs))
+			if hasattr(x, self.fx):
+				new.append(x.__getattribute__(self.fx).__call__(*args, **kwargs))
+			else:
+				new.append(x)
 		return Each(new)
 	def __getattr__(self, attr):
 		new = []

@@ -1,3 +1,6 @@
+# Source:
+# https://gist.github.com/gipi/2401143
+
 #look also
 # https://github.com/dcramer/django-ratings/blob/master/djangoratings/fields.py
 

@@ -3,7 +3,7 @@ from .data import Each
 def namecase(name):
 	if re.match(r'^[A-Z][a-z]+[A-Z][a-z]*$',name):
 		return name
-	regex = r'(m[a]?c|d[ei])(.+)'
+	regex = r'(m[a]?c|di)(.+)'
 	match = re.match(regex,name,flags=re.I)
 	if match:
 		group = match.groups()

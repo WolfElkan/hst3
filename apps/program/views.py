@@ -29,8 +29,12 @@ def courses(request, **kwargs):
 	reg_year = getyear()
 	courses = Courses.filter(year=reg_year,tradition__e=True).order_by('tradition__order')
 	cart = me.owner.enrollments_in(reg_year)
+	cart_pend = cart.filter(isAudition=True)
+	cart_paid = cart.filter(isAudition=False, invoice__status='P')
+	cart_unpaid = cart.filter(isAudition=False, invoice__status='N')
 	volunteer_total = me.owner.volunteer_total_in(reg_year)
 	context = {
+		'invoiceable' : bool(cart.filter(isAudition=False,invoice_id__isnull=True)),
 		'reg_year': reg_year,
 		'family'  : me.owner,
 		'students': equip(me.owner.children, lambda student: student.hst_age_in(reg_year), attr='age'),
@@ -39,18 +43,23 @@ def courses(request, **kwargs):
 		'cart'    : equip(cart, lambda enr: enr.course.eligible(enr.student), attr='elig'),
 		'nCourses': {
 			'total' : len(cart),
-			'paid'  : len(cart.filter(invoice__status='P')),
-			'unpaid': len(cart.filter(invoice__status='N')),
+			'pend'  : len(cart_pend) + len(cart_unpaid),
+			'paid'  : len(cart_paid),
+			'unpaid': len(cart) - len(cart_pend) - len(cart_paid) - len(cart_unpaid),
 		},
 		'hours' : {
-			'total' : volunteer_total,
-			'paid'  : me.owner.hours_worked,
-			'unpaid': volunteer_total - me.owner.hours_worked,
+			'total' : me.owner.volunteer_total_in(reg_year),
+			'pend'  : me.owner.hours_signed_in(reg_year),
+			'paid'  : me.owner.hours_worked_in(reg_year),
+			'unpaid': me.owner.volunteer_total_in(reg_year) 
+					- me.owner.hours_signed_in(reg_year) 
+					- me.owner.hours_worked_in(reg_year),
 		},
 		'tuition' : {
 			'total' : me.owner.total_tuition_in(reg_year),
+			'pend'  : me.owner.pend_tuition_in(reg_year),
 			'paid'  : me.owner.paid_tuition_in(reg_year),
-			'unpaid': me.owner.total_tuition_in(reg_year) - me.owner.paid_tuition_in(reg_year),
+			'unpaid': me.owner.unpaid_tuition_in(reg_year),
 		},
 	}
 	return render(request, 'courses.html', context)
@@ -71,7 +80,7 @@ def courses_enroll(request, **kwargs):
 	return redirect('/register/student/{}/'.format(student_id))
 
 def courses_audition(request, **kwargs):
-	student_id = kwargs['id'] if 'id' in kwargs else 0
+	student_id = kwargs.setdefault('id',0)
 	student = Students.fetch(id=student_id)
 	course = Courses.fetch(id=request.GET['course_id'])
 	if course.eligible(student)['aud']:

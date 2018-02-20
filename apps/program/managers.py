@@ -76,10 +76,23 @@ class EnrollmentManager(sm.SuperManager):
 		return super(EnrollmentManager, self).filter(**kwargs)
 Enrollments = EnrollmentManager()
 
-class AuditionManager(sm.SuperManager):
-	def __init__(self):
-		super(AuditionManager, self).__init__('program_audition')
-Auditions = AuditionManager()
-
 from .models import Venue
 Venues = Venue.objects
+
+class AuditionManager(sm.SuperManager):
+	def __init__(self):
+		super(AuditionManager, self).__init__('program_enrollment')
+	def create(self, **kwargs):
+		kwargs['isAudition'] = True
+		if 'ret_status' not in kwargs:
+			prev_enr = self.filter(
+				student=kwargs['student'],
+				course__tradition=kwargs['course'].tradition,
+				course__year__lt=kwargs['course'].year
+			).order_by('-course__year')
+			kwargs['ret_status'] = bool(prev_enr and prev_enr[0].ret_status)
+		return Enrollments.create(**kwargs)
+	def filter(self, **kwargs):
+		kwargs['isAudition'] = True
+		return Enrollments.filter(**kwargs)
+Auditions = AuditionManager()

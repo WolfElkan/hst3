@@ -2,16 +2,17 @@ from django.db import models
 
 from .managers import Addresses, Families, Parents, Students, Users
 from apps.program.managers import CourseTrads, Courses, Enrollments
+from apps.payment.managers import Invoices
 
 from Utils import custom_fields as custom
 from Utils import supermodel as sm
-from Utils.data import collect, copyatts
+from Utils.data import collect, copyatts, Each
 from Utils.misc import namecase, safe_delete
 
 from django_mysql import models as sqlmod
 from datetime import datetime
 from trace import DEV
-
+Q = models.Q
 
 class Address(models.Model):
 	line1      = models.CharField(null=False, max_length=50)
@@ -75,6 +76,7 @@ class Family(models.Model):
 	updated_at = models.DateTimeField(auto_now=True)
 	rest_model = "family"
 	objects = Families
+
 	def mother(self):
 		return Parents.fetch(id=self.mother_id)
 	def father(self):
@@ -83,23 +85,41 @@ class Family(models.Model):
 		return self.last
 	def children(self):
 		return Students.filter(family_id=self.id).order_by('birthday')
+
+	paid_query = Q(invoice__status='P')
+	pend_query = Q( Q(isAudition=False,invoice__status='N') | Q(isAudition=True,happened=False) )
 	def enrollments_in(self, year):
-		return Enrollments.filter(student__family=self, course__year=year).order_by('created_at')
+		qset = Enrollments.filter(student__family=self, course__year=year).order_by('created_at')
+		qset = qset.exclude(isAudition=True,success=False)
+		qset = qset.exclude(exists=False)
+		return qset
 	def paid_enrollments_in(self, year):
-		return self.enrollments_in(year).filter(paid=True)
+		return self.enrollments_in(year).filter(self.paid_query)
+	def pend_enrollments_in(self, year):
+		return self.enrollments_in(year).filter(self.pend_query)
 	def unpaid_enrollments_in(self, year):
-		return self.enrollments_in(year).filter(paid=False)
+		return self.enrollments_in(year).exclude(self.paid_query).exclude(self.pend_query)
+
+	def total_tuition_in(self, year):
+		return sum(Each(self.enrollments_in(year)).tuition)
+	def paid_tuition_in(self, year):
+		return sum(Each(Invoices.filter(family=self,status='P')).amount)
+		# return sum(collect(self.enrollments_in(year), lambda enr: 0 if enr.isAudition else enr.course.tuition))
+	def pend_tuition_in(self, year):
+		return sum(Each(self.pend_enrollments_in(year)).tuition)
+		# return sum(Each(Invoices.filter(family=self,status='N')).amount) + sum(Each(Each(Enrollments.filter(student__family=self, course__year=year, isAudition=True, happened=False)).course).tuition)
+	def unpaid_tuition_in(self, year):
+		return self.total_tuition_in(year) - self.pend_tuition_in(year) - self.paid_tuition_in(year)
+
 	def volunteer_total_in(self, year):
 		return max([0.0]+list(collect(self.enrollments_in(year), lambda enr: enr.course.vol_hours)))
-	def hours_worked(self):
+	def hours_worked_in(self, year):
 		return 0.0
-	def total_tuition_in(self, year):
-		return sum(collect(self.enrollments_in(year), lambda enr: 0 if enr.isAudition else enr.course.tuition))
-	def paid_tuition_in(self, year):
-		return 0
-	def unpaid_tuition_in(self, year):
-		return self.total_tuition_in(year) - self.paid_tuition_in(year)
+	def hours_signed_in(self, year):
+		return 0.0
+
 	def delete(self):
+		# Manual cascading for Parents and Users
 		safe_delete(self.mother)
 		safe_delete(self.father)
 		safe_delete(self.address)
@@ -157,48 +177,6 @@ class Student(models.Model):
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
 	objects = Students
-	# Mirror functions: student.fxn(course) calls course.fxn(student)
-	def eligible(self, course):
-		return course.eligible(self)
-	def audible(self, course):
-		return course.audible(self)
-	def enroll(self, course):
-		return course.enroll(self)
-	def audition(self, course):
-		return course.audition(self)
-	def hst_age_in(self, year):
-		return year - self.birthday.year - 1
-	def hst_age(self):
-		return self.hst_age_in(getyear())
-	def grade_in(self, year):
-		return year - self.grad_year + 12
-	def grade(self):
-		return self.grade_in(getyear())
-	def enrollments(self):
-		return Enrollments.filter(student=self).order_by('course__year')
-	def enrollments_in(self, year):
-		return Enrollments.filter(student=self, course__year=year)
-	def enrollments_before(self, year):
-		return self.enrollments.filter(course__year__lt=year)
-	def auditions(self):
-		return Enrollments.filter(student=self, isAudition=True)
-	def auditions_in(self, year):
-		return Enrollments.filter(student=self, isAudition=True, course__year=year)
-	def courses(self): # TODO: Use a DB join statement instead # As if I know how to do that
-		qset = []
-		for enrollment in self.enrollments:
-			qset.append(Courses.get(id=enrollment.course_id))
-		return qset
-	def courses_in(self, year): 
-		qset = []
-		for enrollment in self.enrollments_in(year):
-			qset.append(Courses.get(id=enrollment.course_id))
-		return qset
-	def courses_toggle_enrollments(self):
-		qset = []
-		for enrollment in self.enrollments:
-			qset.append({'widget':enrollment,'static':Courses.get(id=enrollment.course_id)})
-		return qset
 	def prefer(self):
 		return self.alt_first if self.alt_first else self.first
 	def last(self):
@@ -213,6 +191,54 @@ class Student(models.Model):
 		return self.family.mother
 	def father(self):
 		return self.family.father
+
+	# Mirror functions: student.fxn(course) calls course.fxn(student)
+	def eligible(self, course):
+		return course.eligible(self)
+	def audible(self, course):
+		return course.audible(self)
+	def enroll(self, course):
+		return course.enroll(self)
+	def audition(self, course):
+		return course.audition(self)
+
+	def hst_age_in(self, year):
+		return year - self.birthday.year - 1
+	def hst_age(self):
+		return self.hst_age_in(getyear())
+	def grade_in(self, year):
+		return year - self.grad_year + 12
+	def grade(self):
+		return self.grade_in(getyear())
+
+	def enrollments(self):
+		return Enrollments.filter(student=self).order_by('course__year')
+	def enrollments_in(self, year):
+		return self.enrollments.filter(course__year=year)
+	def enrollments_before(self, year):
+		return self.enrollments.filter(course__year__lt=year)
+
+	def auditions(self):
+		return Enrollments.filter(student=self, isAudition=True)
+	def auditions_in(self, year):
+		return Enrollments.filter(student=self, isAudition=True, course__year=year)
+	def courses(self): # TODO: Use a DB join statement instead # As if I know how to do that
+		qset = []
+		for enrollment in self.enrollments:
+			if not enrollment.isAudition or enrollment.success or not enrollment.happened:
+				qset.append(Courses.get(id=enrollment.course_id))
+		return qset
+	def courses_in(self, year): 
+		qset = []
+		for enrollment in self.enrollments_in(year):
+			if not enrollment.isAudition or enrollment.success or not enrollment.happened:
+				qset.append(Courses.get(id=enrollment.course_id))
+		return qset
+	def courses_toggle_enrollments(self):
+		qset = []
+		for enrollment in self.enrollments:
+			qset.append({'widget':enrollment,'static':Courses.get(id=enrollment.course_id)})
+		return qset
 	def __str__(self):
 		return self.prefer+' '+self.last
 	def __json__(self):
