@@ -37,7 +37,7 @@
 		{% for row in table %}
 		<tr title="{{row.student}}, #{{row.student.id}}">
 			{% if row.oldest %}
-			<td rowspan="{{row.nchild}}"><a href="/rest/show/family/{{row.family.id}}/">{{row.family.last}}</a></td>
+			<td title="{{row.family}}, #{{row.family.id}}" rowspan="{{row.nchild}}"><a href="/rest/show/family/{{row.family.id}}/">{{row.family.last}}</a></td>
 			{% endif %}
 			<td>
 				<input type="checkbox" name="{{row.student.id}}">

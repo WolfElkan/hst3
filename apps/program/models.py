@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 from django.db import models
 from Utils import custom_fields as custom
 from Utils import supermodel as sm
-from Utils.data import sub, Each
+from Utils.data import sub, Each, find_all
 from django_mysql import models as sqlmod
 from .managers import CourseTrads, Courses, Enrollments
 Q = models.Q
@@ -108,7 +108,8 @@ class CourseTrad(models.Model):
 				result = self.check_eligex(student, year, **kwargs)
 				result = not result if x[0] else result
 				if kwargs['debug']:
-					print x[1], result
+					print '{',x[1],'}', result
+					print
 			elif x[3]:
 				# OR
 				kwargs['eligex'] = x[3]
@@ -116,13 +117,15 @@ class CourseTrad(models.Model):
 				result = self.check_eligex(student, year, **kwargs)
 				result = not result if x[2] else result
 				if kwargs['debug']:
-					print x[3], result
+					print '<{}>'.format(x[3]), result
+					print
 			elif x[5]:
 				# WORD
 				result = self.check_word(student, year, x[5], **kwargs)
 				result = not result if x[4] else result
 				if kwargs['debug']:
 					print x[5], result
+					print
 			else:
 				result = conj
 			if result != conj:
@@ -159,12 +162,16 @@ class CourseTrad(models.Model):
 					'course__tradition': self,
 					'course__year': year,
 				})
+				if kwargs['debug']:
+					print query
 				return bool(Enrollments.filter(**query))
 			if word == 'c':
 				if kwargs['cur']:
 					return True
 				query['course__year'] = year
-				return bool(Enrollments.filter(**query))
+				if kwargs['debug']:
+					print query
+				return bool(Enrollments.filter(**query).exclude(course__tradition__id__startswith='K'))
 			if '*' not in word:
 				query['course__tradition__id'] = word[0:2]
 			elif word[0] != '*':
@@ -176,14 +183,14 @@ class CourseTrad(models.Model):
 			if 'p' in word:
 				query['course__year__lt'] = year
 			if '@' in word:
-				if kwargs['aud']:
-					return True
 				query['isAudition'] = True
 				if '?' not in word:
 					query['success'] = True
 			if '$' in word:
 				query['paid'] = True
-			return bool(Enrollments.filter(**query))
+			if kwargs['debug']:
+				print query
+			return bool(Enrollments.filter(**query).exclude(course__tradition__id__startswith='K'))
 	def eligible(self, student, year):
 		course = Courses.fetch(tradition=self, year=year)
 		if course:
@@ -240,19 +247,23 @@ class Course(models.Model):
 		if enrollment:
 			if enrollment.isAudition and not enrollment.happened:
 				elig['reason'] = '{} has scheduled an audition for {}'.format(student, self)
+				elig['aud'] = True
 				elig['css'] = "audition"
 			elif enrollment.isAudition and not enrollment.success:
 				elig['reason'] = ''
 				elig['css'] = "not_elig"
 			elif enrollment.paid:
 				elig['reason'] = '{} has successfully enrolled in {}'.format(student, self)
+				elig['now'] = True
 				elig['css'] = "enrolled"
 			elif enrollment.invoice:
 				elig['reason'] = "{}'s enrollment in {} has been added to invoice #{}".format(student, self, enrollment.invoice.id)
+				elig['now'] = True
 				elig['css'] = "invoiced"
 				elig['invoice_id'] = enrollment.invoice.id
 			else:
 				elig['reason'] = '{} is registered for {} pending tuition payment'
+				elig['now'] = True
 				elig['css'] = "need_pay"
 		# Fast fail: Student is not eligible under any circumstances
 		elif not self.tradition.check_eligex(student, self.year, aud=True, cur=True):
@@ -289,9 +300,26 @@ class Course(models.Model):
 			kwargs['aud'] = False
 		return self.tradition.check_eligex(student, self.year, **kwargs)
 	def enroll(self, student):
-		if self.eligible(student):
+		# Check if student is eligible now, do nothing and return None otherwise. (Shouldn't happen)
+		if self.eligible(student)['now']:
+			# Check if course requires purchase of prepaid tickets 
+			if self.prepaid:
+				# If so, find the tradition corresponding to this course's show's prepaid tickets
+				Ktrad = CourseTrads.fetch(id__startswith='K',id__endswith=self.show[1])
+				# Stringly calculate the id for this course's prepaid tix this year
+				Kid = self.id[0:2]+Ktrad.id
+				# Create (or find if it already exists) this ticket course
+				K = Courses.create_by_id(Kid)
+				# Check for enrollments by this family in this ticket course
+				prepaid = Enrollments.fetch(student__family=student.family, course=K)
+				# If you find none...
+				if not prepaid:
+					# ...make one
+					Enrollments.create(student=student, course=K)
+			# But either way, create and return the enrollment
 			return Enrollments.create(course=self, student=student)
 	def sudo_enroll(self, student):
+		# Admin method for creating an enrollment without checking eligibility or prepaid tickets
 		return Enrollments.create(course=self, student=student)
 	def audition(self, student):
 		if self.audible(student):
@@ -343,16 +371,77 @@ class Enrollment(models.Model):
 				self.course.title,
 				self.course.year
 			)
+	# Delete the enrollment and all that goes with it
+	def delete(self):
+		# Begin collecting the invoices which will need to be updated
+		invoices = set()
+		# Find the invoice to which enrollment has been added, (if it has been added to an invoice)
+		if self.invoice:
+			invoices.add(self.invoice)
+		# Now delete the enrollment itself, and save the deletion info to return it
+		if self.invoice and self.invoice.status == 'P':
+			self.exists = False
+			self.save()
+			deletion_info = [0L, {u'program.Enrollment':0L}]
+		else:
+			deletion_info = list(super(Enrollment, self).delete())
+		# If course comes with prepaid tickets...
+		if self.course.prepaid:
+			# ...make sure some student in family is enrolled in another course that needs them
+			other = Enrollments.filter(
+				student__family=self.student.family, 
+				course__tradition__prepaid=True, 
+				course__tradition__show=self.course.show,
+				course__year=self.course.year
+			).exclude(course__tradition__id__startswith='K')
+			# If you don't find any, then you're going to need to delete the prepaid tickets from the cart
+			if not other:
+				# Find the CourseTrad for the prepaid tickets for this show
+				Ktrad = CourseTrads.fetch(id__startswith='K',id__endswith=self.course.show[1])
+				# Find the course that corresponds to this year
+				K = Courses.fetch(year=self.course.year, tradition=Ktrad)
+				# Check if there are already
+				prepaid = Enrollments.fetch(student__family=self.student.family, course=K)
+				# If there are...
+				if prepaid:
+					# If they're already on an invoice...
+					if prepaid.invoice:
+						# ...add that invoice to the ones to be updated
+						invoices.add(prepaid.invoice)
+					# ...delete the prepaid tickets
+					prepaid.delete()
+		# Recursively cascade to delete any other enrollments for which the student is ineligible
+		all_enrls = self.student.enrollments_in(self.course.year)
+		bad_enrls = find_all(all_enrls, lambda enr: not enr.eligible)
+		for x in bad_enrls:
+			print x
+			x.delete()
+		deletions = Each(bad_enrls).delete()
+		for x in deletions:
+			deletion_info[0] += x[0]
+			for key in x[1]:
+				if key in deletion_info:
+					deletion_info[1][key] += x[1][key]
+		# Update any invoices that need to be updated (This won't apply to invoices that have already been paid)
+		Each(invoices).update_amount()
+		# And finally, return the deletion info
+		return tuple(deletion_info)
+	# Don't bother with all that other stuff.  Just delete the enrollment already!
+	def sudo_delete(self):
+		return super(Enrollment, self).delete()
+	# Courtesy method
 	def eligible(self, **kwargs):
 		course  = kwargs.setdefault('course',  self.course)
 		student = kwargs.setdefault('student', self.student)
-		return course.eligible(student)
+		return course.check_eligex(student, aud=self.isAudition)
+	# Update attributes after a successful audition
 	def accept(self):
 		if self.isAudition:
 			self.happened = True
 			self.success = True
 			self.isAudition = False
 			self.save()
+	# Update attributes after an unsuccessful audition
 	def reject(self):
 		if self.isAudition:
 			self.happened = True

@@ -18,7 +18,7 @@ def courses(request, **kwargs):
 	me = getme(request)
 	if not me or not me.owner or not me.owner.children:
 		return redirect('/register')
-	current_id = kwargs['id'] if 'id' in kwargs else 0
+	current_id = kwargs.setdefault('id',0)
 	if 'id' in kwargs:
 		current_id = kwargs['id']
 		current_student = me.owner.student_set.fetch(id=current_id)
@@ -65,18 +65,19 @@ def courses(request, **kwargs):
 	return render(request, 'courses.html', context)
 
 def courses_enroll(request, **kwargs):
-	student_id = kwargs['id'] if 'id' in kwargs else 0
+	student_id = kwargs.setdefault('id',0)
 	student = Students.fetch(id=student_id)
 	course = Courses.fetch(id=request.GET['course_id'])
-	if course.eligible(student)['now']:
-		if course.prepaid:
-			Ktrad = CourseTrads.fetch(id__startswith='K',id__endswith=course.show[1])
-			Kid = course.id[0:2]+Ktrad.id
-			K = Courses.create_by_id(Kid)
-			prepaid = Enrollments.fetch(student__family=student.family, course=K)
-			if not prepaid:
-				Enrollments.create(student=student, course=K)
-		Enrollments.create(course=course, student=student)
+	course.enroll(student)
+	# if course.eligible(student)['now']:
+	# 	if course.prepaid:
+	# 		Ktrad = CourseTrads.fetch(id__startswith='K',id__endswith=course.show[1])
+	# 		Kid = course.id[0:2]+Ktrad.id
+	# 		K = Courses.create_by_id(Kid)
+	# 		prepaid = Enrollments.fetch(student__family=student.family, course=K)
+	# 		if not prepaid:
+	# 			Enrollments.create(student=student, course=K)
+	# 	Enrollments.create(course=course, student=student)
 	return redirect('/register/student/{}/'.format(student_id))
 
 def courses_audition(request, **kwargs):
@@ -89,36 +90,34 @@ def courses_audition(request, **kwargs):
 
 def courses_drop(request, **kwargs):
 	# Safely get student id
-	student_id = kwargs['id'] if 'id' in kwargs else 0
+	student_id = kwargs.setdefault('id',0)
 	# Safely fetch student
 	student = Students.fetch(id=student_id)
 	# Safely fetch course
 	course = Courses.fetch(id=request.GET['course_id'])
 	# Find the enrollment
 	enrollment = Enrollments.fetch(course=course, student=student)
-	# Find the invoice to which enrollment has been added, (if it has been added to an invoice)
-	invoices = set([enrollment.invoice])
 	# Delete enrollment
 	enrollment.delete()
-	# Check for any other enrollments that student is now ineligible for
-	now_inelig = find_all(Enrollments.filter(student=student), lambda enr: not enr.eligible['now'])
-	# If course comes with prepaid tickets...
-	if course.prepaid:
-		# ...make sure some student in family is enrolled in another course that needs them
-		other = Enrollments.filter(
-			student__family=student.family, 
-			course__tradition__prepaid=True, 
-			course__tradition__show=course.show,
-			course__year=getyear()
-		)
-		# Otherwise, delete the prepaid tickets from the cart
-		if not other:
-			Ktrad = CourseTrads.fetch(id__startswith='K',id__endswith=course.show[1])
-			K = Courses.fetch(year=course.year, tradition=Ktrad)
-			prepaid = Enrollments.fetch(student__family=student.family, course=K)
-			if prepaid:
-				if prepaid.invoice:
-					invoices.add(prepaid.invoice)
-				prepaid.delete()
-	Each(invoices).update_amount()
+	# # Check for any other enrollments that student is now ineligible for
+	# now_inelig = find_all(Enrollments.filter(student=student), lambda enr: not enr.eligible['now'])
+	# # If course comes with prepaid tickets...
+	# if course.prepaid:
+	# 	# ...make sure some student in family is enrolled in another course that needs them
+	# 	other = Enrollments.filter(
+	# 		student__family=student.family, 
+	# 		course__tradition__prepaid=True, 
+	# 		course__tradition__show=course.show,
+	# 		course__year=getyear()
+	# 	)
+	# 	# Otherwise, delete the prepaid tickets from the cart
+	# 	if not other:
+	# 		Ktrad = CourseTrads.fetch(id__startswith='K',id__endswith=course.show[1])
+	# 		K = Courses.fetch(year=course.year, tradition=Ktrad)
+	# 		prepaid = Enrollments.fetch(student__family=student.family, course=K)
+	# 		if prepaid:
+	# 			if prepaid.invoice:
+	# 				invoices.add(prepaid.invoice)
+	# 			prepaid.delete()
+	# Each(invoices).update_amount()
 	return redirect('/register/student/{}/'.format(student_id))

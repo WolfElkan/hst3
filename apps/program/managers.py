@@ -95,4 +95,6 @@ class AuditionManager(sm.SuperManager):
 	def filter(self, **kwargs):
 		kwargs['isAudition'] = True
 		return Enrollments.filter(**kwargs)
+	def all(self):
+		return Enrollments.filter(isAudition=True)
 Auditions = AuditionManager()
