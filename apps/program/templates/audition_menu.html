@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>HST | Audition Results</title>
+</head>
+<body>
+<h1>HST Audition Results Interface</h1>
+{% for course in courses %}
+<a href="{{course.id}}/">{{course.title}}</a>
+{% endfor %}
+</body>
+</html>

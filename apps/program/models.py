@@ -50,6 +50,7 @@ class CourseTrad(models.Model):
 	vol_hours  = models.FloatField(default=0)
 	the_hours  = models.FloatField(default=0)
 	prepaid    = models.BooleanField(default=False)
+	droppable  = models.BooleanField(default=True) # Whether course may be dropped AFTER a successful audition
 	rest_model = "coursetrad"
 	genre_codes = {
 		'A':'Acting',
@@ -221,6 +222,7 @@ class Course(models.Model):
 	vol_hours  = models.FloatField()
 	the_hours  = models.FloatField()
 	prepaid    = models.BooleanField()
+	approved   = models.BooleanField(default=False)
 	rest_model = "course"
 	objects = Courses
 	def enrollments(self):
@@ -252,6 +254,10 @@ class Course(models.Model):
 			elif enrollment.isAudition and not enrollment.success:
 				elig['reason'] = ''
 				elig['css'] = "not_elig"
+			elif enrollment.isAudition and enrollment.success and not enrollment.happened:
+				elig['reason'] = '{} is eligible for {}'.format(student, self)
+				elig['css'] = "eligible"
+				elig['now'] = True				
 			elif enrollment.paid:
 				elig['reason'] = '{} has successfully enrolled in {}'.format(student, self)
 				elig['now'] = True
@@ -359,6 +365,20 @@ class Enrollment(models.Model):
 	updated_at = models.DateTimeField(auto_now=True)
 	rest_model = "enrollment"
 	objects = Enrollments
+	def inspect(self):
+		print 'student    :',self.student   
+		print 'course     :',self.course    
+		print 'invoice    :',self.invoice   
+		print 'role       :',self.role      
+		print 'role_type  :',self.role_type 
+		print 'isAudition :',self.isAudition
+		print 'ret_status :',self.ret_status
+		print 'happened   :',self.happened  
+		print 'exists     :',self.exists    
+		print 'success    :',self.success   
+		print 'created_at :',self.created_at
+		print 'updated_at :',self.updated_at
+		print 'rest_model :',self.rest_model
 	def __str__(self):
 		if self.course.tradition.id[0] == 'K':
 			return '{} recieves {}, {}'.format(self.student.family,self.course.title,self.course.year)
@@ -373,6 +393,11 @@ class Enrollment(models.Model):
 			)
 	# Delete the enrollment and all that goes with it
 	def delete(self):
+		if self.happened:
+			if self.course.tradition.droppable:
+				self.happened = False
+				self.save()
+			return None
 		# Begin collecting the invoices which will need to be updated
 		invoices = set()
 		# Find the invoice to which enrollment has been added, (if it has been added to an invoice)
@@ -436,6 +461,7 @@ class Enrollment(models.Model):
 		return course.check_eligex(student, aud=self.isAudition)
 	# Update attributes after a successful audition
 	def accept(self):
+		print 'accept'
 		if self.isAudition:
 			self.happened = True
 			self.success = True
@@ -443,6 +469,7 @@ class Enrollment(models.Model):
 			self.save()
 	# Update attributes after an unsuccessful audition
 	def reject(self):
+		print 'reject'
 		if self.isAudition:
 			self.happened = True
 			self.success = False

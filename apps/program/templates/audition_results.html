@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>HST | Audition Results | {{course}}</title>
+	<style type="text/css">
+		.center {
+			text-align: center;
+		}
+	</style>
+</head>
+<body>
+<h1>HST Audition Results Interface</h1>
+<h2>{{course}}</h2>
+<form action="process/" method="POST">{% csrf_token %}
+	<table>
+		<thead>
+			<th>Student</th>
+			<th>No</th>
+			<th>Yes</th>
+			<th>Age</th>
+			<th>Grade</th>
+		</thead>
+	{% for student in students %}
+		<tr>
+			<td>{{student}}</td>
+			<td class="center"><input type="radio" value="reject" name="{{student.id}}" {% if student.enrollment.success is False %}checked{% endif %}></td>
+			<td class="center"><input type="radio" value="accept" name="{{student.id}}" {% if student.enrollment.success is True %}checked{% endif %}></td>
+			<td>{{student.hst_age}}</td>
+			<td>{{student.grade}}</td>
+		</tr>
+	{% endfor %}
+	</table>
+	<button>Submit</button>
+</form>
+</body>
+</html>

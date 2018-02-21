@@ -99,25 +99,30 @@ def courses_drop(request, **kwargs):
 	enrollment = Enrollments.fetch(course=course, student=student)
 	# Delete enrollment
 	enrollment.delete()
-	# # Check for any other enrollments that student is now ineligible for
-	# now_inelig = find_all(Enrollments.filter(student=student), lambda enr: not enr.eligible['now'])
-	# # If course comes with prepaid tickets...
-	# if course.prepaid:
-	# 	# ...make sure some student in family is enrolled in another course that needs them
-	# 	other = Enrollments.filter(
-	# 		student__family=student.family, 
-	# 		course__tradition__prepaid=True, 
-	# 		course__tradition__show=course.show,
-	# 		course__year=getyear()
-	# 	)
-	# 	# Otherwise, delete the prepaid tickets from the cart
-	# 	if not other:
-	# 		Ktrad = CourseTrads.fetch(id__startswith='K',id__endswith=course.show[1])
-	# 		K = Courses.fetch(year=course.year, tradition=Ktrad)
-	# 		prepaid = Enrollments.fetch(student__family=student.family, course=K)
-	# 		if prepaid:
-	# 			if prepaid.invoice:
-	# 				invoices.add(prepaid.invoice)
-	# 			prepaid.delete()
-	# Each(invoices).update_amount()
 	return redirect('/register/student/{}/'.format(student_id))
+
+def audition_menu(request, **kwargs):
+	context = {
+		'courses' : Courses.filter(enrollment__isAudition=True,enrollment__happened=False)
+	}
+	return render(request, 'audition_menu.html', context)
+
+def audition_results(request, **kwargs):
+	course = Courses.fetch(id=kwargs['id'])
+	context = {
+		'course' : course,
+		'students' : equip(Students.filter(enrollment__course=course), lambda student: Enrollments.fetch(student=student,course=course), attr='enrollment')
+	}
+	return render(request, 'audition_results.html', context)
+
+def audition_process(request, **kwargs):
+	course = Courses.fetch(id=kwargs['id'])
+	for key in request.POST:
+		if key.isdigit():
+			student = Students.fetch(id=int(key))
+			enrollment = student.enrollments.filter(course=course)[0]
+			if request.POST[key] == u'accept':
+				enrollment.accept()
+			if request.POST[key] == u'reject':
+				enrollment.reject()
+	return redirect('/admin/auditions/')

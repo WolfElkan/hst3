@@ -15,7 +15,6 @@ from trace import DEV
 import re
 
 def index(request):
-	print type(request)
 	me = getme(request)
 	context = {
 		'name':me.owner if me else None,

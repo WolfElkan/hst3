@@ -22,8 +22,8 @@
 			<td class="mono">{{me.id}}</td>
 		</tr>
 		<tr>
-			<td>User HID:</td>
-			<td class="mono">{{me.hid}}</td>
+			<td>{{me.owner.rest_model|title}} HID:</td>
+			<td class="mono">{{me.owner.hid}}</td>
 		</tr>
 		<tr>
 			<td>Password:</td>
@@ -45,5 +45,6 @@
 <a href="parents">Parent Info</a>
 <a href="students">Student Info</a>
 <a href="courses">Registration Info</a>
+{% if me.permission >= 4 %}<a href="/admin/dashboard/">Admin Dashboard</a>{% endif %}
 </body>
 </html>

@@ -8,11 +8,13 @@ from Utils import custom_fields as custom
 from Utils import supermodel as sm
 from Utils.data import collect, copyatts, Each
 from Utils.misc import namecase, safe_delete
+from Utils.security import getyear
 
 from django_mysql import models as sqlmod
 from datetime import datetime
 from trace import DEV
 Q = models.Q
+
 
 class Address(models.Model):
 	line1      = models.CharField(null=False, max_length=50)
@@ -28,6 +30,7 @@ class Address(models.Model):
 		title = self.line1 + ('\n'+self.line2 if self.line2 else '') + '\n' + self.city + ', ' + self.state + '\n' + str(self.zipcode)
 		return title
 
+
 class Parent(models.Model):
 	first      = models.CharField(max_length=20)
 	family_id  = models.PositiveIntegerField()
@@ -38,20 +41,19 @@ class Parent(models.Model):
 	alt_email  = models.EmailField(default='')
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
+	hid = NotImplemented
 	rest_model = "parent"
 	objects = Parents
+
 	def last(self):
-		if super(Parent, self).__getattribute__('alt_last'):
-			return super(Parent, self).__getattribute__('alt_last')
-		else: 
-			return self.family.last
+		return self.alt_last  if self.alt_last  else self.family.last 
 	def phone(self):
 		return self.alt_phone if self.alt_phone > 0 else self.family.phone
 	def email(self):
 		return self.alt_email if self.alt_email else self.family.email
 	def family(self):
-		family_id = super(Parent, self).__getattribute__('family_id')
-		return Families.get(id=family_id)
+		return Families.get(id=self.family_id)
+
 	def __getattribute__(self, field):
 		if field in ['last','phone','email','family']:
 			call = super(Parent, self).__getattribute__(field)
@@ -65,6 +67,7 @@ class Parent(models.Model):
 			prefix = 'Mrs. '
 		return prefix+self.first+' '+self.last
 
+
 class Family(models.Model):
 	last       = models.CharField(max_length=30)
 	phone      = custom.PhoneNumberField()
@@ -75,6 +78,7 @@ class Family(models.Model):
 	address    = models.OneToOneField(Address, null=True, primary_key=False, rel=True)
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
+	hid = NotImplemented
 	rest_model = "family"
 	objects = Families
 
@@ -126,6 +130,7 @@ class Family(models.Model):
 		safe_delete(self.address)
 		Users.filter(owner=self).delete()
 		return super(Family, self).delete()
+
 	def __str__(self):
 		return self.last+' Family'
 	def __getattribute__(self, field):
@@ -147,6 +152,7 @@ class Family(models.Model):
 			return self.save()
 		else:
 			return super(Family, self).__setattr__(field, value)
+
 
 class Student(models.Model):
 	first     = models.CharField(max_length=20)
@@ -177,6 +183,7 @@ class Student(models.Model):
 	tshirt     = models.CharField(max_length=2, choices=t_shirt_sizes, null=True)
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
+	hid = NotImplemented
 	objects = Students
 	def prefer(self):
 		return self.alt_first if self.alt_first else self.first
@@ -193,7 +200,7 @@ class Student(models.Model):
 	def father(self):
 		return self.family.father
 
-	# Mirror functions: student.fxn(course) calls course.fxn(student)
+	# Courtesy functions: student.fxn(course) calls course.fxn(student)
 	def eligible(self, course):
 		return course.eligible(self)
 	def audible(self, course):
@@ -240,6 +247,7 @@ class Student(models.Model):
 		for enrollment in self.enrollments:
 			qset.append({'widget':enrollment,'static':Courses.get(id=enrollment.course_id)})
 		return qset
+
 	def __str__(self):
 		return self.prefer+' '+self.last
 	def __json__(self):
@@ -265,6 +273,7 @@ class Teacher(models.Model):
 	address    = models.OneToOneField(Address, null=True, primary_key=False, rel=True)
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
+	hid = NotImplemented
 	rest_model = "teacher"
 
 class User(models.Model):
@@ -285,7 +294,6 @@ class User(models.Model):
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
 	rest_model = "user"
-	hid = NotImplemented
 	objects = Users
 	def __str__(self):
 		return self.username

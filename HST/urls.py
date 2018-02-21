@@ -16,9 +16,9 @@ Including another URLconf
 from django.conf.urls import url
 from django.contrib import admin
 
-urlpatterns = [
-    url(r'^admin/', admin.site.urls),
-]
+# urlpatterns = [
+#     url(r'^admin/', admin.site.urls),
+# ]
 from django.conf.urls import include
 
 from . import dev_views   as dev
@@ -78,6 +78,11 @@ urlpatterns = [
 
 	url(r'^reports/students/mass_enroll/register/?$', reports.register),
 	url(r'^reports/students/(?P<year>\d{4})/mass_enroll/register/?$', reports.register),
+
+	url(r'^admin/dashboard/?$', radmin.dashboard),
+	url(r'^admin/auditions/?$', program.audition_menu),
+	url(r'^admin/auditions/(?P<id>\d\d\w\w)/?$', program.audition_results),
+	url(r'^admin/auditions/(?P<id>\d\d\w\w)/process/?$', program.audition_process),
 
 	url(r'^rest/(show|edit)/(?P<model>[a-zA-Z]+)/(?P<id>\d+|(\d\d)?\w\w)/add/(?P<foreign_model>[a-zA-Z]+)/?$', rest.new),
 	url(r'^rest/(show|edit)/(?P<model>[a-zA-Z]+)/(?P<id>\d+|(\d\d)?\w\w)/add/(?P<foreign_model>[a-zA-Z]+)/create/?$', rest.create),
