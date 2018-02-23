@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, HttpResponse
 
 from apps.people.managers import Addresses, Families, Parents, Users, Students
-from apps.program.managers import Courses, CourseTrads, Enrollments, Auditions
+from apps.program.managers import Courses, CourseTrads, Enrollments
 
 from Utils.data import sub
 from Utils.security import getyear

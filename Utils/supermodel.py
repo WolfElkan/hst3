@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 from django.db import models, connection
 from datetime import datetime
+from random import randint
 import re
 from .data import find
 
@@ -179,3 +180,8 @@ class SuperManager(models.Manager):
 			return qset[0]
 	def gid(self, id):
 		return self.fetch(id=id)
+	def random(self):
+		count = self.aggregate(count=models.aggregates.Count('id'))['count']
+		random_index = randint(0, count - 1)
+		return self.all()[random_index]
+

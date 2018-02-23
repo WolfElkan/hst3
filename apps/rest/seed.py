@@ -95,6 +95,7 @@ def load_post(request):
 				enrollment_kwargs = {
 					'student': newStudent,
 					'course' : course,
+					'status' : "enrolled"
 				}
 				if rolled:
 					enrollment_kwargs['role']      = enrollment['role']

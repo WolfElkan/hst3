@@ -71,30 +71,16 @@ class EnrollmentManager(sm.SuperManager):
 		else:
 			return super(EnrollmentManager, self).create(**kwargs)
 	def filter(self, **kwargs):
-		if 'phantom' not in kwargs or not kwargs.pop('phantom'):
-			kwargs['exists'] = True
-		return super(EnrollmentManager, self).filter(**kwargs)
+		phantom = 'phantom' in kwargs and kwargs.pop('phantom')
+		qset = super(EnrollmentManager, self).filter(**kwargs)
+		if not phantom:
+			qset = qset.exclude(status='nonexist')
+		return qset
+	def simulate(self, **kwargs):
+		thing = self.fetch(**kwargs)
+		thing = thing if thing else self.model(**kwargs)
+		return thing.set_status()
 Enrollments = EnrollmentManager()
 
 from .models import Venue
 Venues = Venue.objects
-
-class AuditionManager(sm.SuperManager):
-	def __init__(self):
-		super(AuditionManager, self).__init__('program_enrollment')
-	def create(self, **kwargs):
-		kwargs['isAudition'] = True
-		if 'ret_status' not in kwargs:
-			prev_enr = self.filter(
-				student=kwargs['student'],
-				course__tradition=kwargs['course'].tradition,
-				course__year__lt=kwargs['course'].year
-			).order_by('-course__year')
-			kwargs['ret_status'] = bool(prev_enr and prev_enr[0].ret_status)
-		return Enrollments.create(**kwargs)
-	def filter(self, **kwargs):
-		kwargs['isAudition'] = True
-		return Enrollments.filter(**kwargs)
-	def all(self):
-		return Enrollments.filter(isAudition=True)
-Auditions = AuditionManager()

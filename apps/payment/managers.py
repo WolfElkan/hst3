@@ -23,9 +23,8 @@ class InvoiceManager(sm.SuperManager):
 		this = super(InvoiceManager, self).create(**kwargs)
 		qset = Enrollments.filter(
 			student__family=kwargs['family'],
-			invoice=None,
 			course__year=kwargs['year'],
-			isAudition=False)
+			status='need_pay')
 		for q in qset:
 			q.invoice = this
 			q.save()

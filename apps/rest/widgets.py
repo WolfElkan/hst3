@@ -1,6 +1,7 @@
 from apps.people.managers import Addresses, Families, Parents, Users, Students
 from apps.people.models import Teacher
-from apps.program.managers import Courses, CourseTrads, Enrollments, Auditions
+Teachers = Teacher.objects
+from apps.program.managers import Courses, CourseTrads, Enrollments
 from trace import TRACE
 
 MODELS = {
@@ -16,7 +17,7 @@ MODELS = {
 	'tradition' : CourseTrads,
 	'course'    : Courses,
 	'enrollment': Enrollments,
-	'audition'  : Auditions,
+	'audition'  : Enrollments,
 }
 
 

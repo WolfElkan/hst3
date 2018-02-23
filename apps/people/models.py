@@ -6,7 +6,7 @@ from apps.payment.managers import Invoices
 
 from Utils import custom_fields as custom
 from Utils import supermodel as sm
-from Utils.data import collect, copyatts, Each
+from Utils.data import collect, copyatts, Each, find_all
 from Utils.misc import namecase, safe_delete
 from Utils.security import getyear
 
@@ -91,20 +91,19 @@ class Family(models.Model):
 	def children(self):
 		return Students.filter(family_id=self.id).order_by('birthday')
 
-	paid_query = Q(invoice__status='P')
-	pend_query = Q( Q(isAudition=False,invoice__status='N') | Q(isAudition=True,happened=False) )
+	# paid_query = Q(invoice__status='P')
+	# pend_query = Q( Q(isAudition=False,invoice__status='N') | Q(isAudition=True,happened=False) )
 	def enrollments_in(self, year):
-		qset = Enrollments.filter(student__family=self, course__year=year).order_by('created_at')
-		qset = qset.exclude(isAudition=True,success=False)
-		qset = qset.exclude(exists=False)
+		qset = Enrollments.filter(student__family=self, course__year=year)
+		qset = qset.exclude(status__in=['nonexist','aud_fail'])
+		qset = qset.order_by('created_at')
 		return qset
-	def paid_enrollments_in(self, year):
-		return self.enrollments_in(year).filter(self.paid_query)
-	def pend_enrollments_in(self, year):
-		return self.enrollments_in(year).filter(self.pend_query)
-	def unpaid_enrollments_in(self, year):
-		return self.enrollments_in(year).exclude(self.paid_query).exclude(self.pend_query)
-
+	# def paid_enrollments_in(self, year):
+	# 	return self.enrollments_in(year).filter(self.paid_query)
+	# def pend_enrollments_in(self, year):
+	# 	return self.enrollments_in(year).filter(self.pend_query)
+	# def unpaid_enrollments_in(self, year):
+	# 	return self.enrollments_in(year).exclude(self.paid_query).exclude(self.pend_query)
 	def total_tuition_in(self, year):
 		return sum(Each(self.enrollments_in(year)).tuition)
 	def paid_tuition_in(self, year):
@@ -227,27 +226,36 @@ class Student(models.Model):
 		return self.enrollments.filter(course__year__lt=year)
 
 	def auditions(self):
-		return Enrollments.filter(student=self, isAudition=True)
+		return Enrollments.filter(student=self, status__startswith="aud")
 	def auditions_in(self, year):
-		return Enrollments.filter(student=self, isAudition=True, course__year=year)
+		return Enrollments.filter(student=self, status__startswith="aud", course__year=year)
 	def courses(self): # TODO: Use a DB join statement instead # As if I know how to do that
 		qset = []
-		for enrollment in self.enrollments:
-			if not enrollment.isAudition or enrollment.success or not enrollment.happened:
-				qset.append(Courses.get(id=enrollment.course_id))
+		for enrollment in self.enrollments.filter(status__in=["enrolled","invoiced","need_pay"]):	
+			qset.append(Courses.get(id=enrollment.course_id))
 		return qset
 	def courses_in(self, year): 
-		qset = []
-		for enrollment in self.enrollments_in(year):
-			if not enrollment.isAudition or enrollment.success or not enrollment.happened:
-				qset.append(Courses.get(id=enrollment.course_id))
-		return qset
+		return find_all(self.courses, lambda course: course.year == year)
+		# qset = []
+		# for enrollment in self.enrollments_in(year).filter(status__in=["enrolled","invoiced","need_pay"]):	
+		# 	qset.append(Courses.get(id=enrollment.course_id))
+		# return qset
 	def courses_toggle_enrollments(self):
 		qset = []
 		for enrollment in self.enrollments:
 			qset.append({'widget':enrollment,'static':Courses.get(id=enrollment.course_id)})
 		return qset
-
+	def course_menu(self, **kwargs):
+		year = kwargs.setdefault('year',getyear())
+		courses = Courses.filter(year=year).exclude(tradition__id__startswith="K").order_by('tradition__order')
+		for course in courses:
+			enrollment = Enrollments.simulate(student=self,course=course)
+			enrollment.set_status()
+			# if enrollment.id:
+			# 	print enrollment.id,'   ',enrollment
+			# else:
+			# 	print '        ', enrollment
+			yield enrollment
 	def __str__(self):
 		return self.prefer+' '+self.last
 	def __json__(self):

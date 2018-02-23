@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, HttpResponse
 
 from .managers import Families, Addresses, Parents, Users, Students
-from apps.program.managers import CourseTrads, Courses, Enrollments, Auditions
+from apps.program.managers import CourseTrads, Courses, Enrollments
 
 from Utils.custom_fields import Bcrypt, PhoneNumber
 from Utils.data  import collect, copy, copyatts
@@ -22,7 +22,6 @@ def reg(request):
 		return redirect('/register/parentsinfo')
 	else:
 		return redirect('/register/studentsinfo')
-
 
 def familyinfo(request):
 	forminit(request,'family',['last','phone','email'])

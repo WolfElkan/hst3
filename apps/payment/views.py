@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, HttpResponse
 
 from apps.people.managers import Families, Addresses, Parents, Users, Students
-from apps.program.managers import CourseTrads, Courses, Enrollments, Auditions
+from apps.program.managers import CourseTrads, Courses, Enrollments
 from .managers import Invoices
 
 from Utils.custom_fields import Bcrypt, PhoneNumber

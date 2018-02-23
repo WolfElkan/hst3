@@ -27,7 +27,7 @@ Glyph | Meaning
 `g` | Returns whether the student meets the grade requirements (Always returns true if student does not have a `grad_year` listed.  Almost always returns true since most courses are for grades 1-12)
 `m` | Male: returns true for boys and false for girls
 `f` | Female: returns true for girls and false for boys
-`@` | Searches for a *successful* audition or skill assessment for the class by the student
+`@` | Searches for a *successful* audition or skill assessment for the class by the student.  (If no `@` is included, word will match only actual enrollments, not auditions.)
 `%` | Returns the value of the global variable `DEV`.  (True in development &amp; testing, False in production.)
 ### Single-Letter Modifiers
 Glyph | Meaning
@@ -43,7 +43,7 @@ Glyph | Meaning
 `c` | Will match only enrollments in the *current* year
 `p` | Will match only enrollments in *past* years.
 `$` | Will match only enrollments for which tuition has been paid
-`@?` | Will match an audition or skill assessment for the specified course, even if the audition was failed.  If no `@` is included, word will match only actual enrollments, not auditions.
+`+` | Will match student's whole family
 Note: A student is considered eligible to audition for a course if they would be eligible to enroll in it, should they pass an audition.
 
 ### Boolean Operators

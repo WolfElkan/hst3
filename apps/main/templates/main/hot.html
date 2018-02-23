@@ -4,24 +4,121 @@ Python Hot Code:
 	 * {
 		font-size: 110%;
 	}
+	table {
+		font-size: 75%
+	}
+	table tr td:nth-child(1) {
+		font-family: monospace;
+	}
+	table tr td:nth-child(3) {
+		text-align: center;
+	}
+	.Invisible {
+		color: gray;
+	}
+	.Stable {
+		color: black;
+	}
+	.Unstable {
+		color: #840;
+	}
 </style>
 <form action="/run" method="post">
 	{% csrf_token %}
 	<textarea name="command" rows="10" cols="50" style="font-family: monospace;">{{ command }}</textarea>
 	<input type="submit" value="RUN">
 </form>
-Session:
-<!-- <table>
-	<thead>
-		<th>Key</th>
-		<th>Value</th>
-	</thead>
-	{% for key in session %}
-	<tr>
-		<td>{{key}}</td>
-		<td></td>
-	</tr>
-	{% endfor%}
-</table> -->
 <a href="/clear">Clear Session</a>
 <a href="/nuke">Nuke Database</a>
+<table>
+<thead>
+	<th>Status</th>
+	<th>Display</th>
+	<th>Invoice</th>
+	<th>Stability</th>
+</thead>
+<tr class="Stable">
+	<td>eligible</td>
+	<td>{student} is eligible for {course}</td>
+	<td></td>
+	<td>Stable</td>
+</tr>
+<tr class="Unstable">
+	<td>not_elig</td>
+	<td>{student} is not eligible for {course}</td>
+	<td></td>
+	<td>Unstable</td>
+</tr>
+<tr class="Unstable">
+	<td>aud_need</td>
+	<td>{student} is eligible for an audition or skill assessment for {course}.</td>
+	<td></td>
+	<td>Unstable</td>
+</tr>
+<tr class="Stable">
+	<td>aud_pend</td>
+	<td>{student} has scheduled an audition for {course} ({year})</td>
+	<td></td>
+	<td>Stable</td>
+</tr>
+<tr class="Stable">
+	<td>aud_pass</td>
+	<td>{student} has passed the audition or skill assessment for {course} and may now enroll!</td>
+	<td></td>
+	<td>Stable</td>
+</tr>
+<tr class="Invisible">
+	<td>aud_fail</td>
+	<td>{student} did not pass the audition or skill assessment for {course}.</td>
+	<td></td>
+	<td>Invisible</td>
+</tr>
+<tr class="Stable">
+	<td>enrolled</td>
+	<td>{student} {proverb} enrolled in {course} ({year})</td>
+	<td>P</td>
+	<td>Stable</td>
+</tr>
+<tr class="Stable">
+	<td>invoiced</td>
+	<td>{student}'s enrollment in {course} has been added to invoice #{invoice}</td>
+	<td>N</td>
+	<td>Stable</td>
+</tr>
+<tr class="Stable">
+	<td>need_pay</td>
+	<td>{student} is registered for {course} pending tuition payment</td>
+	<td></td>
+	<td>Stable</td>
+</tr>
+<tr class="Unstable">
+	<td>conflict</td>
+	<td>{student} is in another class at the same time as {course}</td>
+	<td></td>
+	<td>Unstable</td>
+</tr>
+<tr class="Unstable">
+	<td>need_cur</td>
+	<td>{student} will be eligible for {course} once {pronoun} enrolls in at least 1 other class</td>
+	<td></td>
+	<td>Unstable</td>
+</tr>
+<tr class="Unstable">
+	<td>needboth</td>
+	<td>{student} will be eligible to audition for {course} once {pronoun} enrolls in at least 1 other class</td>
+	<td></td>
+	<td>Unstable</td>
+</tr>
+<tr class="Invisible">
+	<td>nonexist</td>
+	<td>{student} was enrolled in {course} ({year}) on cancelled invoice #{invoice}</td>
+	<td>C</td>
+	<td>Invisible</td>
+</tr>
+<tr class="Stable">
+	<td>aud_lock</td>
+	<td>{student} has passed the audition for {course} and must enroll.</td>
+	<td></td>
+	<td>Stable</td>
+</tr>
+</table>

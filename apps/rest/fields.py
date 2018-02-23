@@ -1,8 +1,8 @@
 from .widgets import VarChar, Integer, Enum, Radio, Checkbox, Date, Time, ForeignKey, ForeignSet, ToggleSet, NullBoolean
 from Utils.custom_fields import Bcrypt, PhoneNumber, ZipCode, DayOfWeek, Dollar
-from trace import TRACE
-if TRACE:
-	print '~ FIELDS'
+from Utils.data import collect
+from apps.program.managers import CourseTrads, Enrollments
+
 FIELDS = {
 	'address'   : [
 		{'field':'line1'     , 'template': VarChar(maxlength=50)},
@@ -54,6 +54,7 @@ FIELDS = {
 		{'field':'start'     , 'template': Time()},
 		{'field':'end'       , 'template': Time()},
 		# {'field':'nMeets'    , 'template': Integer()},
+		{'field':'semester'  , 'template': Enum(options='NFSB')},
 		{'field':'show'      , 'template': VarChar(maxlength=2,default='SC')},
 		# {'field':'vs'        , 'template': Checkbox(suffix='This class performs in the Variety Show')},
 		{'field':'min_age'   , 'template': Integer(default= 9)},
@@ -65,7 +66,8 @@ FIELDS = {
 		# {'field':'redtuit'   , 'template': Dollar()},
 		# {'field':'vol_hours' , 'template': Integer()},
 		# {'field':'the_hours' , 'template': Integer()},
-		# {'field':'prepaid'   , 'template': Checkbox(suffix='Families must purchase 10 prepaid tickets for $100, not included in tuition')},
+		{'field':'auto'      , 'template': Checkbox(suffix='Courses in this tradition are automatically added to eligible carts.')},
+		{'field':'prepaid'   , 'template': Checkbox(suffix='Families must purchase 10 prepaid tickets for $100, not included in tuition')},
 		# {'field':'courses'   , 'template': ForeignSet(model='course')},
 	],
 	'course'    : [
@@ -85,7 +87,6 @@ FIELDS = {
 		{'field':'course'    , 'template': ForeignKey(model='course')},
 		{'field':'role'      , 'template': VarChar()},
 		{'field':'role_type' , 'template': Enum(options=['','Chorus','Support','Lead'])},
-		{'field':'isAudition', 'template': Checkbox()},
-		{'field':'success'   , 'template': NullBoolean()},
+		{'field':'status'    , 'template': Enum(options=['']+collect(Enrollments.model.status_choices, lambda choice: choice[0]))},
 	],
 }
