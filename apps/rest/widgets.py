@@ -2,6 +2,7 @@ from apps.people.managers import Addresses, Families, Parents, Users, Students
 from apps.people.models import Teacher
 Teachers = Teacher.objects
 from apps.program.managers import Courses, CourseTrads, Enrollments
+from apps.payment.managers import Invoices
 from trace import TRACE
 
 MODELS = {
@@ -18,6 +19,7 @@ MODELS = {
 	'course'    : Courses,
 	'enrollment': Enrollments,
 	'audition'  : Enrollments,
+	'invoice'   : Invoices,
 }
 
 
@@ -297,6 +299,18 @@ class ForeignKey(object):
 			thing.__setattr__(field, str(value))
 		else:
 			thing.__setitem__(field, str(value))
+		return thing
+
+class Static(object):
+	def __init__(self, **kwargs):
+		self.default = kwargs.setdefault('default',None)
+		self.field = kwargs.setdefault('field',None)
+		super(Static, self).__init__()
+	def widget(self, field, value, **kwargs):
+		return value
+	def static(self, field, value):
+		return value
+	def set(self, thing, field, post, isAttr):
 		return thing
 
 class ForeignSet(object):

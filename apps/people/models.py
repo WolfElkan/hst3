@@ -20,7 +20,7 @@ class Address(models.Model):
 	line1      = models.CharField(null=False, max_length=50)
 	line2      = models.CharField(default='', max_length=50)
 	city       = models.CharField(default='', max_length=25)
-	state      = models.CharField(default='', max_length=2)
+	state      = models.CharField(default='', max_length= 2)
 	zipcode    = custom.ZipCodeField()
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
@@ -32,6 +32,7 @@ class Address(models.Model):
 
 
 class Parent(models.Model):
+	hid        = models.CharField(max_length=7, null=True)
 	first      = models.CharField(max_length=20)
 	family_id  = models.PositiveIntegerField()
 	alt_last   = models.CharField(default='', max_length=30)
@@ -41,7 +42,6 @@ class Parent(models.Model):
 	alt_email  = models.EmailField(default='')
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
-	hid = NotImplemented
 	rest_model = "parent"
 	objects = Parents
 
@@ -69,6 +69,7 @@ class Parent(models.Model):
 
 
 class Family(models.Model):
+	hid        = models.CharField(max_length=5, null=True)
 	last       = models.CharField(max_length=30)
 	phone      = custom.PhoneNumberField()
 	phone_type = sqlmod.EnumField(choices=['','Home','Cell','Work'], default='')
@@ -78,7 +79,6 @@ class Family(models.Model):
 	address    = models.OneToOneField(Address, null=True, primary_key=False, rel=True)
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
-	hid = NotImplemented
 	rest_model = "family"
 	objects = Families
 
@@ -154,6 +154,7 @@ class Family(models.Model):
 
 
 class Student(models.Model):
+	hid       = models.CharField(max_length=7, null=True)
 	first     = models.CharField(max_length=20)
 	alt_first = models.CharField(max_length=20, default='')
 	middle    = models.CharField(max_length=20, default='')
@@ -182,7 +183,6 @@ class Student(models.Model):
 	tshirt     = models.CharField(max_length=2, choices=t_shirt_sizes, null=True)
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
-	hid = NotImplemented
 	objects = Students
 	def prefer(self):
 		return self.alt_first if self.alt_first else self.first
@@ -231,7 +231,7 @@ class Student(models.Model):
 		return Enrollments.filter(student=self, status__startswith="aud", course__year=year)
 	def courses(self): # TODO: Use a DB join statement instead # As if I know how to do that
 		qset = []
-		for enrollment in self.enrollments.filter(status__in=["enrolled","invoiced","need_pay"]):	
+		for enrollment in self.enrollments.filter(status__in=["enrolled","invoiced","need_pay","aud_pend"]):	
 			qset.append(Courses.get(id=enrollment.course_id))
 		return qset
 	def courses_in(self, year): 
@@ -247,14 +247,10 @@ class Student(models.Model):
 		return qset
 	def course_menu(self, **kwargs):
 		year = kwargs.setdefault('year',getyear())
-		courses = Courses.filter(year=year).exclude(tradition__id__startswith="K").order_by('tradition__order')
+		courses = Courses.filter(year=year,tradition__e=True).exclude(tradition__id__startswith="K").order_by('tradition__order')
 		for course in courses:
 			enrollment = Enrollments.simulate(student=self,course=course)
 			enrollment.set_status()
-			# if enrollment.id:
-			# 	print enrollment.id,'   ',enrollment
-			# else:
-			# 	print '        ', enrollment
 			yield enrollment
 	def __str__(self):
 		return self.prefer+' '+self.last
@@ -266,13 +262,29 @@ class Student(models.Model):
 			obj['alt_phone'] = self.alt_phone
 		return obj 
 	def __getattribute__(self, field):
-		if field in ['hst_age','grade','enrollments','courses','courses_toggle_enrollments','auditions','prefer','last','phone','email','full_name','mother','father']:
+		auto_methods = [
+			'hst_age',
+			'grade',
+			'enrollments',
+			'courses',
+			'courses_toggle_enrollments',
+			'auditions',
+			'prefer',
+			'last',
+			'phone',
+			'email',
+			'full_name',
+			'mother',
+			'father'
+		]
+		if field in auto_methods:
 			call = super(Student, self).__getattribute__(field)
 			return call()
 		else:
 			return super(Student, self).__getattribute__(field)
 
 class Teacher(models.Model):
+	hid = NotImplemented
 	first      = models.CharField(max_length=20)
 	last       = models.CharField(max_length=30)
 	sex        = models.CharField(max_length=1, choices=[('M','Male'),('F','Female')])
@@ -281,7 +293,6 @@ class Teacher(models.Model):
 	address    = models.OneToOneField(Address, null=True, primary_key=False, rel=True)
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
-	hid = NotImplemented
 	rest_model = "teacher"
 
 class User(models.Model):
@@ -305,8 +316,9 @@ class User(models.Model):
 	objects = Users
 	def __str__(self):
 		return self.username
-	# def __getattribute__(self, field):
-	# 	if field == 'pw':
-	# 		return custom.Bcrypt(super(User, self).__getattribute__('password'))
-	# 	else:
-	# 		return super(User, self).__getattribute__(field)
+	def __getattribute__(self, field):
+		if field in ['get_permission_display']:
+			call = super(User, self).__getattribute__(field)
+			return call()
+		else:
+			return super(User, self).__getattribute__(field)

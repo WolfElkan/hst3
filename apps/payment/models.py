@@ -46,7 +46,7 @@ class Invoice(models.Model):
 	def cancel(self):
 		if self.status == 'N':
 			for item in self.items:
-				item.exists = False
+				item.status = "nonexist"
 				item.save()
 			self.status = 'C'
 			self.save()

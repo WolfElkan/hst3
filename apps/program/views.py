@@ -12,7 +12,7 @@ def from_myaccount(request, **kwargs):
 	if me.owner.children:
 		return redirect('/register/student/{}/'.format(me.owner.children[0].id))
 	else:
-		return redirect('/myaccount/')
+		return redirect('/register/studentsinfo/')
 
 def courses(request, **kwargs):
 	me = getme(request)
@@ -85,7 +85,7 @@ def courses_audition(request, **kwargs):
 	student_id = kwargs.setdefault('id',0)
 	student = Students.fetch(id=student_id)
 	course = Courses.fetch(id=request.GET['course_id'])
-	if course.eligible(student):
+	if course.audible(student):
 		Enrollments.create(course=course, student=student, status="aud_pend")
 	return redirect('/register/student/{}/'.format(student_id))
 
@@ -104,7 +104,7 @@ def courses_drop(request, **kwargs):
 
 def audition_menu(request, **kwargs):
 	context = {
-		'courses' : Courses.filter(enrollment__status="aud_pend")
+		'courses' : Courses.filter(enrollment__status__in=["aud_pend","pendpass","pendfail"]).distinct()
 	}
 	return render(request, 'audition_menu.html', context)
 
@@ -112,18 +112,20 @@ def audition_results(request, **kwargs):
 	course = Courses.fetch(id=kwargs['id'])
 	context = {
 		'course' : course,
-		'students' : equip(Students.filter(enrollment__course=course), lambda student: Enrollments.fetch(student=student,course=course), attr='enrollment')
+		'me' : getme(request),
 	}
 	return render(request, 'audition_results.html', context)
 
 def audition_process(request, **kwargs):
+	me = getme(request)
 	course = Courses.fetch(id=kwargs['id'])
 	for key in request.POST:
 		if key.isdigit():
 			student = Students.fetch(id=int(key))
 			enrollment = student.enrollments.filter(course=course)[0]
+			print student
 			if request.POST[key] == u'accept':
-				enrollment.accept()
+				enrollment.accept(me)
 			if request.POST[key] == u'reject':
-				enrollment.reject()
+				enrollment.reject(me)
 	return redirect('/admin/auditions/')

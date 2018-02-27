@@ -68,30 +68,43 @@
 	button {
 		display: none;
 	}
-	.eligible td:nth-child(2), .legend .eligible td:nth-child(1) {font-weight: bold;}
+	/*Bold Black on White*/
+	.eligible td:nth-child(2), .legend .eligible td:nth-child(1) {font-weight: bold;} 
 		.eligible form.enroll button {display: inline;}
-	.audition {background-color: #8af}
-		.audition form.drop button {display: inline;}
-/*		#cart .audition td:nth-child(4) {
-			color: gray;
-			font-style: italic;
-		}*/
+	.aud_drop td:nth-child(2), .legend .aud_drop td:nth-child(1) {font-weight: bold;}
+		.aud_drop form.enroll button {display: inline;}
+	/*Blue*/
+	.aud_pend, .pendpass, .pendfail, .pend_pub {background-color: #8af} 
+		.aud_pend form.drop button {display: inline;}
+	/*Orange*/
 	.invoiced {background-color: #fb8}
 		.invoiced form.view button {display: inline;}
+	/*Green*/
 	.enrolled {background-color: #8f8}
 		.enrolled form.view button {display: inline;}
+	/*Yellow*/
 	.need_pay {background-color: #ff8}
 		.need_pay form.drop button {display: inline;}
-	.need_aud {color: blue;}
-	.need_aud td:nth-child(2), .legend .need_aud td:nth-child(1) {font-weight: bold;}
-		.need_aud form.aud button {display: inline;}
-	.need_cur {background-color: #aaa}
-		.need_cur button.enroll_disabled {display: inline;}
+	.aud_pass {background-color: #ff8}
+		.aud_pass form.drop button {display: inline;}
+	/*Blue*/
+	.aud_need {color: blue;}
+	.aud_need td:nth-child(2), .legend .aud_need td:nth-child(1) {font-weight: bold;}
+		.aud_need form.aud button {display: inline;}
+	/*Half Gray*/
+	.need_cur, .needboth {background-color: #aaa}
+		.need_cur button.enroll_disabled, .needboth button.enroll_disabled {display: inline;}
+	/*Gray*/
 	.not_elig {background-color: #777}
 		.not_elig button.enroll_disabled {display: inline;}
+	.aud_fail {background-color: #777}
+	.fail_pub {background-color: #777}
+	/*Red Gray*/
 	.conflict {background-color: #a88}
 		.conflict button.enroll_disabled {display: inline;}
-	.accepted {background-color: #b8f}
+	/*Purple*/
+	.aud_lock {background-color: #b8f}
+		.aud_lock button.drop_disabled {display: inline;}
 
 	.invoice {
 		margin: 15px auto;
@@ -141,7 +154,7 @@
 				<th>Hours</th>
 			</thead>
 			{% for enr in menu %}
-			<tr class="{{enr.status}}" title="{{enr}}">
+			<tr class="{{enr.status}}" title="{{enr.public_title}}">
 					<td class="center">
 						<form class="enroll" action="enroll/">
 							<input type="hidden" name="course_id" value="{{enr.course.id}}">
@@ -162,7 +175,7 @@
 					</td>
 					<td class="center">{{enr.course.title}}</td>
 					<td>{{enr.course.day.short}}</td>
-					<td>{{enr.course.start}} - {{enr.course.end}}</td>
+					<td>{{enr.course.start}} - {{enr.course.end}}{{enr.course.tradition.display_semester}}</td>
 					<td class="right">${{enr.course.tuition}}</td>
 					<td class="right">{{enr.course.vol_hours}}</td>
 			</tr>
@@ -220,7 +233,7 @@
 	<tr class="eligible">
 		<td>Student is eligible to enroll in this class.</td>
 	</tr>
-	<tr class="need_aud">
+	<tr class="aud_need">
 		<td>Student is eligible for an audition or skill assessment for this class.</td>
 	</tr>
 	<tr class="not_elig">
@@ -232,12 +245,12 @@
 	<tr class="conflict">
 		<td>Student is registered for another class at the same time as this.</td>
 	</tr>
-	<tr class="audition">
+	<tr class="aud_pend">
 		<td>Student has scheduled an audition or skill assessment for this class.</td>
 	</tr>
-	<tr class="accepted">
+<!-- 	<tr class="aud_pass">
 		<td>Student passed an audition for this class and may now enroll in it.</td>
-	</tr>
+	</tr> -->
 	<tr class="need_pay">
 		<td>This class has been added to the cart, pending tuition payment.</td>
 	</tr>

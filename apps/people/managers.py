@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 from django.db import models
 from Utils import custom_fields as custom
+from Utils.data import serial
 from Utils.misc import namecase
 from Utils import supermodel as sm
 from django_mysql import models as sqlmod
@@ -27,6 +28,8 @@ class FamilyManager(sm.SuperManager):
 	def create(self, **kwargs):
 		if 'last' in kwargs:
 			kwargs['last'] = namecase(kwargs['last'])
+			las = kwargs['last'][:3].upper()
+			# kwargs['hid'] = las + str(serial(self, 'hid', hid__startswith=las))
 		return super(FamilyManager, self).create(**kwargs)
 Families = FamilyManager()
 

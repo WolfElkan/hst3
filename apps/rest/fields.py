@@ -1,7 +1,8 @@
-from .widgets import VarChar, Integer, Enum, Radio, Checkbox, Date, Time, ForeignKey, ForeignSet, ToggleSet, NullBoolean
+from .widgets import VarChar, Integer, Enum, Radio, Checkbox, Date, Time, ForeignKey, ForeignSet, ToggleSet, NullBoolean, Static
 from Utils.custom_fields import Bcrypt, PhoneNumber, ZipCode, DayOfWeek, Dollar
 from Utils.data import collect
 from apps.program.managers import CourseTrads, Enrollments
+from apps.payment.managers import Invoices
 
 FIELDS = {
 	'address'   : [
@@ -12,6 +13,7 @@ FIELDS = {
 		{'field':'zipcode'   , 'template': ZipCode()},
 	],
 	'family'    : [
+		{'field':'hid'       , 'template': Static()},
 		{'field':'last'      , 'template': VarChar(maxlength=30)},
 		{'field':'phone'     , 'template': PhoneNumber()},
 		{'field':'phone_type', 'template': Enum(options=['','Home','Cell','Work'])},
@@ -31,6 +33,7 @@ FIELDS = {
 		{'field':'alt_email' , 'template': VarChar(maxlength=254)},
 	],
 	'student'   : [
+		{'field':'hid'       , 'template': Static()},
 		{'field':'first'     , 'template': VarChar(maxlength=20)},
 		{'field':'middle'    , 'template': VarChar(maxlength=20)},
 		{'field':'alt_first' , 'template': VarChar(maxlength=20)},
@@ -46,28 +49,32 @@ FIELDS = {
 		{'field':'tshirt'    , 'template': Enum(options=['','YS','YM','YL','XS','AS','AM','AL','XL','2X','3X'])},
 		{'field':'courses_toggle_enrollments', 'template': ToggleSet(field='courses',model='enrollment')},
 	],
+	'user'      : [
+		{'field':'username'  , 'template': Static()},
+		{'field':'permission', 'template': Enum(options=range(8))},
+	],
 	'coursetrad': [
 		{'field':'id'        , 'template': VarChar(maxlength=2)},
 		{'field':'title'     , 'template': VarChar(maxlength=50)},
 		{'field':'e'         , 'template': Checkbox(suffix='This is a real (and currently offered) course that may be enrolled in, not a student group for admin purposes')},
-		# {'field':'day'       , 'template': DayOfWeek()},
+		{'field':'day'       , 'template': DayOfWeek()},
 		{'field':'start'     , 'template': Time()},
 		{'field':'end'       , 'template': Time()},
-		# {'field':'nMeets'    , 'template': Integer()},
+		{'field':'nMeets'    , 'template': Integer()},
 		{'field':'semester'  , 'template': Enum(options='NFSB')},
 		{'field':'show'      , 'template': VarChar(maxlength=2,default='SC')},
-		# {'field':'vs'        , 'template': Checkbox(suffix='This class performs in the Variety Show')},
+		{'field':'sa'        , 'template': Checkbox(suffix='This class performs in the Variety Show')},
 		{'field':'min_age'   , 'template': Integer(default= 9)},
 		{'field':'max_age'   , 'template': Integer(default=18)},
 		{'field':'min_grd'   , 'template': Integer(default= 1)},
 		{'field':'max_grd'   , 'template': Integer(default=12)},
 		{'field':'eligex'    , 'template': VarChar(default='~')},
-		# {'field':'tuition'   , 'template': Dollar()},
+		{'field':'tuition'   , 'template': Dollar()},
 		# {'field':'redtuit'   , 'template': Dollar()},
-		# {'field':'vol_hours' , 'template': Integer()},
-		# {'field':'the_hours' , 'template': Integer()},
+		{'field':'vol_hours' , 'template': Integer()},
+		{'field':'the_hours' , 'template': Integer()},
 		{'field':'auto'      , 'template': Checkbox(suffix='Courses in this tradition are automatically added to eligible carts.')},
-		{'field':'prepaid'   , 'template': Checkbox(suffix='Families must purchase 10 prepaid tickets for $100, not included in tuition')},
+		{'field':'trig'      , 'template': Checkbox(suffix='Families must purchase 10 prepaid tickets for $100, not included in tuition')},
 		# {'field':'courses'   , 'template': ForeignSet(model='course')},
 	],
 	'course'    : [
@@ -88,5 +95,12 @@ FIELDS = {
 		{'field':'role'      , 'template': VarChar()},
 		{'field':'role_type' , 'template': Enum(options=['','Chorus','Support','Lead'])},
 		{'field':'status'    , 'template': Enum(options=['']+collect(Enrollments.model.status_choices, lambda choice: choice[0]))},
+	],
+	'invoice': [
+		{'field':'family'    , 'template': ForeignKey(model='family')},
+		{'field':'amount'    , 'template': Dollar()},
+		{'field':'method'    , 'template': Enum(options=['','Cash','Check','PayPal'])},
+		{'field':'status'    , 'template': Enum(options=['','N','P','C'],display=Invoices.model.status_choices)},
+		{'field':'items'     , 'template': ForeignSet(model='enrollment')},
 	],
 }

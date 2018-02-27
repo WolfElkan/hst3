@@ -16,11 +16,49 @@ from Utils.snippets import order_coursetrads
 from datetime import datetime
 import re
 
-def check_en(student, course):
-	print '{} is {}eligible for {}'.format(student,'' if student.eligible(course) else 'not ',course)
+def make(year):
+	qset = CourseTrads.filter(e=True).exclude(id__startswith='W')
+	for q in qset:
+		c = q.make(year)
+		print c
 
-def check_aud(student, course):
-	print '{} may {}audition for {}'.format(student,'' if student.audible(course) else 'not ',course)
+def reset(user):
+	Enrollments.filter(student__family=user.owner,course__year=getyear()).delete()
+
+def add_hids(**kwargs):
+	for family in Families.filter(**kwargs):
+		match = re.match(r'^([a-z])[^a-z]*([a-z])[^a-z]*([a-z])',family.last,flags=re.I)
+		las = ''.join(match.groups()).upper()
+		if not family.hid:
+			# print las
+			clash3 = Families.filter(hid__startswith=las)
+			num = 1
+			for x in clash3:
+				clashnum = int(x.hid[3:5])
+				if clashnum >= num:
+					num = clashnum + 1
+			fhid = '{}{:0>2}'.format(las,num)
+			if not Families.filter(hid=hid):
+				family.hid = fhid
+				family.save()
+		print family.hid, family
+		if family.father and not family.father.hid:
+			family.father.hid = '{}{:0>2}'.format(las,'FA')
+		if family.mother and not family.mother.hid:
+			family.mother.hid = '{}{:0>2}'.format(las,'MO')
+		for student in family.children:
+			if student.hid:
+				continue
+			num = student.birthday.year
+			while True: # First time I've ever needed to use a do-while loop, and it's Python. Sigh.
+				num %= 100
+				shid = '{}{:0>2}'.format(family.hid,num)
+				num += 1
+				if not Students.filter(hid=shid):
+					break
+			student.hid = shid
+			student.save()
+			print student.hid, student
 
 def hot(request):
 	me = getme(request)

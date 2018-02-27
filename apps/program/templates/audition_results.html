@@ -6,10 +6,48 @@
 		.center {
 			text-align: center;
 		}
+		.enrolled {
+			color: #585;
+		}
+		.aud_pend {
+			color: black;
+			font-weight: bold;
+		}
+		.pendpass, .aud_pass {
+			color: #585;
+		}
+		.pendfail, .aud_fail {
+			color: #a55;
+		}
+		.eligible, .not_elig, .conflict, .need_cur, .needboth, .aud_drop, .aud_need {
+			color: gray;
+		}
+		.aud_lock {
+			color: #70b;
+		}
+		.invoiced {
+			color: #c74
+		}
+		.need_pay {
+			color: #aa0;
+		}
+		.enrolled, .eligible, .not_elig, .conflict, .need_cur, .needboth, .aud_pass, .aud_fail, .aud_drop, .aud_lock, .aud_need {
+			font-style: italic;
+		}
 	</style>
 </head>
 <body>
 <h1>HST Audition Results Interface</h1>
+<p>You are logged in with a {{me.get_permission_display}}-level account.  When you click submit, 
+	{% if me.permission == 7 %}
+	the results will be finalized, but hopefully you're not using actual students.
+	{% elif me.permission >= 5 %}
+	the results will be finalized, and all students will immediately be able to see the result of their audition.
+	{% elif me.permission >= 4 %}
+	you will still be able to edit your choices until the results are finalized and approved by the Executive Director.
+	{% else %}
+	nothing will happen because you shouldn't be able to access this page in the first place.
+{% endif %}</p>
 <h2>{{course}}</h2>
 <form action="process/" method="POST">{% csrf_token %}
 	<table>
@@ -18,15 +56,29 @@
 			<th>No</th>
 			<th>Yes</th>
 			<th>Age</th>
+			<th>Sex</th>
 			<th>Grade</th>
 		</thead>
-	{% for student in students %}
+	{% for enrollment in course.enrollments %}
 		<tr>
-			<td>{{student}}</td>
-			<td class="center"><input type="radio" value="reject" name="{{student.id}}" {% if student.enrollment.success is False %}checked{% endif %}></td>
-			<td class="center"><input type="radio" value="accept" name="{{student.id}}" {% if student.enrollment.success is True %}checked{% endif %}></td>
-			<td>{{student.hst_age}}</td>
-			<td>{{student.grade}}</td>
+			<td class="{{enrollment.status}}" title="{{enrollment}}">{{enrollment.student}} {% if enrollment.status is "enrolled" %}checked{% endif %}</td>
+			<td class="center">
+				<input 
+				type="radio" 
+				value="reject" 
+				name="{{enrollment.student.id}}" {% if enrollment.status == "pendfail" %} checked {% endif %} {% if enrollment.status == "enrolled" or enrollment.status == "invoiced" or enrollment.status == "need_pay" or enrollment.status == "aud_pass" or enrollment.status == "aud_lock" or enrollment.status == "eligible" or enrollment.status == "aud_need" or enrollment.status == "aud_drop" %} disabled {% endif %}
+				{% if enrollment.status == "aud_fail" or enrollment.status == "not_elig" or enrollment.status == "conflict" or enrollment.status == "need_cur" or enrollment.status == "needboth" %} disabled checked>{% endif %}
+			</td>
+			<td class="center">
+				<input 
+				type="radio" 
+				value="accept" 
+				name="{{enrollment.student.id}}" {% if enrollment.status == "pendpass" %} checked {% endif %} {% if enrollment.status == "enrolled" or enrollment.status == "invoiced" or enrollment.status == "need_pay" or enrollment.status == "aud_pass" or enrollment.status == "aud_lock" or enrollment.status == "aud_drop" %} disabled checked {% endif %}
+				{% if enrollment.status == "aud_fail" or enrollment.status == "not_elig" or enrollment.status == "eligible" or enrollment.status == "aud_need" or enrollment.status == "conflict" or enrollment.status == "need_cur" or enrollment.status == "needboth" %} disabled>{% endif %}
+			</td>
+			<td>{{enrollment.student.hst_age}}</td>
+			<td>{{enrollment.student.sex}}</td>
+			<td>{{enrollment.student.grade}}</td>
 		</tr>
 	{% endfor %}
 	</table>

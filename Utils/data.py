@@ -125,6 +125,11 @@ def find_all(arr, lam):
 			new.append(x)
 	return new
 
+def serial(manager, column, **query):
+	qset = manager.filter(**query)
+	arr = Each(qset).__getattribute__(column)
+	return max(arr) + 1 if arr else 1
+
 # There might be a Python built-in method for this
 def sub(val, dic):
 	if val in dic:

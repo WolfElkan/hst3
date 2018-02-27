@@ -5,6 +5,7 @@
 </head>
 <body>
 <h1>HST Audition Results Interface</h1>
+{% if not courses %}<p>There are no classes with currently pending auditions.</p>{% endif %}
 {% for course in courses %}
 <a href="{{course.id}}/">{{course.title}}</a>
 {% endfor %}

@@ -26,30 +26,38 @@ def load_get(request):
 	return render(request, 'json/seed.html', context)
 
 def load_post(request):
-	nUsers = 0
-	nFamilies = 0
-	nStudents = 0
-	nParents = 0
-	nAddresses = 0
-	nVenues = 0
+	nUsers       = 0
+	nFamilies    = 0
+	nStudents    = 0
+	nParents     = 0
+	nAddresses   = 0
+	nVenues      = 0
 	nCourseTrads = 0
-	nCourses = 0
+	nCourses     = 0
 	nEnrollments = 0
 	json_dump = request.POST['json_dump']
 	request.session['json_dump'] = ''
 	data = json.loads(json_dump)
 	for ct in data['coursetrads']:
 		if 'alias_id' not in ct:
-			print 'Importing '+ct['title'].upper()
-			CourseTrads.create(**ct)
-			nCourseTrads += 1
+			already = CourseTrads.fetch(id=ct['id'])
+			if already:
+				print 'Exists:   '+ct['title'].upper()
+			else:
+				print 'Importing '+ct['title'].upper()
+				CourseTrads.create(**ct)
+				nCourseTrads += 1
 	for ct in data['coursetrads']:
 		if 'alias_id' in ct:
-			print 'Importing '+ct['title'].upper()
-			alias = CourseTrads.get(id=ct.pop('alias_id'))
-			ct['alias'] = alias
-			CourseTrads.create(**ct)
-			nCourseTrads += 1
+			already = CourseTrads.fetch(id=ct['id'])
+			if already:
+				print 'Exists:   '+ct['title'].upper()
+			else:
+				print 'Importing '+ct['title'].upper()
+				alias = CourseTrads.get(id=ct.pop('alias_id'))
+				ct['alias'] = alias
+				CourseTrads.create(**ct)
+				nCourseTrads += 1
 	# cts = CourseTrads.filter(e=True)
 	# for year in data['years']:
 	# 	for ct in cts:
@@ -136,11 +144,12 @@ def dump(request):
 				'title'    : ct.title,
 				'e'        : ct.e,
 				'day'      : ct.day,
+				'semester' : ct.semester,
 				'start'    : str(ct.start),
 				'end'      : str(ct.end),
 				'nMeets'   : ct.nMeets,
 				'show'     : ct.show,
-				'vs'       : ct.vs,
+				'sa'       : ct.sa,
 				'min_age'  : ct.min_age,
 				'max_age'  : ct.max_age,
 				'min_grd'  : ct.min_grd,
@@ -150,7 +159,7 @@ def dump(request):
 				'redtuit'  : float(ct.redtuit),
 				'vol_hours': ct.vol_hours,
 				'the_hours': ct.the_hours,
-				'prepaid'  : ct.prepaid,
+				'trig'     : ct.trig,
 			})
 		else:
 			data['coursetrads'].append({

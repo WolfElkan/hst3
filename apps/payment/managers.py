@@ -24,9 +24,10 @@ class InvoiceManager(sm.SuperManager):
 		qset = Enrollments.filter(
 			student__family=kwargs['family'],
 			course__year=kwargs['year'],
-			status='need_pay')
+			status__in=['aud_pass','aud_lock','need_pay'])
 		for q in qset:
 			q.invoice = this
+			q.status = 'invoiced'
 			q.save()
 		this.update_amount()
 		return this

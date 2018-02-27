@@ -44,7 +44,7 @@ def students(request, **kwargs):
 
 def mass_enroll(request, **kwargs):
 	year = kwargs['year'] if 'year' in kwargs else getyear()
-	courses = Courses.all()
+	courses = Courses.filter(year=kwargs['year'])
 	students = []
 	for x in request.POST:
 		if re.match(r'^\d+$', x):

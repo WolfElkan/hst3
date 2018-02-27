@@ -14,3 +14,4 @@ def namecase(name):
 def safe_delete(thing):
 	if thing and hasattr(thing,'delete'):
 		thing.delete()
+

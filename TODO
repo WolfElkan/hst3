@@ -3,6 +3,8 @@ X	Fix Family.delete cascade
 	Check all REST routes
 X	Give Widgets a default= kwarg
 
+Add created_at and updated_at to all models
+
 people
 X	Make registration landing page redirect to appropriate step if family has partially registered.
 X	Add Change Password route
@@ -32,13 +34,15 @@ X	family.children gets them in age order
 		X	J1 should only need audition for 8-year-olds
 		X	C2 cur kwarg is buggy
 		X	Troupes should not let students audition if they haven't taken acting
-			**c -> c
+		X	**c -> c
 	X	Delete unecessary _get route
+		Debug Adding and Dropping
 
 admin
-	figure out a name for admin app that doesn't clash with django
+X	figure out a name for admin app that doesn't clash with django "radmin"
 	Audition Result Interface
 		GA is weird
+	X	if a student is allowed to enroll directly in a class that other students must audition for, still display their name, but freeze the radio button on yes.
 
 program
 	Models
@@ -57,8 +61,8 @@ reports
 		show only current students in annual version
 
 payment
-	create app
-	Invoice payment
+X	create app
+X	Invoice payment
 	~Link with PayPal
 
 Utils

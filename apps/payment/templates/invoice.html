@@ -19,7 +19,7 @@
 			padding-top: 3px;
 			border-top: solid black 1px;
 		}
-		.cancelled td {
+		.nonexist td {
 			color: darkgray;
 			text-decoration: line-through;
 			font-style: italic;
@@ -60,7 +60,7 @@
 				<th>Amount</th>
 			</thead>
 			{% for item in invoice.items %}
-			<tr{% if not item.exists %} class="cancelled"{% endif %}>
+			<tr class="{{item.status}}">
 				<td>{{item.display_student}}</td>
 				<td>{{item.course}}</td>
 				<td class="money">${{item.course.tuition}}</td>
