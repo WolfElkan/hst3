@@ -15,7 +15,6 @@ def route_post(request):
 	return redirect('/route')
 
 from apps.program.managers import CourseTrads
-
 orders = [
 	{'id':"AA",'order': 10},
 	{'id':"AB",'order': 20},

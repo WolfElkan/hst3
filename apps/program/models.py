@@ -52,7 +52,7 @@ class CourseTrad(models.Model):
 	max_age = models.PositiveIntegerField(default=18)
 	min_grd = models.PositiveIntegerField(default=1)
 	max_grd = models.PositiveIntegerField(default=12)
-	eligex  = models.TextField(default="a")
+	eligex  = models.TextField(default="#")
 	# Cost
 	tuition    = models.DecimalField(max_digits=6, decimal_places=2, default=0)
 	redtuit    = models.DecimalField(max_digits=6, decimal_places=2, default=0)
@@ -169,7 +169,7 @@ class CourseTrad(models.Model):
 		else:
 			query = {
 				'student':student,
-				'status__in':["enrolled","invoiced","need_pay"],
+				'status__in':["enrolled","invoiced","need_pay","aud_pass"],
 			}
 			if word == '@':
 				if kwargs['aud']:
@@ -247,15 +247,26 @@ class Course(models.Model):
 	def enrollments(self):
 		return Enrollments.filter(course_id=self.id)
 	def students(self):
-		qset = []
-		for enrollment in self.enrollments:
-			qset.append(Students.get(id=enrollment.student_id))
-		return qset
+		return Students.filter(enrollment__course=self)
+	def equipped_students(self):
+		result = []
+		for student in self.students:
+			result.append({
+				'whole' :student,
+				'first' :student.alt_first if student.alt_first else student.first,
+				'last'  :student.alt_last if student.alt_last else student.family.last,
+				'age'   :student.hst_age_in(self.year),
+			})
+		return result
 	def students_toggle_enrollments(self):
-		qset = []
+		result = []
 		for enrollment in self.enrollments:
-			qset.append({'widget':enrollment,'static':Students.get(id=enrollment.student_id)})
-		return qset
+			result.append({'widget':enrollment,'static':Students.get(id=enrollment.student_id)})
+		return result
+	def boys(self):
+		return self.students.filter(sex='M')
+	def girls(self):
+		return self.students.filter(sex='F')
 	def __str__(self):
 		return self.title+' ('+str(self.year)+')'
 	def eligible(self, student):
@@ -267,42 +278,31 @@ class Course(models.Model):
 		if self.aud_date and datetime.now().date() > self.aud_date:
 			kwargs['aud'] = False
 		return self.tradition.check_eligex(student, self.year, **kwargs)
-	def enroll(self, student):
-		# Check if student == eligible now, do nothing and return None otherwise. (Shouldn't happen)
-		if self.eligible(student):
-			# Check if course requires purchase of prepaid tickets 
-			# if self.prepaid:
-			# 	# If so, find the tradition corresponding to this course's show's prepaid tickets
-			# 	Ktrad = CourseTrads.fetch(id__startswith='K',id__endswith=self.show[1])
-			# 	# Stringly calculate the id for this course's prepaid tix this year
-			# 	Kid = self.id[0:2]+Ktrad.id
-			# 	# Create (or find if it already exists) this ticket course
-			# 	K = Courses.create_by_id(Kid)
-			# 	# Check for enrollments by this family in this ticket course
-			# 	prepaid = Enrollments.fetch(student__family=student.family, course=K)
-			# 	# If you find none...
-			# 	if not prepaid:
-			# 		# ...make one
-			# 		Enrollments.create(student=student, course=K)
-			# But either way, create and return the enrollment
+	def enroll(self, student, sudo=False):
+		if sudo or self.eligible(student):
 			enrollment = Enrollments.create(course=self, student=student)
+			enrollment.save()
 			if self.tradition.trig:
 				for auto_trad in CourseTrads.filter(auto=True):
-					print auto_trad
+					# print auto_trad, auto_trad.check_eligex(student, self.year, debug=True)
 					if auto_trad.eligible(student, self.year):
 						course = Courses.fetch(tradition=auto_trad,year=self.year)
 						if not course:
 							course = Courses.create(tradition=auto_trad,year=self.year)
-						Enrollments.create(course=course, student=student)
+						status = "need_pay"
+						if sudo:
+							status = "aud_pass" if self.course.tradition.droppable else "aud_lock"
+						Enrollments.create(course=course, student=student, status=status)
 			return enrollment
-	def sudo_enroll(self, student):
-		# Admin method for creating an enrollment without checking eligibility or prepaid tickets
-		return Enrollments.create(course=self, student=student)
+	def accept(self, student):
+		return self.enroll(student, True)
 	def audition(self, student):
 		if self.audible(student):
 			return Enrollments.create(course=self, student=student, status="aud_pend")
 	def conflicts_with(self, other):
-		if self.year != other.year:
+		if self.id == other.id:
+			return False
+		elif self.year != other.year:
 			return False
 		elif self.semester == 'N' or  other.semester == 'N':
 			return False
@@ -318,8 +318,10 @@ class Course(models.Model):
 			return False
 		else:
 			return True
+	def prepaid(self):
+		return self.trig
 	def __getattribute__(self, field):
-		if field in ['students_toggle_enrollments','students','enrollments']:
+		if field in ['students_toggle_enrollments','students','enrollments','prepaid']:
 			call = super(Course, self).__getattribute__(field)
 			return call()
 		elif '_' not in field and field not in ['audible','clean','delete','eligible','enroll','id','objects','pk','save','tradition'] and hasattr(CourseTrad, field):
@@ -336,13 +338,13 @@ class Enrollment(models.Model):
 	status_choices = [
  		("eligible","{student} is eligible for {course}"),                                                                    # Stable
 		("not_elig","{student} is not eligible for {course}"),                                                                # Unstable
-		("aud_need","{student} is eligible for {article} {audskil} for {course}."),                                                 # Unstable
-		("aud_pend","{student} has scheduled {article} {audskil} for {course} ({year})"),                                           # Stable
-		("pendpass","{student} has completed the {audskil} and is recommended for {course} {year}, pending executive approval."),             # Stable
-		("pendfail","{student} has completed the {audskil} but is not recommended for {course} {year}, pending executive approval."),             # Stable
-		("pend_pub","{student} has completed {article} {audskil} for {course} and is awaiting the results."),
+		("aud_need","{student} is eligible for {article} {audskil} for {course}."),                                           # Unstable
+		("aud_pend","{student} has scheduled {article} {audskil} for {course} ({year})"),                                     # Stable
+		("pendpass","{student} has completed the {audskil} and is recommended for {course} {year}, pending executive approval."),  # Stable
+		("pendfail","{student} has completed the {audskil} but is not recommended for {course} {year}, pending executive approval."),  # Stable
+		("pend_pub","{student} has completed {article} {audskil} for {course} and is awaiting the results."),                 
 		("fail_pub",""),
-		("aud_pass","{student} has passed the {audskil} for {course} and may now enroll!"),                                   # Stable
+		("aud_pass","{student} has passed the {audskil} for {course}!"),                                                      # Stable
 		("aud_fail","{student} did not pass the {audskil} for {course}."),                                                    # Invisible
 		("aud_drop","{student} passed the {audskil} for {course} and then dropped it, but {pronoun} may still re-enroll."),   # Stable
 		("aud_lock","{student} has passed the {audskil} for {course} and must enroll."),                                      # Stable
@@ -394,9 +396,9 @@ class Enrollment(models.Model):
 		elif any(Each(self.student.courses_in(self.course.year)).conflicts_with(self.course)):
 			return "conflict"
 		elif self.course.check_eligex(self.student):
-			return "eligible"
+			return self.status if self.id else "eligible"
 		elif self.course.check_eligex(self.student, aud=True):
-			return "aud_need"
+			return self.status if self.id else "aud_need"
 		elif self.course.check_eligex(self.student, cur=True):
 			return "need_cur"
 		# elif self.course.check_eligex(self.student, aud=True, cur=True):
@@ -425,6 +427,7 @@ class Enrollment(models.Model):
 	def accept(self, user):
 		if self.status in ["aud_pend","pendpass","pendfail"]:
 			if user.permission >= 5:
+				self.course.accept(self.student)
 				self.status = "aud_pass" if self.course.tradition.droppable else "aud_lock"
 			elif user.permission >= 4:
 				self.status = "pendpass"
@@ -439,6 +442,8 @@ class Enrollment(models.Model):
 	def fate(self):
 		self.status = self.calc_status()
 		self.save()
+		# print self.course.id, self.status
+		# print
 		if self.status in ["not_elig","aud_need","conflict","need_cur","needboth"]:
 			self.delete()
 	def drop(self):

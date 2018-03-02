@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>HST | Reports Home</title>
+	<style type="text/css">
+		a {
+			display: block;
+		}
+		.e {
+			font-weight: bold;
+		}
+	</style>
+</head>
+<body>
+<h1>Reports</h1>
+<h2><a href="/reports/students/{{year}}/">Master Enrollments</a></h2>
+<h2>{{year}} Class Rosters</h2>
+{% for course in courses %}
+<a {% if course.tradition.e %} class="e" {% endif %} href="/reports/roster/{{course.id}}/">{{course.title}}</a>
+{% endfor %}
+<br><a href="/reports/historical/">Historical</a>
+</body>
+</html>

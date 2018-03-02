@@ -56,6 +56,7 @@ FIELDS = {
 	'coursetrad': [
 		{'field':'id'        , 'template': VarChar(maxlength=2)},
 		{'field':'title'     , 'template': VarChar(maxlength=50)},
+		{'field':'eligex'    , 'template': VarChar(default='~')},
 		{'field':'e'         , 'template': Checkbox(suffix='This is a real (and currently offered) course that may be enrolled in, not a student group for admin purposes')},
 		{'field':'day'       , 'template': DayOfWeek()},
 		{'field':'start'     , 'template': Time()},
@@ -68,7 +69,6 @@ FIELDS = {
 		{'field':'max_age'   , 'template': Integer(default=18)},
 		{'field':'min_grd'   , 'template': Integer(default= 1)},
 		{'field':'max_grd'   , 'template': Integer(default=12)},
-		{'field':'eligex'    , 'template': VarChar(default='~')},
 		{'field':'tuition'   , 'template': Dollar()},
 		# {'field':'redtuit'   , 'template': Dollar()},
 		{'field':'vol_hours' , 'template': Integer()},

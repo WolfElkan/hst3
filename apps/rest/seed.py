@@ -116,16 +116,16 @@ def load_post(request):
 				# 	course = Courses.get(id=enrollment['course_id'])
 				# 	Enrollments.create(course=course, student=newStudent, role=enrollment['role'], role_type=enrollment['role_type'])
 			nStudents += 1
-	print 'IMPORT COMPLETE'
-	print 'Users:     ' + str(nUsers).rjust(4)
-	print 'Families:  ' + str(nFamilies).rjust(4)
-	print 'Students:  ' + str(nStudents).rjust(4)
-	print 'Parents:   ' + str(nParents).rjust(4)
-	print 'Addresses: ' + str(nAddresses).rjust(4)
-	print 'Venues:    ' + str(nVenues).rjust(4)
-	print 'Traditions:' + str(nCourseTrads).rjust(4)
-	print 'Courses:   ' + str(nCourses).rjust(4)
-	print 'Enrollments:'+ str(nEnrollments).rjust(3)
+	print 'IMPORT COMPLETED'
+	print 'Users:     ' + str(nUsers).rjust(5)
+	print 'Families:  ' + str(nFamilies).rjust(5)
+	print 'Students:  ' + str(nStudents).rjust(5)
+	print 'Parents:   ' + str(nParents).rjust(5)
+	print 'Addresses: ' + str(nAddresses).rjust(5)
+	print 'Venues:    ' + str(nVenues).rjust(5)
+	print 'Traditions:' + str(nCourseTrads).rjust(5)
+	print 'Courses:   ' + str(nCourses).rjust(5)
+	print 'Enrollments:'+ str(nEnrollments).rjust(4)
 
 	return redirect('/seed/load/')
 

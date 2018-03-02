@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<style type="text/css">
+		a {
+			display: block;
+		}
+		.e {
+			font-weight: bold;
+		}
+	</style>
+</head>
+<body>
+<h1>HST Historical Class Rosters</h1>
+{% for year in history %}
+<h2><a href="/reports/students/{{year.year}}/">{{year.year}}</a></h2>
+	{% for course in year.courses %}
+	<a {% if course.tradition.e %} class="e" {% endif %} href="/reports/roster/{{course.id}}/">{{course.title}}</a>
+	{% endfor %}
+{% endfor %}
+</body>
+</html>

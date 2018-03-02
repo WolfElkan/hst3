@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>HST | {{course.title}} Class List {{course.year}}</title>
+	<style type="text/css">
+		* {
+			font-family: sans-serif;
+		}
+		.stats {
+			display: inline-block;
+			margin: 0 auto;
+		}
+		h1 {
+			font-size: 18px;
+			margin: 7px;
+		}
+		h2 {
+			font-size: 16px;
+			font-weight: normal;
+			font-style: italic;
+			display: inline;
+			margin: 0 30px;
+		}
+		th, td {
+			border: solid black 1px;
+			padding: 2px 5px;
+		}
+		table {
+			border-collapse: collapse;
+			/*display: block;*/
+			margin: 10px;
+		}
+	</style>
+</head>
+<body>
+	<center>
+		<h1>HST {{course.tradition}} CLASS LIST</h1>
+		<h1>{{course.year|add:-1}} - {{course.year}}</h1>
+		<div class="stats">
+			<h2>Female: {{course.girls|length}}</h2>
+			<h2>Male: {{course.boys|length}}</h2>
+			<h2>Total: {{course.students|length}}</h2>
+		</div>
+	<table>
+		<thead>
+			<th>Last Name</th>
+			<th>First Name</th>
+			<th>Sex</th>
+			<th>Age</th>
+			<th>Parents</th>
+			<th>Phone</th>
+			<th>Parent's Email</th>
+		</thead>
+	{% for student in course.equipped_students %}
+	<tr>
+		<td>{{student.last}}</td>
+		<td>{{student.first}}</td>
+		<td>{{student.whole.sex}}</td>
+		<td>{{student.age}}</td>
+		<td>{{student.whole.family.mother.first}}{% if student.whole.family.mother and student.whole.family.father %} &amp; {% endif %}{{student.whole.family.father.first}}</td>
+		<td>{{student.whole.family.phone}}</td>
+		<td>{{student.whole.family.email}}</td>
+	</tr>
+	{% endfor %}
+	</table>
+	</center>
+
+</body>
+</html>

@@ -4,7 +4,7 @@ from apps.people.managers import Addresses, Families, Parents, Users, Students
 from apps.program.managers import Courses, CourseTrads, Enrollments
 
 from Utils.data import sub
-from Utils.security import getyear
+from Utils.security import getyear, gethist
 
 import re
 
@@ -14,6 +14,28 @@ def make(request, year):
 		ct.make(year)
 	return HttpResponse('ok')
 
+def index(request, **kwargs):
+	context = {
+		'courses':Courses.filter(year=getyear()).order_by('tradition__order'),
+		'year':getyear()
+	}
+	return render(request, 'index.html', context)
+
+def roster(request, id):
+	context = {
+		'course':Courses.fetch(id=id)
+	}
+	return render(request, 'roster.html', context)
+
+def historical(request, **kwargs):
+	history = []
+	for year in gethist():
+		history.append({
+			'year':year,
+			'courses':Courses.filter(year=year),
+		})
+	context = {'history':history}
+	return render(request, 'historical.html', context)
 
 def students(request, **kwargs):
 	year = int(kwargs['year']) if 'year' in kwargs else getyear()

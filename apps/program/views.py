@@ -86,6 +86,7 @@ def courses_audition(request, **kwargs):
 	student = Students.fetch(id=student_id)
 	course = Courses.fetch(id=request.GET['course_id'])
 	if course.audible(student):
+		# course.audition(student)
 		Enrollments.create(course=course, student=student, status="aud_pend")
 	return redirect('/register/student/{}/'.format(student_id))
 

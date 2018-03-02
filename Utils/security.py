@@ -16,8 +16,17 @@ def getme(request):
 
 from datetime import datetime
 from trace import DEV
+
 def getyear():
 	if DEV:
 		return 2018
 	now = datetime.now()
 	return now.year + (0 if now.month < 5 else 1)
+
+from apps.program.managers import Courses
+def gethist():
+	years = []
+	for year in range(getyear()-1,1994,-1):
+		if Courses.filter(year=year):
+			years.append(year)
+	return years

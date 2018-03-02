@@ -86,6 +86,9 @@ X	Delete Auditions table.  Integrate with Enrollments
 
 Fix nuke.sh
 
+For Deployment
+	Generalize years
+
 Questions:
 	What did we decide about login by email?
 	Student height?

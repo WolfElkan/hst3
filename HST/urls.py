@@ -70,6 +70,9 @@ urlpatterns = [
 	url(r'^rest/new/(?P<model>[a-zA-Z]+)/create/?$', rest.create),
 	url(r'^rest/create/(?P<model>[a-zA-Z]+)/?$', rest.create),
 
+	url(r'^reports/?$', reports.index),
+	url(r'^reports/historical/?$', reports.historical),
+	url(r'^reports/roster/(?P<id>\d\d\w\w)/?$', reports.roster),
 	url(r'^reports/students/?$', reports.students),
 	url(r'^reports/students/(?P<year>\d{4})/?$', reports.students),
 
