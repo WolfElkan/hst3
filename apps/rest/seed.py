@@ -159,6 +159,7 @@ def dump(request):
 				'redtuit'  : float(ct.redtuit),
 				'vol_hours': ct.vol_hours,
 				'the_hours': ct.the_hours,
+				'auto'     : ct.auto,
 				'trig'     : ct.trig,
 			})
 		else:

@@ -25,7 +25,7 @@ X		(eventually) Support loading existing students from database for editing, tra
 	create PolyRole table
 
 X	family.children gets them in age order
-	add HIDs
+X	add HIDs
 
 	Course Interface
 	X	Click anywhere on a tab
@@ -36,7 +36,7 @@ X	family.children gets them in age order
 		X	Troupes should not let students audition if they haven't taken acting
 		X	**c -> c
 	X	Delete unecessary _get route
-		Debug Adding and Dropping
+	X	Debug Adding and Dropping
 
 admin
 X	figure out a name for admin app that doesn't clash with django "radmin"
@@ -48,7 +48,7 @@ program
 	Models
 		CourseTrad
 			Provide validation to make infinite aliasing impossible
-			Add semester fields. Update conflict method accordingly
+		X	Add semester fields. Update conflict method accordingly
 
 rest
 	support /add/[mo|fa]ther
@@ -74,20 +74,20 @@ Clean Up Inheritance
 	Widgets
 	Validations
 
-Replace equip() with .annotate() (https://docs.djangoproject.com/en/2.0/ref/models/querysets/#annotate)
+no	Replace equip() with .annotate() (https://docs.djangoproject.com/en/2.0/ref/models/querysets/#annotate)
 
 X	Add audition level for audition required, but no prereqs for audition, assign C2 that level (solved with eligex)
 
 Remove Unnecessary imports
 Track down phantom print statements
 
-X	Delete Auditions table.  Integrate with Enrollments
-	Delete auditions link in REST homepage
+X	Delete Auditions table. Integrate with Enrollments
+X	Delete auditions link in REST homepage
 
 Fix nuke.sh
 
 For Deployment
-	Generalize years
+X	Generalize years
 
 Questions:
 	What did we decide about login by email?

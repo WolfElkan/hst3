@@ -1,3 +1,7 @@
+# Local Installation
+
+After setting up the application with Django, open the file `coursetrads.json`, and copy the text of the file.  Go to `/seed/load/`, paste the text into the JSON window and click import.  
+
 # HST Website Django Backend
 *Technical Documentation & User Guide*
 

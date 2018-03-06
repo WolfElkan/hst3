@@ -19,7 +19,7 @@ from trace import DEV
 
 def getyear():
 	if DEV:
-		return 2018
+		return 2019
 	now = datetime.now()
 	return now.year + (0 if now.month < 5 else 1)
 

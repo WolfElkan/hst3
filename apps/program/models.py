@@ -206,6 +206,7 @@ class CourseTrad(models.Model):
 				query.pop('student')
 				query['student__family'] = student.family
 			if kwargs['debug']:
+				print datetime.now()
 				print query
 			return bool(Enrollments.filter(**query).exclude(course__tradition__id__startswith='K'))
 	def eligible(self, student, year):
@@ -282,23 +283,30 @@ class Course(models.Model):
 		if sudo or self.eligible(student):
 			enrollment = Enrollments.create(course=self, student=student)
 			enrollment.save()
+			# enrollment.ispect()
 			if self.tradition.trig:
 				for auto_trad in CourseTrads.filter(auto=True):
-					# print auto_trad, auto_trad.check_eligex(student, self.year, debug=True)
+					# if student.sex == "M" and auto_trad.id == 'KG':
+						# print auto_trad.check_eligex(student, self.year, debug=True)
 					if auto_trad.eligible(student, self.year):
-						course = Courses.fetch(tradition=auto_trad,year=self.year)
-						if not course:
-							course = Courses.create(tradition=auto_trad,year=self.year)
+						auto_course = Courses.fetch(tradition=auto_trad,year=self.year)
+						if not auto_course:
+							auto_course = Courses.create(tradition=auto_trad,year=self.year)
 						status = "need_pay"
 						if sudo:
-							status = "aud_pass" if self.course.tradition.droppable else "aud_lock"
-						Enrollments.create(course=course, student=student, status=status)
+							status = "aud_pass" if self.tradition.droppable else "aud_lock"
+						Enrollments.create(course=auto_course, student=student, status=status)
 			return enrollment
 	def accept(self, student):
 		return self.enroll(student, True)
 	def audition(self, student):
 		if self.audible(student):
 			return Enrollments.create(course=self, student=student, status="aud_pend")
+	def cart(self, student):
+		enrollment = self.enroll(student)
+		if not enrollment:
+			enrollment = Enrollments.create(course=self, student=student, status="aud_pend")
+		return enrollment
 	def conflicts_with(self, other):
 		if self.id == other.id:
 			return False
@@ -409,6 +417,7 @@ class Enrollment(models.Model):
 			self.status = self.calc_status()
 		return self
 	def inspect(self):
+		print
 		print 'id         :',self.id
 		print 'student    :',self.student
 		print 'course     :',self.course

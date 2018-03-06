@@ -65,20 +65,12 @@ def courses(request, **kwargs):
 	}
 	return render(request, 'courses.html', context)
 
+
 def courses_enroll(request, **kwargs):
 	student_id = kwargs.setdefault('id',0)
 	student = Students.fetch(id=student_id)
 	course = Courses.fetch(id=request.GET['course_id'])
-	course.enroll(student)
-	# if course.eligible(student)['now']:
-	# 	if course.prepaid:
-	# 		Ktrad = CourseTrads.fetch(id__startswith='K',id__endswith=course.show[1])
-	# 		Kid = course.id[0:2]+Ktrad.id
-	# 		K = Courses.create_by_id(Kid)
-	# 		prepaid = Enrollments.fetch(student__family=student.family, course=K)
-	# 		if not prepaid:
-	# 			Enrollments.create(student=student, course=K)
-	# 	Enrollments.create(course=course, student=student)
+	course.cart(student)
 	return redirect('/register/student/{}/'.format(student_id))
 
 def courses_audition(request, **kwargs):
@@ -86,21 +78,14 @@ def courses_audition(request, **kwargs):
 	student = Students.fetch(id=student_id)
 	course = Courses.fetch(id=request.GET['course_id'])
 	if course.audible(student):
-		# course.audition(student)
 		Enrollments.create(course=course, student=student, status="aud_pend")
 	return redirect('/register/student/{}/'.format(student_id))
 
 def courses_drop(request, **kwargs):
-	# Safely get student id
 	student_id = kwargs.setdefault('id',0)
-	# Safely fetch student
-	student = Students.fetch(id=student_id)
-	# Safely fetch course
-	course = Courses.fetch(id=request.GET['course_id'])
-	# Find the enrollment
-	enrollment = Enrollments.fetch(course=course, student=student)
-	# Delete enrollment
-	enrollment.drop()
+	enrollment = Enrollments.fetch(id=request.GET['enr_id'])
+	if enrollment:
+		enrollment.drop()
 	return redirect('/register/student/{}/'.format(student_id))
 
 def audition_menu(request, **kwargs):
