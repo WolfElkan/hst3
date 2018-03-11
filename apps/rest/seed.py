@@ -6,6 +6,7 @@ from apps.program.managers import CourseTrads, Courses, Enrollments, Venues
 from Utils.data  import copy, copyatts
 from Utils.fjson import FriendlyEncoder
 from Utils.seshinit import seshinit
+from Utils.snippets import order_coursetrads, make
 
 from datetime import datetime
 import json
@@ -26,6 +27,7 @@ def load_get(request):
 	return render(request, 'json/seed.html', context)
 
 def load_post(request):
+	start_import = datetime.now()
 	nUsers       = 0
 	nFamilies    = 0
 	nStudents    = 0
@@ -116,6 +118,12 @@ def load_post(request):
 				# 	course = Courses.get(id=enrollment['course_id'])
 				# 	Enrollments.create(course=course, student=newStudent, role=enrollment['role'], role_type=enrollment['role_type'])
 			nStudents += 1
+	print '- order_coursetrads'
+	order_coursetrads()
+	year = getyear()
+	print '- make {}'.format(year)
+	make(year)
+	import_duration = datetime.now() - start_import
 	print 'IMPORT COMPLETED'
 	print 'Users:     ' + str(nUsers).rjust(5)
 	print 'Families:  ' + str(nFamilies).rjust(5)
@@ -126,6 +134,7 @@ def load_post(request):
 	print 'Traditions:' + str(nCourseTrads).rjust(5)
 	print 'Courses:   ' + str(nCourses).rjust(5)
 	print 'Enrollments:'+ str(nEnrollments).rjust(4)
+	print 'Time:    '   + str(import_duration)
 
 	return redirect('/seed/load/')
 

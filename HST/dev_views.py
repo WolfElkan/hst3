@@ -11,7 +11,7 @@ from Utils.fjson import FriendlyEncoder
 from Utils.misc  import namecase, safe_delete
 from Utils.security import authorized, getme, getyear, gethist
 from Utils.seshinit import seshinit, forminit
-from Utils.snippets import order_coursetrads
+from Utils.snippets import order_coursetrads, make
 
 from datetime import datetime
 import re
@@ -23,12 +23,6 @@ def lookup_student(obj):
 	if not student:
 		student = Students.fetch(alt_first=first,family__last=last)
 	return student
-
-def make(year):
-	qset = CourseTrads.filter(e=True).exclude(id__startswith='W')
-	for q in qset:
-		c = q.make(year)
-		print c
 
 def reset(user):
 	Enrollments.filter(student__family=user.owner,course__year=getyear()).delete()

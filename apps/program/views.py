@@ -109,7 +109,6 @@ def audition_process(request, **kwargs):
 		if key.isdigit():
 			student = Students.fetch(id=int(key))
 			enrollment = student.enrollments.filter(course=course)[0]
-			print student
 			if request.POST[key] == u'accept':
 				enrollment.accept(me)
 			if request.POST[key] == u'reject':

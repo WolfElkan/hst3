@@ -15,6 +15,13 @@ def route_post(request):
 	return redirect('/route')
 
 from apps.program.managers import CourseTrads
+
+def make(year):
+	qset = CourseTrads.filter(e=True).exclude(id__startswith='W')
+	for q in qset:
+		c = q.make(year)
+		print c
+
 orders = [
 	{'id':"AA",'order': 10},
 	{'id':"AB",'order': 20},

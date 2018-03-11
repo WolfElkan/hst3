@@ -90,20 +90,11 @@ class Family(models.Model):
 		return self.last
 	def children(self):
 		return Students.filter(family_id=self.id).order_by('birthday')
-
-	# paid_query = Q(invoice__status='P')
-	# pend_query = Q( Q(isAudition=False,invoice__status='N') | Q(isAudition=True,happened=False) )
 	def enrollments_in(self, year):
 		qset = Enrollments.filter(student__family=self, course__year=year)
-		qset = qset.exclude(status__in=['nonexist','aud_fail'])
+		qset = qset.exclude(status__in=['nonexist','aud_fail','aud_drop'])
 		qset = qset.order_by('created_at')
 		return qset
-	# def paid_enrollments_in(self, year):
-	# 	return self.enrollments_in(year).filter(self.paid_query)
-	# def pend_enrollments_in(self, year):
-	# 	return self.enrollments_in(year).filter(self.pend_query)
-	# def unpaid_enrollments_in(self, year):
-	# 	return self.enrollments_in(year).exclude(self.paid_query).exclude(self.pend_query)
 	def total_tuition_in(self, year):
 		return sum(Each(self.enrollments_in(year)).tuition)
 	def paid_tuition_in(self, year):
@@ -122,6 +113,10 @@ class Family(models.Model):
 	def hours_signed_in(self, year):
 		return 0.0
 
+	def fate(self, year=None):
+		if not year:
+			year = getyear()
+		Each(self.children).fate(year)
 	def delete(self):
 		# Manual cascading for Parents and Users
 		safe_delete(self.mother)
@@ -219,7 +214,7 @@ class Student(models.Model):
 		return self.grade_in(getyear())
 
 	def enrollments(self):
-		return Enrollments.filter(student=self).order_by('course__year')
+		return Enrollments.filter(student=self).order_by('course__year').exclude(status__in=['nonexist','aud_fail','aud_drop'])
 	def enrollments_in(self, year):
 		return self.enrollments.filter(course__year=year)
 	def enrollments_before(self, year):
@@ -229,17 +224,10 @@ class Student(models.Model):
 		return Enrollments.filter(student=self, status__startswith="aud")
 	def auditions_in(self, year):
 		return Enrollments.filter(student=self, status__startswith="aud", course__year=year)
-	def courses(self): # TODO: Use a DB join statement instead # As if I know how to do that
-		qset = []
-		for enrollment in self.enrollments.filter(status__in=["enrolled","invoiced","need_pay","aud_pend"]):	
-			qset.append(Courses.get(id=enrollment.course_id))
-		return qset
-	def courses_in(self, year): 
-		return find_all(self.courses, lambda course: course.year == year)
-		# qset = []
-		# for enrollment in self.enrollments_in(year).filter(status__in=["enrolled","invoiced","need_pay"]):	
-		# 	qset.append(Courses.get(id=enrollment.course_id))
-		# return qset
+	def courses(self): 
+		return Courses.filter(enrollment__in=self.enrollments)
+	def courses_in(self, year):
+		return self.courses.filter(year=year)
 	def courses_toggle_enrollments(self):
 		qset = []
 		for enrollment in self.enrollments:
@@ -252,6 +240,18 @@ class Student(models.Model):
 			enrollment = Enrollments.simulate(student=self,course=course)
 			enrollment.set_status()
 			yield enrollment
+	def fate(self, year=None):
+		if not year:
+			year = getyear()
+		for auto_trad in CourseTrads.filter(auto=True):
+			auto_course = Courses.fetch(year=year,tradition=auto_trad)
+			if not auto_course:
+				auto_course = Courses.create(year=year,tradition=auto_trad)
+			enrollment = Enrollments.fetch(student=self,course=auto_course)
+			if enrollment:
+				enrollment.fate()
+			elif auto_course.eligible(self):
+				Enrollments.create(student=self,course=auto_course)
 	def __str__(self):
 		return self.prefer+' '+self.last
 	def __json__(self):

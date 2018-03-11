@@ -44,7 +44,6 @@ class CourseTrad(models.Model):
 		('F','Fall'),
 		('S','Spring'),
 		('B','Both'),
-		('O','Once')
 	]
 	semester   = models.CharField(max_length=1,default='N')
 	# Prerequisites
@@ -279,26 +278,23 @@ class Course(models.Model):
 		if self.aud_date and datetime.now().date() > self.aud_date:
 			kwargs['aud'] = False
 		return self.tradition.check_eligex(student, self.year, **kwargs)
-	def enroll(self, student, sudo=False):
-		if sudo or self.eligible(student):
-			enrollment = Enrollments.create(course=self, student=student)
+	def enroll(self, student, **kwargs):
+		enrollment = Enrollments.fetch(course=self,student=student)
+		if enrollment:
+			enrollment.status = sub(enrollment.status, {
+				'aud_drop':'aud_pass',
+			})
 			enrollment.save()
-			# enrollment.ispect()
-			if self.tradition.trig:
-				for auto_trad in CourseTrads.filter(auto=True):
-					# if student.sex == "M" and auto_trad.id == 'KG':
-						# print auto_trad.check_eligex(student, self.year, debug=True)
-					if auto_trad.eligible(student, self.year):
-						auto_course = Courses.fetch(tradition=auto_trad,year=self.year)
-						if not auto_course:
-							auto_course = Courses.create(tradition=auto_trad,year=self.year)
-						status = "need_pay"
-						if sudo:
-							status = "aud_pass" if self.tradition.droppable else "aud_lock"
-						Enrollments.create(course=auto_course, student=student, status=status)
-			return enrollment
+		else:
+			passed_audition = kwargs.setdefault('passed_audition',False)
+			if passed_audition or self.eligible(student):
+				enrollment = Enrollments.create(course=self, student=student)
+				enrollment.save()
+				if self.tradition.trig:
+					student.fate()
+		return enrollment
 	def accept(self, student):
-		return self.enroll(student, True)
+		return self.enroll(student, passed_audition=True)
 	def audition(self, student):
 		if self.audible(student):
 			return Enrollments.create(course=self, student=student, status="aud_pend")
@@ -306,6 +302,7 @@ class Course(models.Model):
 		enrollment = self.enroll(student)
 		if not enrollment:
 			enrollment = Enrollments.create(course=self, student=student, status="aud_pend")
+		student.fate()
 		return enrollment
 	def conflicts_with(self, other):
 		if self.id == other.id:
@@ -385,8 +382,8 @@ class Enrollment(models.Model):
 			invoice = self.invoice.id if self.invoice else 0,
 			pronoun = 'he' if self.student.sex == 'M' else 'she',
 			proverb = 'was' if self.course.year < getyear() else 'is',
-			audskil = 'skill assessment' if self.course.id[2] in 'SC' else 'audition',
-			article = 'a' if self.course.id[2] in 'SC' else 'an',
+			audskil = 'audition' if self.course.id[2] in 'SC' else 'skill assessment',
+			article = 'an' if self.course.id[2] in 'SC' else 'a',
 		)
 	def public_status(self):
 		return sub(self.status, {"pendpass":"aud_pend","pendfail":"aud_pend","aud_fail":"fail_pub"})
@@ -441,6 +438,7 @@ class Enrollment(models.Model):
 			elif user.permission >= 4:
 				self.status = "pendpass"
 			self.save()
+			self.student.fate()
 	def reject(self, user):
 		if self.status in ["aud_pend","pendpass","pendfail"]:
 			if user.permission >= 5:
@@ -448,20 +446,20 @@ class Enrollment(models.Model):
 			elif user.permission >= 4:
 				self.status = "pendfail"
 			self.save()
+			self.student.fate()
 	def fate(self):
 		self.status = self.calc_status()
 		self.save()
-		# print self.course.id, self.status
-		# print
 		if self.status in ["not_elig","aud_need","conflict","need_cur","needboth"]:
 			self.delete()
 	def drop(self):
 		if self.status == "aud_pass" and self.course.tradition.droppable:
 			self.status = "aud_drop"
 			self.save()
+			self.student.family.fate()
 		elif self.status in ["aud_pend","need_pay"]:
 			self.delete()
-			Each(self.student.family.enrollments_in(self.course.year)).fate()
+			self.student.family.fate()
 	def cancel(self):
 		if self.status == "invoiced":
 			self.status = "nonexist"
