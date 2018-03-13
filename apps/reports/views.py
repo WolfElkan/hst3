@@ -8,12 +8,6 @@ from Utils.security import getyear, gethist
 
 import re
 
-def make(request, year):
-	cts = CourseTrads.filter(e=True)
-	for ct in cts:
-		ct.make(year)
-	return HttpResponse('ok')
-
 def index(request, **kwargs):
 	context = {
 		'courses':Courses.filter(year=getyear()).order_by('tradition__order'),
@@ -39,7 +33,13 @@ def historical(request, **kwargs):
 
 def students(request, **kwargs):
 	year = int(kwargs['year']) if 'year' in kwargs else getyear()
-	families = Families.all().order_by('last')
+	kwargs.update(request.GET)
+	current_families_only = kwargs.setdefault('current_families_only',False)
+	current_students_only = kwargs.setdefault('current_students_only',False)
+	families = Families.all()
+	if current_families_only:
+		families = families.filter(student__enrollment__course__year=year).distinct()
+	families = families.order_by('last')
 	table = []
 	blank = {'content':'','rowspan':1,'class':'enr'}
 	ctids = {'SB':'TT','SG':'GB','SJ':'JR'}
@@ -48,6 +48,7 @@ def students(request, **kwargs):
 		for student in family.children:
 			row = {
 				'family' : family,
+				'last'   : family.unique_last_in(year),
 				'student': student,
 				'age'    : student.hst_age_in(year),
 				'nchild' : len(family.children),

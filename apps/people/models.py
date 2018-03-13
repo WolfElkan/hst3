@@ -100,6 +100,8 @@ class Family(models.Model):
 				return self.last
 	def children(self):
 		return Students.filter(family_id=self.id).order_by('birthday')
+	def children_enrolled_in(self,year):
+		return self.children.filter(enrollment__course__year=year).distinct()
 	def enrollments_in(self, year):
 		qset = Enrollments.filter(student__family=self, course__year=year)
 		qset = qset.exclude(status__in=['nonexist','aud_fail','aud_drop'])
