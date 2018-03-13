@@ -34,10 +34,11 @@ def historical(request, **kwargs):
 def students(request, **kwargs):
 	year = int(kwargs['year']) if 'year' in kwargs else getyear()
 	kwargs.update(request.GET)
-	current_families_only = kwargs.setdefault('current_families_only',False)
-	current_students_only = kwargs.setdefault('current_students_only',False)
+	everyone = kwargs.setdefault('everyone',False) == [u'True']
+	siblings = kwargs.setdefault('siblings',False) == [u'True']
+	siblings |= everyone
 	families = Families.all()
-	if current_families_only:
+	if not everyone:
 		families = families.filter(student__enrollment__course__year=year).distinct()
 	families = families.order_by('last')
 	table = []
@@ -45,13 +46,14 @@ def students(request, **kwargs):
 	ctids = {'SB':'TT','SG':'GB','SJ':'JR'}
 	for family in families:
 		oldest = True
-		for student in family.children:
+		children = family.children if siblings else family.children_enrolled_in(year)
+		for student in children:
 			row = {
 				'family' : family,
 				'last'   : family.unique_last_in(year),
 				'student': student,
 				'age'    : student.hst_age_in(year),
-				'nchild' : len(family.children),
+				'nchild' : len(children),
 				'oldest' : oldest,
 			}
 			oldest = False
