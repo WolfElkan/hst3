@@ -24,6 +24,7 @@ class Venue(models.Model):
 	# 	else:
 	# 		return super(Venue, self).__getattribute__(field)
 
+
 class CourseTrad(models.Model):
 	# General:
 	id         = models.CharField(max_length=2, primary_key=True)
@@ -231,6 +232,7 @@ class CourseTrad(models.Model):
 		else:
 			return super(CourseTrad, self).__getattribute__(field)
 
+
 class Course(models.Model):
 	id         = models.CharField(max_length=4, primary_key=True)
 	year       = models.DecimalField(max_digits=4, decimal_places=0)
@@ -247,16 +249,27 @@ class Course(models.Model):
 	def enrollments(self):
 		return Enrollments.filter(course_id=self.id)
 	def students(self):
-		return Students.filter(enrollment__course=self)
+		return Students.filter(enrollment__course=self).order_by('family__last','birthday')
 	def equipped_students(self):
 		result = []
-		for student in self.students:
+		students = self.students.reverse()
+		nOlders = 0
+		for s in range(len(students)):
+			student = students[s]
+			if s and student.family.id == students[s-1].family.id:
+				nOlders += 1
+			else:
+				nOlders = 0
+			oldest = s >= len(students)-1 or student.family.id != students[s+1].family.id
 			result.append({
 				'whole' :student,
 				'first' :student.alt_first if student.alt_first else student.first,
 				'last'  :student.alt_last if student.alt_last else student.family.last,
 				'age'   :student.hst_age_in(self.year),
+				'rows'  :nOlders + 1,
+				'oldest':oldest
 			})
+		result.reverse()
 		return result
 	def students_toggle_enrollments(self):
 		result = []
@@ -333,6 +346,7 @@ class Course(models.Model):
 			return super(Course, self).__getattribute__('tradition').__getattribute__(field)
 		else:
 			return super(Course, self).__getattribute__(field)
+
 
 class Enrollment(models.Model):
 	student    = models.ForeignKey('people.Student')
