@@ -5,6 +5,13 @@ def authorized(request, level=0):
 
 # Find User object for current logged-in user, without causing errors.
 # me is always a User, never a Family, Student, or Teacher
+
+def getyear():
+	if DEV:
+		return 2019
+	now = datetime.now()
+	return now.year + (0 if now.month < 5 else 1)
+
 from apps.people.managers import Users
 def getme(request):
 	if 'meid' in request.session:
@@ -16,12 +23,6 @@ def getme(request):
 
 from datetime import datetime
 from trace import DEV
-
-def getyear():
-	if DEV:
-		return 2019
-	now = datetime.now()
-	return now.year + (0 if now.month < 5 else 1)
 
 from apps.program.managers import Courses
 def gethist():

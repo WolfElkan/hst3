@@ -14,13 +14,17 @@ def route_get(request):
 def route_post(request):
 	return redirect('/route')
 
-from apps.program.managers import CourseTrads
+from apps.program.managers import CourseTrads, Courses
 
 def make(year):
+	count = 0
 	qset = CourseTrads.filter(e=True).exclude(id__startswith='W')
 	for q in qset:
-		c = q.make(year)
-		print c
+		c = Courses.fetch(year=year,tradition=q)
+		if not c:
+			count += 1
+			print q.make(year)
+	return count
 
 orders = [
 	{'id':"AA",'order': 10},

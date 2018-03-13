@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, HttpResponse
 
-from apps.people.managers import Families, Addresses, Parents, Users, Students
+from apps.people.managers import Families, Addresses, Parents, Users, Students, NameClashes
 from apps.program.managers import CourseTrads, Courses, Enrollments
 from apps.payment.managers import Invoices
 

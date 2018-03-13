@@ -3,6 +3,7 @@ from django.db import models
 from Utils import custom_fields as custom
 from Utils.data import serial
 from Utils.misc import namecase
+from Utils.security import getyear
 from Utils import supermodel as sm
 from django_mysql import models as sqlmod
 from datetime import datetime
@@ -12,6 +13,7 @@ class AddressManager(sm.SuperManager):
 	def __init__(self):
 		super(AddressManager, self).__init__('people.address')
 Addresses = AddressManager()
+
 
 class FamilyManager(sm.SuperManager):
 	def __init__(self):
@@ -33,6 +35,7 @@ class FamilyManager(sm.SuperManager):
 		return super(FamilyManager, self).create(**kwargs)
 Families = FamilyManager()
 
+
 class ParentManager(sm.SuperManager):
 	def __init__(self):
 		super(ParentManager, self).__init__('people.parent')
@@ -45,6 +48,7 @@ class ParentManager(sm.SuperManager):
 			sm.Regular('alt_email',r'^$|(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)','Please enter a valid email address.'),
 		]
 Parents = ParentManager()
+
 
 class StudentManager(sm.SuperManager):
 	def __init__(self):
@@ -67,6 +71,53 @@ class StudentManager(sm.SuperManager):
 			kwargs['alt_last'] = namecase(kwargs['alt_last'])
 		return super(StudentManager, self).create(**kwargs)
 Students = StudentManager()
+
+
+class NameClashManager(sm.SuperManager):
+	def __init__(self):
+		super(NameClashManager, self).__init__('people.nameclash')
+	def filter(self, **kwargs):
+		if 'family' in kwargs:
+			family = kwargs.pop('family')
+			kwargs['last'] = family.last
+		return super(NameClashManager, self).filter(**kwargs)
+	def blanks(self, family):
+		return self.model.blanks(self.model(), family)
+	def calc(self, family, year=None):
+		if hasattr(family,'last'):
+			last = family.last
+		else:
+			last = family
+		clashes = Families.filter(last=last)
+		if year:
+			clashes = clashes.filter(student__enrollment__course__year=year).distinct()
+		if len(clashes) <= 1:
+			return 0
+		else:
+			for tup in self.model.style_choices:
+				num = tup[0]
+				style = tup[1]
+				unique = set([])
+				good = True
+				for family in clashes:
+					blanks = self.blanks(family)
+					styled = style.format(**blanks)
+					if styled in unique:
+						good = False
+						break
+					else:
+						unique.add(styled)
+				if good:
+					return num
+	def fate(self, family, year):
+		num = self.calc(family,year)
+		if num:
+			return self.create(last=family.last,year=year,style=num)
+	def universal(self, family):
+		num = self.calc(family)
+		return self.model.style_choices[num][1].format(**self.blanks(family))
+NameClashes = NameClashManager()
+		
 
 class UserManager(sm.SuperManager):
 	def __init__(self):

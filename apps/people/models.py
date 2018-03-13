@@ -1,6 +1,6 @@
 from django.db import models
 
-from .managers import Addresses, Families, Parents, Students, Users
+from .managers import Addresses, Families, Parents, Students, Users, NameClashes
 from apps.program.managers import CourseTrads, Courses, Enrollments
 from apps.payment.managers import Invoices
 
@@ -87,7 +87,17 @@ class Family(models.Model):
 	def father(self):
 		return Parents.fetch(id=self.father_id)
 	def unique_last(self):
-		return self.last
+		return NameClashes.universal(self)
+	def unique_last_in(self, year):
+		nameclash = NameClashes.fetch(family=self,year=year)
+		if nameclash:
+			return nameclash.display(self)
+		else:
+			nameclash = NameClashes.fate(self, year)
+			if nameclash:
+				return nameclash.display(self)
+			else:
+				return self.last
 	def children(self):
 		return Students.filter(family_id=self.id).order_by('birthday')
 	def enrollments_in(self, year):
@@ -283,6 +293,40 @@ class Student(models.Model):
 		else:
 			return super(Student, self).__getattribute__(field)
 
+
+class NameClash(models.Model):
+	last  = models.CharField(max_length=30)
+	year  = models.DecimalField(max_digits=4, decimal_places=0)
+	style_choices = [
+		(0, '{last}'),
+		(1, '{last}, {mother:.1}'),
+		(2, '{last}, {mother:.1}&{father:.1}'),
+		(3, '{last}, {mother}'),
+		(4, '{last}, {mother} & {father}'),
+		(5, '{last}, ({city})'),
+		(6, '{last} #{id}')
+	]
+	style = models.PositiveSmallIntegerField(default=0, choices=style_choices)
+	rest_model = 'nameclash'
+	objects = NameClashes
+	def blanks(self, family):
+		return {
+			'last'   : family.last,
+			'mother' : family.mother.first,
+			'father' : family.father.first,
+			'city'   : family.address.city if family.address else '?',
+			'id'     : family.id		
+		}
+	def display(self, family):
+		return self.get_style_display().format(**self.blanks(family))
+	# def __getattribute__(self, field):
+	# 	if field in []:
+	# 		call = super(NameClash, self).__getattribute__(field)
+	# 		return call()
+	# 	else:
+	# 		return super(NameClash, self).__getattribute__(field)
+	
+		
 class Teacher(models.Model):
 	hid = NotImplemented
 	first      = models.CharField(max_length=20)
@@ -294,6 +338,7 @@ class Teacher(models.Model):
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
 	rest_model = "teacher"
+
 
 class User(models.Model):
 	username   = models.CharField(max_length=30, unique=True)

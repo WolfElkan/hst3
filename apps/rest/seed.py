@@ -7,6 +7,7 @@ from Utils.data  import copy, copyatts
 from Utils.fjson import FriendlyEncoder
 from Utils.seshinit import seshinit
 from Utils.snippets import order_coursetrads, make
+from Utils.security import getyear
 
 from datetime import datetime
 import json
@@ -122,8 +123,9 @@ def load_post(request):
 	order_coursetrads()
 	year = getyear()
 	print '- make {}'.format(year)
-	make(year)
+	nCourses += make(year)
 	import_duration = datetime.now() - start_import
+	print
 	print 'IMPORT COMPLETED'
 	print 'Users:     ' + str(nUsers).rjust(5)
 	print 'Families:  ' + str(nFamilies).rjust(5)
