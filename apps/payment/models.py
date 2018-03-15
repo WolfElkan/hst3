@@ -26,10 +26,13 @@ class Invoice(models.Model):
 	status = models.CharField(max_length=1,default='N',choices=status_choices)
 	year = models.DecimalField(max_digits=4, decimal_places=0)
 	code = models.UUIDField(default=uuid.uuid4, editable=False)
+	memo = models.TextField(default='')
 	payment_id = models.PositiveIntegerField(null=True) # Check number or PayPal Transaction ID
 	created_at = models.DateTimeField(auto_now_add=True)
+	check_date = models.DateField(null=True)
+	depos_date = models.DateTimeField(null=True)
+	clear_date = models.DateField(null=True)
 	updated_at = models.DateTimeField(auto_now=True)
-	settled_at = models.DateTimeField(null=True)
 	objects = Invoices
 	def items(self):
 		return Enrollments.filter(invoice=self, phantom=True)

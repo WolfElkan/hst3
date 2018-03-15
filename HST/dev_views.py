@@ -6,9 +6,9 @@ from apps.payment.managers import Invoices
 
 from Utils.custom_fields import Bcrypt, PhoneNumber, DayOfWeek
 from Utils.data  import collect, copy, copyatts, Each, equip, find, find_all, sub
-from Utils.debug import pretty, pdir
+from Utils.debug import pretty, pdir, divs
 from Utils.fjson import FriendlyEncoder
-from Utils.misc  import namecase, safe_delete
+from Utils.misc  import namecase, cleanhex, safe_delete
 from Utils.security import authorized, getme, getyear, gethist
 from Utils.seshinit import seshinit, forminit
 from Utils.snippets import order_coursetrads, make
@@ -67,7 +67,7 @@ def hot(request):
 	seshinit(request,'command')
 	context = {
 		'command': request.session['command'],
-		# 'session': pretty(request.session.dict)
+		'session': divs(request.session.__dict__['_session_cache'])
 	}
 	return render(request, 'main/hot.html', context)
 

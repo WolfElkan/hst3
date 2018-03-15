@@ -21,7 +21,7 @@ X		(eventually) Support loading existing students from database for editing, tra
 		Make validations work
 		Make titles of required fields bold automatically
 	X	If someone tries to create parents that have already been created, update the existing parents.
-	create NameClash table
+X	create NameClash table
 	create PolyRole table
 
 X	family.children gets them in age order
@@ -58,12 +58,12 @@ x	BUG: DayOfWeek saves 1 day earlier
 reports
 	students
 		create timeless version
-		show only current students in annual version
+	X	show only current students in annual version
 
 payment
 X	create app
 X	Invoice payment
-	~Link with PayPal
+	Link with PayPal
 
 Utils
 X	namecase
@@ -73,8 +73,6 @@ X	Clean up hacks.py
 Clean Up Inheritance
 	Widgets
 	Validations
-
-no	Replace equip() with .annotate() (https://docs.djangoproject.com/en/2.0/ref/models/querysets/#annotate)
 
 X	Add audition level for audition required, but no prereqs for audition, assign C2 that level (solved with eligex)
 
@@ -88,6 +86,13 @@ Fix nuke.sh
 
 For Deployment
 X	Generalize years
+	Secure Pages
+
+Admin
+X	Accept Invoice
+X	Create New Year
+	403
+	404
 
 Questions:
 	What did we decide about login by email?
@@ -97,5 +102,8 @@ Questions:
 	Migrate to Postgres?
 
 Optional Features:
+	Cancel Courses
 	Do you want to be able to schedule when enrollment for a course opens?
 	Hover over course to see why student is not eligible
+	Partial Invoice Payment
+	Trade security for convenience: Confirm rather than require invoice code

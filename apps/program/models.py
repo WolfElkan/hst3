@@ -7,7 +7,7 @@ from Utils.security import getyear
 from django_mysql import models as sqlmod
 from .managers import CourseTrads, Courses, Enrollments
 Q = models.Q
-from apps.people.managers import Students
+from apps.people.managers import Students, Families
 from trace import TRACE, DEV
 from datetime import datetime
 import re
@@ -250,6 +250,8 @@ class Course(models.Model):
 		return Enrollments.filter(course_id=self.id)
 	def students(self):
 		return Students.filter(enrollment__course=self).order_by('family__last','birthday')
+	def families(self):
+		return Families.filter(student__enrollment__course=self).distinct()
 	def equipped_students(self):
 		result = []
 		students = self.students.reverse()

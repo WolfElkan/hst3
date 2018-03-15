@@ -83,9 +83,18 @@ urlpatterns = [
 	url(r'^reports/students/(?P<year>\d{4})/mass_enroll/register/?$', reports.register),
 
 	url(r'^admin/dashboard/?$', radmin.dashboard),
+
 	url(r'^admin/auditions/?$', program.audition_menu),
 	url(r'^admin/auditions/(?P<id>\d\d\w\w)/?$', program.audition_results),
 	url(r'^admin/auditions/(?P<id>\d\d\w\w)/process/?$', program.audition_process),
+
+	url(r'^admin/invoice/find/?$', payment.find_invoice),
+	url(r'^admin/invoice/(?P<id>\d{6})/?$', radmin.invoice),
+	url(r'^admin/invoice/(?P<id>\d{6})/(?P<method>check|cash|paypal)\??$', radmin.invoice),
+	url(r'^admin/invoice/(?P<id>\d{6})/deposit/?$', radmin.invoice_deposit),
+	url(r'^admin/invoice/(?P<id>\d{6})/clear/?$', radmin.invoice_clear),
+
+	url(r'^admin/newyear/year/?$', radmin.newyear_year),
 
 	url(r'^rest/(show|edit)/(?P<model>[a-zA-Z]+)/(?P<id>\d+|(\d\d)?\w\w)/add/(?P<foreign_model>[a-zA-Z]+)/?$', rest.new),
 	url(r'^rest/(show|edit)/(?P<model>[a-zA-Z]+)/(?P<id>\d+|(\d\d)?\w\w)/add/(?P<foreign_model>[a-zA-Z]+)/create/?$', rest.create),

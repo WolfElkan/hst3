@@ -9,3 +9,56 @@ def pretty(arr, delim='  ', indent='', level=0, printout=''):
 
 def pdir(thing):
 	return pretty(dir(thing))
+
+def divs(obj):
+	visible = '&#9644;' if obj == '' else obj
+	if type(obj) is int:
+		return '<span class="int number">{}</span>'.format(visible)
+	elif type(obj) is long:
+		return '<span class="long number">{}L</span>'.format(visible)
+	elif type(obj) is float:
+		return '<span class="float number">{}</span>'.format(visible)
+	elif type(obj) is complex:
+		return '<span class="complex number">{}</span>'.format(visible)
+
+	elif type(obj) is str:
+		return '<span class="str string">{}</span>'.format(obj)
+	elif type(obj) is unicode:
+		return '<span class="unicode string">{}</span>'.format(obj)
+	elif type(obj) is buffer:
+		return '<span class="buffer string">{}</span>'.format(obj)
+
+	elif type(obj) is bool:
+		return '<span class="bool {}">{}</span>'.format(obj,obj)
+
+	elif type(obj) is list:
+		html = '<ol start="0" class="list">'
+		for item in obj:
+			html += '<li>{}</li>'.format(divs(item))
+		html += '</ol>'
+		return html
+
+	elif type(obj) is tuple:
+		html = '<ol start="0" class="tuple">'
+		for item in obj:
+			html += '<li>{}</li>'.format(divs(item))
+		html += '</ol>'
+		return html
+
+	elif type(obj) is dict:
+		html = '<table class="dict">'
+		for key in obj:
+			html += '<tr class="pair"><td class="key">{}:</td><td class="value">{}</td></tr>'.format(key,divs(obj[key]))
+		html += '</table>'
+		return html
+
+	else:
+		return '<div class="object"><span class="type">{}</span><span class="strobj">{}</span></div>'.format(type(obj),str(obj))
+
+
+
+
+
+
+
+

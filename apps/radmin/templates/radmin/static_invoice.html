@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Invoice {{invoice.id}}</title>
+	<style type="text/css">
+		input:disabled {
+			text-align: right;
+		}
+		form {
+			display: inline;
+		}
+		.submit {
+			margin: 20px;
+		}
+	</style>
+</head>
+<body>
+<a href="/admin/dashboard/">Return to Dashboard</a>
+<center>
+	<h1>Invoice #{{invoice.id}}</h1>
+		<table>
+			<tr title="family">
+				<td>Family:</td>
+				<td>{{invoice.family.unique_last}}</td>
+			</tr>
+			<tr title="amount">
+				<td>Amount:</td>
+				<td>${{invoice.amount}}</td>
+			</tr>
+			<tr title="created_at">
+				<td>Posted:</td>
+				<td>{% if invoice.created_at %}{{invoice.created_at}}{% else %}?{% endif %}</td>
+			</tr>
+			<tr title="updated_at">
+				<td>Last Activity:</td>
+				<td>{% if invoice.updated_at %}{{invoice.updated_at}}{% else %}?{% endif %}</td>
+			</tr>
+			<tr title="check_date">
+				<td>{{invoice.method}} Date:</td>
+				<td>{% if invoice.check_date %}{{invoice.check_date}}{% else %}?{% endif %}</td>
+			</tr>
+			<tr title="depos_date">
+				<td>Deposited:</td>
+				<td>
+					{% if invoice.depos_date %}
+					{{invoice.depos_date}}
+					{% else %}
+					<a href="deposit">MARK AS DEPOSITED</a>
+					{% endif %}
+				</td>
+			</tr>
+			<tr title="clear_date">
+				<td>Cleared:</td>
+				<td>
+					{% if invoice.clear_date %}
+					{{invoice.clear_date}}
+					{% else %}
+					<a href="clear">MARK AS CLEARED</a>
+					{% endif %}
+				</td>
+			</tr>
+			<tr title="method">
+				<td>Method:</td>
+				<td>{{invoice.method}}</td>
+			</tr>
+			<tr title="get_status_display">
+				<td>Status:</td>
+				<td>{{invoice.get_status_display}}</td>
+			</tr>
+			<form method="post">{% csrf_token %}
+			{% if invoice.method == 'Check' %}
+				<tr title="payment_id">
+					<td>Check Number:</td>
+					<td>{{invoice.payment_id}}</td>
+				</tr>
+				<tr title="check_date">
+					<td>Check Date:</td>
+					<td>{{invoice.check_date}}</td>
+				</tr>
+				<tr title="amount">
+					<td>Check Amount:</td>
+					<td>${{invoice.amount}}</td>
+				</tr>		
+				<tr title="memo">
+					<td>Memo:</td>
+					<td>{{invoice.memo}}</td>
+				</tr>		
+			{% elif invoice.method == 'Cash' %}
+			{% elif invoice.method == 'PayPal' %}
+			{% endif %}
+		</table>
+		{% if method %}<button class="submit">Submit</button>{% endif %}
+	</form>
+	<a href="/register/invoice/{{invoice.id}}/" target="_blank">View Invoice</a>
+</center>
+</body>
+</html>

@@ -314,8 +314,8 @@ class NameClash(models.Model):
 	def blanks(self, family):
 		return {
 			'last'   : family.last,
-			'mother' : family.mother.first,
-			'father' : family.father.first,
+			'mother' : family.mother.first if family.mother  else ' ',
+			'father' : family.father.first if family.father  else ' ',
 			'city'   : family.address.city if family.address else '?',
 			'id'     : family.id		
 		}

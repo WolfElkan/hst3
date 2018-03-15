@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>HST | Accept Check</title>
+	{% load staticfiles %}
+	<script src="{% static 'main/js/script.js' %}" charset="utf-8"></script>
+	<link rel="stylesheet" type="text/css" href="{% static 'main/css/style.css' %}">
+	<link rel="icon" type="image/png" href="{% static 'main/images/favicon.ico/favicon.ico' %}">
+</head>
+<body id="login">
+	<a href="/">Home</a>
+	<center>
+		<h1>Find Invoice</h1>
+		<form method="post">{% csrf_token %}
+			<table>
+				<tr>
+					<td>Invoice ID:</td>
+					<td><input type="number" name="invoice_id" value="{{p.invoice.id}}"></td>
+					<td class="error">{{e.invoice.id}}</td>
+				</tr>
+				<tr>
+					<td>Invoice Code:</td>
+					<td><input type="hexidecimal" name="invoice_code" value="{{p.invoice.code}}"></td>
+					<td class="error">{{e.invoice.code}}</td>
+				</tr>
+			</table>
+			<button>Find Invoice</button>
+		</form>
+	</center>
+</body>
+</html>

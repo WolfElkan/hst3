@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>HST | Admin</title>
+	<style type="text/css">
+		.already {
+			color: #585;
+			font-style: italic;
+		}
+	</style>
+</head>
+<body>
+<center>
+	<h1>Create Courses</h1>
+	<form>
+		Year:
+		{% if courses %}
+		{{year|add:-1}}-{{year}}
+		<a href="/admin/newyear/year/">Change</a>
+		{% else %}
+		<input type="number" name="year" value="{{year}}">
+		(Spring)
+		<button>Continue</button>
+		{% endif %}
+		<table>
+		{% for course in courses %}
+			{% if course.already %}
+			<tr class="already">
+				<td><input type="checkbox" disabled checked name="{{year2}}{{course.id}}">{{course.title}}</td>
+			</tr>
+			{% else %}
+			<tr>
+				<td><input type="checkbox" name="{{year2}}{{course.id}}">{{course.title}}</td>
+			</tr>
+			{% endif %}
+		{% endfor %}
+		</table>
+		{% if courses %}<button>Create Courses</button>{% endif %}
+	</form>
+</center>
+</body>
+</html>

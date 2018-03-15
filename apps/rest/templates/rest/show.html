@@ -18,6 +18,7 @@
 <body>
 	<a href="/reports/students/2016/">2016</a>
 	<h1>{{thing}}</h1>
+	{% if model == "course" %}<a href="/reports/roster/{{thing.id}}/">Roster</a>{% endif %}
 	<h2><a href="/rest/index/{{model}}/">{{Model}}</a></h2>
 	<!-- <a href="prev/">&lt;Prev</a>
 	<a href="next/">Next&gt;</a> -->

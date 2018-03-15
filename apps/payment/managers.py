@@ -13,7 +13,12 @@ class InvoiceManager(sm.SuperManager):
 	def __init__(self):
 		super(InvoiceManager, self).__init__('main.InvoiceManager')
 		self.fields = []
-		self.validations = []
+		self.validations = [
+			sm.Present('id','Please enter the 6-digit Invoice ID (Probably {:02d}xxxx)'.format(getyear()%100)),
+			sm.Regular('id',r'^$|^\d{6}$','This is not a valid Invoice ID. It should be a 6-digit number.'),
+			sm.Present('code','Please enter the 32-character Invoice Code.'),
+			sm.Regular('code',r'^$|([0-9a-fA-F]-?){32}','This is not a valid UUID. It should be 32 hexidecimal digits')
+		]
 	def create(self, **kwargs):
 		kwargs.setdefault('year', getyear())
 		year0000 = (int(kwargs['year']) % 100) * 10000

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Invoice {{invoice.id}}</title>
+	<style type="text/css">
+		input:disabled {
+			text-align: right;
+		}
+		form {
+			display: inline;
+		}
+		.submit {
+			margin: 20px;
+		}
+	</style>
+</head>
+<body>
+<a href="/admin/dashboard/">Return to Dashboard</a>
+<center>
+	<h1>Invoice #{{invoice.id}}</h1>
+		<table>
+			<tr>
+				<td>Family:</td>
+				<td>{{invoice.family.unique_last}}</td>
+			</tr>
+			<tr>
+				<td>Amount:</td>
+				<td>${{invoice.amount}}</td>
+			</tr>
+			<tr>
+				<td>Posted:</td>
+				<td>{% if invoice.created_at %}{{invoice.created_at}}{% else %}?{% endif %}</td>
+			</tr>
+			<tr>
+				<td>Last Activity:</td>
+				<td>{% if invoice.updated_at %}{{invoice.updated_at}}{% else %}?{% endif %}</td>
+			</tr>
+			<tr>
+				<td>Paid:</td>
+				<td>{% if invoice.check_date %}{{invoice.check_date}}{% else %}?{% endif %}</td>
+			</tr>
+			<tr>
+				<td>Deposited:</td>
+				<td>{% if invoice.depos_date %}{{invoice.depos_date}}{% else %}?{% endif %}</td>
+			</tr>
+			<tr>
+				<td>Cleared:</td>
+				<td>{% if invoice.clear_date %}{{invoice.clear_date}}{% else %}?{% endif %}</td>
+			</tr>
+			<tr>
+				<td>Method:</td>
+				<td>
+					{% if invoice.method %}
+						{{invoice.method}}
+					{% elif not method %}
+						<form action="check"> <button>Check</button> </form>
+						<form action="cash">  <button disabled>Cash</button>  </form>
+						<form action="paypal"><button disabled>Paypal</button></form>
+					{% else %}
+						<button disabled>{{method|title}}</button>
+						{% if invoice.status == "N" %}
+						<a href="/admin/invoice/{{invoice.id}}/">Change</a>
+						{% endif %}
+					{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<td>Status:</td>
+				<td>{{invoice.get_status_display}}</td>
+			</tr>
+			<form method="post">{% csrf_token %}
+			{% if method == 'check' %}
+				<tr>
+					<td>Check Number:</td>
+					<td><input type="number" name="payment_id"></td>
+				</tr>
+				<tr>
+					<td>Check Date:</td>
+					<td><input type="date" name="check_date"></td>
+				</tr>
+				<tr>
+					<td>Check Amount:</td>
+					<td><input type="text" disabled value="${{invoice.amount}}"></td>
+				</tr>		
+				<tr>
+					<td>Memo:</td>
+					<td><input type="text" name="memo"></td>
+				</tr>		
+			{% elif method == 'cash' %}
+			{% elif method == 'paypal' %}
+			{% endif %}
+		</table>
+		{% if method %}<button class="submit">Submit</button>{% endif %}
+	</form>
+	<a href="/register/invoice/{{invoice.id}}/" target="_blank">View Invoice</a>
+</center>
+</body>
+</html>

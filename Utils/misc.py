@@ -11,6 +11,9 @@ def namecase(name):
 	else:
 		return name.title()
 
+def cleanhex(string):
+	return ''.join(re.findall(r'[0-9a-fA-F]',str(string))).lower()
+
 def safe_delete(thing):
 	if thing and hasattr(thing,'delete'):
 		thing.delete()
