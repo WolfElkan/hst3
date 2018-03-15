@@ -1,103 +1,53 @@
-Today:
-X	Fix Family.delete cascade
+	Documentation
+
 	Check all REST routes
-X	Give Widgets a default= kwarg
 
-Add created_at and updated_at to all models
+Student Interface
+	Make titles of required fields bold automatically
+	Support date field on other browsers
+	BUG: Dynamic methods not being applied when elements are saved
 
-people
-X	Make registration landing page redirect to appropriate step if family has partially registered.
-X	Add Change Password route
-
-X	Refactor Parent model, callable attributes
-
-	Student Interface
-X		(eventually) Support loading existing students from database for editing, track by internal id's
-		Make titles of required fields bold automatically
-		Support date field on other browsers
-		BUG: Dynamic methods not being applied when elements are saved
-
-	Parent Interface
-		Make validations work
-		Make titles of required fields bold automatically
-	X	If someone tries to create parents that have already been created, update the existing parents.
-X	create NameClash table
+Parent Interface
+	Make validations work
+	Make titles of required fields bold automatically
+	
 	create PolyRole table
 
-X	family.children gets them in age order
-X	add HIDs
-
-	Course Interface
-	X	Click anywhere on a tab
-		ELIGEX:
-		X	Conflicts
-		X	J1 should only need audition for 8-year-olds
-		X	C2 cur kwarg is buggy
-		X	Troupes should not let students audition if they haven't taken acting
-		X	**c -> c
-	X	Delete unecessary _get route
-	X	Debug Adding and Dropping
-
-admin
-X	figure out a name for admin app that doesn't clash with django "radmin"
-	Audition Result Interface
-		GA is weird
-	X	if a student is allowed to enroll directly in a class that other students must audition for, still display their name, but freeze the radio button on yes.
-
-program
-	Models
-		CourseTrad
-			Provide validation to make infinite aliasing impossible
-		X	Add semester fields. Update conflict method accordingly
+	Provide validation to CourseTrad model to make infinite aliasing impossible
 
 rest
 	support /add/[mo|fa]ther
-x	BUG: DayOfWeek saves 1 day earlier
 	Give Widgets control over whether static values are rendered safely
 
-reports
-	students
-		create timeless version
-	X	show only current students in annual version
+	LINK WITH PAYPAL
 
-payment
-X	create app
-X	Invoice payment
-	Link with PayPal
-
-Utils
-X	namecase
-X	Clean up hacks.py
 	__json__ -> _json_
 
-Clean Up Inheritance
-	Widgets
-	Validations
+Aesthetics
+	Clean Up Inheritance
+		Widgets
+		Validations
+	Streamline imports
+	Method order
+	Modularize Eligibility logic?
 
-X	Add audition level for audition required, but no prereqs for audition, assign C2 that level (solved with eligex)
+	Fix nuke.sh
 
-Remove Unnecessary imports
-Track down phantom print statements
+Compatability
 
-X	Delete Auditions table. Integrate with Enrollments
-X	Delete auditions link in REST homepage
-
-Fix nuke.sh
-
-For Deployment
-X	Generalize years
-	Secure Pages
+Security
+	add clause to all views
 
 Admin
-X	Accept Invoice
-X	Create New Year
 	403
 	404
 
 Questions:
+	Beta testing?
 	What did we decide about login by email?
 	Student height?
 	Antimony protocol?
+	GB/JR General Audition (Audition results interface)
 	Broadway dance courses? (JB or Z2)
 	Migrate to Postgres?
 
@@ -106,4 +56,6 @@ Optional Features:
 	Do you want to be able to schedule when enrollment for a course opens?
 	Hover over course to see why student is not eligible
 	Partial Invoice Payment
+	Secure sessions (Django or scratch?)
 	Trade security for convenience: Confirm rather than require invoice code
+	Timeless Master Enrollment Report

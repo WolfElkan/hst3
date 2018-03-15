@@ -1,6 +1,32 @@
 # Local Installation
 
-After setting up the application with Django, open the file `coursetrads.json`, and copy the text of the file.  Go to `/seed/load/`, paste the text into the JSON window and click import.  
+0. Clone or download to local system and navigate in Terminal to the directory where it's saved.
+
+0. Run `pip install requirements.txt` to install dependencies.
+
+0. Activate virtual environment.
+
+0. Run `python manage.py makemigrations` to create the data migration files.
+
+0. Start up a local MySQL server. (See settings file `HST/HST/settings.py:94-103` for MySQL settings used in development.)
+
+0. Change the specs in `settings.py` to point to your MySQL server if different configuration settings were used.
+
+0. Run `python manage.py migrate` to create the database on local server.
+
+0. Run `python manage.py runserver` to initialize application.
+
+0. Open web browser (Currently Google Chrome works best) and navigate to [localhost:8000](http://localhost:8000/). (Note: it's useful to have terminal window open and visible next to the browser for debugging purposes.)
+
+0. If application is running successfully, you will see an HST Homepage.  Click [JSON Bulk Data Interface](http://localhost:8000/seed/load/)
+
+0. Unzip the `hst.json.zip` file. (Note: this file contains confidential contact information for HST's families and, for privacy reasons, is NOT included in this repository or anywhere else on the web.  Contact the developer for this file.)
+
+0. Open `hst.json`, the file that unzips from `hst.json.zip`, in a Text Editor.  Copy the *entire text* of the file and paste it into the "JSON:" window on the application.
+
+0. Making sure you have the Terminal window visible (because it looks cool), click IMPORT.
+
+0. Once the data is successfully imported, navigate back to the homepage, and explore the website!
 
 # HST Website Django Backend
 *Technical Documentation & User Guide*
@@ -9,11 +35,11 @@ After setting up the application with Django, open the file `coursetrads.json`, 
 
 This web application is built with the following objectives in mind:
 
-1. To provide an intuitive, easy-to-use platform which users of varying computer skills can use to complete various functions necessary to the operation of HST,
-1. To allow HST to change, adapt and grow over the coming years, without requiring modification of the internal code of the application,
-1. To reduce the opportunity for human error, by automating any processes possible without causing undue complications,
-1. To reduce required volunteer time and allow HST to take full advantage of the digital age by streamlining data management processes wherever helpful,
-1. To be a blessing and an expression of God's love and providence to HST's staff, students and families as they have been to the developer.
+0. To provide an intuitive, easy-to-use platform which users of varying computer skills can use to complete various functions necessary to the operation of HST,
+0. To allow HST to change, adapt and grow over the coming years, without requiring modification of the internal code of the application,
+0. To reduce the opportunity for human error, by automating any processes possible without causing undue complications,
+0. To reduce required volunteer time and allow HST to take full advantage of the digital age by streamlining data management processes wherever helpful,
+0. To be a blessing and an expression of God's love and providence to HST's staff, students and families as they have been to the developer.
 
 ## Eligex
 

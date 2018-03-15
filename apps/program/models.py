@@ -16,6 +16,8 @@ class Venue(models.Model):
 	id   = models.CharField(max_length=3, primary_key=True)
 	name = models.CharField(max_length=30)
 	address = models.ForeignKey('people.Address', null=True)
+	created_at = models.DateTimeField(auto_now_add=True)
+	updated_at = models.DateTimeField(auto_now=True)
 	rest_model = "venue"
 	# def __getattribute__(self, field):
 	# 	if field in []:
@@ -90,6 +92,8 @@ class CourseTrad(models.Model):
 		# 'Y':'',
 		'Z':'Jazz', # Broadway (Older Beginners)
 	}
+	created_at = models.DateTimeField(auto_now_add=True)
+	updated_at = models.DateTimeField(auto_now=True)
 	objects = CourseTrads
 	def __str__(self):
 		return self.title.upper()
@@ -244,6 +248,8 @@ class Course(models.Model):
 	vol_hours  = models.FloatField()
 	the_hours  = models.FloatField()
 	approved   = models.BooleanField(default=False)
+	created_at = models.DateTimeField(auto_now_add=True)
+	updated_at = models.DateTimeField(auto_now=True)
 	rest_model = "course"
 	objects = Courses
 	def enrollments(self):

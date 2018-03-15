@@ -309,6 +309,8 @@ class NameClash(models.Model):
 		(6, '{last} #{id}')
 	]
 	style = models.PositiveSmallIntegerField(default=0, choices=style_choices)
+	created_at = models.DateTimeField(auto_now_add=True)
+	updated_at = models.DateTimeField(auto_now=True)
 	rest_model = 'nameclash'
 	objects = NameClashes
 	def blanks(self, family):
