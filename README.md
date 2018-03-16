@@ -1,6 +1,6 @@
 # Local Installation
 
-0. Clone or download to local system and navigate in Terminal to the directory where it's saved.
+1. Clone or download to local system and navigate in Terminal to the directory where it's saved.
 
 0. Run `pip install requirements.txt` to install dependencies.
 
@@ -35,7 +35,7 @@
 
 This web application is built with the following objectives in mind:
 
-0. To provide an intuitive, easy-to-use platform which users of varying computer skills can use to complete various functions necessary to the operation of HST,
+1. To provide an intuitive, easy-to-use platform which users of varying computer skills can use to complete various functions necessary to the operation of HST,
 0. To allow HST to change, adapt and grow over the coming years, without requiring modification of the internal code of the application,
 0. To reduce the opportunity for human error, by automating any processes possible without causing undue complications,
 0. To reduce required volunteer time and allow HST to take full advantage of the digital age by streamlining data management processes wherever helpful,
@@ -43,16 +43,16 @@ This web application is built with the following objectives in mind:
 
 ## Eligex
 
-This web application can determine whether a given student is eligible for a given course in a given year.  However, due to the complicated nature of the eligibility requirements for many of HST's classes, it was necessary to develop an expression language to determine eligibility of students.  Eligex is a language that in which any requirements and prerequisites for an HST class can be written and will be understood by the server.  It also enables requirements to be written for future classes HST may offer, or to modify the requirements for existing classes, without rewriting the internal code of the website.  It may look daunting, but it's really just boolean algebra (True and False statements).
+This web application can automatically determine whether a given student is eligible for a given course in a given year.  However, due to the complicated nature of the eligibility requirements for many of HST's classes, it was necessary to develop an expression language to determine eligibility of students.  "Eligibility Expressions" (or Eligex) is a language in which any requirements and prerequisites for an HST class can be written and will be understood by the server.  It also enables requirements to be written for future classes HST may offer, or to modify the requirements for existing classes, without rewriting the internal code of the website.  It may look daunting, but it's really just boolean algebra (True and False statements).
 
-A line of Eligex is case-sensitive and contains one or more "words", separated by spaces which are converted into True or False values.  Unless trackets (`<` `>`) are used, these values will be compiled conjunctively, or AND'ed.  That is to say, if any of the words is False, the expression will return False, and the student will not be eligible for the class.  Only if all the words are True, will the expression return True and the student will be eligible for the class.
+A line of Eligex is case-sensitive and contains one or more "words" (separated by spaces) which are converted into True or False values.  Unless trackets (`<` `>`) are used, these values will be compiled conjunctively, or AND'ed.  That is to say, if any of the words is False, the expression will return False, and the student will not be eligible for the class.  Only if all the words are True, will the expression return True and the student will be eligible for the class.
 
 ### Single-Letter Words
-Note: Letters with special meanings are lowercase to avoid clashing with capital letters which refer to `CourseTrad` id's.
-Glyph | Meaning
-:---: | ---
-`#` | Always returns True
-`~` | Always returns False
+Note: Letters with special meanings are lowercase to avoid clashing with ID's of specific courses, represented by CAPITAL letters.
+Glyph | Meaning |
+:---: | --- |
+`#` | Always returns True (Mostly used for classes with no prerequisites)
+`~` | Always returns False (Mostly used for defunct or historical classes)
 `a` | Returns whether the student meets the age requirements
 `g` | Returns whether the student meets the grade requirements (Always returns true if student does not have a `grad_year` listed.  Almost always returns true since most courses are for grades 1-12)
 `m` | Male: returns true for boys and false for girls
@@ -73,7 +73,8 @@ Glyph | Meaning
 `c` | Will match only enrollments in the *current* year
 `p` | Will match only enrollments in *past* years.
 `$` | Will match only enrollments for which tuition has been paid
-`+` | Will match student's whole family
+`+` | Will match enrollments by anyone in student's family
+
 Note: A student is considered eligible to audition for a course if they would be eligible to enroll in it, should they pass an audition.
 
 ### Boolean Operators
@@ -83,65 +84,97 @@ Eligex is compiled conjunctively by default.  All words in an expression must be
 Glyph | Meaning
 :---: | ---
 `<` `>` | Words within trackets will be evaluated disjunctively, or OR'ed.  The compiler will first evaluate the expression within the trackets to see if *any* of them are true, and if so the entire tracketed expression will be treated as a single True value in the outer expression.  If all of the enclosed words evaluate as False, the tracketed expression will be evaluated as a single False value.
-`{` `}` | Braces are evaluated just like trackets, but words within them are AND'ed.  These are useful for nesting inside of trackets (AND within an OR within an AND).  Note that enclosing symbols may not be nested within symbols of the same type.  `< a { T3p @ < P2p T2p > } >` is an invalid expression because it contains trackets within trackets.
+`{` `}` | Braces are evaluated just like trackets, but words within them are AND'ed.  These are useful for nesting inside of trackets (AND within an OR within the default AND).  
 `!` | Not: May be appended before a word to return the opposite value
 
-### Examples
-
-Eligex | Class | Description
-:------: | :---: | ------------
-`a g` | All classes not listed here | Student must meet age and grade requirements.  
-`a g f`<br>`a g m`|Broadway Choir<br>Boys Jazz &amp; Hip Hop| Student must meet age and grade requirements, <br>and be a girl or boy respectively.
-`a g @ **c`|A Capella Choir| Students must meet age and grade requirements, <br>pass an audition, and be currently enrolled in at <br>least 1 other class.
-`< a { ay @ } >`|Jazz 1| Students who meet the age requirement <br>may enroll immediately, but students who <br>are 1 year too young may audition.
-`a g @`|Broadway Tap 2<br>Broadway Jazz 2|Students must meet age and grade requirements<br>and pass a skill assessment.
-`a g < T2p { @ T1p } >`<br>`a g < T4p { @ T3p } >`<br>`a g < J2p { @ J1p } >`<br>`a g < J4p { @ J3p } >`|Tap 2<br>Tap 4<br>Jazz 2<br>Jazz 4<br>|In addition to age and grade, students<br>either have taken the class one level <br>below this and pass a skill assessment, <br>or have already taken this class.
-`a g < T3p { @ T2p } { @ P2p } >`||
-`a g < I*p T*p P*p >` || Students must meet age and grade requirements <br>and have formerly taken either an Irish class, or a <br>Tap or Broadway Tap class. 
-`a g A*p @`           ||  Students must meet age and grade requirements, <br>and have taken an Acting class in order to audition 
-
-<!-- ## Antimony Protocol -->
+Note that enclosing symbols may not be nested within symbols of the same type.  `a < J2p { @ < J1p Z1p > } >` is an invalid expression because it contains trackets within trackets.  The expression `a < J2p { @ J1p } { @ Z1p } >` should be used instead with the `@` distributed.
 
 ## HST Class Traditions
 
-All HST classes are referred to as "courses" in the internal code of the site, to avoid clashing with the Python reserved word `class`.  `CourseTrad`
+All HST classes are referred to as "courses" in the internal code of the site, to avoid clashing with the Python reserved word `class`.  Since HST generally runs the same courses every year, there are 2 types of course objects that the database uses.  There are the actual `Course` objects, which represent a given course in a given year (e.g. the 2013 Gaithersburg Troupe, or the 2018 Jazz 3 class) and there are course "tradition" or `CourseTrad` objects which represent the courses HST offers every year as timeless entities (e.g. Gaithersburg Troupe or Jazz 3).  There are 32 courses HST traditionally offers, plus 1 "General Audition."  They are listed [below](#enrollable-courses).
 
-### Enrollable Classes
- ID  | Title                   | Ages    | Grades | Eligex                           | Note
-:---:|-------------------------|:-------:|:------:|:--------------------------------:|-----:
-`AA` | Acting A                |  9 - 11 | 1 - 12 | `a`                              | 1
-`AB` | Acting B                | 12 - 18 | 1 - 12 | `a`                              | 1
-`C1` | Broadway Choir          | 10 - 18 | 1 - 12 | `a f`                            | 2
-`C2` | A Cappella Choir        | 14 - 18 | 1 - 12 | `a c @@`                         | 4
-`J1` | Jazz 1                  |  9 - 12 | 1 - 12 | `< a { ay @@ } >`                | 5
-`J2` | Jazz 2                  | 11 - 12 | 1 - 12 | `a < J2p { @@ J1p } >`           | 6
-`J3` | Jazz 3                  | 14 - 18 | 1 - 12 | `a < J3p { @@ J2p } { @@ Z2p } >`| 7
-`J4` | Jazz 4                  | 16 - 18 | 1 - 12 | `a < J4p { @@ J3p } >`           | 6
-`Z1` | Broadway Jazz 1         | 13 - 18 | 1 - 12 | `a`                              | 1
-`Z2` | Broadway Jazz 2         | 13 - 18 | 1 - 12 | `a @@`                           | 3
-`T1` | Tap 1                   |  9 - 12 | 1 - 12 | `a`                              | 1
-`T2` | Tap 2                   | 11 - 12 | 1 - 12 | `a < T2p { @@ T1p } >`           | 6
-`T3` | Tap 3                   | 14 - 18 | 1 - 12 | `a < T3p { @@ T2p } { @@ P2p } >`| 7
-`T4` | Tap 4                   | 16 - 18 | 1 - 12 | `a < T4p { @@ T3p } >`           | 6
-`P1` | Broadway Tap 1          | 13 - 18 | 1 - 12 | `a`                              | 1
-`P2` | Broadway Tap 2          | 13 - 18 | 1 - 12 | `a @@`                           | 3
-`IS` | Irish Dance Soft Shoe   |  9 - 18 | 1 - 12 | `a`                              | 1
-`IH` | Irish Dance Hard Shoe   | 11 - 18 | 1 - 12 | `a < I*p T*p P*p >`              | 8
-`HB` | Boys Jazz &amp; Hip-Hop |  9 - 12 | 1 - 12 | `a m`                            | 2
-`HJ` | Jazz &amp; Hip-Hop      | 13 - 18 | 1 - 12 | `a`                              | 1
-`GA` | JR/GB General Audition  | 10 - 13 | 4 -  8 | `a g A*p !S*p @@`                |10
-`SG` | Gaithersburg Troupe     | 10 - 13 | 4 -  8 | `a g A*p S*p @@`                 | 9
-`SJ` | Junior Troupe           | 10 - 13 | 4 -  8 | `a g A*p S*p @@`                 | 9
-`SB` | Travel Troupe           | 14 - 18 | 1 - 12 | `a A*p`                          |11
-`SH` | Shakespeare Troupe      | 14 - 18 | 9 - 12 | `a g A*p @@`                     |12
-`SR` | Senior Troupe           | 14 - 18 | 9 - 12 | `a g A*p @@`                     |12
-`WN` | Painting Workshop       | 14 - 18 | 1 - 12 | `a`                              | 1
-`WP` | Prop Workshop           | 14 - 18 | 1 - 12 | `a`                              | 1
-`WW` | Wig Workshop            | 14 - 18 | 1 - 12 | `a`                              | 1
-`WX` | Tech Crew Workshop      | 12 - 18 | 1 - 12 | `a`                              | 1
-`XA` | Tech Apps               | 12 - 18 | 1 - 12 | `a`                              | 1
-`XM` | Makeup Team             | 14 - 18 | 1 - 12 | `a`                              | 1
-`XX` | Tech Team               | 12 - 18 | 1 - 12 | `a WX`                           |13
+In addition to these "enrollable" courses, Showcase Finale Groups, Acting Scenes, historical courses, prepaid tickets, and other entities may be represented as `CourseTrad` objects.  These non-enrollable courses are kept in the same table, and are distinguished from the enrollable courses using the boolean `e` attribute.  (See models)
+
+Each `CourseTrad` object has a 2-character ID, with the first letter indicating the genre or type of course, and the second indicating the course level or some other identifying characteristic.  The yearly `Course` objects have 4-character ID's: the last two digits of the year, followed by the 2-character `CourseTrad` ID.  The first letters of the `CourseTrad` ID's (and by extention, the 3rd character of the `Course` ID's) are as follows:
+
+* Classes in Showcase
+  * `A`: Acting Classes ([note](#note-about-acting-classes))
+  * `C`: Choirs
+  * Dance Classes
+    * Jazz
+      * `J`: Jazz
+      * `Z`: Broadway Jazz
+    * Tap
+      * `T`: Tap
+      * `P`: Broadway Tap
+    * `I`: Irish Dance
+    * `H`: Jazz &amp; Hip Hop
+* `S`: Troupes ([note](#antimony-protocol))
+* Tech Program
+  * `X`: Tech
+  * `W`: Workshops
+* Non-Enrollable
+  * `A`: Acting Scenes ([note](#note-about-acting-classes))
+  * `F`: Showcase Finale
+  * `G`: General Audition
+  * `K`: Prepaid Tickets
+* Other
+  * Historical courses (needed for Alumni Website)
+  * Aliases (see [Antimony Protocol](#antimony-protocol))
+
+The letters `E`, `M`, `N`, `Q`, `R`, `U`, `V`, and `Y` are not currently in use.
+
+##### Note About Acting Classes
+
+Ignoring aliases, `A` is the only letter that begins the ID's of both enrollable and non-enrollable courses.  `AA` and `AB` are [enrollable](enrollable-courses).  `AC`, `A0`-`A9`, `AX`, `AY`, and `AZ` are [non-enrollable](non-enrollable-courses).
+
+##### Antimony Protocol
+
+HST puts on 6 shows per year (7 including the Silent Auction).  Each of these shows already has one or more 2-letter abbreviations: VS or SA for the Variety Show/Silent Auction, TT or CH for the Travel Troupe Coffee House (or AI for Acting Intensive), SC for Showcase, GB for Gaithersburg Troupe, SH for Shakespeare Troupe, JR for Junior Troupe, and SR for Senior Troupe.  Of these, 4 out of 7 have an abbreviation that starts with S (SA, SC, SH and SR).  It just so happens that these four shows take place in alphabetical order.  
+
+Furthermore, if the two younger troupes' ID's (GB and JR) were changed to an S followed by the first letter of the troupe name, they would become SG and SJ, which would *still* be alpha-chronological (SA, SC, SG, SH, SJ, SR).  The only exception is Travel Troupe which falls between the Silent Auction and Showcase.  The only option for this course that maintains the order is SB, which happens to be the symbol for the chemical element [Antimony](https://en.wikipedia.org/wiki/Antimony), which everyone knows is Travel Troupes favorite periodic element!  Right?
+
+Anyway, by default, objects are always sorted by alphabetical order of their ID's, so having this order actually mean something is very helpful.
+
+The one disadvantage of the so-called "Antimony Protocol" is that it's confusing when we've been using JR and GB for so long.  This problem is solved with `CourseTrad` "aliasing".  In addition to the enrollable and non-enrollable courses, there are also 5 alias objects in the `CourseTrad` table.  These objects are called with the old non-Antimony abbreviation, but return the proper `CourseTrad` anyway.  This means that you may choose to use the Antimony or non-Antimony ID's, and you will still get the desired course.  (This logic is performed at the `ModelManager` level, so it works in almost all contexts.)
+
+### Enrollable Courses
+
+ ID  | Title                   | Ages    | Grades | Eligex                          | Note
+:---:|-------------------------|:-------:|:------:|:-------------------------------:|-------------:
+`AA` | Acting A                |  9 - 11 | 1 - 12 | `a`                             |  [1](#notes)
+`AB` | Acting B                | 12 - 18 | 1 - 12 | `a`                             |  [1](#notes)
+`C1` | Broadway Choir          | 10 - 18 | 1 - 12 | `a f`                           |  [2](#notes), [14](#notes)
+`C2` | A Cappella Choir        | 14 - 18 | 1 - 12 | `a c @`                         |  [4](#notes), [14](#notes)
+`J1` | Jazz 1                  |  9 - 12 | 1 - 12 | `< a { ay @ } >`                |  [5](#notes)
+`J2` | Jazz 2                  | 11 - 12 | 1 - 12 | `a < J2p { @ J1p } >`           |  [6](#notes)
+`J3` | Jazz 3                  | 14 - 18 | 1 - 12 | `a < J3p { @ J2p } { @ Z2p } >` |  [7](#notes)
+`J4` | Jazz 4                  | 16 - 18 | 1 - 12 | `a < J4p { @ J3p } >`           |  [6](#notes)
+`Z1` | Broadway Jazz 1         | 13 - 18 | 1 - 12 | `a`                             |  [1](#notes), [15](#notes)
+`Z2` | Broadway Jazz 2         | 13 - 18 | 1 - 12 | `a @`                           |  [3](#notes), [15](#notes)
+`T1` | Tap 1                   |  9 - 12 | 1 - 12 | `a`                             |  [1](#notes)
+`T2` | Tap 2                   | 11 - 12 | 1 - 12 | `a < T2p { @ T1p } >`           |  [6](#notes)
+`T3` | Tap 3                   | 14 - 18 | 1 - 12 | `a < T3p { @ T2p } { @ P2p } >` |  [7](#notes)
+`T4` | Tap 4                   | 16 - 18 | 1 - 12 | `a < T4p { @ T3p } >`           |  [6](#notes)
+`P1` | Broadway Tap 1          | 13 - 18 | 1 - 12 | `a`                             |  [1](#notes), [15](#notes)
+`P2` | Broadway Tap 2          | 13 - 18 | 1 - 12 | `a @`                           |  [3](#notes), [15](#notes)
+`IS` | Irish Dance Soft Shoe   |  9 - 18 | 1 - 12 | `a`                             |  [1](#notes)
+`IH` | Irish Dance Hard Shoe   | 11 - 18 | 1 - 12 | `a < I*p T*p P*p >`             |  [8](#notes)
+`HB` | Boys Jazz &amp; Hip-Hop |  9 - 12 | 1 - 12 | `a m`                           |  [2](#notes)
+`HJ` | Jazz &amp; Hip-Hop      | 13 - 18 | 1 - 12 | `a`                             |  [1](#notes)
+`SG` | Gaithersburg Troupe     | 10 - 13 | 4 -  8 | `a g A*p S*p @`                 |  [9](#notes)
+`SJ` | Junior Troupe           | 10 - 13 | 4 -  8 | `a g A*p S*p @`                 |  [9](#notes)
+`SB` | Travel Troupe           | 14 - 18 | 1 - 12 | `a A*p`                         | [11](#notes)
+`SH` | Shakespeare Troupe      | 14 - 18 | 9 - 12 | `a g A*p @`                     | [12](#notes)
+`SR` | Senior Troupe           | 14 - 18 | 9 - 12 | `a g A*p @`                     | [12](#notes)
+`WN` | Painting Workshop       | 14 - 18 | 1 - 12 | `a`                             |  [1](#notes)
+`WP` | Prop Workshop           | 14 - 18 | 1 - 12 | `a`                             |  [1](#notes)
+`WW` | Wig Workshop            | 14 - 18 | 1 - 12 | `a`                             |  [1](#notes)
+`WX` | Tech Crew Workshop      | 12 - 18 | 1 - 12 | `a`                             |  [1](#notes)
+`XA` | Tech Apps               | 12 - 18 | 1 - 12 | `a`                             |  [1](#notes)
+`XM` | Makeup Team             | 14 - 18 | 1 - 12 | `a`                             |  [1](#notes)
+`XX` | Tech Team               | 12 - 18 | 1 - 12 | `a WX`                          | [13](#notes)
+`GA` | JR/GB General Audition  | 10 - 13 | 4 -  8 | `a g A*p !S*p @`                | [10](#notes)
 
 #### Notes:
 1. Students need only meet age requirements for Acting classes, Level 1 Tap, Broadway Tap or Broadway Jazz classes, Irish Soft Shoe, Co-ed Jazz &amp; Hip-Hop, Workshops, Tech Apps, or Makeup Team,
@@ -153,107 +186,56 @@ All HST classes are referred to as "courses" in the internal code of the site, t
 7. Same as note 6, but previous enrollment in the preceding class's Broadway counterpart is also accepted.
 8. Students must meet age requirements, and have taken any Tap, Broadway Tap, or Irish class in the past.
 9. Students who meet age and grade requirements, have taken an acting class, and have already been in a troupe, may audition directly for Junior or Gaithersburg Troupe.
-10. Students who meet age and grade requirements, and have taken an acting class, but have not been a troupe, may audition jointly for both Junior and Gaithersburg Troupe.
+10. Students who meet age and grade requirements, and have taken an acting class, but have *not* been a troupe, may audition jointly for both Junior and Gaithersburg Troupe.
 11. Students who meet age requirements, and have taken an Acting class, may enroll in Travel Troupe with no audition necessary.
 12. Students who meet age and grade requirements, and have taken an acting class, may audition for Senior or Shakespeare Troupes.
 13. Students who meet the age requirements and have taken the Tech Crew Workshop (either this year or in the past) may sign up for the Tech Team.
+14. The younger choir begins with B and the older choir begins with A, so to avoid the counterintuitive situation of having each choir's name begin with the letter from the code of the other choir, the numbers 1 and 2 are used instead.
+15. "Broadway" dance courses use the *last* letter of the genre, taP and jazZ.  Another option would have been to use the first letter, but use A and B for levels 1 and 2 respectively.  There are pros and cons to both options which we can discuss.
 
-<!-- `a g A*p S*p @` | Students must meet age and grade requirements, have taken an Acting class, *and* must have already been in a troupe in order to audition for this class.  This is the eligex
-`a g A*p !S*p @` | Students must meet age and grade requirements, and have taken an Acting class, but *not* yet been in a troupe
- -->
+### Non-Enrollable Courses
 
-
-
-<!-- A*	Acting Classes
-	AA: Acting A
-	AB: Acting B
-	A0: Showcase Acting Skit #0 (rarely used) (non-enrollable)
-	A1: Showcase Acting Skit #1 (non-enrollable)
-	A2: Showcase Acting Skit #2 (non-enrollable)
-	A3: Showcase Acting Skit #3 (non-enrollable)
-	A4: Showcase Acting Skit #4 (non-enrollable)
-	A5: Showcase Acting Skit #5 (non-enrollable)
-	A6: Showcase Acting Skit #6 (non-enrollable)
-	A7: Showcase Acting Skit #7 (non-enrollable)
-	A8: Showcase Acting Skit #8 (non-enrollable)
-	A9: Showcase Acting Skit #9 (rarely used) (non-enrollable)
-	AI: -> SB (former name)
-B*	historical
-	BT: Ballet (defunct)
-C*	Choirs [Note: The numbers 1 and 2 are used instead of A and B, to avoid the counterintuitive situation of having each choir's name begin with the letter from the code of the other choir]
-	C1: Broadway Choir
-	C2: A Capella Choir
-	CH: -> SB (Coffee House)
-D*	historical
-	DI: Dance Intensive (defunct)
-E*	- not used -
-F*	Showcase Finale
-	FN: Showcase Finale, all performers in Showcase (non-enrollable)
-	F0: 12th grade showcase performers who begin the finale (non-enrollable)
-	F1: Finale Group #1 (non-enrollable)
-	F2: Finale Group #2 (non-enrollable)
-	F3: Finale Group #3 (non-enrollable)
-	F4: Finale Group #4 (non-enrollable)
-	F5: Finale Group #5 (non-enrollable)
-	F6: Finale Group #6 (non-enrollable)
-	F7: Finale Group #7 (non-enrollable)
-	F8: Finale Group #8 (non-enrollable)
-	F9: Finale Group #9 (non-enrollable)
-	FX: Finale Group #10 (non-enrollable) [Note: Use Roman Numeral X as mnemonic]
-	FY: Finale Group #11 (rarely used) (non-enrollable)
-	FZ: Finale Group #12 (rarely used) (non-enrollable)
-G*	alternate
-	GB: -> SG
-H*	Dance Class Genre: Jazz/Hip-Hop
-	HB: Boys' Jazz & Hip-Hop
-	HJ: Jazz & Hip-Hop
-I*	Dance Class Genre: Irish Stepdancing
-	IS: Irish Soft Shoe
-	IH: Irish Hard Shoe
-J*	alternate
-	JR: -> SJ
-K*	- not used -
-L*	historic
-	LN: Interpretive Sign Language (defunct)
-M*	- not used -
-N*	- not used -
-O*	- not used -
-P*	Dance Class Genre: Broadway Tap [Note: Broadway dance codes use last letter of genre]
-	P1: Broadway Tap 1
-	P2: Broadway Tap 2
-Q*	- not used -
-R*	- not used -
-S*	Acting Troupes & Shows
-	SA: Variety Show (Mnemonic: SA = Silent Auction)
-	SB: Travel Troupe (Mnemonic: Uhh... Travel Troupe is made of Antimony, right?)
-	SC: Showcase
-	SG: Gaithersburg Troupe
-	SH: Shakespeare Troupe
-	SJ: Junior Troupe
-	SR: Senior Troupe
-T*	alternate
-	TT: -> SB
-U*	- not used -
-V*	Variety Show
-	VS: -> SA
-W*	One-Time Workshops
-	WX: Tech Crew Workshop
-	WW: Wig Team Workshop
-	WP: Prop Workshop
-	WN: Painting Workshop
-X*	Tech Program
-	XA: Tech Apps
-	XM: Make up team
-	XX: Tech Team
-Y*	- not used -
-Z*	Dance Class Genre: Broadway Jazz [ See note at P* ]
-	Z1: Broadway Jazz 1
-	Z2: Broadway Jazz 2 -->
-<!-- 
-#name = 'mAcdonald'
-#regex = r'(mac)(.+)'
-#foo = re.match(regex,name,flags=re.IGNORECASE)
-# bar = Each(foo.groups()).title()
-# bar = ''.join(bar)
-#print bar
-print Each([1,2,3,4,5]).__int__ -->
+<table>
+<thead><th>ID</th><th>Course</th><th>Note</th></thead>
+<tr><td><code>AC</code></td><td>Acting Combined</td><td>Used for Showcase conflict checking</td></tr>
+<tr><td><code>A0</code></td><td>Scene #0</td><td rowspan="10">Showcase Acting Scenes</td></tr>
+<tr><td><code>A1</code></td><td>Scene #1</td></tr>
+<tr><td><code>A2</code></td><td>Scene #2</td></tr>
+<tr><td><code>A3</code></td><td>Scene #3</td></tr>
+<tr><td><code>A4</code></td><td>Scene #4</td></tr>
+<tr><td><code>A5</code></td><td>Scene #5</td></tr>
+<tr><td><code>A6</code></td><td>Scene #6</td></tr>
+<tr><td><code>A7</code></td><td>Scene #7</td></tr>
+<tr><td><code>A8</code></td><td>Scene #8</td></tr>
+<tr><td><code>A9</code></td><td>Scene #9</td></tr>
+<tr><td><code>FN</code></td><td>Showcase Finale</td><td>All Showcase students in Finale</td></tr>
+<tr><td><code>F0</code></td><td>Showcase Finale Seniors</td><td rowspan="13">Individual Finale groups</td></tr>
+<tr><td><code>F1</code></td><td>Showcase Finale Group #1</td></tr>
+<tr><td><code>F2</code></td><td>Showcase Finale Group #2</td></tr>
+<tr><td><code>F3</code></td><td>Showcase Finale Group #3</td></tr>
+<tr><td><code>F4</code></td><td>Showcase Finale Group #4</td></tr>
+<tr><td><code>F5</code></td><td>Showcase Finale Group #5</td></tr>
+<tr><td><code>F6</code></td><td>Showcase Finale Group #6</td></tr>
+<tr><td><code>F7</code></td><td>Showcase Finale Group #7</td></tr>
+<tr><td><code>F8</code></td><td>Showcase Finale Group #8</td></tr>
+<tr><td><code>F9</code></td><td>Showcase Finale Group #9</td></tr>
+<tr><td><code>FX</code></td><td>Showcase Finale Group #10 (Roman Numeral X)</td></tr>
+<tr><td><code>FY</code></td><td>Showcase Finale Group #11</td></tr>
+<tr><td><code>FZ</code></td><td>Showcase Finale Group #12</td></tr>
+<tr><td><code>KB</code></td><td>10 Prepaid Tickets to Coffee House</td><td rowspan="6">Prepaid Tickets</td></tr>
+<tr><td><code>KC</code></td><td>10 Prepaid Tickets to Showcase</td></tr>
+<tr><td><code>KG</code></td><td>10 Prepaid Tickets to Gaithersburg Troupe</td></tr>
+<tr><td><code>KH</code></td><td>10 Prepaid Tickets to Shakespeare Troupe</td></tr>
+<tr><td><code>KJ</code></td><td>10 Prepaid Tickets to Junior Troupe</td></tr>
+<tr><td><code>KR</code></td><td>10 Prepaid Tickets to Senior Troupe</td></tr>
+<tr><td><code>BT</code></td><td>Ballet</td><td rowspan="5">Historical</td></tr>
+<tr><td><code>DI</code></td><td>Dance Intensive</td></tr>
+<tr><td><code>LN</code></td><td>Interpretive Sign Language</td></tr>
+<tr><td><code>O1</code></td><td>Overture 1</td></tr>
+<tr><td><code>O2</code></td><td>Overture 2</td></tr>
+<tr><td><code>GB</code></td><td><code>GB</code> &rarr; <code>SG</code> (Gaithersburg Troupe)</td><td rowspan="5">Aliases</td></tr>
+<tr><td><code>JR</code></td><td><code>JR</code> &rarr; <code>SJ</code> (Junior Troupe)</td></tr>
+<tr><td><code>TT</code></td><td><code>TT</code> &rarr; <code>SB</code> (Travel Troupe)</td></tr>
+<tr><td><code>CH</code></td><td><code>CH</code> &rarr; <code>SB</code> (Coffee House)</td></tr>
+<tr><td><code>AI</code></td><td><code>AI</code> &rarr; <code>SB</code> (Acting Intensive)</td></tr>
+</table>

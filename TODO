@@ -47,11 +47,12 @@ Questions:
 	What did we decide about login by email?
 	Student height?
 	Antimony protocol?
-	GB/JR General Audition (Audition results interface)
 	Broadway dance courses? (JB or Z2)
+	GB/JR General Audition (Audition results interface)
 	Migrate to Postgres?
 
 Optional Features:
+	Student Special Needs fields
 	Cancel Courses
 	Do you want to be able to schedule when enrollment for a course opens?
 	Hover over course to see why student is not eligible
@@ -59,3 +60,4 @@ Optional Features:
 	Secure sessions (Django or scratch?)
 	Trade security for convenience: Confirm rather than require invoice code
 	Timeless Master Enrollment Report
+	Human-readable eligex translator
