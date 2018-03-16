@@ -49,6 +49,7 @@ A line of Eligex is case-sensitive and contains one or more "words" (separated b
 
 ### Single-Letter Words
 Note: Letters with special meanings are lowercase to avoid clashing with ID's of specific courses, represented by CAPITAL letters.
+
 Glyph | Meaning |
 :---: | --- |
 `#` | Always returns True (Mostly used for classes with no prerequisites)
@@ -130,9 +131,9 @@ Ignoring aliases, `A` is the only letter that begins the ID's of both enrollable
 
 ##### Antimony Protocol
 
-HST puts on 6 shows per year (7 including the Silent Auction).  Each of these shows already has one or more 2-letter abbreviations: VS or SA for the Variety Show/Silent Auction, TT or CH for the Travel Troupe Coffee House (or AI for Acting Intensive), SC for Showcase, GB for Gaithersburg Troupe, SH for Shakespeare Troupe, JR for Junior Troupe, and SR for Senior Troupe.  Of these, 4 out of 7 have an abbreviation that starts with S (SA, SC, SH and SR).  It just so happens that these four shows take place in alphabetical order.  
+HST produces 6 shows per year (7 including the Variety Show).  Each of these shows already has one or more 2-letter abbreviations: VS or SA for the Variety Show/Silent Auction, TT or CH for the Travel Troupe Coffee House (or AI for Acting Intensive), SC for Showcase, GB for Gaithersburg Troupe, SH for Shakespeare Troupe, JR for Junior Troupe, and SR for Senior Troupe.  Of these, 4 out of 7 have an abbreviation that starts with S (SA, SC, SH and SR).  It just so happens that these four shows are performed in alphabetical order of these abbreviations.  
 
-Furthermore, if the two younger troupes' ID's (GB and JR) were changed to an S followed by the first letter of the troupe name, they would become SG and SJ, which would *still* be alpha-chronological (SA, SC, SG, SH, SJ, SR).  The only exception is Travel Troupe which falls between the Silent Auction and Showcase.  The only option for this course that maintains the order is SB, which happens to be the symbol for the chemical element [Antimony](https://en.wikipedia.org/wiki/Antimony), which everyone knows is Travel Troupes favorite periodic element!  Right?
+Furthermore, if the two younger troupes' ID's (GB and JR) were changed to an S followed by the first letter of the troupe name, they would become SG and SJ, which would *still* be alpha-chronological (SA, SC, SG, SH, SJ, SR).  The only exception is Travel Troupe which falls between the Silent Auction and Showcase.  The only option for this course that maintains the order is SB, which happens to be the symbol for the chemical element [Antimony](https://en.wikipedia.org/wiki/Antimony), which everyone knows is Travel Troupe's favorite periodic element!  Right?
 
 Anyway, by default, objects are always sorted by alphabetical order of their ID's, so having this order actually mean something is very helpful.
 
@@ -140,8 +141,8 @@ The one disadvantage of the so-called "Antimony Protocol" is that it's confusing
 
 ### Enrollable Courses
 
- ID  | Title                   | Ages    | Grades | Eligex                          | Note
-:---:|-------------------------|:-------:|:------:|:-------------------------------:|-------------:
+ ID  | Title                   | Ages    | Grades | Eligex                          | Notes
+:---:|-------------------------|:-------:|:------:|:-------------------------------:|:------------:
 `AA` | Acting A                |  9 - 11 | 1 - 12 | `a`                             |  [1](#notes)
 `AB` | Acting B                | 12 - 18 | 1 - 12 | `a`                             |  [1](#notes)
 `C1` | Broadway Choir          | 10 - 18 | 1 - 12 | `a f`                           |  [2](#notes), [14](#notes)
@@ -177,7 +178,7 @@ The one disadvantage of the so-called "Antimony Protocol" is that it's confusing
 `GA` | JR/GB General Audition  | 10 - 13 | 4 -  8 | `a g A*p !S*p @`                | [10](#notes)
 
 #### Notes:
-1. Students need only meet age requirements for Acting classes, Level 1 Tap, Broadway Tap or Broadway Jazz classes, Irish Soft Shoe, Co-ed Jazz &amp; Hip-Hop, Workshops, Tech Apps, or Makeup Team,
+1. Students need only meet age requirements for Acting classes, Level 1 Tap, Broadway Tap or Broadway Jazz classes, Irish Soft Shoe, Co-ed Jazz &amp; Hip-Hop, Workshops, Tech Apps, or Makeup Team.
 2. Students must meet age requirements, and be a girl or boy to be in Broadway Choir or Boy's Jazz &amp; Hip-Hop respectively.
 3. Students must meet age requirements, and pass an audition or skill assessment for Level 2 Broadway Tap and Jazz classes.
 4. Students must meet age requirements, and be enrolled in at least 1 other class concurrently in order to audition for A Capella Choir.
@@ -191,14 +192,14 @@ The one disadvantage of the so-called "Antimony Protocol" is that it's confusing
 12. Students who meet age and grade requirements, and have taken an acting class, may audition for Senior or Shakespeare Troupes.
 13. Students who meet the age requirements and have taken the Tech Crew Workshop (either this year or in the past) may sign up for the Tech Team.
 14. The younger choir begins with B and the older choir begins with A, so to avoid the counterintuitive situation of having each choir's name begin with the letter from the code of the other choir, the numbers 1 and 2 are used instead.
-15. "Broadway" dance courses use the *last* letter of the genre, taP and jazZ.  Another option would have been to use the first letter, but use A and B for levels 1 and 2 respectively.  There are pros and cons to both options which we can discuss.
+15. "Broadway" dance courses use the *last* letter of the genre, taP and jazZ.  Another option would be to use the first letter, but use A and B for levels 1 and 2 respectively.  There are pros and cons to both options which we can discuss.
 
 ### Non-Enrollable Courses
 
 <table>
 <thead><th>ID</th><th>Course</th><th>Note</th></thead>
 <tr><td><code>AC</code></td><td>Acting Combined</td><td>Used for Showcase conflict checking</td></tr>
-<tr><td><code>A0</code></td><td>Scene #0</td><td rowspan="10">Showcase Acting Scenes</td></tr>
+<tr><td><code>A0</code></td><td>Scene #0 (rarely used)</td><td rowspan="10">Showcase Acting Scenes</td></tr>
 <tr><td><code>A1</code></td><td>Scene #1</td></tr>
 <tr><td><code>A2</code></td><td>Scene #2</td></tr>
 <tr><td><code>A3</code></td><td>Scene #3</td></tr>
@@ -207,7 +208,7 @@ The one disadvantage of the so-called "Antimony Protocol" is that it's confusing
 <tr><td><code>A6</code></td><td>Scene #6</td></tr>
 <tr><td><code>A7</code></td><td>Scene #7</td></tr>
 <tr><td><code>A8</code></td><td>Scene #8</td></tr>
-<tr><td><code>A9</code></td><td>Scene #9</td></tr>
+<tr><td><code>A9</code></td><td>Scene #9 (rarely used)</td></tr>
 <tr><td><code>FN</code></td><td>Showcase Finale</td><td>All Showcase students in Finale</td></tr>
 <tr><td><code>F0</code></td><td>Showcase Finale Seniors</td><td rowspan="13">Individual Finale groups</td></tr>
 <tr><td><code>F1</code></td><td>Showcase Finale Group #1</td></tr>
