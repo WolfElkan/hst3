@@ -2,9 +2,11 @@
 
   1. Clone or download to local system and navigate in Terminal to the directory where it's saved.
 
-  1. Run `pip install requirements.txt` to install dependencies.
+  1. Run `sudo apt-get install python-virtualenv` to install the Virtual Environment software.
 
-  1. Activate virtual environment.
+  1. Run `mkvirtualenv hst3env` to create a new Virtual Environment.
+
+  1. Run `source hst3env/bin/activate` to activate Virtual Environment.
 
   1. Run `python manage.py makemigrations` to create the data migration files.
 
@@ -332,6 +334,7 @@
   * Timeless Master Enrollment Report
   * Human-readable eligex translator
   * Hover over course to see why student is not eligible
+  * Tests
 
 # Other Questions
 

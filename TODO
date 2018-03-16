@@ -45,13 +45,12 @@ Admin
 Questions:
 	Beta testing?
 	What did we decide about login by email?
-	Student height?
-	Antimony protocol?
-	Broadway dance courses? (JB or Z2)
 	GB/JR General Audition (Audition results interface)
-	Migrate to Postgres?
 
 Optional Features:
+	Delete Student height?
+	Broadway dance courses? (JB or Z2)
+	Migrate to Postgres?
 	Student Special Needs fields
 	Cancel Courses
 	Do you want to be able to schedule when enrollment for a course opens?
