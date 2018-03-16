@@ -8,9 +8,9 @@
 
   1. Run `python manage.py makemigrations` to create the data migration files.
 
-  1. Start up a local MySQL server. (See settings file `HST/HST/settings.py:94-103` for MySQL settings used in development.)
+  1. Start up a local MySQL server. (See [settings file](HST/settings.py#L94) for MySQL settings used in development.)
 
-  1. Change the specs in `settings.py` to point to your MySQL server if different configuration settings were used.
+  1. Change the specs in settings file to point to your MySQL server if different configuration settings were used.
 
   1. Run `python manage.py migrate` to create the database on local server.
 
@@ -44,7 +44,7 @@
 
 ## Apps
 
-  This website contains 7 apps (located in the [apps](tree/master/apps) folder) which handle different functionalities of the site.  They are alphabetically:
+  This website contains 7 apps (located in the [apps](apps) folder) which handle different functionalities of the site.  They are alphabetically:
 
   **main** handles the static files and development views.
 
@@ -259,10 +259,10 @@
 
   Glyph | Meaning |
   :---: | --- |
-  `#` | Always returns True (Mostly used for classes with no prerequisites)
-  `~` | Always returns False (Mostly used for defunct or historical classes)
-  `a` | Returns whether the student meets the age requirements
-  `g` | Returns whether the student meets the grade requirements (Always returns true if student does not have a `grad_year` listed.  Almost always returns true since most courses are for grades 1-12)
+  `#` | Always returns True. (Mostly used for classes with no prerequisites)
+  `~` | Always returns False. (Mostly used for classes that are no longer offered)
+  `a` | Returns whether the student meets the listed age requirement.
+  `g` | Returns whether the student meets the listed grade requirement. (Always returns true if student does not have a `grad_year` listed.  Almost always returns true since most courses are for grades 1-12)
   `m` | Male: returns true for boys and false for girls
   `f` | Female: returns true for girls and false for boys
   `@` | Searches for a *successful* audition or skill assessment for the class by the student.  (If no `@` is included, word will match only actual enrollments, not auditions.)
@@ -277,7 +277,7 @@
 
 #### Enrollment Search
 
-  To require that a student have taken one HST class in order to be eligible for another, the two-letter `CourseTrad` ID of the prerequired course may be used as an Eligex word (E. g., `J2` will return True for students who are now, or have ever been, enrolled in Jazz 2).  The glyph `*` may be substituted for either character in the ID, and will match any character.  E. g., `*4` will match any Level 4 class and `T*` will match any Tap class (Note: under the current system, `T*` will *not* match Broadway Tap classes, as these begin with `P`.  Likewise, `J*` will match Jazz classes, but not Broadway Jazz classes which are matched with `Z*` See [note 15](#notes))
+  To require that a student have taken one HST class in order to be eligible for another, the two-letter `CourseTrad` ID of the prerequired course may be used as an Eligex word (E. g., `J2` will return True for students who are now, or have ever been, enrolled in Jazz 2).  The glyph `*` may be substituted for either character in the ID, and will match any character.  E. g., `*4` will match any Level 4 class and `T*` will match any Tap class (Note: under the current system, `T*` will *not* match Broadway Tap classes, as these begin with `P`.  Likewise, `J*` will match Jazz classes, but not Broadway Jazz classes which are matched with `Z*`. See [note 15](#notes))
 
   To further refine these searches, the following modifiers may be appended *after* the class's ID:
 
@@ -300,9 +300,9 @@
   :---: | ---
   `<` `>` | Words within trackets will be evaluated disjunctively, or OR'ed.  The compiler will first evaluate the expression within the trackets to see if *any* of them are true, and if so the entire tracketed expression will be treated as a single True value in the outer expression.  If all of the enclosed words evaluate as False, the tracketed expression will be evaluated as a single False value.
   `{` `}` | Braces are evaluated just like trackets, but words within them are AND'ed.  These are useful for nesting inside of trackets (AND within an OR within the default AND).  
-  `!` | Not: May be appended before a word to return the opposite value
+  `!` | Not: May be appended before a word to return the opposite value.
 
-  Note that enclosing symbols may not be nested within symbols of the same type.  `a < J2p { @ < J1p Z1p > } >` is an invalid expression because it contains trackets within trackets.  The expression `a < J2p { @ J1p } { @ Z1p } >` should be used instead with the `@` distributed.
+  Note that enclosing symbols may not be nested within symbols of the same type.  `a < J2p { @ < J1p Z1p > } >` is an invalid expression because it contains trackets within trackets.  The expression `a < J2p { @ J1p } { @ Z1p } >` should be used instead, with the `@` distributed.
 
 ## `radmin` app
 
@@ -321,7 +321,8 @@
 ## Utilities
 
 # Optional Features
-
+  
+  * More reports
   * Student Special Needs field
   * Cancel Courses
   * Do you want to be able to schedule when enrollment for a course opens?
