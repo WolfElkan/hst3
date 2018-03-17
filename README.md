@@ -2,11 +2,13 @@
 
   1. Clone or download to local system and navigate in Terminal to the directory where it's saved.
 
-  1. Run `sudo apt-get install python-virtualenv` to install the Virtual Environment software.
+  1. Run `pip install virtualenv` to install the Virtual Environment software.
 
-  1. Run `mkvirtualenv hst3env` to create a new Virtual Environment.
+  1. Run `virtualenv -p python2 hst3env` to create a new Virtual Environment.
 
   1. Run `source hst3env/bin/activate` to activate Virtual Environment.
+
+  1. Run `pip install -r requirements.txt` to install dependencies (This could take a few minutes).
 
   1. Run `python manage.py makemigrations` to create the data migration files.
 
@@ -22,15 +24,15 @@
 
   1. If application is running successfully, you will see an HST Homepage.  Click [JSON Bulk Data Interface](http://localhost:8000/seed/load/)
 
-  1. Unzip the `hst.json.zip` file. (Note: this file contains confidential contact information for HST's families and, for privacy reasons, is NOT included in this repository or anywhere else on the web.  Contact the developer for this file.)
+  1. Unzip the `hst.json.zip` file. (Note: this file contains confidential contact information for HST's families and, for privacy reasons, is NOT included in this repository or available anywhere on the web.  Contact the developer directly for this file.)
 
   1. Open `hst.json`, the file that unzips from `hst.json.zip`, in a Text Editor.  Copy the *entire text* of the file and paste it into the "JSON:" window on the application.
 
   1. Making sure you have the Terminal window visible (because it looks cool), click IMPORT.
 
-  1. Once the data is successfully imported, navigate back to the homepage, and explore the website!
+  1. Once the data is successfully imported, navigate back to the [homepage](localhost:8000), and explore the website!
 
-# Technical Documentation & User Guide
+# Technical Documentation
 
   This website is built with [Django](https://www.djangoproject.com/), a Python-based, open-source web framework.  
 
@@ -335,6 +337,7 @@
   * Human-readable eligex translator
   * Hover over course to see why student is not eligible
   * Tests
+  * Migrate to latest versions of Python, Django
 
 # Other Questions
 
