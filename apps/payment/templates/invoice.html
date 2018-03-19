@@ -63,7 +63,7 @@
 			<tr class="{{item.status}}">
 				<td>{{item.display_student}}</td>
 				<td>{{item.course}}</td>
-				<td class="money">${{item.course.tuition}}</td>
+				<td class="money">${{item.tuition}}</td>
 			</tr>
 			{% endfor %}
 			<thead class="sum">
@@ -76,6 +76,6 @@
 	</center>
 	If you would prefer to pay this invoice by check, please print this page, enclose the check, and mail to:
 	<p>HST Cultural Arts, Inc.<br>P.O. BOX 150<br>ROCKVILLE, MD<br>20848-0150</p>
-	Make sure to include this Invoice Code: {{invoice.code}}
+	Make sure to the page includes this Invoice Code: {{invoice.code}}
 </body>
 </html>

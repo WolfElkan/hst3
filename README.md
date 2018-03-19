@@ -1,12 +1,16 @@
 # Local Installation
 
-  1. Clone or download to local system and navigate in Terminal to the directory where it's saved.
+  1. Navigate to the folder where you want to store this project.
+
+  1. Run `git clone https://github.com/WolfElkan/hst3.git` to clone project to this folder. (Or download and unzip it.)
 
   1. Run `pip install virtualenv` to install the Virtual Environment software.
 
   1. Run `virtualenv -p python2 hst3env` to create a new Virtual Environment.
 
   1. Run `source hst3env/bin/activate` to activate Virtual Environment.
+
+  1. Navigate into project folder (`cd hst3`)
 
   1. Run `pip install -r requirements.txt` to install dependencies (This could take a few minutes).
 
@@ -56,17 +60,17 @@
 
   **people** handles the students, families and faculty, as well as new family sign up.
 
-  **program** handles the HST curriculum, including courses, enrollments and student eligibility.  (This app is unrelated to the printed program handed out at shows to audience members, and the name of the app may be changed [if desired](#optional-features).)
+  **program** handles the HST curriculum, including courses, enrollments and student eligibility.  (This app is unrelated to the printed program handed out at shows to audience members, and the name of the app may be changed [if desired](issues/17).)
 
   **radmin** handles administrative tasks such as invoice processing, audition results and course creation.  It would have been called `admin` but that clashes with the Django backend.  Besides we're rad enough, aren't we?
 
-  **reports** handles the printable course rosters and any other printed reports.  New reports can be added [very quickly](#optional-features)
+  **reports** handles the printable course rosters and any other printed reports.  New reports can be added [very quickly](issues/2)
 
   **rest** is a slightly buggy backend database interface.  This app handles the pages that tech support would be looking at when helping customers.  
 
 ### Low-Priority Apps
 
-  These apps are not necessary for the May signup blitz, and theoretically could be built over the summer.  (However, I probably can also have them ready before the 2018 shows [if needed](#optional-features))
+  These apps are not necessary for the May signup blitz, and theoretically could be built over the summer.  (However, I probably can also have them ready before the 2018 shows if needed:
 
   **shows** would handle scene conflicts, and anything else related only to the shows.
 
@@ -145,49 +149,50 @@
 
   Furthermore, if the two younger troupes' ID's (GB and JR) were changed to an S followed by the first letter of the troupe name, they would become SG and SJ, which would *still* be alpha-chronological (SA, SC, SG, SH, SJ, SR).  The only exception is Travel Troupe which falls between the Silent Auction and Showcase.  The only option for this course that maintains the order is SB, which happens to be the symbol for the chemical element [Antimony](https://en.wikipedia.org/wiki/Antimony), which everyone knows is Travel Troupe's favorite periodic element!  Right?
 
-  Anyway, by default, objects are always sorted by alphabetical order of their ID's, so having this order actually mean something is very helpful.
+  Anyway, by default, objects are always sorted by alphabetical order of their ID's, so having this order actually mean something is very helpful.  Also, for many internal functions, (particularly [Eligex](#eligex)) it is necessary to be able to distinguish different types of courses from their ID's alone, so having all troupe ID's begin with S is helpful here as well.
 
-  The one disadvantage of the so-called "Antimony Protocol" is that it's confusing when we've been using JR and GB for so long.  This problem is solved with `CourseTrad` "aliasing".  In addition to the enrollable and non-enrollable courses, there are also 5 alias objects in the `CourseTrad` table.  These objects are called with the old non-Antimony abbreviation, but return the proper `CourseTrad` anyway.  This means that you may choose to use the Antimony or non-Antimony ID's, and you will still get the desired course.  (This logic is performed at the `ModelManager` level, so it works in almost all contexts.)
+  The one disadvantage of the so-called "Antimony Protocol" is that it's confusing since we've been using JR and GB for so long.  This problem is solved with `CourseTrad` "aliasing".  In addition to the enrollable and non-enrollable courses, there are also 5 alias objects in the `CourseTrad` table.  These objects are called with the old non-Antimony abbreviation, but return the proper `CourseTrad` anyway.  **This means that you may use the Antimony or non-Antimony ID's, and you will still get the desired course.**  (This logic is performed at the `ModelManager` level, so it works in almost all contexts.)
 
 #### Enrollable Courses
 
    ID  | Title                   | Ages    | Grades | Eligex                          | Notes
   :---:|-------------------------|:-------:|:------:|:-------------------------------:|:------------:
-  `AA` | Acting A                |  9 - 11 | 1 - 12 | `a`                             |  [1](#notes)
-  `AB` | Acting B                | 12 - 18 | 1 - 12 | `a`                             |  [1](#notes)
-  `C1` | Broadway Choir          | 10 - 18 | 1 - 12 | `a f`                           |  [2](#notes), [14](#notes)
-  `C2` | A Cappella Choir        | 14 - 18 | 1 - 12 | `a c @`                         |  [4](#notes), [14](#notes)
-  `J1` | Jazz 1                  |  9 - 12 | 1 - 12 | `< a { ay @ } >`                |  [5](#notes)
-  `J2` | Jazz 2                  | 11 - 12 | 1 - 12 | `a < J2p { @ J1p } >`           |  [6](#notes)
-  `J3` | Jazz 3                  | 14 - 18 | 1 - 12 | `a < J3p { @ J2p } { @ Z2p } >` |  [7](#notes)
-  `J4` | Jazz 4                  | 16 - 18 | 1 - 12 | `a < J4p { @ J3p } >`           |  [6](#notes)
-  `Z1` | Broadway Jazz 1         | 13 - 18 | 1 - 12 | `a`                             |  [1](#notes), [15](#notes)
-  `Z2` | Broadway Jazz 2         | 13 - 18 | 1 - 12 | `a @`                           |  [3](#notes), [15](#notes)
-  `T1` | Tap 1                   |  9 - 12 | 1 - 12 | `a`                             |  [1](#notes)
-  `T2` | Tap 2                   | 11 - 12 | 1 - 12 | `a < T2p { @ T1p } >`           |  [6](#notes)
-  `T3` | Tap 3                   | 14 - 18 | 1 - 12 | `a < T3p { @ T2p } { @ P2p } >` |  [7](#notes)
-  `T4` | Tap 4                   | 16 - 18 | 1 - 12 | `a < T4p { @ T3p } >`           |  [6](#notes)
-  `P1` | Broadway Tap 1          | 13 - 18 | 1 - 12 | `a`                             |  [1](#notes), [15](#notes)
-  `P2` | Broadway Tap 2          | 13 - 18 | 1 - 12 | `a @`                           |  [3](#notes), [15](#notes)
-  `IS` | Irish Dance Soft Shoe   |  9 - 18 | 1 - 12 | `a`                             |  [1](#notes)
-  `IH` | Irish Dance Hard Shoe   | 11 - 18 | 1 - 12 | `a < I*p T*p P*p >`             |  [8](#notes)
-  `HB` | Boys Jazz &amp; Hip-Hop |  9 - 12 | 1 - 12 | `a m`                           |  [2](#notes)
-  `HJ` | Jazz &amp; Hip-Hop      | 13 - 18 | 1 - 12 | `a`                             |  [1](#notes)
+  `AA` | Acting A                |  9 - 11 |        | `a`                             |  [1](#notes)
+  `AB` | Acting B                | 12 - 18 |        | `a`                             |  [1](#notes)
+  `C1` | Broadway Choir          | 10 - 18 |        | `a f`                           |  [2](#notes), [14](#notes)
+  `C2` | A Cappella Choir        | 14 - 18 |        | `a c @`                         |  [4](#notes), [14](#notes)
+  `J1` | Jazz 1                  |  9 - 12 |        | `< a { ay @ } >`                |  [5](#notes)
+  `J2` | Jazz 2                  | 11 - 12 |        | `a < J2p { @ J1p } >`           |  [6](#notes)
+  `J3` | Jazz 3                  | 14 - 18 |        | `a < J3p { @ J2p } { @ Z2p } >` |  [7](#notes)
+  `J4` | Jazz 4                  | 16 - 18 |        | `a < J4p { @ J3p } >`           |  [6](#notes)
+  `Z1` | Broadway Jazz 1         | 13 - 18 |        | `a`                             |  [1](#notes), [15](#notes)
+  `Z2` | Broadway Jazz 2         | 13 - 18 |        | `a @`                           |  [3](#notes), [15](#notes)
+  `T1` | Tap 1                   |  9 - 12 |        | `a`                             |  [1](#notes)
+  `T2` | Tap 2                   | 11 - 12 |        | `a < T2p { @ T1p } >`           |  [6](#notes)
+  `T3` | Tap 3                   | 14 - 18 |        | `a < T3p { @ T2p } { @ P2p } >` |  [7](#notes)
+  `T4` | Tap 4                   | 16 - 18 |        | `a < T4p { @ T3p } >`           |  [6](#notes)
+  `P1` | Broadway Tap 1          | 13 - 18 |        | `a`                             |  [1](#notes), [15](#notes)
+  `P2` | Broadway Tap 2          | 13 - 18 |        | `a @`                           |  [3](#notes), [15](#notes)
+  `IS` | Irish Dance Soft Shoe   |  9 - 18 |        | `a`                             |  [1](#notes)
+  `IH` | Irish Dance Hard Shoe   | 11 - 18 |        | `a < I*p T*p P*p >`             |  [8](#notes)
+  `HB` | Boys Jazz &amp; Hip-Hop |  9 - 12 |        | `a m`                           |  [2](#notes)
+  `HJ` | Jazz &amp; Hip-Hop      | 13 - 18 |        | `a`                             |  [1](#notes)
   `SG` | Gaithersburg Troupe     | 10 - 13 | 4 -  8 | `a g A*p S*p @`                 |  [9](#notes)
   `SJ` | Junior Troupe           | 10 - 13 | 4 -  8 | `a g A*p S*p @`                 |  [9](#notes)
-  `SB` | Travel Troupe           | 14 - 18 | 1 - 12 | `a A*p`                         | [11](#notes)
+  `SB` | Travel Troupe           | 14 - 18 |        | `a A*p`                         | [11](#notes)
   `SH` | Shakespeare Troupe      | 14 - 18 | 9 - 12 | `a g A*p @`                     | [12](#notes)
   `SR` | Senior Troupe           | 14 - 18 | 9 - 12 | `a g A*p @`                     | [12](#notes)
-  `WN` | Painting Workshop       | 14 - 18 | 1 - 12 | `a`                             |  [1](#notes)
-  `WP` | Prop Workshop           | 14 - 18 | 1 - 12 | `a`                             |  [1](#notes)
-  `WW` | Wig Workshop            | 14 - 18 | 1 - 12 | `a`                             |  [1](#notes)
-  `WX` | Tech Crew Workshop      | 12 - 18 | 1 - 12 | `a`                             |  [1](#notes)
-  `XA` | Tech Apps               | 12 - 18 | 1 - 12 | `a`                             |  [1](#notes)
-  `XM` | Makeup Team             | 14 - 18 | 1 - 12 | `a`                             |  [1](#notes)
-  `XX` | Tech Team               | 12 - 18 | 1 - 12 | `a WX`                          | [13](#notes)
+  `WN` | Painting Workshop       | 14 - 18 |        | `a`                             |  [1](#notes)
+  `WP` | Prop Workshop           | 14 - 18 |        | `a`                             |  [1](#notes)
+  `WW` | Wig Workshop            | 14 - 18 |        | `a`                             |  [1](#notes)
+  `WX` | Tech Crew Workshop      | 12 - 18 |        | `a`                             |  [1](#notes)
+  `XA` | Tech Apps               | 12 - 18 |        | `a`                             |  [1](#notes)
+  `XM` | Makeup Team             | 14 - 18 |        | `a`                             |  [1](#notes)
+  `XX` | Tech Team               | 12 - 18 |        | `a WX`                          | [13](#notes)
   `GA` | JR/GB General Audition  | 10 - 13 | 4 -  8 | `a g A*p !S*p @`                | [10](#notes)
 
 ##### Notes:
+
   1. Students need only meet age requirements for Acting classes, Level 1 Tap, Broadway Tap or Broadway Jazz classes, Irish Soft Shoe, Co-ed Jazz &amp; Hip-Hop, Workshops, Tech Apps, or Makeup Team.
   2. Students must meet age requirements, and be a girl or boy to be in Broadway Choir or Boy's Jazz &amp; Hip-Hop respectively.
   3. Students must meet age requirements, and pass an audition or skill assessment for Level 2 Broadway Tap and Jazz classes.
@@ -263,14 +268,14 @@
 
   Glyph | Meaning |
   :---: | --- |
-  `#` | Always returns True. (Mostly used for classes with no prerequisites)
-  `~` | Always returns False. (Mostly used for classes that are no longer offered)
+  `#` | Always returns `True`. (Mostly used for classes with no prerequisites)
+  `~` | Always returns `False`. (Mostly used for classes that are no longer offered)
   `a` | Returns whether the student meets the listed age requirement.
-  `g` | Returns whether the student meets the listed grade requirement. (Always returns true if student does not have a `grad_year` listed.  Almost always returns true since most courses are for grades 1-12)
-  `m` | Male: returns true for boys and false for girls
-  `f` | Female: returns true for girls and false for boys
-  `@` | Searches for a *successful* audition or skill assessment for the class by the student.  (If no `@` is included, word will match only actual enrollments, not auditions.)
-  `%` | Returns the value of the global variable `DEV`.  (True in development &amp; testing, False in production.)
+  `g` | Returns whether the student meets the listed grade requirement. (Always returns `True` if student does not have a `grad_year` listed.  Almost always returns `True` since most courses are for grades 1-12)
+  `m` | Male: returns `True` for boys and `False` for girls
+  `f` | Female: returns `True` for girls and `False` for boys
+  `@` | Returns `True` if student has completed a successful audition or skill assessment for this class.  Returns `False` otherwise
+  `%` | Returns the value of the global variable `DEV`.  (`True` in development &amp; testing, `False` in production.)
 
 #### Single-Letter Modifiers
 
@@ -281,7 +286,7 @@
 
 #### Enrollment Search
 
-  To require that a student have taken one HST class in order to be eligible for another, the two-letter `CourseTrad` ID of the prerequired course may be used as an Eligex word (E. g., `J2` will return True for students who are now, or have ever been, enrolled in Jazz 2).  The glyph `*` may be substituted for either character in the ID, and will match any character.  E. g., `*4` will match any Level 4 class and `T*` will match any Tap class (Note: under the current system, `T*` will *not* match Broadway Tap classes, as these begin with `P`.  Likewise, `J*` will match Jazz classes, but not Broadway Jazz classes which are matched with `Z*`. See [note 15](#notes))
+  To require that a student have taken one HST class in order to be eligible for another, the two-letter `CourseTrad` ID of the prerequired course may be used as an Eligex word (E. g., `J2` will return True for students who are now, or have ever been, enrolled in a Jazz 2 class).  The glyph `*` may be substituted for either character in the ID, and will match any character.  E. g., `*4` will match any Level 4 class and `T*` will match any Tap class (Note: under the current system, `T*` will *not* match Broadway Tap classes, as these begin with `P`.  Likewise, `J*` will match Jazz classes, but not Broadway Jazz classes which are matched with `Z*`. See [note 15](#notes))
 
   To further refine these searches, the following modifiers may be appended *after* the class's ID:
 
@@ -292,9 +297,9 @@
   `$` | Will match only enrollments for which tuition has been paid
   `+` | Will match enrollments by anyone in student's family
 
-  Note: A student is considered eligible to audition for a course if they *would* be eligible to enroll in it, if they had passed an audition.
+  A student is considered eligible to audition for a course if they *would* be eligible to enroll in it, if they had passed an audition.
 
-  Note: Presents go under Christmas Trees, not in Eligexes.  If you put a `p` after an eligex word in the hopes of matching "present" enrollments, you will be disappointed.
+  A common mistake is to think `p` stands for "present", and append it after a `CourseTrad` ID to find present enrollments.  This will not work.  A good mnemonic for this is that presents go under Christmas Trees, not in Eligexes.
 
 #### Boolean Operators
 
@@ -310,7 +315,19 @@
 
 ## `radmin` app
 
+### Invoice Check Acceptance
+
+### Audition Results
+
+### New Year
+
 ## `reports` app
+
+### Master Enrollment Report
+
+  Links to `rest` framework.
+
+### Class Rosters
 
 ## `rest` app
 
@@ -324,23 +341,3 @@
 
 ## Utilities
 
-# Optional Features
-  
-  * More reports
-  * Student Special Needs field
-  * Cancel Courses
-  * Do you want to be able to schedule when enrollment for a course opens?
-  * Partial Invoice Payment
-  * Secure sessions (Django or scratch?)
-  * Trade security for convenience: Confirm rather than require invoice code
-  * Timeless Master Enrollment Report
-  * Human-readable eligex translator
-  * Hover over course to see why student is not eligible
-  * Tests
-  * Migrate to latest versions of Python, Django
-
-# Other Questions
-
-  * Beta testing?
-  * What did we decide about login by email?
-  * GB/JR General Audition (Audition results interface)

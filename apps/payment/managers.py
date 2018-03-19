@@ -6,12 +6,21 @@ from Utils.security import getyear
 from Utils.data import Each
 from django_mysql import models as sqlmod
 from datetime import datetime
+from trace import DEV
 
 from apps.program.managers import Enrollments
 
+class DiscountManager(sm.SuperManager):
+	def __init__(self):
+		super(DiscountManager, self).__init__('payment.DiscountManager')
+	# def create(self, **kwargs):
+	# 	return super(DiscountManager, self).create(**kwargs)
+Discounts = DiscountManager()
+
+
 class InvoiceManager(sm.SuperManager):
 	def __init__(self):
-		super(InvoiceManager, self).__init__('main.InvoiceManager')
+		super(InvoiceManager, self).__init__('payment.InvoiceManager')
 		self.fields = []
 		self.validations = [
 			sm.Present('id','Please enter the 6-digit Invoice ID (Probably {:02d}xxxx)'.format(getyear()%100)),
@@ -34,6 +43,13 @@ class InvoiceManager(sm.SuperManager):
 			q.invoice = this
 			q.status = 'invoiced'
 			q.save()
+		amount = this.update_amount()
+		if DEV:
+			Discounts.create(
+				amount=amount.__mul__(99).shift(-2), 
+				title='Total divided by 100 for testing.',
+				invoice=this
+			)
 		this.update_amount()
 		return this
 Invoices = InvoiceManager()

@@ -1,6 +1,6 @@
-	Documentation
+-	Documentation
 
-	Check all REST routes
+X	Check all REST routes
 
 Student Interface
 	Make titles of required fields bold automatically
@@ -19,7 +19,7 @@ rest
 	support /add/[mo|fa]ther
 	Give Widgets control over whether static values are rendered safely
 
-	LINK WITH PAYPAL
+>	LINK WITH PAYPAL
 
 	__json__ -> _json_
 
@@ -41,22 +41,24 @@ Security
 Admin
 	403
 	404
+	/ redirect
 
 Questions:
-	Beta testing?
-	What did we decide about login by email?
-	GB/JR General Audition (Audition results interface)
+>	Beta testing?
+>	What did we decide about login by email?
+>	GB/JR General Audition (Audition results interface)
 
 Optional Features:
-	Delete Student height?
+	Finale Groups
+>	Delete Student height?
 	Broadway dance courses? (JB or Z2)
 	Migrate to Postgres?
-	Student Special Needs fields
-	Cancel Courses
-	Do you want to be able to schedule when enrollment for a course opens?
-	Hover over course to see why student is not eligible
-	Partial Invoice Payment
-	Secure sessions (Django or scratch?)
-	Trade security for convenience: Confirm rather than require invoice code
-	Timeless Master Enrollment Report
-	Human-readable eligex translator
+>	Student Special Needs fields
+>	Cancel Courses
+>	Do you want to be able to schedule when enrollment for a course opens?
+>	Hover over course to see why student is not eligible
+>	Partial Invoice Payment
+>	Secure sessions (Django or scratch?)
+>	Trade security for convenience: Confirm rather than require invoice code
+>	Timeless Master Enrollment Report
+>	Human-readable eligex translator

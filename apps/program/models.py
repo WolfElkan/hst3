@@ -241,6 +241,7 @@ class Course(models.Model):
 	id         = models.CharField(max_length=4, primary_key=True)
 	year       = models.DecimalField(max_digits=4, decimal_places=0)
 	tradition  = models.ForeignKey(CourseTrad, unique_for_year=True, db_column='trad_id')
+	title      = models.CharField(max_length=50)
 	last_date  = models.DateField(null=True)
 	aud_date   = models.DateField(null=True)
 	teacher    = models.ForeignKey('people.Teacher', null=True)
@@ -350,7 +351,7 @@ class Course(models.Model):
 		if field in ['students_toggle_enrollments','students','enrollments','prepaid']:
 			call = super(Course, self).__getattribute__(field)
 			return call()
-		elif '_' not in field and field not in ['audible','clean','delete','eligible','enroll','id','objects','pk','save','tradition'] and hasattr(CourseTrad, field):
+		elif '_' not in field and field not in ['audible','clean','delete','eligible','enroll','id','objects','pk','save','title','tradition'] and hasattr(CourseTrad, field):
 			return super(Course, self).__getattribute__('tradition').__getattribute__(field)
 		else:
 			return super(Course, self).__getattribute__(field)

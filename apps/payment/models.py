@@ -1,7 +1,9 @@
 from django.db import models
 
-from apps.program.managers import Enrollments
-from .managers import Invoices
+from apps.program.managers import Enrollments, Courses
+from apps.program.models import Enrollment
+from apps.people.managers import Students
+from .managers import Invoices, Discounts
 
 from Utils import custom_fields as custom
 from Utils import supermodel as sm
@@ -35,17 +37,21 @@ class Invoice(models.Model):
 	updated_at = models.DateTimeField(auto_now=True)
 	objects = Invoices
 	def items(self):
-		return Enrollments.filter(invoice=self, phantom=True)
+		return list(Enrollments.filter(invoice=self, phantom=True)) + list(Discounts.filter(invoice=self))
 	def calc_amount(self):
 		amount = Decimal(0)
 		for q in self.items:
-			amount += q.course.tuition
+			if type(q) is Enrollment:
+				amount += q.course.tuition
+			elif type(q) is Discount:
+				amount -= q.amount
 		return amount
 		# return sum(Each(self.items).course.tuition)
 	def update_amount(self):
 		if self.status == 'N':
 			self.amount = self.calc_amount()
 			self.save()
+			return self.amount
 	def cancel(self):
 		if self.status == 'N':
 			for item in self.items:
@@ -59,4 +65,19 @@ class Invoice(models.Model):
 			return call()
 		else:
 			return super(Invoice, self).__getattribute__(field)
-		
+
+class Discount(models.Model):
+	objects    = Discounts
+	amount     = models.DecimalField(max_digits=6, decimal_places=2, default=0)
+	title      = models.CharField(max_length=50)
+	invoice    = models.ForeignKey(Invoice)
+	display_student = 'Discount:'
+	def tuition(self):
+		return '({})'.format(self.amount)
+	def __getattribute__(self, field):
+		if field in ['tuition']:
+			call = super(Discount, self).__getattribute__(field)
+			return call()
+		else:
+			return super(Discount, self).__getattribute__(field)
+				

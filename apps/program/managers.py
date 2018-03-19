@@ -23,7 +23,7 @@ class CourseManager(sm.SuperManager):
 		super(CourseManager, self).__init__('program_course')
 	def create(self, **data):
 		# Inherit these fields from Tradition, unless overridden.
-		for field in ['tuition','vol_hours','the_hours']:
+		for field in ['tuition','vol_hours','the_hours','title']:
 			if field not in data:
 				data[field] = data['tradition'].__getattribute__(field)
 		data['id'] = str(int(data['year'])%100).zfill(2)+data['tradition'].id
