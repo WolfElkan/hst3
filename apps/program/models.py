@@ -483,6 +483,10 @@ class Enrollment(models.Model):
 		elif self.status in ["aud_pend","need_pay"]:
 			self.delete()
 			self.student.family.fate()
+		elif self.status == "invoiced":
+			invoice = self.invoice
+			self.delete()
+			invoice.update_amount()
 	def cancel(self):
 		if self.status == "invoiced":
 			self.status = "nonexist"
