@@ -58,6 +58,8 @@ urlpatterns = [
 	url(r'^register/invoice/(?P<id>\d+)/?$',payment.invoice_show),
 	url(r'^register/invoice/(?P<id>\d+)/paypal/?$',payment.paypal_pay),
 	url(r'^ipn/(?P<csrf>([0-9a-fA-F]-?){32})$', payment.paypal_ipn),
+
+	url(r'^family/(?P<family_id>\d+)/invoices/?$',payment.invoice_index),
 	
 	url(r'^hot/?$', dev.hot),
 	url(r'^run/?$', dev.run),

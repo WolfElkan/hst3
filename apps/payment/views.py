@@ -12,15 +12,13 @@ from Utils.custom_fields import Bcrypt, PhoneNumber
 from Utils.data  import collect, copy, copyatts, cleandate
 from Utils.fjson import FriendlyEncoder, json
 from Utils.misc  import namecase, cleanhex
-from Utils.security import authorized, getme, getyear
+from Utils.security import authorized, getme, getyear, gethist
 from Utils.seshinit import seshinit, forminit
 
 from urllib import urlencode
 from urllib2 import urlopen
 
 from datetime import datetime
-
-# Create your views here.
 
 def invoice_create(request):
 	me = getme(request)
@@ -37,6 +35,14 @@ def invoice_show(request, id):
 		'host'   : 'https://{}'.format(CURRENT_HOST)
 	}
 	return render(request, 'invoice.html', context)
+
+def invoice_index(request, family_id):
+	family = Families.fetch(id=family_id)
+	invoices = Invoices.filter(family=family)
+	context = {
+		'hist' : collect(gethist(0), lambda year: {'year':year, 'invoices':Invoices.filter(year=year,family=family)})
+	}
+	return render(request, 'invoice_index.html', context)
 
 def find_invoice(request, **kwargs):
 	forminit(request,'invoice',['id','code'])

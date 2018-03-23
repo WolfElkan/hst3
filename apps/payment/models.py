@@ -39,6 +39,8 @@ class Invoice(models.Model):
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
 	objects = Invoices
+	def __str__(self):
+		return "Invoice #{}".format(self.id)
 	def items(self):
 		return Enrollments.filter(invoice=self, phantom=True)
 	def calc_amount(self):

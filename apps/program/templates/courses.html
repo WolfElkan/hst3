@@ -65,7 +65,7 @@
 	.center {
 		text-align: center;
 	}
-	button {
+	button, a.view {
 		display: none;
 	}
 	/*Bold Black on White*/
@@ -81,7 +81,7 @@
 		.invoiced form.drop button {display: inline;}
 	/*Green*/
 	.enrolled {background-color: #8f8}
-		.enrolled form.view button {display: inline;}
+		.enrolled a.view {display: inline;}
 	/*Yellow*/
 	.need_pay {background-color: #ff8}
 		.need_pay form.drop button {display: inline;}
@@ -153,10 +153,8 @@
 							<input type="hidden" name="status" value="{{enr.status}}">
 							<button>Drop</button>
 						</form>
-						<form class="view" action="/register/invoice/{{enr.invoice_id}}">
-							<button {% if not enr.invoice_id %}disabled{% endif %}>View</button>
-						</form>
 						<button class="enroll_disabled" disabled>Enroll</button>
+						<a class="view" href="/register/invoice/{{enr.invoice_id}}">Invoice</a>
 					</td>
 					<td class="center">{{enr.course.title}}</td>
 					<td>{{enr.course.day.short}}</td>
@@ -213,6 +211,7 @@
 	</table>
 	<form method="POST" action="/register/process/">{% csrf_token %}
 		<button {% if not invoiceable %} disabled {% endif %} class="invoice">Generate Invoice</button>
+		<a href="/family/{{family.id}}/invoices/">Show Invoices</a>
 	</form>
 </div>
 <div class="pane">

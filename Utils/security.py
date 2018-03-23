@@ -25,9 +25,9 @@ from datetime import datetime
 from trace import DEV
 
 from apps.program.managers import Courses
-def gethist():
+def gethist(ago=1):
 	years = []
-	for year in range(getyear()-1,1994,-1):
+	for year in range(getyear()-ago,1994,-1):
 		if Courses.filter(year=year):
 			years.append(year)
 	return years

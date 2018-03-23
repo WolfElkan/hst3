@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>HST | Invoices</title>
+</head>
+<body>
+	<a href="/myaccount/courses">&larr; Back to Course Selection</a>
+	{% for year in hist %}
+	<h2>{{year.year}}</h2>
+		{% for invoice in year.invoices %}
+		<a href="/register/invoice/{{invoice.id}}">{{invoice}}</a><br>
+		{% endfor %}
+	{% endfor %}
+</body>
+</html>
