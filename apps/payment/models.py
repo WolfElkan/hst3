@@ -29,7 +29,6 @@ class Invoice(models.Model):
 	status = models.CharField(max_length=1,default='N',choices=status_choices)
 	year = models.DecimalField(max_digits=4, decimal_places=0)
 	code = models.UUIDField(default=uuid.uuid4, editable=False)
-	priv = models.UUIDField(default=uuid.uuid4, editable=False)
 	                                             # Check:        PayPal:
 	memo = models.TextField(default='')          # Memo line     custom
 	payment_id = models.CharField(max_length=20) # Check Number  txn_id

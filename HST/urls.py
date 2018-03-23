@@ -32,8 +32,8 @@ import apps.reports.views as reports
 import apps.rest.seed     as seed
 
 urlpatterns = [
-	url(r'^$', main.index),
 
+	url(r'^$', main.index),
 
 	url(r'^login/?$', main.login),
 	url(r'^logout/?$', main.logout),
@@ -93,12 +93,6 @@ urlpatterns = [
 	url(r'^admin/auditions/(?P<id>\d\d\w\w)/?$', program.audition_results),
 	url(r'^admin/auditions/(?P<id>\d\d\w\w)/process/?$', program.audition_process),
 
-	url(r'^admin/invoice/find/?$', payment.find_invoice),
-	url(r'^admin/invoice/(?P<id>\d{6})/?$', radmin.invoice),
-	url(r'^admin/invoice/(?P<id>\d{6})/(?P<method>check|cash|paypal)\??$', radmin.invoice),
-	url(r'^admin/invoice/(?P<id>\d{6})/deposit/?$', radmin.invoice_deposit),
-	url(r'^admin/invoice/(?P<id>\d{6})/clear/?$', radmin.invoice_clear),
-
 	url(r'^admin/newyear/year/?$', radmin.newyear_year),
 
 	url(r'^rest/(show|edit)/(?P<model>[a-zA-Z]+)/(?P<id>\d+|(\d\d)?\w\w)/add/(?P<foreign_model>[a-zA-Z]+)/?$', rest.new),
@@ -107,4 +101,5 @@ urlpatterns = [
 	url(r'^seed/load/?$', seed.load),
 	url(r'^seed/dump/?$', seed.dump),
 	url(r'^seed/nuke/?$', seed.nuke),
+
 ]
