@@ -9,7 +9,7 @@
 		vertical-align: top;
 	}
 	h2 {
-		margin: 0;
+		/*margin: 0;*/
 		text-align: center;
 	}
 	.student_menu {
@@ -215,38 +215,42 @@
 		<button {% if not invoiceable %} disabled {% endif %} class="invoice">Generate Invoice</button>
 	</form>
 </div>
-<table class="legend">
-	<tr class="eligible">
-		<td>Student is eligible to enroll in this class.</td>
-	</tr>
-	<tr class="aud_need">
-		<td>Student is eligible for an audition or skill assessment for this class.</td>
-	</tr>
-	<tr class="not_elig">
-		<td>Student is not eligible for this class.</td>
-	</tr>
-	<tr class="need_cur">
-		<td>Student will be eligible, but must enroll in at least 1 other class first.</td>
-	</tr>
-	<tr class="conflict">
-		<td>Student is registered for another class at the same time as this.</td>
-	</tr>
-	<tr class="aud_pend">
-		<td>Student has scheduled an audition or skill assessment for this class.</td>
-	</tr>
-<!-- 	<tr class="aud_pass">
-		<td>Student passed an audition for this class and may now enroll in it.</td>
-	</tr> -->
-	<tr class="need_pay">
-		<td>This class has been added to the cart, pending tuition payment.</td>
-	</tr>
-	<tr class="invoiced">
-		<td>Student's registration for this class is on an unpaid invoice.</td>
-	</tr>
-	<tr class="enrolled">
-		<td>Student is successfully enrolled this class.</td>
-	</tr>
-</table>
+<div class="pane">
+	<h2><u>Legend</u></h2>
+	<table class="legend">
+		<tr class="eligible">
+			<td>Student is eligible to enroll in this class.</td>
+		</tr>
+		<tr class="aud_need">
+			<td>Student is eligible for an audition or skill assessment for this class.</td>
+		</tr>
+		<tr class="not_elig">
+			<td>Student is not eligible for this class.</td>
+		</tr>
+		<tr class="need_cur">
+			<td>Student will be eligible, but must enroll in at least 1 other class first.</td>
+		</tr>
+		<tr class="conflict">
+			<td>Student is registered for another class at the same time as this.</td>
+		</tr>
+		<tr class="aud_pend">
+			<td>Student has scheduled an audition or skill assessment for this class.</td>
+		</tr>
+	<!-- 	<tr class="aud_pass">
+			<td>Student passed an audition for this class and may now enroll in it.</td>
+		</tr> -->
+		<tr class="need_pay">
+			<td>This class has been added to the cart, pending tuition payment.</td>
+		</tr>
+		<tr class="invoiced">
+			<td>Student's registration for this class is on an unpaid invoice.</td>
+		</tr>
+		<tr class="enrolled">
+			<td>Student is successfully enrolled this class.</td>
+		</tr>
+	</table>
+	
+</div>
 
 </body>
 </html>

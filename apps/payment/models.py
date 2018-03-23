@@ -40,7 +40,7 @@ class Invoice(models.Model):
 	updated_at = models.DateTimeField(auto_now=True)
 	objects = Invoices
 	def items(self):
-		return list(Enrollments.filter(invoice=self, phantom=True)) + list(Discounts.filter(invoice=self))
+		return Enrollments.filter(invoice=self, phantom=True)
 	def calc_amount(self):
 		amount = Decimal(0)
 		for q in self.items:
@@ -62,10 +62,10 @@ class Invoice(models.Model):
 				item.save()
 			self.status = 'C'
 			self.save()
-	def pay(self):
+	def pay(self, ipn):
 		if self.status == 'N':
 			for item in self.items:
-				if item.status == "need_pay":
+				if item.status == "invoiced":
 					item.status = "enrolled"
 					item.save()
 			self.status = 'P'
@@ -77,33 +77,18 @@ class Invoice(models.Model):
 		else:
 			return super(Invoice, self).__getattribute__(field)
 
-class Discount(models.Model):
-	objects    = Discounts
-	amount     = models.DecimalField(max_digits=6, decimal_places=2, default=0)
-	course     = models.CharField(max_length=50)
-	invoice    = models.ForeignKey(Invoice)
-	rest_model = 'discount'
-	display_student = 'Discount:'
-	def tuition(self):
-		return '({})'.format(self.amount)
-	def __getattribute__(self, field):
-		if field in ['tuition']:
-			call = super(Discount, self).__getattribute__(field)
-			return call()
-		else:
-			return super(Discount, self).__getattribute__(field)
-
-
-# https://developer.paypal.com/docs/classic/ipn/integration-guide/IPNandPDTVariables/	
+# https://developer.paypal.com/docs/classic/ipn/integration-guide/IPNandPDTVariables/
 class PayPal(models.Model):
 	message                = models.TextField(editable=False)
-	txn_id                 = models.CharField(max_length= 20, primary_key=True)
+	txn_id                 = models.CharField(max_length= 20)
 	created_at             = models.DateTimeField(auto_now_add=True)
 	objects = PayPals
 	def __getitem__(self, field):
-		dic = json.loads(self.message)
+		dic = self.data()
 		if field in dic:
 			return dic[field]
+	def data(self):
+		return json.loads(self.message)
 
 	# txn_type_choices = [
 	# 	"",

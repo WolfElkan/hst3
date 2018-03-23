@@ -1,11 +1,19 @@
 # Use IceCream?
 def pretty(arr, delim='  ', indent='', level=0, printout=''):
-	for thing in arr:
-		if type(thing) is list:
-			printout = pretty(thing, delim, indent+'['+delim, level+1, printout)
-		else:
-			printout += indent + str(thing) + '\n'
-	return printout if level else printout[:-1]
+	if type(arr) is dict:
+		lens = []
+		for key in arr:
+			lens.append(len(key))
+		maxlens = max(lens)
+		for key in arr:
+			print "{}{} : {}".format(key,' '*(maxlens-len(key)),arr[key])
+	else:	
+		for thing in arr:
+			if type(thing) is list:
+				printout = pretty(thing, delim, indent+'['+delim, level+1, printout)
+			else:
+				printout += indent + str(thing) + '\n'
+		return printout if level else printout[:-1]
 
 def pdir(thing):
 	return pretty(dir(thing))

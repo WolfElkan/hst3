@@ -145,4 +145,4 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-PAYPAL_BUSINESS_EMAIL = '7930573@gmail.com'
+PAYPAL_BUSINESS_EMAIL = 'swiftlytiltingstudios@gmail.com'

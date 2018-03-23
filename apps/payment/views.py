@@ -95,6 +95,7 @@ def paypal_pay(request, id):
 @csrf_exempt
 def paypal_ipn(request, csrf):
 	print '*'*100
+	print datetime.now()
 	print request.POST
 	# new_txn['payment_date'] = datetime.strptime(new_txn.pop('payment_date')[:24], '%a %b %d %Y %H:%M:%S')
 	ipn = PayPals.create(message=json.dumps(request.POST), txn_id=request.POST['txn_id'])
@@ -103,12 +104,5 @@ def paypal_ipn(request, csrf):
 	if cleanhex(csrf) == cleanhex(invoice.priv):
 		print ipn['payment_status']
 		if ipn['payment_status'] == 'Completed':
-			invoice.payment_id = ipn['txn_id']
-			invoice.check_date = cleandate(ipn['payment_date'])
-			invoice.check_date = ipn['payment_date']
-			invoice.clear_date = datetime.now()
-			invoice.method     = 'PayPal'
-			invoice.memo       = ipn['custom']
-			invoice.status     = 'P'
-			invoice.save()
+			invoice.pay(ipn)
 	return HttpResponse('Thank You IPN')
