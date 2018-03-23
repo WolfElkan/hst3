@@ -27,11 +27,12 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     u'localhost',
+    u'68314d84.ngrok.io',
     '127.0.0.1',
     '192.168.1.6',
-    '192.168.13.242',
 ]
 
+CURRENT_HOST = ALLOWED_HOSTS[1]
 
 # Application definition
 
@@ -143,3 +144,5 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
 STATIC_URL = '/static/'
+
+PAYPAL_BUSINESS_EMAIL = '7930573@gmail.com'

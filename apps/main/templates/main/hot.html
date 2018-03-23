@@ -1,3 +1,4 @@
+{% load staticfiles %}
 <title>Hot Code</title>
 <style type="text/css">
 	.enlarge, textarea, input {
@@ -6,7 +7,7 @@
 	table {
 		/*font-size: 75%;*/
 	}
-	.session {
+	.session, .request {
 		font-family: monospace;
 	}
 		.number {
@@ -40,21 +41,43 @@
 			}
 		.list {
 			border: solid gray 1px;
+			display: inline-block;
 		}
 		.tuple {
 			border: solid gray 1px;
 			border-radius: 5px;
+			display: inline-block;
 		}
 		.dict {
 			border: solid black 1px;
 		}
 			.pair {}
-				.key {}
+				.key {
+					font-family: monospace;
+				}
 				.value {}
 		.object {}
 			.type {}
 			.strobj {}
 </style>
+<script src="{% static 'main/js/jquery.js' %}" charset="utf-8"></script>
+<script type="text/javascript">
+	$(document).ready(function() {
+
+		$('.show_req').click(function() {
+			$('.show_req').hide()
+			$('.hide_req').show()
+			$('.request').show()
+		})
+
+		$('.hide_req').click(function() {
+			$('.show_req').show()
+			$('.hide_req').hide()
+			$('.request').hide()
+		})
+
+	})
+</script>
 <div class="enlarge">
 Python Hot Code:
 <form action="/run" method="post">
@@ -66,3 +89,6 @@ Python Hot Code:
 <a href="/clear">Clear Session</a>
 </div>
 <div style="text-align: right;"><a href="/nuke">Nuke Database</a></div>
+<button class="show_req">Show Full Request</button>
+<button style="display: none;" class="hide_req">Hide Request</button>
+<div style="display: none;" class="request">{{request|safe}}</div>

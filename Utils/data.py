@@ -81,6 +81,19 @@ def copyatts(source, keys, ifnull=True):
 			this[key] = None
 	return this
 
+import re
+from datetime import datetime
+
+#               Thu Mar 22 2018 20:06:56 GMT-0400 (EDT)
+def cleandate(string):
+	months = [0,'Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+	pattern = r'[a-z]{3} [a-z]{3} [0-9]{2} [0-9]{4} [0-9]{2}:[0-9]{2}:[0-9]{2}'
+	dic = re.match(pattern, string, flags=re.I)
+	tz = re.search(r'GMT([+-][0-9]{4})',string).group(1)
+	naive = datetime.strptime(dic.group(0),'%a %b %d %Y %H:%M:%S')
+	zone = datetime.now()
+	return datetime.replace(naive,tzinfo=tz)
+
 class Each(object):
 	def __init__(self, arr):
 		self.arr = arr

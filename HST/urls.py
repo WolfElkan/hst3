@@ -34,6 +34,7 @@ import apps.rest.seed     as seed
 urlpatterns = [
 	url(r'^$', main.index),
 
+
 	url(r'^login/?$', main.login),
 	url(r'^logout/?$', main.logout),
 	url(r'^myaccount/?$', main.account),
@@ -55,6 +56,8 @@ urlpatterns = [
 
 	url(r'^register/process/?$',payment.invoice_create),
 	url(r'^register/invoice/(?P<id>\d+)/?$',payment.invoice_show),
+	url(r'^register/invoice/(?P<id>\d+)/paypal/?$',payment.paypal_pay),
+	url(r'^ipn/(?P<csrf>([0-9a-fA-F]-?){32})$', payment.paypal_ipn),
 	
 	url(r'^hot/?$', dev.hot),
 	url(r'^run/?$', dev.run),

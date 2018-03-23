@@ -117,7 +117,16 @@ class DayOfWeekField(EnumField):
 	def from_db_value(self, value, col, wrapper, options):
 		return DayOfWeek(value)
 
+# class PayPalDateTimeField(models.DateTimeField):
+# 	def __init__(self, **kwargs):
+# 		super(PayPalDateTimeField, self).__init__(**kwargs)
+# 	def pre_save(self):
+# 		pass
 
+class PayPalDateTimeField(models.CharField):
+	def __init__(self):
+		super(PayPalDateTimeField, self).__init__(max_length=28, default='')
+		
 class PhoneNumber(object):
 	def __init__(self, *value):
 		self.field = None

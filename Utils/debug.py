@@ -10,6 +10,9 @@ def pretty(arr, delim='  ', indent='', level=0, printout=''):
 def pdir(thing):
 	return pretty(dir(thing))
 
+def san(string):
+	return string.replace('<','&lt;').replace('>','&gt;')
+
 def divs(obj):
 	visible = '&#9644;' if obj == '' else obj
 	if type(obj) is int:
@@ -22,11 +25,11 @@ def divs(obj):
 		return '<span class="complex number">{}</span>'.format(visible)
 
 	elif type(obj) is str:
-		return '<span class="str string">{}</span>'.format(obj)
+		return '<span class="str string">{}</span>'.format(san(obj))
 	elif type(obj) is unicode:
-		return '<span class="unicode string">{}</span>'.format(obj)
+		return '<span class="unicode string">{}</span>'.format(san(obj))
 	elif type(obj) is buffer:
-		return '<span class="buffer string">{}</span>'.format(obj)
+		return '<span class="buffer string">{}</span>'.format(san(obj))
 
 	elif type(obj) is bool:
 		return '<span class="bool {}">{}</span>'.format(obj,obj)
@@ -52,8 +55,16 @@ def divs(obj):
 		html += '</table>'
 		return html
 
+	# elif hasattr(obj, '__dict__') and type(obj.__dict__) is dict:
+	# 	html = '<table class="nudge dict">'
+	# 	for key in obj.__dict__:
+	# 		if key in obj.__dict__:
+	# 			html += '<tr class="pair"><td class="key">{}:</td><td class="value">{}</td></tr>'.format(key,obj.__dict__[key])
+	# 	html += '</table>'
+	# 	return html
+
 	else:
-		return '<div class="object"><span class="type">{}</span><span class="strobj">{}</span></div>'.format(type(obj),str(obj))
+		return '<div class="object"><span class="type">{}</span><span class="strobj">{}&#x1F34D;</span></div>'.format(type(obj),repr(obj))
 
 
 

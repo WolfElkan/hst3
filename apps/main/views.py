@@ -1,10 +1,11 @@
 from django.shortcuts import render, redirect, HttpResponse
 
+
 from apps.people.managers import Families, Addresses, Parents, Users, Students
 from apps.program.managers import CourseTrads, Courses, Enrollments
 
 from Utils.data  import collect, copy, copyatts, Each, equip, find, find_all, sub
-from Utils.debug import pretty, pdir
+from Utils.debug import pretty, pdir, divs
 from Utils.fjson import FriendlyEncoder
 from Utils.misc  import namecase, safe_delete
 from Utils.security import authorized, getme, getyear
@@ -13,6 +14,19 @@ from Utils.seshinit import seshinit, forminit
 from trace import DEV
 
 import re
+
+# @csrf_exempt
+# def examine(request):
+# 	print '*'*100
+# 	seshinit(request,'command')
+# 	print request.POST
+# 	context = {
+# 		'command': request.session['command'],
+# 		'session': divs(request.session.__dict__['_session_cache']),
+# 		'request': divs(request.POST.copy()),
+# 	}
+# 	return render(request, 'main/hot.html', context)
+
 
 def index(request):
 	me = getme(request)

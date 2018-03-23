@@ -44,12 +44,19 @@ class InvoiceManager(sm.SuperManager):
 			q.status = 'invoiced'
 			q.save()
 		amount = this.update_amount()
-		if DEV:
-			Discounts.create(
-				amount=amount.__mul__(99).shift(-2), 
-				title='Total divided by 100 for testing.',
-				invoice=this
-			)
+		divide = 2
+		# if DEV:
+		# 	Discounts.create(
+		# 		amount=amount.__mul__((10 ** divide) - 1).shift(-divide), 
+		# 		course='total divided by 1{} for testing'.format('0'*divide),
+		# 		invoice=this
+		# 	)
 		this.update_amount()
 		return this
 Invoices = InvoiceManager()
+
+class PayPalManager(sm.SuperManager):
+	def __init__(self):
+		super(PayPalManager, self).__init__('payment.paypal')
+		self.fields = [u'last_name',u'txn_id',u'shipping_method',u'shipping_discount',u'receiver_email',u'payment_status',u'payment_gross',u'residence_country',u'invoice',u'address_state',u'payer_status',u'txn_type',u'address_country',u'payment_date',u'first_name',u'item_name',u'address_street',u'charset',u'custom',u'notify_version',u'address_name',u'item_number',u'receiver_id',u'transaction_subject',u'business',u'payer_id',u'discount',u'verify_sign',u'address_zip',u'payment_fee',u'address_country_code',u'address_city',u'address_status',u'receipt_id',u'insurance_amount',u'mc_fee',u'mc_currency',u'payer_email',u'payment_type',u'mc_gross',u'ipn_track_id',u'quantity']
+PayPals = PayPalManager()

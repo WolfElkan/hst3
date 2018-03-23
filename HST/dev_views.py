@@ -2,10 +2,10 @@ from django.shortcuts import render, redirect, HttpResponse
 
 from apps.people.managers import Families, Addresses, Parents, Users, Students, NameClashes
 from apps.program.managers import CourseTrads, Courses, Enrollments
-from apps.payment.managers import Invoices
+from apps.payment.managers import Invoices, PayPals
 
 from Utils.custom_fields import Bcrypt, PhoneNumber, DayOfWeek
-from Utils.data  import collect, copy, copyatts, Each, equip, find, find_all, sub
+from Utils.data  import collect, copy, copyatts, Each, equip, find, find_all, sub, cleandate
 from Utils.debug import pretty, pdir, divs
 from Utils.fjson import FriendlyEncoder
 from Utils.misc  import namecase, cleanhex, safe_delete
@@ -67,7 +67,8 @@ def hot(request):
 	seshinit(request,'command')
 	context = {
 		'command': request.session['command'],
-		'session': divs(request.session.__dict__['_session_cache'])
+		'session': divs(request.session.__dict__['_session_cache']),
+		'request': divs(request.__dict__.copy()),
 	}
 	return render(request, 'main/hot.html', context)
 

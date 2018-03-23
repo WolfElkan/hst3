@@ -19,7 +19,7 @@ def roster(request, id):
 	context = {
 		'course':Courses.fetch(id=id)
 	}
-	return render(request, 'roster.html', context)
+	return render(request, 'rowspan_roster.html', context)
 
 def historical(request, **kwargs):
 	history = []
