@@ -10,6 +10,7 @@ PayPals = PayPal.objects
 
 from Utils.custom_fields import Bcrypt, PhoneNumber
 from Utils.data  import collect, copy, copyatts, cleandate
+from Utils.debug import pretty
 from Utils.fjson import FriendlyEncoder, json
 from Utils.misc  import namecase, cleanhex
 from Utils.security import authorized, getme, getyear, gethist
@@ -66,7 +67,7 @@ def paypal_pay(request, id):
 def paypal_ipn(request, csrf):
 	print '*'*100
 	print datetime.now()
-	print request.POST
+	print pretty(request.POST)
 	# new_txn['payment_date'] = datetime.strptime(new_txn.pop('payment_date')[:24], '%a %b %d %Y %H:%M:%S')
 	ipn = PayPals.create(message=json.dumps(request.POST), txn_id=request.POST['txn_id'])
 	invoice = Invoices.fetch(id=request.POST[u'invoice'])

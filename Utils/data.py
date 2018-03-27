@@ -1,5 +1,4 @@
 from django.db.models.query import QuerySet
-from django.http.request import QueryDict
 from inspect import getargspec # Update getargspec -> signature in Python3
 
 class Caller(object):
