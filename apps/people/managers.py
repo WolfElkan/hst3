@@ -3,7 +3,7 @@ from django.db import models
 from Utils import custom_fields as custom
 from Utils.data import serial
 from Utils.misc import namecase
-from Utils.security import getyear
+from Utils.security import getyear, gethist
 from Utils import supermodel as sm
 from django_mysql import models as sqlmod
 from datetime import datetime
@@ -33,6 +33,15 @@ class FamilyManager(sm.SuperManager):
 			las = kwargs['last'][:3].upper()
 			# kwargs['hid'] = las + str(serial(self, 'hid', hid__startswith=las))
 		return super(FamilyManager, self).create(**kwargs)
+	def all_join_alpha(self):
+		result = []
+		ids = []
+		for year in gethist(0)[::-1]:
+			for family in self.filter(student__enrollment__course__year=year).order_by('last'):
+				if family.id not in ids:
+					ids.append(family.id)
+					result.append(family)
+		return result
 Families = FamilyManager()
 
 

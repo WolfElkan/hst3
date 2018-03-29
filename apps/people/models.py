@@ -152,7 +152,7 @@ class Family(models.Model):
 		return self.name_num
 
 	def __str__(self):
-		return '{} Family #{}'.format(self.last,self.name_num) if self.name_num else self.last
+		return ('{} Family #{}' if self.name_num else '{} Family').format(self.last,self.name_num)
 	def __getattribute__(self, field):
 		if field in ['mother','father','unique_last','children','enrollments','hours_worked']:
 			call = super(Family, self).__getattribute__(field)
