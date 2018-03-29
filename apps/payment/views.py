@@ -70,9 +70,10 @@ def paypal_ipn(request, csrf):
 	# new_txn['payment_date'] = datetime.strptime(new_txn.pop('payment_date')[:24], '%a %b %d %Y %H:%M:%S')
 	ipn = PayPals.create(message=json.dumps(request.POST), txn_id=request.POST['txn_id'])
 	invoice = Invoices.fetch(id=request.POST[u'invoice'])
-	print invoice.id
-	if cleanhex(csrf) == cleanhex(invoice.code):
-		print ipn['payment_status']
-		if ipn['payment_status'] == 'Completed':
-			invoice.pay(ipn)
+	if invoice:
+		print invoice.id
+		if cleanhex(csrf) == cleanhex(invoice.code):
+			print ipn['payment_status']
+			if ipn['payment_status'] == 'Completed':
+				invoice.pay(ipn)
 	return HttpResponse('Thank You IPN')
