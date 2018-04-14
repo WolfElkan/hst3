@@ -3,12 +3,15 @@ def authorized(request, level=0):
 	if me:
 		return me.permission >= level
 
+from datetime import datetime
+
+def cleandate(kwargs):
+	return datetime.now()
+
 # Find User object for current logged-in user, without causing errors.
 # me is always a User, never a Family, Student, or Teacher
 
-from datetime import datetime
 from trace import DEV
-
 from apps.program.managers import Courses
 
 def gethist(ago=1):

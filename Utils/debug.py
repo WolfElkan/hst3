@@ -21,7 +21,9 @@ def pdir(thing):
 def san(string):
 	return string.replace('<','&lt;').replace('>','&gt;')
 
-def divs(obj):
+from django.http.request import QueryDict
+
+def divs(obj,emoji='&#x1F535;'):
 	visible = '&#9644;' if obj == '' else obj
 	if type(obj) is int:
 		return '<span class="int number">{}</span>'.format(visible)
@@ -45,23 +47,31 @@ def divs(obj):
 	elif type(obj) is list:
 		html = '<ol start="0" class="list">'
 		for item in obj:
-			html += '<li>{}</li>'.format(divs(item))
+			html += '<li>{}</li>'.format(divs(item,emoji))
 		html += '</ol>'
 		return html
 
 	elif type(obj) is tuple:
 		html = '<ol start="0" class="tuple">'
 		for item in obj:
-			html += '<li>{}</li>'.format(divs(item))
+			html += '<li>{}</li>'.format(divs(item,emoji))
 		html += '</ol>'
 		return html
 
 	elif type(obj) is dict:
 		html = '<table class="dict">'
 		for key in obj:
-			html += '<tr class="pair"><td class="key">{}:</td><td class="value">{}</td></tr>'.format(key,divs(obj[key]))
+			html += '<tr class="pair"><td class="key">{}:</td><td class="value">{}</td></tr>'.format(key,divs(obj[key],emoji))
 		html += '</table>'
 		return html
+
+	elif type(obj) is QueryDict:
+		html = '<table class="QueryDict">'
+		for key in obj:
+			html += '<tr class="pair"><td class="key">{}:</td><td class="value">{}</td></tr>'.format(key,divs(obj[key],emoji))
+		html += '</table>'
+		return html
+
 
 	# elif hasattr(obj, '__dict__') and type(obj.__dict__) is dict:
 	# 	html = '<table class="nudge dict">'
@@ -72,7 +82,7 @@ def divs(obj):
 	# 	return html
 
 	else:
-		return '<div class="object"><span class="type">{}</span><span class="strobj">{}&#x1F34D;</span></div>'.format(type(obj),repr(obj))
+		return '<div class="object"><span class="type">{}</span><span class="strobj">{}{}</span></div>'.format(type(obj),san(repr(obj)),emoji)
 
 
 

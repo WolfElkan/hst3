@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
+import requests
 from HST.settings import PAYPAL_BUSINESS_EMAIL, CURRENT_HOST
 
 from apps.people.managers import Families, Addresses, Parents, Users, Students
@@ -10,13 +11,14 @@ PayPals = PayPal.objects
 
 from Utils.custom_fields import Bcrypt, PhoneNumber
 from Utils.data  import collect, copy, copyatts, cleandate
+from Utils.debug import pretty, divs
 from Utils.fjson import FriendlyEncoder, json
 from Utils.misc  import namecase, cleanhex
 from Utils.security import authorized, getme, getyear, gethist
 from Utils.seshinit import seshinit, forminit
 
-from urllib import urlencode
-from urllib2 import urlopen
+# from urllib import urlencode
+# from urllib2 import urlopen
 
 from datetime import datetime
 
@@ -64,16 +66,26 @@ def paypal_pay(request, id):
 
 @csrf_exempt
 def paypal_ipn(request, csrf):
+
 	print '*'*100
-	print datetime.now()
-	print request.POST
-	# new_txn['payment_date'] = datetime.strptime(new_txn.pop('payment_date')[:24], '%a %b %d %Y %H:%M:%S')
-	ipn = PayPals.create(message=json.dumps(request.POST), txn_id=request.POST['txn_id'])
-	invoice = Invoices.fetch(id=request.POST[u'invoice'])
-	if invoice:
-		print invoice.id
-		if cleanhex(csrf) == cleanhex(invoice.code):
-			print ipn['payment_status']
-			if ipn['payment_status'] == 'Completed':
-				invoice.pay(ipn)
-	return HttpResponse('Thank You IPN')
+
+	paypal_url = 'https://www.paypal.com/cgi-bin/webscr'
+	if request.POST.get('test_ipn'):
+		paypal_url = 'https://www.sandbox.paypal.com/cgi-bin/webscr'
+
+	invoice = Invoices.fetch(id=request.POST.get('invoice'))
+	csrf_safe = bool(invoice) and cleanhex(csrf) == cleanhex(invoice.csrf)
+
+	query = 'cmd=_notify-validate'
+	for key, value in request.POST.items():
+		query += '&{}={}'.format(key, value)
+	
+	response = requests.post(paypal_url, data=query)
+	print response.text
+	verified = response.text == 'VERIFIED'
+
+	paypal = PayPals.create(request.POST, csrf_safe, verified)
+	
+	if csrf_safe and verified and request.POST.get('payment_status') == 'Completed':
+		invoice.pay(paypal)
+	return HttpResponse('')
