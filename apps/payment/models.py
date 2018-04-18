@@ -35,7 +35,6 @@ class PayPal(models.Model):
 		for key in data:
 			query += '&{}={}'.format(key, data[key])
 		response = requests.post(url, data=query)
-		print response.text
 		self.verified = response.text == 'VERIFIED'
 		self.save()
 		return self.verified

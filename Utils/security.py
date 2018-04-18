@@ -5,7 +5,8 @@ def authorized(request, level=0):
 
 from datetime import datetime
 
-def cleandate(kwargs):
+def cleandate(date):
+	print date
 	return datetime.now()
 
 # Find User object for current logged-in user, without causing errors.

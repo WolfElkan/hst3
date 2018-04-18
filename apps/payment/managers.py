@@ -2,7 +2,8 @@ from __future__ import unicode_literals
 from django.db import models
 from Utils import custom_fields as custom
 from Utils import supermodel as sm
-from Utils.security import getyear, cleandate
+from Utils.security import getyear
+from dateparser import parse
 from Utils.data import Each
 from django_mysql import models as sqlmod
 from datetime import datetime
@@ -18,7 +19,7 @@ class PayPalManager(sm.SuperManager):
 		return super(PayPalManager, self).create(
 			message   = json.dumps(post),
 			txn_id    = post['txn_id'],
-			payment_date = cleandate(post['payment_date']),
+			payment_date = parse(post['payment_date']),
 		)
 PayPals = PayPalManager()
 
