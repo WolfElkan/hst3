@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect, HttpResponse
 from apps.people.managers import Families, Addresses, Parents, Users, Students
 from apps.program.managers import CourseTrads, Courses, Enrollments, Venues
 
-from Utils.data  import copy, copyatts
+from Utils.data  import copy, copyatts, Each
 from Utils.fjson import FriendlyEncoder
 from Utils.seshinit import seshinit
 from Utils.snippets import order_coursetrads, make
@@ -77,6 +77,7 @@ def load_post(request):
 			nAddresses += 1
 			family['address'] = address
 		family = Families.create(**family)
+		family.update_name_num()
 		nFamilies += 1
 		if 'mother' in fam:
 			mother = copy(fam['mother'])
@@ -119,6 +120,8 @@ def load_post(request):
 				# 	course = Courses.get(id=enrollment['course_id'])
 				# 	Enrollments.create(course=course, student=newStudent, role=enrollment['role'], role_type=enrollment['role_type'])
 			nStudents += 1
+	print "-assign name_num's"
+	Each(Families.all()).update_name_num()
 	print '- order_coursetrads'
 	order_coursetrads()
 	year = getyear()
@@ -180,8 +183,7 @@ def dump(request):
 				'alias_id' : ct.alias_id,
 				'e'        : False,
 			})
-	FamiliesAll = Families.all().order_by('last')
-	for family in FamiliesAll:
+	for family in Families.all_join_alpha():
 		family_obj = {
 			'last':family.last,
 			'phone':int(family.phone),

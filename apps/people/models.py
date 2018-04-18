@@ -71,6 +71,7 @@ class Parent(models.Model):
 class Family(models.Model):
 	hid        = models.CharField(max_length=5, null=True)
 	last       = models.CharField(max_length=30)
+	name_num   = models.PositiveIntegerField(default=0)
 	phone      = custom.PhoneNumberField()
 	phone_type = sqlmod.EnumField(choices=['','Home','Cell','Work'], default='')
 	email      = models.EmailField()
@@ -87,17 +88,13 @@ class Family(models.Model):
 	def father(self):
 		return Parents.fetch(id=self.father_id)
 	def unique_last(self):
-		return NameClashes.universal(self)
+		return '{} #{}'.format(self.last,self.name_num) if self.name_num else self.last
 	def unique_last_in(self, year):
-		nameclash = NameClashes.fetch(family=self,year=year)
-		if nameclash:
-			return nameclash.display(self)
+		clashes = Families.filter(last=self.last,student__enrollment__course__year=year).exclude(id=self.id)
+		if clashes:
+			return self.unique_last
 		else:
-			nameclash = NameClashes.fate(self, year)
-			if nameclash:
-				return nameclash.display(self)
-			else:
-				return self.last
+			return self.last
 	def children(self):
 		return Students.filter(family_id=self.id).order_by('birthday')
 	def children_enrolled_in(self,year):
@@ -136,9 +133,26 @@ class Family(models.Model):
 		safe_delete(self.address)
 		Users.filter(owner=self).delete()
 		return super(Family, self).delete()
+	def clear_name_num(self):
+		self.name_num = 0
+		self.save()
+	def update_name_num(self, fix_all=False):
+		clashes = Families.filter(last=self.last).exclude(id=self.id)
+		older = clashes.filter(created_at__lt=self.created_at)
+		if fix_all:
+			Each(older).update_name_num()
+		if older:
+			self.name_num = max(Each(older).name_num) + 1
+		else:
+			self.name_num = int(bool(clashes))
+		self.save()
+		if fix_all:
+			newer = clashes.filter(created_at__lt=self.created_at)
+			Each(newer).update_name_num()
+		return self.name_num
 
 	def __str__(self):
-		return self.last+' Family'
+		return ('{} Family #{}' if self.name_num else '{} Family').format(self.last,self.name_num)
 	def __getattribute__(self, field):
 		if field in ['mother','father','unique_last','children','enrollments','hours_worked']:
 			call = super(Family, self).__getattribute__(field)
@@ -295,41 +309,6 @@ class Student(models.Model):
 		else:
 			return super(Student, self).__getattribute__(field)
 
-
-class NameClash(models.Model):
-	last  = models.CharField(max_length=30)
-	year  = models.DecimalField(max_digits=4, decimal_places=0)
-	style_choices = [
-		(0, '{last}'),
-		(1, '{last}, {mother:.1}'),
-		(2, '{last}, {mother:.1}&{father:.1}'),
-		(3, '{last}, {mother}'),
-		(4, '{last}, {mother} & {father}'),
-		(5, '{last}, ({city})'),
-		(6, '{last} #{id}')
-	]
-	style = models.PositiveSmallIntegerField(default=0, choices=style_choices)
-	created_at = models.DateTimeField(auto_now_add=True)
-	updated_at = models.DateTimeField(auto_now=True)
-	rest_model = 'nameclash'
-	objects = NameClashes
-	def blanks(self, family):
-		return {
-			'last'   : family.last,
-			'mother' : family.mother.first if family.mother  else ' ',
-			'father' : family.father.first if family.father  else ' ',
-			'city'   : family.address.city if family.address else '?',
-			'id'     : family.id		
-		}
-	def display(self, family):
-		return self.get_style_display().format(**self.blanks(family))
-	# def __getattribute__(self, field):
-	# 	if field in []:
-	# 		call = super(NameClash, self).__getattribute__(field)
-	# 		return call()
-	# 	else:
-	# 		return super(NameClash, self).__getattribute__(field)
-	
 		
 class Teacher(models.Model):
 	hid = NotImplemented

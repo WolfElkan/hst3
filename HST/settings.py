@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 
 import os
 
+from . import ignored
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -20,14 +22,14 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'ek3r@s77wcfxr#ipt7py@8=h-nyf6yu%wv*r6ohdb-e9)*#*-h'
+SECRET_KEY = ignored.SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = [
     u'localhost',
-    u'54ac151b.ngrok.io',
+    ignored.NGROK_URL,
     '127.0.0.1',
     '192.168.1.6',
 ]
@@ -96,7 +98,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'HST',
         'USER': 'django',
-        'PASSWORD': 'E&Na2rVG8#nnVQVv23DW@b4f#8Ebrl83kL8c2FE9bdTgGTpl?#t?h02lnef3',
+        'PASSWORD': ignored.DB_PASSWORD,
         'HOST': '127.0.0.1',
         'PORT': '3306',
         'OPTIONS': {
@@ -145,4 +147,4 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-PAYPAL_BUSINESS_EMAIL = 'swiftlytiltingstudios@gmail.com'
+PAYPAL_BUSINESS_EMAIL = ignored.PAYPAL_BUSINESS_EMAIL

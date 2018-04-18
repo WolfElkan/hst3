@@ -99,7 +99,7 @@
         <!-- Update to your currency -->
         <input type="hidden" name="invoice" value="{{invoice.id}}" id="invoice"> 
         <!-- Add Unique invoice for each transaction -->
-        <input type="hidden" name="notify_url" value='{{host}}/ipn/{{invoice.code}}' /> 
+        <input type="hidden" name="notify_url" value='{{host}}/ipn/{{invoice.csrf}}' /> 
         <!-- Please add IPN URL You can use this service to automate back-office and administrative functions, including fulfilling orders, tracking customers, and providing status and other information related to transactions. -->
         <input type='hidden' name='cancel_return' value="{{host}}/register/invoice/{{invoice.id}}" /> 
         <!-- Take customers to this URL when they cancel their checkout -->

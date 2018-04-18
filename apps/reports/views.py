@@ -40,7 +40,7 @@ def students(request, **kwargs):
 	families = Families.all()
 	if not everyone:
 		families = families.filter(student__enrollment__course__year=year).distinct()
-	families = families.order_by('last')
+	families = families.order_by('last','name_num')
 	table = []
 	blank = {'content':'','rowspan':1,'class':'enr'}
 	ctids = {'SB':'TT','SG':'GB','SJ':'JR'}
