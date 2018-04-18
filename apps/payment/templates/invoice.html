@@ -59,7 +59,7 @@
 			</tr>
 			<tr>
 				<td>Status:</td>
-				<td>{{invoice.get_status_display}}</td>
+				<td>{{invoice.get_status_display}}{% if waiting %}*{% endif %}</td>
 			</tr>
 		</table>
 		<h2>Items</h2>
@@ -82,12 +82,14 @@
 				<th class="money">${{invoice.amount|floatformat:2}}</th>
 			</thead>
 		</table>
-		<form style="display: none;" action="/register/invoice/{{invoice.id}}/paypal/">
-			<button {% if invoice.status != 'N' %}disabled{% endif %}>Pay now with PayPal</button>
+		<form action="/register/invoice/{{invoice.id}}/paypal/">
+			{% if invoice.status == 'N' %}
+			<button id="paypal">Pay now with PayPal</button>
+			{% endif %}
 		</form>
 		<!-- <div><a href="/register/invoice/{{invoice.id}}/paypal/">Pay invoice now with PayPal</a></div> -->
 		<div>
- <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+ <form style="display: none;" action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
         <input type="hidden" name="business" value="{{email}}">
         <!-- Specify a Buy Now button. -->
         <input type="hidden" name="cmd" value="_xclick">
@@ -106,9 +108,12 @@
         <input type='hidden' name='return' value="{{host}}/register/invoice/{{invoice.id}}?ref=paypal" /> 
         <!-- Take customers to this URL when they finish their checkout  -->
         <!-- Display the payment button. -->
-        <button id="paypal" title="PayPal - The safer, easier way to pay online">Pay with PayPal</button>
+        <button title="PayPal - The safer, easier way to pay online">Pay with PayPal</button>
         <!-- <input type="image" name="submit" border="0" src="https://www.paypalobjects.com/en_US/i/btn/btn_buynow_LG.gif" > -->
     </form>
+    {% if waiting %}
+    <p>* Still waiting for verification from PayPal.  Try refreshing the page.</p>
+    {% endif %}
 </div>
 </center>
 </body>

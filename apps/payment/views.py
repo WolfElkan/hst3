@@ -33,8 +33,8 @@ def invoice_show(request, id):
 	context = {
 		'invoice': invoice,
 		'email'  : PAYPAL_BUSINESS_EMAIL,
-		# 'host'   : "http://{REMOTE_ADDR}:{SERVER_PORT}".format(**request.META),
-		'host'   : 'https://{}'.format(CURRENT_HOST)
+		'host'   : 'https://{}'.format(CURRENT_HOST),
+		'waiting': invoice.status == 'N' and request.GET.get('ref') == 'paypal',
 	}
 	return render(request, 'invoice.html', context)
 
