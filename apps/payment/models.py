@@ -1,4 +1,5 @@
 from django.db import models
+import requests
 
 from apps.program.managers import Enrollments, Courses
 from apps.program.models import Enrollment
@@ -18,7 +19,7 @@ import json
 class PayPal(models.Model):
 	message    = models.TextField(editable=False)
 	csrf_safe  = models.BooleanField(default=False)
-	verified   = models.BooleanField(default=False)
+	verified   = models.NullBooleanField()
 	txn_id     = models.CharField(max_length= 20)
 	created_at = models.DateTimeField(auto_now_add=True)
 	payment_date = models.DateTimeField(null=True)
@@ -29,6 +30,17 @@ class PayPal(models.Model):
 			return dic[field]
 	def data(self):
 		return json.loads(self.message)
+	def verify(self, url):
+		query = 'cmd=_notify-validate'
+		data = self.data()
+		for key in data:
+			query += '&{}={}'.format(key, data[key])
+		response = requests.post(url, data=query)
+		print response.text
+		self.verified = response.text == 'VERIFIED'
+		self.save()
+		return self.verified
+
 
 class Invoice(models.Model):
 	family = models.ForeignKey('people.Family')

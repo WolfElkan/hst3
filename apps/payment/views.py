@@ -76,15 +76,9 @@ def paypal_ipn(request, csrf):
 	invoice = Invoices.fetch(id=request.POST.get('invoice'))
 	csrf_safe = bool(invoice) and cleanhex(csrf) == cleanhex(invoice.csrf)
 
-	query = 'cmd=_notify-validate'
-	for key, value in request.POST.items():
-		query += '&{}={}'.format(key, value)
-	
-	response = requests.post(paypal_url, data=query)
-	print response.text
-	verified = response.text == 'VERIFIED'
+	paypal = PayPals.create(request.POST, csrf_safe)
 
-	paypal = PayPals.create(request.POST, csrf_safe, verified)
+	verified = paypal.verify(paypal_url)
 	
 	if csrf_safe and verified and request.POST.get('payment_status') == 'Completed':
 		invoice.pay(paypal)
