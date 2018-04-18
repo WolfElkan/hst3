@@ -82,14 +82,9 @@
 				<th class="money">${{invoice.amount|floatformat:2}}</th>
 			</thead>
 		</table>
-		<form action="/register/invoice/{{invoice.id}}/paypal/">
-			{% if invoice.status == 'N' %}
-			<button id="paypal">Pay now with PayPal</button>
-			{% endif %}
-		</form>
-		<!-- <div><a href="/register/invoice/{{invoice.id}}/paypal/">Pay invoice now with PayPal</a></div> -->
 		<div>
- <form style="display: none;" action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+	{% if invoice.status == 'N' %}
+ 	<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
         <input type="hidden" name="business" value="{{email}}">
         <!-- Specify a Buy Now button. -->
         <input type="hidden" name="cmd" value="_xclick">
@@ -101,16 +96,17 @@
         <!-- Update to your currency -->
         <input type="hidden" name="invoice" value="{{invoice.id}}" id="invoice"> 
         <!-- Add Unique invoice for each transaction -->
-        <input type="hidden" name="notify_url" value='{{host}}/ipn/{{invoice.csrf}}' /> 
+        <input type="hidden" name="notify_url" value='{{host}}/ipn/' /> 
         <!-- Please add IPN URL You can use this service to automate back-office and administrative functions, including fulfilling orders, tracking customers, and providing status and other information related to transactions. -->
         <input type='hidden' name='cancel_return' value="{{host}}/register/invoice/{{invoice.id}}" /> 
         <!-- Take customers to this URL when they cancel their checkout -->
         <input type='hidden' name='return' value="{{host}}/register/invoice/{{invoice.id}}?ref=paypal" /> 
         <!-- Take customers to this URL when they finish their checkout  -->
         <!-- Display the payment button. -->
-        <button title="PayPal - The safer, easier way to pay online">Pay with PayPal</button>
+        <button id="paypal" title="PayPal - The safer, easier way to pay online">Pay with PayPal</button>
         <!-- <input type="image" name="submit" border="0" src="https://www.paypalobjects.com/en_US/i/btn/btn_buynow_LG.gif" > -->
     </form>
+	{% endif %}
     {% if waiting %}
     <p>* Still waiting for verification from PayPal.  Try refreshing the page.</p>
     {% endif %}

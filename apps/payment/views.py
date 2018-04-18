@@ -17,9 +17,6 @@ from Utils.misc  import namecase, cleanhex
 from Utils.security import authorized, getme, getyear, gethist
 from Utils.seshinit import seshinit, forminit
 
-# from urllib import urlencode
-# from urllib2 import urlopen
-
 from datetime import datetime
 
 def invoice_create(request):
@@ -46,40 +43,15 @@ def invoice_index(request, family_id):
 	}
 	return render(request, 'invoice_index.html', context)
 
-def paypal_pay(request, id):
-	invoice = Invoices.fetch(id=id)
-	paypal_data = {
-		'business'      : PAYPAL_BUSINESS_EMAIL,
-		'cmd'           : '_xclick',
-		'item_name'     : 'HST Tuition Invoice #{}'.format(invoice.id),
-		'amount'        : invoice.amount,
-		'currency_code' : 'USD',
-		'invoice'       : invoice.id,
-		'notify_url'    : '{}/register/invoice/{}/success?uuid={}'.format(request.environ['HTTP_HOST'],invoice.id,invoice.code),
-		'cancel_return' : '{}/register/invoice/{}/cancel?uuid={}'.format(request.environ['HTTP_HOST'],invoice.id,invoice.code),
-		'return'        : '{}/register/invoice/{}/success?uuid={}'.format(request.environ['HTTP_HOST'],invoice.id,invoice.code),
-	}
-	post_data = paypal_data.items()
-	result = urlopen("https://www.paypal.com/cgi-bin/webscr",urlencode(post_data))
-	yo = result.read()
-	return HttpResponse(yo)
-
 @csrf_exempt
-def paypal_ipn(request, csrf):
-
+def paypal_ipn(request):
 	print '*'*100
-
 	paypal_url = 'https://www.paypal.com/cgi-bin/webscr'
 	if request.POST.get('test_ipn'):
 		paypal_url = 'https://www.sandbox.paypal.com/cgi-bin/webscr'
-
 	invoice = Invoices.fetch(id=request.POST.get('invoice'))
-	csrf_safe = bool(invoice) and cleanhex(csrf) == cleanhex(invoice.csrf)
-
-	paypal = PayPals.create(request.POST, csrf_safe)
-
+	paypal = PayPals.create(request.POST)
 	verified = paypal.verify(paypal_url)
-	
-	if csrf_safe and verified and request.POST.get('payment_status') == 'Completed':
+	if verified and request.POST.get('payment_status') == 'Completed':
 		invoice.pay(paypal)
 	return HttpResponse('')

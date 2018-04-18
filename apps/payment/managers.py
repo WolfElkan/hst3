@@ -14,10 +14,9 @@ from apps.program.managers import Enrollments
 class PayPalManager(sm.SuperManager):
 	def __init__(self):
 		super(PayPalManager, self).__init__('payment.paypal')
-	def create(self, post, csrf_safe):
+	def create(self, post):
 		return super(PayPalManager, self).create(
 			message   = json.dumps(post),
-			csrf_safe = csrf_safe,
 			txn_id    = post['txn_id'],
 			payment_date = cleandate(post['payment_date']),
 		)

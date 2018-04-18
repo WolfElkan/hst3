@@ -18,7 +18,6 @@ import json
 
 class PayPal(models.Model):
 	message    = models.TextField(editable=False)
-	csrf_safe  = models.BooleanField(default=False)
 	verified   = models.NullBooleanField()
 	txn_id     = models.CharField(max_length= 20)
 	created_at = models.DateTimeField(auto_now_add=True)
@@ -53,7 +52,6 @@ class Invoice(models.Model):
 	}
 	status = models.CharField(max_length=1,default='N',choices=status_choices)
 	year   = models.DecimalField(max_digits=4, decimal_places=0)
-	csrf   = models.UUIDField(default=uuid.uuid4, editable=False)
 	paypal = models.OneToOneField(PayPal, null=True)
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
@@ -70,7 +68,6 @@ class Invoice(models.Model):
 			elif type(q) is Discount:
 				amount -= q.amount
 		return amount
-		# return sum(Each(self.items).course.tuition)
 	def update_amount(self):
 		if self.status == 'N':
 			self.amount = self.calc_amount()
@@ -90,6 +87,7 @@ class Invoice(models.Model):
 					item.status = "enrolled"
 					item.save()
 			self.status = 'P'
+			self.method = 'PayPal'
 			self.paypal = paypal
 			self.save()
 	def __getattribute__(self, field):

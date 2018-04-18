@@ -69,6 +69,8 @@ def hot(request):
 		'command': request.session['command'],
 		'session': divs(request.session.__dict__['_session_cache']),
 		'request': divs(request.__dict__.copy()),
+		'get': divs(request.GET.__dict__.copy()),
+		'post': divs(request.POST.__dict__.copy()),
 	}
 	return render(request, 'main/hot.html', context)
 
