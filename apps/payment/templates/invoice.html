@@ -70,7 +70,7 @@
 				<th>Amount</th>
 			</thead>
 			{% for item in invoice.items %}
-			<tr class="{{item.status}}">
+			<tr class="{{item.status}}" onclick="">
 				<td>{{item.display_student}}</td>
 				<td>{{item.course}}</td>
 				<td class="money">${{item.tuition}}</td>

@@ -45,7 +45,6 @@ def invoice_index(request, family_id):
 
 @csrf_exempt
 def paypal_ipn(request):
-	print '*'*100
 	paypal_url = 'https://www.paypal.com/cgi-bin/webscr'
 	if request.POST.get('test_ipn'):
 		paypal_url = 'https://www.sandbox.paypal.com/cgi-bin/webscr'

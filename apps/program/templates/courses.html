@@ -6,10 +6,10 @@
 </head>
 <style type="text/css">
 	* {
-		vertical-align: top;
+		/*vertical-align: top;*/
 	}
 	h2 {
-		/*margin: 0;*/
+		text-decoration: underline;
 		text-align: center;
 	}
 	.student_menu {
@@ -35,9 +35,9 @@
 	.selected_tab {
 		border-bottom: solid white;
 		text-decoration: none;
+		font-weight: bold;
 	}
 	.selected_tab div {
-		font-weight: bold;
 		color: black;
 	}
 	.course_menu {
@@ -50,14 +50,20 @@
 		display: inline-block;
 		border-spacing: 0;
 	}
-	tr {
+	.outlined tr {
 		outline: solid black 1px;
 	}
 	td {
 		padding: 5px;
 	}
-	.pane {
+	.ib {
 		display: inline-block;
+	}
+	.il {
+		display: inline;
+	}
+	.pane {
+		display: block;
 	}
 	.right {
 		text-align: right;
@@ -107,149 +113,180 @@
 		.aud_lock button.drop_disabled {display: inline;}
 
 	.invoice {
-		margin: 15px auto;
+		margin: 15px;
 		display: block;
 	}
 
 	/*.legend {display: none;}*/
-	.legend td:nth-child(2) {
-		font-family: monospace;
+	td.cart {
+		vertical-align: top;
 	}
-</style>
-<body>
-	<div class="pane">
-		<div class="student_menu">
-			{% for student in students %}
-			<a href="/register/student/{{student.id}}/" class="tab{% if student.id|add:0 == current_student.id|add:0 %} selected_tab {% endif %}">
-			<div title="{{student}}, age {{student.age}}">{{student.prefer}}</div>
-			</a>
-			{% endfor %}
-		</div>
-		<div class="course_menu">
-		<table>
-			<thead>
-				<th>{{reg_year}}</th>
-				<th>Class</th>
-				<th>Day</th>
-				<th>Time</th>
-				<th>Tuition</th>
-				<th>Hours</th>
-			</thead>
-			{% for enr in menu %}
-			<tr class="{{enr.status}}" title="{{enr.public_title}}">
-					<td class="center">
-						<form class="enroll" action="enroll/">
-							<input type="hidden" name="course_id" value="{{enr.course.id}}">
-							<input type="hidden" name="status" value="{{enr.status}}">
-							<button>Enroll</button>
-						</form>
-						<form class="aud" action="enroll/">
-							<input type="hidden" name="course_id" value="{{enr.course.id}}">
-							<input type="hidden" name="status" value="{{enr.status}}">
-							<button>Audition</button>
-						</form>
-						<form class="drop" action="drop/">
-							<input type="hidden" name="enr_id" value="{{enr.id}}">
-							<input type="hidden" name="status" value="{{enr.status}}">
-							<button>Drop</button>
-						</form>
-						<button class="enroll_disabled" disabled>Enroll</button>
-						<a class="view" href="/register/invoice/{{enr.invoice_id}}">Invoice</a>
-					</td>
-					<td class="center">{{enr.course.title}}</td>
-					<td>{{enr.course.day.short}}</td>
-					<td>{{enr.course.start}} - {{enr.course.end}}{{enr.course.tradition.display_semester}}</td>
-					<td class="right">${{enr.course.tuition}}</td>
-					<td class="right">{{enr.course.vol_hours}}</td>
-			</tr>
-			{% endfor %}
-		</table>
-	</div>
+	td.legend {
+		vertical-align: bottom;
+		padding-bottom: 0;
+	}
 
-</div>
-<div id="cart" class="pane">
-	{{family.enrollments}}
-	<table>
-		<thead>
-			<th>Student</th>
-			<th>Class</th>
-			<th>Hours</th>
-			<th>Tuition</th>
-		</thead>
-		{% for enrollment in cart %}
-		<tr class="{{enrollment.status}}" title="Enrollment #{{enrollment.id}}">
-			<td>{% if enrollment.course.e %}{{enrollment.student.prefer}}{% endif %}</td>
-			<td class="center">{{enrollment.course.title}}</td>
-			<td class="right">{{enrollment.course.vol_hours}}</td>
-			<td class="right">${{enrollment.course.tuition|floatformat:2}}</td>
-		</tr>
-		{% endfor %}
-		<tr class="total">
-			<td><b>Total:</b></td>
-			<td class="center">{{nCourses.total}}</td>
-			<td class="right">{{hours.total}}</td>
-			<td class="right">${{tuition.total|floatformat:2}}</td>
-		</tr>
-		<tr class="total">
-			<td><b>Pending:</b></td>
-			<td class="center">{{nCourses.pend}}</td>
-			<td class="right">{{hours.pend}}</td>
-			<td class="right">${{tuition.pend|floatformat:2}}</td>
-		</tr>
-		<tr class="total">
-			<td><b>Paid:</b></td>
-			<td class="center">{{nCourses.paid}}</td>
-			<td class="right">{{hours.paid}}</td>
-			<td class="right">${{tuition.paid|floatformat:2}}</td>
-		</tr>
-		<tr class="total">
-			<td><b>Due:</b></td>
-			<td class="center">{{nCourses.unpaid}}</td>
-			<td class="right">{{hours.unpaid}}</td>
-			<td class="right">${{tuition.unpaid|floatformat:2}}</td>
-		</tr>
-	</table>
-	<form method="POST" action="/register/process/">{% csrf_token %}
-		<button {% if not invoiceable %} disabled {% endif %} class="invoice">Generate Invoice</button>
-		<a href="/family/{{family.id}}/invoices/">Show Invoices</a>
-	</form>
-</div>
-<div class="pane">
-	<h2><u>Legend</u></h2>
-	<table class="legend">
-		<tr class="eligible">
-			<td>Student is eligible to enroll in this class.</td>
-		</tr>
-		<tr class="aud_need">
-			<td>Student is eligible for an audition or skill assessment for this class.</td>
-		</tr>
-		<tr class="not_elig">
-			<td>Student is not eligible for this class.</td>
-		</tr>
-		<tr class="need_cur">
-			<td>Student will be eligible, but must enroll in at least 1 other class first.</td>
-		</tr>
-		<tr class="conflict">
-			<td>Student is registered for another class at the same time as this.</td>
-		</tr>
-		<tr class="aud_pend">
-			<td>Student has scheduled an audition or skill assessment for this class.</td>
-		</tr>
-	<!-- 	<tr class="aud_pass">
-			<td>Student passed an audition for this class and may now enroll in it.</td>
-		</tr> -->
-		<tr class="need_pay">
-			<td>This class has been added to the cart, pending tuition payment.</td>
-		</tr>
-		<tr class="invoiced">
-			<td>Student's registration for this class is on an unpaid invoice.</td>
-		</tr>
-		<tr class="enrolled">
-			<td>Student is successfully enrolled this class.</td>
-		</tr>
-	</table>
-	
-</div>
+</style>
+<script type="text/javascript">
+	function go(url) {
+		window.location.replace(url)
+	}
+	function mo(url) {
+		window.location.href = url
+	}
+</script>
+<body>
+
+<table>
+	<tr>
+		<td rowspan="2">
+			
+			<div class="student_menu">
+				{% for student in students %}
+				<div onclick="go('/register/student/{{student.id}}/')" class="tab{% if student.id|add:0 == current_student.id|add:0 %} selected_tab {% endif %}" title="{{student}}, age {{student.age}}">
+					{{student.prefer}}
+				</div>
+				{% endfor %}
+			</div>
+			<div class="course_menu">
+				<table class="outlined">
+					<thead>
+						<th>{{reg_year}}</th>
+						<th>Class</th>
+						<th>Day</th>
+						<th>Time</th>
+						<th>Tuition</th>
+						<th>Hours</th>
+					</thead>
+					{% for enr in menu %}
+					<tr class="{{enr.status}}" title="{{enr.public_title}}">
+						<td class="center">
+							<form class="enroll" action="enroll/">
+								<input type="hidden" name="course_id" value="{{enr.course.id}}">
+								<input type="hidden" name="status" value="{{enr.status}}">
+								<button>Enroll</button>
+							</form>
+							<form class="aud" action="enroll/">
+								<input type="hidden" name="course_id" value="{{enr.course.id}}">
+								<input type="hidden" name="status" value="{{enr.status}}">
+								<button>Audition</button>
+							</form>
+							<form class="drop" action="drop/">
+								<input type="hidden" name="enr_id" value="{{enr.id}}">
+								<input type="hidden" name="status" value="{{enr.status}}">
+								<button>Drop</button>
+							</form>
+							<button class="enroll_disabled" disabled>Enroll</button>
+							<a class="view" href="/register/invoice/{{enr.invoice_id}}">Invoice</a>
+						</td>
+						<td class="center">{{enr.course.title}}</td>
+						<td>{{enr.course.day.short}}</td>
+						<td>{{enr.course.start}} - {{enr.course.end}}{{enr.course.tradition.display_semester}}</td>
+						<td class="right">${{enr.course.tuition}}</td>
+						<td class="right">{{enr.course.vol_hours}}</td>
+					</tr>
+					{% endfor %}
+				</table>
+			</div>
+
+		</td>
+		<td class="cart">
+			
+			<div class="cart">
+				<h2>Enrollment Cart</h2>
+				<center>
+					<table class="outlined">
+						<thead>
+							<th>Student</th>
+							<th>Class</th>
+							<th>Hours</th>
+							<th>Tuition</th>
+						</thead>
+						{% for enrollment in cart %}
+						<tr {% if enrollment.invoice %} onclick="mo('/register/invoice/{{enrollment.invoice.id}}')" {% endif %} class="{{enrollment.status}}" title="Enrollment #{{enrollment.id}}">
+							<td>{% if enrollment.course.e %}{{enrollment.student.prefer}}{% endif %}</td>
+							<td class="center">{{enrollment.course.title}}</td>
+							<td class="right">{{enrollment.course.vol_hours}}</td>
+							<td class="right">${{enrollment.course.tuition|floatformat:2}}</td>
+						</tr>
+						{% endfor %}
+						<tr class="total">
+							<td><b>Total:</b></td>
+							<td class="center">{{nCourses.total}}</td>
+							<td class="right">{{hours.total}}</td>
+							<td class="right">${{tuition.total|floatformat:2}}</td>
+						</tr>
+						<tr class="total">
+							<td><b>Pending:</b></td>
+							<td class="center">{{nCourses.pend}}</td>
+							<td class="right">{{hours.pend}}</td>
+							<td class="right">${{tuition.pend|floatformat:2}}</td>
+						</tr>
+						<tr class="total">
+							<td><b>Paid:</b></td>
+							<td class="center">{{nCourses.paid}}</td>
+							<td class="right">{{hours.paid}}</td>
+							<td class="right">${{tuition.paid|floatformat:2}}</td>
+						</tr>
+						<tr class="total">
+							<td><b>Due:</b></td>
+							<td class="center">{{nCourses.unpaid}}</td>
+							<td class="right">{{hours.unpaid}}</td>
+							<td class="right">${{tuition.unpaid|floatformat:2}}</td>
+						</tr>
+					</table>
+					<form method="POST" action="/register/process/">{% csrf_token %}
+						<button {% if not invoiceable %} disabled {% endif %} class="invoice">Generate Invoice</button>
+					</form>
+				</center>
+				<a href="/family/{{family.id}}/invoices/">All Invoices</a>
+			</div>
+
+		</td>
+	</tr>
+	<tr>
+		<td>
+			
+			<div class="legend">
+				<h2>Legend</h2>
+				<table class="legend outlined">
+					<tr class="eligible">
+						<td>Student is eligible to enroll in this class.</td>
+					</tr>
+					<tr class="aud_need">
+						<td>Student is eligible for an audition or skill assessment for this class.</td>
+					</tr>
+					<tr class="not_elig">
+						<td>Student is not eligible for this class.</td>
+					</tr>
+					<tr class="need_cur">
+						<td>Student will be eligible, but must enroll in at least 1 other class first.</td>
+					</tr>
+					<tr class="conflict">
+						<td>Student is registered for another class at the same time as this.</td>
+					</tr>
+					<tr class="aud_pend">
+						<td>Student has scheduled an audition or skill assessment for this class.</td>
+					</tr>
+				<!-- 	<tr class="aud_pass">
+						<td>Student passed an audition for this class and may now enroll in it.</td>
+					</tr> -->
+					<tr class="need_pay">
+						<td>This class has been added to the cart, pending tuition payment.</td>
+					</tr>
+					<tr class="invoiced">
+						<td>Student's registration for this class is on an unpaid invoice.</td>
+					</tr>
+					<tr class="enrolled">
+						<td>Student is successfully enrolled this class.</td>
+					</tr>
+				</table>
+			</div>
+			
+		</td>
+	</tr>
+</table>
+
 
 </body>
 </html>
