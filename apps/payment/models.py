@@ -24,9 +24,7 @@ class PayPal(models.Model):
 	payment_date = models.DateTimeField(null=True)
 	objects = PayPals
 	def __getitem__(self, field):
-		dic = self.data()
-		if field in dic:
-			return dic[field]
+		return self.data().get(field)
 	def data(self):
 		return json.loads(self.message)
 	def verify(self, url):
@@ -79,16 +77,19 @@ class Invoice(models.Model):
 				item.save()
 			self.status = 'C'
 			self.save()
+	def confirm(self, paypal):
+		return self.status == 'N' and paypal['amount'] == self.amount and paypal['invoice'] == self.id
 	def pay(self, paypal):
-		if self.status == 'N':
+		if self.confirm(paypal):
 			for item in self.items:
 				if item.status == "invoiced":
 					item.status = "enrolled"
 					item.save()
 			self.status = 'P'
 			self.method = 'PayPal'
-			self.paypal = paypal
+			self.paypal =  paypal
 			self.save()
+			return True
 	def __getattribute__(self, field):
 		if field in ['items','get_status_display']:
 			call = super(Invoice, self).__getattribute__(field)

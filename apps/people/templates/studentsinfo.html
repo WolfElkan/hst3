@@ -39,7 +39,7 @@
 	</style>
 	<script type="text/javascript">
 
-		var fields = ['first','middle','alt_last','alt_first','sex','birthday','grad_year','tshirt','alt_phone','alt_email']
+		var fields = ['first','alt_last','alt_first','sex','birthday','grad_year','tshirt','alt_phone','alt_email']
 
 		var family_last = '{{family.last}}'
 		var reg_year = Number('{{reg_year}}')
@@ -168,7 +168,7 @@
 				return `<tr id="${this.sid}"><td>${this.alt_first ? this.alt_first : this.first} ${this.alt_last ? this.alt_last : family_last}</td><td>${this.birthday ? this.hst_age : ''}${this.hst_age == this.cur_age() ? '' : '*'}</td><td>${this.sex}</td><td>${this.grade}</td><td>${this.height_tr}</td><td>${this.tshirt}</td><td>${this.alt_phone ? phone_format(this.alt_phone) : ''}</td><td>${this.alt_email ? this.alt_email : ''}</td><td><button class="edit">Edit</button><button class="delete">Delete</button></td></tr>`
 			} 
 			this.json = function() {
-				var columns = ['first','middle','alt_last','alt_first','sex','grad_year','height','alt_phone','alt_email','tshirt','isNew','exists']
+				var columns = ['first','alt_last','alt_first','sex','grad_year','height','alt_phone','alt_email','tshirt','isNew','exists']
 				json_obj = {}
 				for (var i = 0; i < columns.length; i++) {
 					var col = columns[i]
@@ -355,7 +355,8 @@
 	<a href="/">Home</a>
 	<h1>New Family Registration</h1>
 	<h2>Step 3: Students Information</h2>
-	<span class="instructions">Click the Add Student button to register your students for the {{reg_year|add:-1}}-{{reg_year}} school year with HST.  (You will sign them up for their classes on the next screen.)  Fields in <b>bold</b> are required.  Leave placeholders in other fields if they are the same as the Family.</span>
+	<p class="instructions">Click the Add Student button to register your students for the {{reg_year|add:-1}}-{{reg_year}} school year with HST.  (You will sign them up for their classes on the next screen.)  Fields in <b>bold</b> are required.  Leave placeholders in other fields if they are the same as the Family. </p>
+	<p> Note: Information will <i>not</i> be preserved if you refresh this page.</p>
 	<div>
 		<div id="student_list_div">
 			<table id="student_list">
@@ -380,15 +381,11 @@
 					<td><input type="text" name="first" id="first"></td>
 					<td class="error" id="first_error"></td>
 				</tr>
-				<tr><td>Middle Name:</td>
-					<td><input type="text" name="middle" id="middle"></td>
-					<td class="error" id="middle_error"></td>
-				</tr>
 				<tr><td>Last Name:</td>
 					<td><input type="text" name="alt_last" id="alt_last" placeholder="{{family.last}}"></td>
 					<td class="error" id="alt_last_error"></td>
 				</tr>
-				<tr><td>Preferred Name:</td>
+				<tr><td>Nickname:</td>
 					<td><input type="text" name="alt_first" id="alt_first"></td>
 					<td class="error" id="alt_first_error"></td>
 				</tr>

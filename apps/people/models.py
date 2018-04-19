@@ -178,7 +178,6 @@ class Student(models.Model):
 	hid       = models.CharField(max_length=7, null=True)
 	first     = models.CharField(max_length=20)
 	alt_first = models.CharField(max_length=20, default='')
-	middle    = models.CharField(max_length=20, default='')
 	alt_last  = models.CharField(max_length=30, default='')
 	family    = models.ForeignKey(Family)
 	sex       = models.CharField(max_length=1, choices=[('M','Male'),('F','Female')])
@@ -214,7 +213,7 @@ class Student(models.Model):
 	def email(self):
 		return self.alt_email if self.alt_email else self.family.email
 	def full_name(self):
-		return ' '.join([self.first,self.middle,self.last] if self.middle else [self.first,self.last])
+		return ' '.join([self.first,self.last])
 	def mother(self):
 		return self.family.mother
 	def father(self):
@@ -281,7 +280,7 @@ class Student(models.Model):
 	def __str__(self):
 		return self.prefer+' '+self.last
 	def __json__(self):
-		obj = copyatts(self,['first','sex','id','alt_first','middle','alt_last','grad_year','height','alt_email','tshirt','current'], False)
+		obj = copyatts(self,['first','sex','id','alt_first','alt_last','grad_year','height','alt_email','tshirt','current'], False)
 		if self.birthday:
 			obj['birthday']  = str(self.birthday)
 		if int(self.alt_phone):

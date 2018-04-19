@@ -62,11 +62,10 @@ Parents = ParentManager()
 class StudentManager(sm.SuperManager):
 	def __init__(self):
 		super(StudentManager, self).__init__('people.student')
-		self.fields = ['first','middle','alt_last','alt_first','sex','birthday','grad_year','height','alt_phone','alt_email','tshirt']
+		self.fields = ['first','alt_last','alt_first','sex','birthday','grad_year','height','alt_phone','alt_email','tshirt']
 		self.validations = [
 			sm.Present('first','Please enter a first name.'),
 			sm.Regular('first',r'^.{0,20}$','This name is too long.  The maximum is 20 characters.'),
-			sm.Regular('middle',r'^.{0,20}$','This name is too long.  The maximum is 20 characters.'),
 			sm.Regular('alt_last',r'^.{0,30}$','This name is too long.  The maximum is 30 characters.'),
 			sm.Regular('alt_first',r'^.{0,20}$','This name is too long.  The maximum is 20 characters.'),
 			sm.Present('sex','Please select a sex.'),

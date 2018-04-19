@@ -50,7 +50,8 @@ def paypal_ipn(request):
 		paypal_url = 'https://www.sandbox.paypal.com/cgi-bin/webscr'
 	invoice = Invoices.fetch(id=request.POST.get('invoice'))
 	paypal = PayPals.create(request.POST)
-	verified = paypal.verify(paypal_url)
-	if verified and request.POST.get('payment_status') == 'Completed':
-		invoice.pay(paypal)
+	if invoice.confirm(paypal):
+		verified = paypal.verify(paypal_url)
+		if verified:
+			invoice.pay(paypal)
 	return HttpResponse('')

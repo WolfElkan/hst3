@@ -86,25 +86,15 @@
 	{% if invoice.status == 'N' %}
  	<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
         <input type="hidden" name="business" value="{{email}}">
-        <!-- Specify a Buy Now button. -->
         <input type="hidden" name="cmd" value="_xclick">
-        <!-- Specify details about the item that buyers will purchase. -->
-        <input type="hidden" name="item_name" value="HST Tuition Invoice #{{invoice.id}}"> <!-- Add Description e.g your room type Required-->
+        <input type="hidden" name="item_name" value="HST Tuition Invoice #{{invoice.id}}"> 
         <input type="hidden" name="amount" value="{{invoice.amount}}"> 
-        <!-- Dynamically add Total Amount Required-->
         <input type="hidden" name="currency_code" value="USD"> 
-        <!-- Update to your currency -->
         <input type="hidden" name="invoice" value="{{invoice.id}}" id="invoice"> 
-        <!-- Add Unique invoice for each transaction -->
         <input type="hidden" name="notify_url" value='{{host}}/ipn/' /> 
-        <!-- Please add IPN URL You can use this service to automate back-office and administrative functions, including fulfilling orders, tracking customers, and providing status and other information related to transactions. -->
         <input type='hidden' name='cancel_return' value="{{host}}/register/invoice/{{invoice.id}}" /> 
-        <!-- Take customers to this URL when they cancel their checkout -->
         <input type='hidden' name='return' value="{{host}}/register/invoice/{{invoice.id}}?ref=paypal" /> 
-        <!-- Take customers to this URL when they finish their checkout  -->
-        <!-- Display the payment button. -->
         <button id="paypal" title="PayPal - The safer, easier way to pay online">Pay with PayPal</button>
-        <!-- <input type="image" name="submit" border="0" src="https://www.paypalobjects.com/en_US/i/btn/btn_buynow_LG.gif" > -->
     </form>
 	{% endif %}
     {% if waiting %}
