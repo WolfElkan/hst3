@@ -39,6 +39,8 @@
 	</style>
 	<script type="text/javascript">
 
+		var trace = true
+
 		var fields = ['first','alt_last','alt_first','sex','birthday','grad_year','tshirt','alt_phone','alt_email']
 
 		var family_last = '{{family.last}}'
@@ -124,15 +126,16 @@
 				return age
 			}
 			this.isValid = function(validations) {
-				console.log(this)
-				for (var i = 0; i < validations.length; i++) {
-					var regex = new RegExp(validations[i].regex)
-					var field = validations[i].field
-					if (!String(this[field]).match(regex)) {
-						return false
-					}
-				}
 				return true
+			// 	console.log(this)
+			// 	for (var i = 0; i < validations.length; i++) {
+			// 		var regex = new RegExp(validations[i].regex)
+			// 		var field = validations[i].field
+			// 		if (!String(this[field]).match(regex)) {
+			// 			return false
+			// 		}
+			// 	}
+			// 	return true
 			}
 			this.show_errors = function(validations) {
 				var error_tds = $('.error')
@@ -267,6 +270,7 @@
 		}
 
 		function new_current_sid_increment() {
+	
 			var max = 0
 			for (var i = 0; i < student_bank.length; i++) {
 				student = student_bank[i]
@@ -305,7 +309,7 @@
 					var student = find_student(current_sid)
 				}
 				if (student.isValid(validations)) {
-					student.id = current_sid
+					student.sid = current_sid
 					save_student(student)
 					$('#submit').show()
 				} else {
@@ -403,7 +407,7 @@
 				<tr><td><b>Birthday:</b></td>
 					<td>
 						<input type="date" name="birthday" id="birthday" placeholder="YYYY-MM-DD">
-						<span id="birthday_static" title="Student birthdays cannot be edited.  Please email HST if you have entered it incorrectly."></span>
+						<span id="birthday_static" title="Student birthdays cannot be edited.  Please email HST if it was entered incorrectly."></span>
 					</td>
 					<td class="error" id="birthday_error"></td>
 				</tr>
@@ -442,6 +446,10 @@
 				</tr>
 				<tr><td>Personal Email:</td>
 					<td><input type="email" name="alt_email" id="alt_email" placeholder="Use Family Email"></td>
+					<td class="error" id="alt_email_error"></td>
+				</tr>
+				<tr><td>Special Needs<br>or Allergies:</td>
+					<td><textarea name="needs" id="needs" placeholder="None"></textarea></td>
 					<td class="error" id="alt_email_error"></td>
 				</tr>
 			</table>

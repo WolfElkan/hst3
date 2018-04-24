@@ -35,7 +35,6 @@ FIELDS = {
 	'student'   : [
 		{'field':'hid'       , 'template': Static()},
 		{'field':'first'     , 'template': VarChar(maxlength=20)},
-		{'field':'middle'    , 'template': VarChar(maxlength=20)},
 		{'field':'alt_first' , 'template': VarChar(maxlength=20)},
 		{'field':'family'    , 'template': ForeignKey(model='family')},
 		{'field':'alt_last'  , 'template': VarChar(maxlength=30)},
@@ -47,6 +46,7 @@ FIELDS = {
 		{'field':'alt_phone' , 'template': PhoneNumber()},
 		{'field':'alt_email' , 'template': VarChar(maxlength=254)},
 		{'field':'tshirt'    , 'template': Enum(options=['','YS','YM','YL','XS','AS','AM','AL','XL','2X','3X'])},
+		{'field':'needs'     , 'template': VarChar()},
 		{'field':'courses_toggle_enrollments', 'template': ToggleSet(field='courses',model='enrollment')},
 	],
 	'user'      : [

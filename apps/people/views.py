@@ -59,18 +59,15 @@ def familyinfo_post(request):
 	if Families.isValid(new_family) and Users.isValid(new_user, override_unique_username=ouu):
 		new_user.pop('pw_confm')
 		if not me:
-			print 'not me'
 			new_family = Families.create(**new_family)
 			new_user['owner'] = new_family
 			me = Users.create(**new_user)
 		elif me and not me.owner:
-			print 'me and not me.owner'
 			me.username = new_user['username']
 			new_family = Families.create(**new_family)
 			me.owner = new_family
 			me.save()
 		elif me and me.owner:
-			print 'me and me.owner'
 			me.username = new_user['username']
 			family = me.owner
 			family.last  = new_family['last']
@@ -259,7 +256,7 @@ def studentsinfo_post(request):
 			student_proxy = Students.fetch(id=student['id'])
 			if student_proxy:
 				if current:
-					for key in ['first','middle','alt_last','alt_first','sex','grad_year','height','alt_phone','alt_email','tshirt']:
+					for key in ['first','alt_last','alt_first','sex','grad_year','height','alt_phone','alt_email','tshirt','needs']:
 						if key in student:
 							student_proxy.__setattr__(key, student[key])
 				else:

@@ -187,6 +187,7 @@ class Student(models.Model):
 	height    = models.FloatField(null=True)
 	alt_phone = custom.PhoneNumberField(null=True)
 	alt_email = models.EmailField(default='')
+	needs     = models.TextField(default='')
 	rest_model = "student"
 	t_shirt_sizes = [
 		('YS','Youth Small'),
