@@ -184,7 +184,6 @@ class Student(models.Model):
 	current   = models.BooleanField(default=True)
 	birthday  = models.DateField()
 	grad_year = models.DecimalField(max_digits=4, decimal_places=0, null=True)
-	height    = models.FloatField(null=True)
 	alt_phone = custom.PhoneNumberField(null=True)
 	alt_email = models.EmailField(default='')
 	needs     = models.TextField(default='')
@@ -281,7 +280,7 @@ class Student(models.Model):
 	def __str__(self):
 		return self.prefer+' '+self.last
 	def __json__(self):
-		obj = copyatts(self,['first','sex','id','alt_first','alt_last','grad_year','height','alt_email','tshirt','current'], False)
+		obj = copyatts(self,['first','sex','id','alt_first','alt_last','grad_year','alt_email','tshirt','current'], False)
 		if self.birthday:
 			obj['birthday']  = str(self.birthday)
 		if int(self.alt_phone):

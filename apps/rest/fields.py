@@ -42,7 +42,6 @@ FIELDS = {
 		{'field':'current'   , 'template': Checkbox(suffix='Student is currently in HST')},
 		{'field':'birthday'  , 'template': Date()},
 		{'field':'grad_year' , 'template': Integer()},
-		{'field':'height'    , 'template': Integer(suffix='inches')},
 		{'field':'alt_phone' , 'template': PhoneNumber()},
 		{'field':'alt_email' , 'template': VarChar(maxlength=254)},
 		{'field':'tshirt'    , 'template': Enum(options=['','YS','YM','YL','XS','AS','AM','AL','XL','2X','3X'])},
