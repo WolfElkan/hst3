@@ -19,9 +19,6 @@
 			padding: 5px;
 			display: none;
 		}
-		#height_ft, #height_in {
-			width: 40px;
-		}
 		h3 {
 			margin: 0 3px 7px;
 			font-weight: normal;
@@ -88,7 +85,7 @@
 			this.update = function() {
 			if (trace && student_bank[0]) {console.log(student_bank[0].first)}
 			if (trace) {console.log('Student.update')}
-				if (this.isNew) {
+				if (this.isNew || form_type == 2) {
 					for (var i = 0; i < fields.length; i++) {
 						var field = fields[i]
 						this[field] = $$('#'+field).value
@@ -99,7 +96,7 @@
 						this[field] = arg[field] ? arg[field] : ''
 					}
 				}
-				if (this.birthday) {
+				if (this.birthday && type(this.birthday) == String) {
 					this.birthday = {
 						'year' : Number(this.birthday.substr(0,4)),
 						'month': Number(this.birthday.substr(5,2)),
@@ -114,6 +111,9 @@
 					this.birthday.db = `${zeropad(this.birthday.year,4)}-${zeropad(this.birthday.month,2)}-${zeropad(this.birthday.date,2)}`
 				}
 				this.grade = this.grad_year ? reg_year - this.grad_year + 12 : ''
+				if (this.grade > 12) {
+					this.grade = 'Alum'
+				}
 				this.hst_age = reg_year - this.birthday.year - 1
 
 			}
@@ -255,7 +255,7 @@
 				student_bank.push(student)
 				$('#student_list').append(student.tr())
 			} else if (form_type == 2) {
-				console.log(student)
+				console.log(student.first)
 				$$('#'+student.sid).outerHTML = student.tr()
 				x = find_student(student.sid).index
 				student_bank[x] = student
