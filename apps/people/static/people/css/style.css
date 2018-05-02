@@ -1,0 +1,24 @@
+#student_list_div,
+#student_form_div,
+#student_form {
+	display: inline-block;
+}
+#student_form_div {
+	border: solid black 1px;
+	padding: 5px;
+	display: none;
+}
+h3 {
+	margin: 0 3px 7px;
+	font-weight: normal;
+}
+#student_list td {
+	text-align: center;
+}
+#student_list td:nth-child(1) {
+	text-align: left;
+}
+#birthday_static {
+	font-family: sans-serif;
+	font-size: 14px;
+}
