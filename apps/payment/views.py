@@ -14,7 +14,7 @@ from Utils.data  import collect, copy, copyatts, cleandate
 from Utils.debug import pretty, divs
 from Utils.fjson import FriendlyEncoder, json
 from Utils.misc  import namecase, cleanhex
-from Utils.security import authorized, getme, getyear, gethist
+from Utils.security import getme, getyear, gethist
 from Utils.seshinit import seshinit, forminit
 
 from datetime import datetime

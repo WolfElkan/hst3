@@ -19,6 +19,8 @@ class Venue(models.Model):
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
 	rest_model = "venue"
+	def stand(self, me):
+		return False
 	# def __getattribute__(self, field):
 	# 	if field in []:
 	# 		function = super(Venue, self).__getattribute__(field)
@@ -97,6 +99,11 @@ class CourseTrad(models.Model):
 	objects = CourseTrads
 	def __str__(self):
 		return self.title.upper()
+	def stand(self, me):
+		if me.owner_type == 'Family':
+			return bool(self.courses.filter(enrollment__student__family=me.owner))
+		elif me.owner_type == 'Student':
+			return bool(self.courses.filter(enrollment__student=me.owner))
 	def display_semester(self):
 		sem = self.semester
 		return ' ({})'.format(sem) if sem in 'FS' else ''
@@ -253,6 +260,11 @@ class Course(models.Model):
 	updated_at = models.DateTimeField(auto_now=True)
 	rest_model = "course"
 	objects = Courses
+	def stand(self, me):
+		if me.owner_type == 'Family':
+			return bool(self.students.filter(family=me.owner))
+		elif me.owner_type == 'Student':
+			return bool(self.students.filter(id=me.owner.id))
 	def enrollments(self):
 		return Enrollments.filter(course_id=self.id)
 	def students(self):
@@ -389,6 +401,11 @@ class Enrollment(models.Model):
 	updated_at = models.DateTimeField(auto_now=True)
 	rest_model = "enrollment"
 	objects = Enrollments
+	def stand(self, me):
+		if me.owner_type == 'Family':
+			return self.student.family.id == me.owner.id
+		elif me.owner_type == 'Student':
+			return self.student.id == me.owner.id
 	def __init__(self, *args, **kwargs):
 		if hasattr(self, '_state'):
 			self.set_status()

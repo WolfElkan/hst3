@@ -5,7 +5,7 @@ from .managers import CourseTrads, Courses, Enrollments
 from apps.payment.managers import Invoices
 
 from Utils.data  import equip, find_all, Each, collect
-from Utils.security import authorized, getme, getyear
+from Utils.security import getme, getyear
 
 def from_myaccount(request, **kwargs):
 	me = getme(request)

@@ -1,7 +1,55 @@
-def authorized(request, level=0):
+from trace import DEV
+# def authorized(request, level=0):
+# 	me = getme(request)
+# 	if me:
+# 		return me.permission >= level
+
+from django.shortcuts import render
+
+# def verify_standing(me, standing):
+# 	if not standing:
+# 		return False
+# 	person = me.owner
+# 	if person.rest_model == 'family':
+# 		family = standing_family(standing)
+# 		return family and person.id == family.id
+# 	elif person.rest_model == 'student':
+# 		student = standing_student(standing)
+# 		return student and person.id == student.id
+# 	elif standing.rest_model == 'course':
+# 		return False
+# 	else:
+# 		return False
+
+# def standing_family(standing):
+# 	if standing.rest_model == 'user' and standing.owner.rest_model == 'family':
+# 		return standing.owner
+# 	elif standing.rest_model == 'family':
+# 		return standing
+# 	elif standing.rest_model in ['student','parent','invoice','paypal']:
+# 		return standing.family
+# 	elif standing.rest_model == 'enrollment':
+# 		return standing.student.family
+
+# def standing_student(standing):
+# 	if standing.rest_model == 'user' and standing.owner.rest_model == 'student':
+# 		return standing.owner
+# 	elif standing.rest_model == 'student':
+# 		return standing
+# 	elif standing.rest_model == 'enrollment':
+# 		return standing.student
+
+def restricted(request, level=0, standing=None):
 	me = getme(request)
-	if me:
-		return me.permission >= level
+	if standing and standing.stand(me):
+		return False
+	if not me or me.permission < level:
+		context = {
+			'me':me,
+			'need':dict(me.perm_levels)[level]
+		}
+		return render(request, 'main/403.html', context, status=403)
+
 
 from datetime import datetime
 
@@ -12,7 +60,6 @@ def cleandate(date):
 # Find User object for current logged-in user, without causing errors.
 # me is always a User, never a Family, Student, or Teacher
 
-from trace import DEV
 from apps.program.managers import Courses
 
 def gethist(ago=1):

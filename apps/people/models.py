@@ -26,6 +26,14 @@ class Address(models.Model):
 	updated_at = models.DateTimeField(auto_now=True)
 	rest_model = "address"
 	objects = Addresses
+	def stand(self, me):
+		if me.owner_type == 'Family':
+			family = me.owner
+		elif me.owner_type == 'Student':
+			family = me.owner.family
+		else:
+			family = None
+		return family and family.address.id == self.id
 	def __str__(self):
 		title = self.line1 + ('\n'+self.line2 if self.line2 else '') + '\n' + self.city + ', ' + self.state + '\n' + str(self.zipcode)
 		return title
@@ -54,6 +62,14 @@ class Parent(models.Model):
 	def family(self):
 		return Families.get(id=self.family_id)
 
+	def stand(self, me):
+		if me.owner_type == 'Family':
+			family = me.owner
+		elif me.owner_type == 'Student':
+			family = me.owner.family
+		else:
+			family = None
+		return self.family.id == family.id
 	def __getattribute__(self, field):
 		if field in ['last','phone','email','family']:
 			call = super(Parent, self).__getattribute__(field)
@@ -83,6 +99,14 @@ class Family(models.Model):
 	rest_model = "family"
 	objects = Families
 
+	def stand(self, me):
+		if me.owner_type == 'Family':
+			family = me.owner
+		elif me.owner_type == 'Student':
+			family = me.owner.family
+		else:
+			family = None
+		return self.id == family.id
 	def mother(self):
 		return Parents.fetch(id=self.mother_id)
 	def father(self):
@@ -204,6 +228,11 @@ class Student(models.Model):
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
 	objects = Students
+	def stand(self, me):
+		if me.owner_type == 'Family':
+			return me.owner.id == self.family.id
+		elif me.owner_type == 'Student':
+			return me.owner.family.id == self.family.id
 	def prefer(self):
 		return self.alt_first if self.alt_first else self.first
 	def last(self):
@@ -320,6 +349,20 @@ class Teacher(models.Model):
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
 	rest_model = "teacher"
+	def stand(self, me):
+		if me.owner_type == 'Family':
+			return False
+		elif me.owner_type == 'Student':
+			return bool(Enrollments.filter(student_id=me.owner.id,course__teacher=self))
+	def courses(self):
+		pass
+	def __getattribute__(self, field):
+		if field in ['courses']:
+			call = super(Teacher, self).__getattribute__(field)
+			return call()
+		else:
+			return super(Teacher, self).__getattribute__(field)
+
 
 
 class User(models.Model):
@@ -341,6 +384,8 @@ class User(models.Model):
 	updated_at = models.DateTimeField(auto_now=True)
 	rest_model = "user"
 	objects = Users
+	def stand(self, me):
+		return self.id == me.id
 	def __str__(self):
 		return self.username
 	def __getattribute__(self, field):

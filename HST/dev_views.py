@@ -9,7 +9,7 @@ from Utils.data  import collect, copy, copyatts, Each, equip, find, find_all, su
 from Utils.debug import pretty, pdir, divs
 from Utils.fjson import FriendlyEncoder
 from Utils.misc  import namecase, cleanhex, safe_delete
-from Utils.security import authorized, getme, getyear, gethist
+from Utils.security import getme, getyear, gethist
 from Utils.seshinit import seshinit, forminit
 from Utils.snippets import order_coursetrads, make
 

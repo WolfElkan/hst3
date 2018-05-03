@@ -7,7 +7,7 @@ from Utils.custom_fields import Bcrypt, PhoneNumber
 from Utils.data  import collect, copy, copyatts
 from Utils.fjson import FriendlyEncoder, json
 from Utils.misc  import namecase
-from Utils.security import authorized, getme, getyear
+from Utils.security import restricted, getme, getyear
 from Utils.seshinit import seshinit, forminit
 
 import re
@@ -94,7 +94,7 @@ def familyinfo_post(request):
 
 # if me.owner
 def parentsinfo(request):
-	if not authorized(request):
+	if restricted(request):
 		return redirect('/')
 	forminit(request,'mom',['mom_skipped','mom_first','mom_alt_last','mom_alt_phone','mom_alt_email'])
 	forminit(request,'dad',['dad_skipped','dad_first','dad_alt_last','dad_alt_phone','dad_alt_email'])
@@ -215,7 +215,7 @@ def parentsinfo_post(request):
 
 # if me.owner.mother or me.owner.father
 def studentsinfo(request):
-	if not authorized(request):
+	if restricted(request):
 		return redirect('/')
 	elif request.method == 'GET':
 		return studentsinfo_get(request)

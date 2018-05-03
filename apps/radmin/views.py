@@ -8,7 +8,7 @@ from Utils.custom_fields import Bcrypt, PhoneNumber
 from Utils.data  import collect, copy, copyatts, equip
 from Utils.fjson import FriendlyEncoder, json
 from Utils.misc  import namecase, cleanhex
-from Utils.security import authorized, getme, getyear
+from Utils.security import getme, getyear
 from Utils.seshinit import seshinit, forminit
 
 from datetime import datetime

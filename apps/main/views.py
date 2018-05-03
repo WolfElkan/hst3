@@ -8,25 +8,12 @@ from Utils.data  import collect, copy, copyatts, Each, equip, find, find_all, su
 from Utils.debug import pretty, pdir, divs
 from Utils.fjson import FriendlyEncoder
 from Utils.misc  import namecase, safe_delete
-from Utils.security import authorized, getme, getyear
+from Utils.security import getme, getyear
 from Utils.seshinit import seshinit, forminit
 
 from trace import DEV
 
 import re
-
-# @csrf_exempt
-# def examine(request):
-# 	print '*'*100
-# 	seshinit(request,'command')
-# 	print request.POST
-# 	context = {
-# 		'command': request.session['command'],
-# 		'session': divs(request.session.__dict__['_session_cache']),
-# 		'request': divs(request.POST.copy()),
-# 	}
-# 	return render(request, 'main/hot.html', context)
-
 
 def index(request):
 	me = getme(request)
@@ -122,3 +109,7 @@ def changepassword_post(request):
 		return redirect(re.match(r'^.*/',request.META['HTTP_REFERER']).group())
 	else:
 		return redirect(request.META['HTTP_REFERER'])
+
+
+def dciv(request):
+	return render(request, 'main/404.html', status=404)

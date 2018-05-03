@@ -23,6 +23,8 @@ class PayPal(models.Model):
 	created_at = models.DateTimeField(auto_now_add=True)
 	payment_date = models.DateTimeField(null=True)
 	objects = PayPals
+	def invoice(self):
+		return Invoices.fetch(id=self.get('invoice'))
 	def __getitem__(self, field):
 		return self.data().get(field)
 	def data(self):
@@ -36,6 +38,14 @@ class PayPal(models.Model):
 		self.verified = response.text == 'VERIFIED'
 		self.save()
 		return self.verified
+	def stand(self, me):
+		return self.invoice.family.id == me.id
+	def __getattribute__(self, field):
+		if field in ['invoice','family']:
+			call = super(PayPal, self).__getattribute__(field)
+			return call()
+		else:
+			return super(PayPal, self).__getattribute__(field)
 
 
 class Invoice(models.Model):
@@ -55,6 +65,8 @@ class Invoice(models.Model):
 	objects = Invoices
 	def __str__(self):
 		return "Invoice #{}".format(self.id)
+	def stand(self, me):
+		return self.family.id == me.id
 	def items(self):
 		return Enrollments.filter(invoice=self, phantom=True)
 	def calc_amount(self):
