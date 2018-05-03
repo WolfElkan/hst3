@@ -10,10 +10,16 @@ from .fields import FIELDS
 from .widgets import MODELS
 
 def home(request):
+	bad = restricted(request)
+	if bad:
+		return bad
 	context = {}
 	return render(request, 'rest/home.html', context)
 
 def index(request, model):
+	bad = restricted(request)
+	if bad:
+		return bad
 	columns = []
 	for ftp in FIELDS[model]:
 		field = ftp['field']
@@ -40,6 +46,9 @@ def index(request, model):
 	return render(request, 'rest/index.html', context)
 
 def new(request, model, **kwargs):
+	bad = restricted(request,5)
+	if bad:
+		return bad
 	if 'foreign_model' in kwargs:
 		old_model = model
 		model = kwargs['foreign_model']
@@ -72,6 +81,9 @@ def new(request, model, **kwargs):
 	return render(request, 'rest/new.html', context)
 
 def create(request, model, **kwargs):
+	bad = restricted(request,5)
+	if bad:
+		return bad
 	if 'foreign_model' in kwargs:
 		old_model = model
 		model = kwargs['foreign_model']
@@ -101,6 +113,9 @@ def edit(request, model, id):
 def show_or_edit(request, model, id, isEdit):
 	manager = MODELS[model]
 	thing = manager.get(id=id)
+	bad = restricted(request,5) if isEdit else restricted(request,4,thing,1)
+	if bad:
+		return bad
 	tempset = FIELDS[model]
 	display = []
 	for ftp in tempset:
@@ -127,6 +142,9 @@ def show_or_edit(request, model, id, isEdit):
 	return render(request, 'rest/edit.html' if isEdit else 'rest/show.html', context)
 
 def update(request, model, id):
+	bad = restricted(request,5)
+	if bad:
+		return bad
 	manager = MODELS[model]
 	thing = manager.get(id=id)
 	for ftp in FIELDS[model]:
@@ -139,6 +157,9 @@ def update(request, model, id):
 	return redirect("/rest/show/{}/{}".format(model, thing.id))
 
 def delete(request, model, id):
+	bad = restricted(request,5)
+	if bad:
+		return bad
 	manager = MODELS[model]
 	thing = manager.get(id=id)
 	thing.delete()

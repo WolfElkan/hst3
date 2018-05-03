@@ -24,21 +24,24 @@ def index(request):
 	return render(request, 'main/index.html', context)
 
 
-def login(request):
+def login(request, **kwargs):
+	# Do not put any user authorization here!
 	forminit(request,'login',['username','password'])
 	if request.method == 'GET':
-		return login_get(request)
+		return login_get(request, **kwargs)
 	elif request.method == 'POST':
-		return login_post(request)
+		return login_post(request, **kwargs)
 	else:
 		print "Unrecognized HTTP Verb"
-		return index(request)
+		return index(request, **kwargs)
 
-def login_get(request):
+def login_get(request, **kwargs):
 	context = copy(request.session, ['p','e'])
 	return render(request, 'main/login.html', context)
 
-def login_post(request):
+def login_post(request, path):
+	if not path:
+		path = '/'
 	me = Users.fetch(username=request.POST['username'])
 	persist = copy(request.POST, ['username','password'])
 	if not me:
@@ -49,18 +52,18 @@ def login_post(request):
 			new_user['permission'] = 7
 			Users.create(**new_user)
 			request.session['meid'] = new_user['id']
-			return redirect('/')
+			return redirect(path)
 		else:
 			request.session['e'] = {'login':{'username': "You do not have an account.  Please register."}}
 			request.session['p'] = {'login':persist}
-			return redirect('/login')
+			return redirect('/login{}'.format(path))
 	elif not me.password(request.POST['password']):
 		request.session['e'] = {'login':{'password': "Your password is incorrect"}}
 		request.session['p'] = {'login':persist}
-		return redirect('/login')
+		return redirect('/login{}'.format(path))
 	else:
 		request.session['meid'] = me.id
-		return redirect('/')
+		return redirect(path)
 
 
 def logout(request):

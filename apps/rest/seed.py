@@ -7,12 +7,15 @@ from Utils.data  import copy, copyatts, Each
 from Utils.fjson import FriendlyEncoder
 from Utils.seshinit import seshinit
 from Utils.snippets import order_coursetrads, make
-from Utils.security import getyear
+from Utils.security import getyear, restricted
 
 from datetime import datetime
 import json
 
 def load(request):
+	bad = restricted(request,6)
+	if bad:
+		return bad
 	if request.method == 'GET':
 		return load_get(request)
 	elif request.method == 'POST':
@@ -21,6 +24,9 @@ def load(request):
 		return HttpResponse("Unrecognized HTTP Verb")
 
 def load_get(request):
+	bad = restricted(request,6)
+	if bad:
+		return bad
 	seshinit(request,'json_dump')
 	context = {
 		'json_dump': request.session['json_dump']
@@ -28,6 +34,9 @@ def load_get(request):
 	return render(request, 'json/seed.html', context)
 
 def load_post(request):
+	bad = restricted(request,6)
+	if bad:
+		return bad
 	start_import = datetime.now()
 	nUsers       = 0
 	nFamilies    = 0
@@ -144,6 +153,9 @@ def load_post(request):
 	return redirect('/seed/load/')
 
 def dump(request):
+	bad = restricted(request,6)
+	if bad:
+		return bad
 	data = {
 		'venues':[],
 		'coursetrads':[],
@@ -235,6 +247,9 @@ def dump(request):
 	return HttpResponse(json.dumps(data, cls=FriendlyEncoder))
 
 def nuke(request):
+	bad = restricted(request,6)
+	if bad:
+		return bad
 	Users.all().delete()
 	Families.all().delete()
 	Students.all().delete()

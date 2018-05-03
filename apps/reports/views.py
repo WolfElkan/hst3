@@ -4,11 +4,14 @@ from apps.people.managers import Addresses, Families, Parents, Users, Students
 from apps.program.managers import Courses, CourseTrads, Enrollments
 
 from Utils.data import sub
-from Utils.security import getyear, gethist
+from Utils.security import getyear, gethist, restricted
 
 import re
 
 def index(request, **kwargs):
+	bad = restricted(request,5)
+	if bad:
+		return bad
 	context = {
 		'courses':Courses.filter(year=getyear()).order_by('tradition__order'),
 		'year':getyear()
@@ -16,8 +19,12 @@ def index(request, **kwargs):
 	return render(request, 'index.html', context)
 
 def roster(request, id):
+	course = Courses.fetch(id=id)
+	bad = restricted(request,5,course)
+	if bad:
+		return bad
 	context = {
-		'course':Courses.fetch(id=id)
+		'course':course
 	}
 	return render(request, 'rowspan_roster.html', context)
 
@@ -32,6 +39,9 @@ def historical(request, **kwargs):
 	return render(request, 'historical.html', context)
 
 def students(request, **kwargs):
+	bad = restricted(request,5)
+	if bad:
+		return bad
 	year = int(kwargs['year']) if 'year' in kwargs else getyear()
 	kwargs.update(request.GET)
 	everyone = kwargs.setdefault('everyone',False) == [u'True']
@@ -68,6 +78,9 @@ def students(request, **kwargs):
 	return render(request, 'students.html', context)
 
 def mass_enroll(request, **kwargs):
+	bad = restricted(request,5)
+	if bad:
+		return bad
 	year = kwargs['year'] if 'year' in kwargs else getyear()
 	courses = Courses.filter(year=kwargs['year'])
 	students = []
@@ -82,6 +95,9 @@ def mass_enroll(request, **kwargs):
 	return render(request, 'mass_enroll.html', context)
 
 def register(request, **kwargs):
+	bad = restricted(request,5)
+	if bad:
+		return bad
 	new_enrollments = {}
 	course = Courses.get(id=str(request.POST['course_id']))
 	for x in request.POST:

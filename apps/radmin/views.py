@@ -8,16 +8,22 @@ from Utils.custom_fields import Bcrypt, PhoneNumber
 from Utils.data  import collect, copy, copyatts, equip
 from Utils.fjson import FriendlyEncoder, json
 from Utils.misc  import namecase, cleanhex
-from Utils.security import getme, getyear
+from Utils.security import getme, getyear, restricted
 from Utils.seshinit import seshinit, forminit
 
 from datetime import datetime
 
 def dashboard(request, **kwargs):
+	bad = restricted(request,4)
+	if bad:
+		return bad
 	context = {}
 	return render(request, 'radmin/dashboard.html', context)
 
 def newyear_year(request, **kwargs):
+	bad = restricted(request,5)
+	if bad:
+		return bad
 	if request.method == 'GET':
 		return newyear_year_get(request, **kwargs)
 	elif request.method == 'POST':
@@ -26,6 +32,9 @@ def newyear_year(request, **kwargs):
 		return HttpResponse("Unrecognized HTTP Verb")
 
 def newyear_year_get(request, method=None):
+	bad = restricted(request,5)
+	if bad:
+		return bad
 	context = {
 		'year': getyear(),
 	}
@@ -44,6 +53,9 @@ def newyear_year_get(request, method=None):
 	return render(request, 'radmin/newyear/year.html', context)
 
 def newyear_year_post(request, id, method=None):
+	bad = restricted(request,5)
+	if bad:
+		return bad
 	return redirect('/admin/newyear/year/'.format(newyear_year.id))
 
 

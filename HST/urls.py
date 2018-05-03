@@ -36,7 +36,7 @@ urlpatterns = [
 
 	url(r'^$', main.index),
 
-	url(r'^login/?$', main.login),
+	url(r'^login(?P<path>.*)/?$', main.login),
 	url(r'^logout/?$', main.logout),
 	url(r'^myaccount/?$', main.account),
 	url(r'^myaccount/changepassword/?$', main.changepassword),

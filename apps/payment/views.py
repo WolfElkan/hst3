@@ -14,7 +14,7 @@ from Utils.data  import collect, copy, copyatts, cleandate
 from Utils.debug import pretty, divs
 from Utils.fjson import FriendlyEncoder, json
 from Utils.misc  import namecase, cleanhex
-from Utils.security import getme, getyear, gethist
+from Utils.security import getme, getyear, gethist, restricted
 from Utils.seshinit import seshinit, forminit
 
 from datetime import datetime
@@ -27,6 +27,9 @@ def invoice_create(request):
 def invoice_show(request, id):
 	# me = getme(request)
 	invoice = Invoices.fetch(id=id)
+	bad = restricted(request,5,invoice)
+	if bad:
+		return bad
 	context = {
 		'invoice': invoice,
 		'email'  : PAYPAL_BUSINESS_EMAIL,
@@ -37,6 +40,9 @@ def invoice_show(request, id):
 
 def invoice_index(request, family_id):
 	family = Families.fetch(id=family_id)
+	bad = restricted(request,5,family)
+	if bad:
+		return bad
 	invoices = Invoices.filter(family=family)
 	context = {
 		'hist' : collect(gethist(0), lambda year: {'year':year, 'invoices':Invoices.filter(year=year,family=family)})

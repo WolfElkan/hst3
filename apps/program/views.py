@@ -5,7 +5,7 @@ from .managers import CourseTrads, Courses, Enrollments
 from apps.payment.managers import Invoices
 
 from Utils.data  import equip, find_all, Each, collect
-from Utils.security import getme, getyear
+from Utils.security import getme, getyear, restricted
 
 def from_myaccount(request, **kwargs):
 	me = getme(request)
@@ -89,6 +89,9 @@ def courses_drop(request, **kwargs):
 	return redirect('/register/student/{}/'.format(student_id))
 
 def audition_menu(request, **kwargs):
+	bad = restricted(request,4)
+	if bad:
+		return bad
 	context = {
 		'courses' : Courses.filter(enrollment__status__in=["aud_pend","pendpass","pendfail"]).distinct()
 	}
@@ -96,6 +99,9 @@ def audition_menu(request, **kwargs):
 
 def audition_results(request, **kwargs):
 	course = Courses.fetch(id=kwargs['id'])
+	bad = restricted(request,5,course,4)
+	if bad:
+		return bad
 	context = {
 		'course' : course,
 		'me' : getme(request),
@@ -105,6 +111,9 @@ def audition_results(request, **kwargs):
 def audition_process(request, **kwargs):
 	me = getme(request)
 	course = Courses.fetch(id=kwargs['id'])
+	bad = restricted(request,5,course,4)
+	if bad:
+		return bad
 	for key in request.POST:
 		if key.isdigit():
 			student = Students.fetch(id=int(key))

@@ -1,49 +1,12 @@
 from trace import DEV
-# def authorized(request, level=0):
-# 	me = getme(request)
-# 	if me:
-# 		return me.permission >= level
 
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
-# def verify_standing(me, standing):
-# 	if not standing:
-# 		return False
-# 	person = me.owner
-# 	if person.rest_model == 'family':
-# 		family = standing_family(standing)
-# 		return family and person.id == family.id
-# 	elif person.rest_model == 'student':
-# 		student = standing_student(standing)
-# 		return student and person.id == student.id
-# 	elif standing.rest_model == 'course':
-# 		return False
-# 	else:
-# 		return False
-
-# def standing_family(standing):
-# 	if standing.rest_model == 'user' and standing.owner.rest_model == 'family':
-# 		return standing.owner
-# 	elif standing.rest_model == 'family':
-# 		return standing
-# 	elif standing.rest_model in ['student','parent','invoice','paypal']:
-# 		return standing.family
-# 	elif standing.rest_model == 'enrollment':
-# 		return standing.student.family
-
-# def standing_student(standing):
-# 	if standing.rest_model == 'user' and standing.owner.rest_model == 'student':
-# 		return standing.owner
-# 	elif standing.rest_model == 'student':
-# 		return standing
-# 	elif standing.rest_model == 'enrollment':
-# 		return standing.student
-
-def restricted(request, level=0, standing=None):
+def restricted(request, level=0, standing=None, standing_level=0):
 	me = getme(request)
-	if standing and standing.stand(me):
-		return False
-	if not me or me.permission < level:
+	if not me:
+		return redirect('/login{}'.format(request.path))
+	if me.permission < (standing_level if standing and standing.stand(me) else level):
 		context = {
 			'me':me,
 			'need':dict(me.perm_levels)[level]
