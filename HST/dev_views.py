@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect, HttpResponse
 
-from apps.people.managers import Families, Addresses, Parents, Users, Students, NameClashes
+from apps.people.managers  import Families, Addresses, Parents, Users, Students
 from apps.program.managers import CourseTrads, Courses, Enrollments
 from apps.payment.managers import Invoices, PayPals
+from apps.radmin.managers  import Policies
 
 from Utils.custom_fields import Bcrypt, PhoneNumber, DayOfWeek
 from Utils.data  import collect, copy, copyatts, Each, equip, find, find_all, sub, cleandate

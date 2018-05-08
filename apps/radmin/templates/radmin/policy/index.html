@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>HST | Policy Index</title>
+</head>
+<body>
+Previous Policy Agreements
+<ul>
+	{% for policy in policies reversed %}
+	<li><a href="/admin/policy/show/{{policy.year}}/">{{policy.year}}</a></li>
+	{% endfor %}
+</ul>
+</body>
+</html>

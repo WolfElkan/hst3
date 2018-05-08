@@ -1,13 +1,15 @@
 from django.shortcuts import render, redirect, HttpResponse
 
-from apps.people.managers import Families, Addresses, Parents, Users, Students
+from apps.people.managers  import Families, Addresses, Parents, Users, Students
 from apps.program.managers import CourseTrads, Courses, Enrollments, Venues
+from apps.radmin.managers  import Policies
 
 from Utils.data  import copy, copyatts, Each
 from Utils.fjson import FriendlyEncoder
 from Utils.seshinit import seshinit
 from Utils.snippets import order_coursetrads, make
 from Utils.security import getyear, restricted
+from trace import DEV
 
 from datetime import datetime
 import json
@@ -129,13 +131,21 @@ def load_post(request):
 				# 	course = Courses.get(id=enrollment['course_id'])
 				# 	Enrollments.create(course=course, student=newStudent, role=enrollment['role'], role_type=enrollment['role_type'])
 			nStudents += 1
-	print "-assign name_num's"
+	print "- assign name_num's"
 	Each(Families.all()).update_name_num()
 	print '- order_coursetrads'
 	order_coursetrads()
 	year = getyear()
 	print '- make {}'.format(year)
 	nCourses += make(year)
+	if DEV:
+		print '- assign developer: Wolf Elkan'
+		elkan = Families.fetch(last='Elkan')
+		if elkan:
+			nwe = elkan.children[0]
+			su = Users.fetch(username='Wolf')
+			su.owner = nwe
+			su.save()
 	import_duration = datetime.now() - start_import
 	print
 	print 'IMPORT COMPLETED'
@@ -247,9 +257,9 @@ def dump(request):
 	return HttpResponse(json.dumps(data, cls=FriendlyEncoder))
 
 def nuke(request):
-	bad = restricted(request,6)
-	if bad:
-		return bad
+	# bad = restricted(request,6)
+	# if bad:
+	# 	return bad
 	Users.all().delete()
 	Families.all().delete()
 	Students.all().delete()
@@ -259,5 +269,10 @@ def nuke(request):
 	CourseTrads.all().delete()
 	Courses.all().delete()
 	Enrollments.all().delete()
+	request.session.clear()
+	if DEV:
+		pass
+		# Users.create(username='wolf',password='asdfasdf',permission=7)
+	Policies.create(markdown='# HST Policies',year=getyear()-1)
 	print '\n\n'+' '*34+'THE RADIANCE OF A THOUSAND SUNS'+'\n\n'
 	return redirect ('/seed/load')

@@ -1,8 +1,10 @@
-from trace import DEV
+from trace import DEV, OPEN
 
 from django.shortcuts import render, redirect
 
 def restricted(request, level=0, standing=None, standing_level=0):
+	if OPEN:
+		return None
 	me = getme(request)
 	if not me:
 		return redirect('/login{}'.format(request.path))

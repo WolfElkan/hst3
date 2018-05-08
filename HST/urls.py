@@ -93,6 +93,11 @@ urlpatterns = [
 	url(r'^admin/auditions/(?P<id>\d\d\w\w)/?$', program.audition_results),
 	url(r'^admin/auditions/(?P<id>\d\d\w\w)/process/?$', program.audition_process),
 
+	url(r'^admin/policy/edit/?$', radmin.policy_edit),
+	url(r'^admin/policy/edit/(?P<year>\d{4})/?$', radmin.policy_edit),
+	url(r'^admin/policy/show/(?P<year>\d{4})/?$', radmin.policy_show),
+	url(r'^admin/policy/index/?$', radmin.policy_index),
+
 	url(r'^admin/newyear/year/?$', radmin.newyear_year),
 
 	url(r'^rest/(show|edit)/(?P<model>[a-zA-Z]+)/(?P<id>\d+|(\d\d)?\w\w)/add/(?P<foreign_model>[a-zA-Z]+)/?$', rest.new),

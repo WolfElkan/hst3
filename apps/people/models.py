@@ -94,6 +94,9 @@ class Family(models.Model):
 	mother_id  = models.PositiveIntegerField(null=True)
 	father_id  = models.PositiveIntegerField(null=True)
 	address    = models.OneToOneField(Address, null=True, primary_key=False, rel=True)
+	policy     = models.ForeignKey('radmin.Policy',null=True)
+	policyPage = models.PositiveIntegerField(default=0)
+	policyDate = models.DateTimeField(null=True)
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
 	rest_model = "family"
@@ -198,6 +201,7 @@ class Family(models.Model):
 			return super(Family, self).__setattr__(field, value)
 
 
+# Current students, alumni, and prospective students are all kept in this table.
 class Student(models.Model):
 	hid       = models.CharField(max_length=7, null=True)
 	first     = models.CharField(max_length=20)
@@ -377,7 +381,7 @@ class User(models.Model):
 		(4,'Teacher'),
 		(5,'Founder'),
 		(6,'Admin'),
-		(7,'Demo')
+		(7,'Developer')
 	]
 	permission = models.PositiveSmallIntegerField(default=0, choices=perm_levels)
 	created_at = models.DateTimeField(auto_now_add=True)

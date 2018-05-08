@@ -309,9 +309,10 @@ class PolymorphicField(poly.MultiColumnField):
 		this = self
 		old_create = self.manager.create
 		def new_create(**thing):
-			foreign = thing.pop(this.attname)
-			thing[this.attname + '_type'] = foreign.__class__.__name__.title()
-			thing[this.attname + '_id'] = foreign.id
+			if this.attname in thing:
+				foreign = thing.pop(this.attname)
+				thing[this.attname + '_type'] = foreign.__class__.__name__.title()
+				thing[this.attname + '_id'] = foreign.id
 			return old_create(**thing)
 		self.manager.create = new_create
 	def __get__(self, thing, model):
