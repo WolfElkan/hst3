@@ -27,10 +27,12 @@ import apps.main.views    as main
 import apps.payment.views as payment
 import apps.people.views  as people
 import apps.program.views as program
-import apps.radmin.views  as radmin
 import apps.rest.views    as rest
 import apps.reports.views as reports
 import apps.rest.seed     as seed
+import apps.radmin.views.main   as radmin_main
+import apps.radmin.views.policy as policy
+import apps.radmin.views.year   as year
 
 urlpatterns = [
 
@@ -87,18 +89,18 @@ urlpatterns = [
 	url(r'^reports/students/mass_enroll/register/?$', reports.register),
 	url(r'^reports/students/(?P<year>\d{4})/mass_enroll/register/?$', reports.register),
 
-	url(r'^admin/dashboard/?$', radmin.dashboard),
+	url(r'^admin/dashboard/?$', radmin_main.dashboard),
 
 	url(r'^admin/auditions/?$', program.audition_menu),
 	url(r'^admin/auditions/(?P<id>\d\d\w\w)/?$', program.audition_results),
 	url(r'^admin/auditions/(?P<id>\d\d\w\w)/process/?$', program.audition_process),
 
-	url(r'^admin/policy/edit/?$', radmin.policy_edit),
-	url(r'^admin/policy/edit/(?P<year>\d{4})/?$', radmin.policy_edit),
-	url(r'^admin/policy/show/(?P<year>\d{4})/?$', radmin.policy_show),
-	url(r'^admin/policy/index/?$', radmin.policy_index),
+	url(r'^admin/policy/edit/?$', policy.mod),
+	url(r'^admin/policy/edit/(?P<year>\d{4})/?$', policy.mod),
+	url(r'^admin/policy/show/(?P<year>\d{4})/?$', policy.show),
+	url(r'^admin/policy/index/?$', policy.index),
 
-	url(r'^admin/newyear/year/?$', radmin.newyear_year),
+	url(r'^admin/year/?$', year.bib),
 
 	url(r'^rest/(show|edit)/(?P<model>[a-zA-Z]+)/(?P<id>\d+|(\d\d)?\w\w)/add/(?P<foreign_model>[a-zA-Z]+)/?$', rest.new),
 	url(r'^rest/(show|edit)/(?P<model>[a-zA-Z]+)/(?P<id>\d+|(\d\d)?\w\w)/add/(?P<foreign_model>[a-zA-Z]+)/create/?$', rest.create),
