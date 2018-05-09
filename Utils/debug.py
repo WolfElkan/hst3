@@ -19,8 +19,19 @@ def pretty(arr, delim='  ', indent='', level=0, printout=''):
 def pdir(thing):
 	return pretty(dir(thing))
 
-def san(string):
-	return string.replace('<','&lt;').replace('>','&gt;')
+def san(s):
+	s = s.replace('<','&lt;')
+	s = s.replace('>','&gt;')
+	s = s.replace('\a','&#x1f514;')
+	s = s.replace('\b','&#x1f519;')
+	s = s.replace('\f','&#x1f4c4;')
+	s = s.replace('\n\r','&#x21a9;')
+	s = s.replace('''
+		''','&#x21a9;')
+	s = s.replace('\r\n','&#x21a9;&#xfe0f;')
+	s = s.replace('\t','&#x27a1;')
+	s = s.replace('\v','&#x2b07;')
+	return s
 
 from django.http.request import QueryDict
 
