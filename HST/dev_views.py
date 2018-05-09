@@ -14,7 +14,7 @@ from Utils.security import getme, getyear, gethist
 from Utils.seshinit import seshinit, forminit
 from Utils.snippets import order_coursetrads, make
 
-from datetime import datetime
+import datetime
 import re
 
 def lookup_student(obj):

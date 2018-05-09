@@ -2,12 +2,17 @@
 <html>
 <head>
 	<title>HST | Policy Index</title>
+	<style type="text/css">
+		.clean {
+			font-style: italic;
+		}
+	</style>
 </head>
 <body>
 Previous Policy Agreements
 <ul>
 	{% for policy in policies reversed %}
-	<li><a href="/admin/policy/show/{{policy.year}}/">{{policy.year}}</a></li>
+	<li {% if policy.clean %} class="clean" {% endif %} ><a href="/admin/policy/show/{{policy.year}}/">{{policy.year}}</a></li>
 	{% endfor %}
 </ul>
 </body>

@@ -60,6 +60,8 @@ def newyear_year_post(request, id, method=None):
 	return redirect('/admin/newyear/year/'.format(newyear_year.id))
 
 def policy_index(request):
+	if not Policies.fetch(year=getyear()):
+		Policies.create(year=getyear())
 	context = {
 		'policies':Policies.all()
 	}
@@ -91,7 +93,7 @@ def policy_edit_post(request, **kwargs):
 	bad = restricted(request,5)
 	if bad:
 		return bad
-	policy = Policies.get_or_create(year=request.POST.get('year'))
+	policy = Policies.fetch(year=request.POST.get('year'))
 	if policy:
 		policy.markdown = request.POST.get('markdown')
 		policy.save()
@@ -103,7 +105,7 @@ def policy_show(request, **kwargs):
 	bad = restricted(request,1)
 	if bad:
 		return bad
-	policy = Policies.get_or_create(year=kwargs.get('year'))
+	policy = Policies.fetch(year=kwargs.get('year'))
 	context = {
 		'policy':policy
 	}

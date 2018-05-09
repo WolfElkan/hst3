@@ -9,14 +9,13 @@ from Utils import custom_fields as custfd
 from Utils import supermodel as sm
 from Utils.data import Each, collect
 
-from datetime import datetime
+import datetime
 from trace import DEV, OPEN
 import markdown2, re
 
 class Policy(models.Model):
 	year       = models.DecimalField(max_digits=4, decimal_places=0, primary_key=True)
 	markdown   = models.TextField(default='# HST Policy Agreement')
-	nPages     = models.PositiveIntegerField(default=0)
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
 	objects    = Policies
@@ -27,16 +26,15 @@ class Policy(models.Model):
 		else:
 			md = self.markdown
 		return markdown2.markdown(md)
-	def countpages(self):
-		self.nPages = len(re.findall(self.ff,self.markdown))
-		super(Policy, self).save()
-	def save(self, **kwargs):
-		self.countpages()
-		super(Policy, self).save(**kwargs)
+	def nPages(self):
+		return len(re.findall(self.ff,self.markdown))
+	def clean(self):
+		epsilon = datetime.timedelta(0,5)
+		return self.updated_at - self.created_at < epsilon
 	def __str__(self):
 		return '{} Policy'.format(self.year)
 	def __getattribute__(self, field):
-		if field in ['html']:
+		if field in ['html','nPages']:
 			call = super(Policy, self).__getattribute__(field)
 			return call()
 		else:

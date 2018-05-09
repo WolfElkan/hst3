@@ -12,8 +12,4 @@ from trace import DEV
 class PolicyManager(sm.SuperManager):
 	def __init__(self):
 		super(PolicyManager, self).__init__('radmin_policy')
-	def create(self, **kwargs):
-		new = super(PolicyManager, self).create(**kwargs)
-		new.countpages()
-		return new
 Policies = PolicyManager()
