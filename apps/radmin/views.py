@@ -91,7 +91,7 @@ def policy_edit_post(request, **kwargs):
 	bad = restricted(request,5)
 	if bad:
 		return bad
-	policy = Policies.fetch(year=request.POST.get('year'))
+	policy = Policies.get_or_create(year=request.POST.get('year'))
 	if policy:
 		policy.markdown = request.POST.get('markdown')
 		policy.save()
@@ -103,7 +103,7 @@ def policy_show(request, **kwargs):
 	bad = restricted(request,1)
 	if bad:
 		return bad
-	policy = Policies.fetch(year=kwargs.get('year'))
+	policy = Policies.get_or_create(year=kwargs.get('year'))
 	context = {
 		'policy':policy
 	}

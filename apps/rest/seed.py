@@ -138,12 +138,12 @@ def load_post(request):
 	year = getyear()
 	print '- make {}'.format(year)
 	nCourses += make(year)
-	if DEV:
+	su = Users.fetch(username='wolf')
+	if DEV and su:
 		print '- assign developer: Wolf Elkan'
 		elkan = Families.fetch(last='Elkan')
 		if elkan:
 			nwe = elkan.children[0]
-			su = Users.fetch(username='Wolf')
 			su.owner = nwe
 			su.save()
 	import_duration = datetime.now() - start_import
@@ -260,19 +260,27 @@ def nuke(request):
 	# bad = restricted(request,6)
 	# if bad:
 	# 	return bad
-	Users.all().delete()
+
+	# Main
+	request.session.clear()
+	# Payment
+	# PayPals.all().delete()
+	# Invoices.all().delete()
+	# People
+	Addresses.all().delete()
+	Parents.all().delete()
 	Families.all().delete()
 	Students.all().delete()
-	Parents.all().delete()
-	Addresses.all().delete()
+	Users.all().delete()
+	# Program
 	Venues.all().delete()
 	CourseTrads.all().delete()
 	Courses.all().delete()
 	Enrollments.all().delete()
-	request.session.clear()
-	if DEV:
-		pass
-		# Users.create(username='wolf',password='asdfasdf',permission=7)
-	Policies.create(markdown='# HST Policies',year=getyear()-1)
+	# RAdmin
+	Policies.all().delete()
+	print '*'*100
+	# if DEV:
+	# 	Users.create(username='wolf',password='asdfasdf',permission=7)
 	print '\n\n'+' '*34+'THE RADIANCE OF A THOUSAND SUNS'+'\n\n'
 	return redirect ('/seed/load')

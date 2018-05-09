@@ -16,10 +16,4 @@ class PolicyManager(sm.SuperManager):
 		new = super(PolicyManager, self).create(**kwargs)
 		new.countpages()
 		return new
-	def fetch(self, **kwargs):
-		already = self.filter(**kwargs)[0]
-		if already:
-			return already
-		elif not self.filter(year=kwargs.get('year')):
-			return self.create(year=kwargs['year'],markdown='# HST Policy Agreement')
 Policies = PolicyManager()

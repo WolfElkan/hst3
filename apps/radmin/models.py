@@ -15,7 +15,7 @@ import markdown2, re
 
 class Policy(models.Model):
 	year       = models.DecimalField(max_digits=4, decimal_places=0, primary_key=True)
-	markdown   = models.TextField()
+	markdown   = models.TextField(default='# HST Policy Agreement')
 	nPages     = models.PositiveIntegerField(default=0)
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
