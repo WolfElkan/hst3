@@ -12,4 +12,12 @@ from trace import DEV
 class PolicyManager(sm.SuperManager):
 	def __init__(self):
 		super(PolicyManager, self).__init__('radmin_policy')
+	def current(self):
+		return self.fetch(year=getyear())
+	def __getattribute__(self, field):
+		if field in ['current']:
+			call = super(PolicyManager, self).__getattribute__(field)
+			return call()
+		else:
+			return super(PolicyManager, self).__getattribute__(field)
 Policies = PolicyManager()

@@ -25,6 +25,12 @@
 			<td>{{me.owner.rest_model|title}} HID:</td>
 			<td class="mono">{{me.owner.hid}}</td>
 		</tr>
+		{% if me.owner.rest_model == 'family' %}
+		<tr>
+			<td>Policy Agreement:</td>
+			<td>You agreed to {{me.owner.policyPage}} pages of the {{me.owner.policyYear}} Policy on {{me.owner.policyDate}} <a href="#">Review</a></td>
+		</tr>		
+		{% endif %}
 		<tr>
 			<td>Password:</td>
 			<td>{{password|safe}} <a href="changepassword">Change</a></td>

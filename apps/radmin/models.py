@@ -19,13 +19,14 @@ class Policy(models.Model):
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
 	objects    = Policies
-	ff = r'(\n|^)\s*# '
+	ff = r'^\s*# |\n\s*# '
+	def md(self, page=0):
+		if page and page <= self.nPages:
+			return '# '+(re.split(self.ff,self.markdown)[page])
+		elif not page:
+			return self.markdown
 	def html(self,page=0):
-		if page:
-			md = '# '+(re.split(self.ff)[page])
-		else:
-			md = self.markdown
-		return markdown2.markdown(md)
+		return markdown2.markdown(self.md(page))
 	def nPages(self):
 		return len(re.findall(self.ff,self.markdown))
 	def clean(self):
@@ -34,7 +35,7 @@ class Policy(models.Model):
 	def __str__(self):
 		return '{} Policy'.format(self.year)
 	def __getattribute__(self, field):
-		if field in ['html','nPages']:
+		if field in ['nPages']:
 			call = super(Policy, self).__getattribute__(field)
 			return call()
 		else:

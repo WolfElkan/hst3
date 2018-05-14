@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>HST | Policy Agreement | Page {{page}}</title>
+	<style type="text/css">
+		form {
+			display: inline;
+		}
+	</style>
+</head>
+<body>
+<div class="content">{{content|safe}}</div>
+<form method="POST">{% csrf_token %}
+	<input type="hidden" name="accept" value="False">
+	<input type="hidden" name="year" value="{{full.year}}">
+	<input type="hidden" name="page" value="{{page}}">
+	<button>Decline</button>
+</form>
+<form method="POST">{% csrf_token %}
+	<input type="hidden" name="accept" value="True">
+	<input type="hidden" name="year" value="{{full.year}}">
+	<input type="hidden" name="page" value="{{page}}">
+	<button>Accept</button>
+</form>
+<form></form>
+</body>
+</html>

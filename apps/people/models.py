@@ -91,10 +91,10 @@ class Family(models.Model):
 	phone      = custom.PhoneNumberField()
 	phone_type = sqlmod.EnumField(choices=['','Home','Cell','Work'], default='')
 	email      = models.EmailField()
-	mother_id  = models.PositiveIntegerField(null=True)
-	father_id  = models.PositiveIntegerField(null=True)
+	mother     = models.ForeignKey(Parent, null=True, related_name='mother')
+	father     = models.ForeignKey(Parent, null=True, related_name='father')
 	address    = models.OneToOneField(Address, null=True, primary_key=False, rel=True)
-	policy     = models.ForeignKey('radmin.Policy',null=True)
+	policyYear = models.DecimalField(max_digits=4, decimal_places=0, null=True)
 	policyPage = models.PositiveIntegerField(default=0)
 	policyDate = models.DateTimeField(null=True)
 	created_at = models.DateTimeField(auto_now_add=True)
@@ -110,10 +110,6 @@ class Family(models.Model):
 		else:
 			family = None
 		return self.id == family.id
-	def mother(self):
-		return Parents.fetch(id=self.mother_id)
-	def father(self):
-		return Parents.fetch(id=self.father_id)
 	def unique_last(self):
 		return '{} #{}'.format(self.last,self.name_num) if self.name_num else self.last
 	def unique_last_in(self, year):
@@ -181,24 +177,11 @@ class Family(models.Model):
 	def __str__(self):
 		return ('{} Family #{}' if self.name_num else '{} Family').format(self.last,self.name_num)
 	def __getattribute__(self, field):
-		if field in ['mother','father','unique_last','children','enrollments','hours_worked']:
+		if field in ['unique_last','children','enrollments','hours_worked']:
 			call = super(Family, self).__getattribute__(field)
 			return call()
 		else:
 			return super(Family, self).__getattribute__(field)
-	def __setattr__(self, field, value):
-		if field == 'mother' and value.__class__ == Parent:
-			value.family_id = self.id
-			value.save()
-			super(Family, self).__setattr__('mother_id', value.id)
-			return self.save()
-		if field == 'father' and value.__class__ == Parent:
-			value.family_id = self.id
-			value.save()
-			super(Family, self).__setattr__('father_id', value.id)
-			return self.save()
-		else:
-			return super(Family, self).__setattr__(field, value)
 
 
 # Current students, alumni, and prospective students are all kept in this table.
@@ -366,7 +349,6 @@ class Teacher(models.Model):
 			return call()
 		else:
 			return super(Teacher, self).__getattribute__(field)
-
 
 
 class User(models.Model):

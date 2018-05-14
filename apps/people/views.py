@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, HttpResponse
 
 from .managers import Families, Addresses, Parents, Users, Students
 from apps.program.managers import CourseTrads, Courses, Enrollments
+from apps.radmin.managers import Policies
 
 from Utils.custom_fields import Bcrypt, PhoneNumber
 from Utils.data  import collect, copy, copyatts
@@ -32,8 +33,7 @@ def familyinfo(request):
 	elif request.method == 'POST':
 		return familyinfo_post(request)
 	else:
-		print "Unrecognized HTTP Verb"
-		return index(request)
+		return HttpResponse("Unrecognized HTTP Verb", status=405)
 
 def familyinfo_get(request):
 	me = getme(request)
@@ -262,5 +262,41 @@ def studentsinfo_post(request):
 				else:
 					student_proxy.current = False
 				student_proxy.save()
-	return redirect('/register/student/{}/'.format(me.owner.children[0].id))
+	return redirect('/register/policy/1/')
 
+def policy(request, **kwargs):
+	if request.method == 'GET':
+		return policydisplay(request, **kwargs)
+	elif request.method == 'POST':
+		return policyaccept(request, **kwargs)
+	else:
+		return HttpResponse("Unrecognized HTTP Verb", status=405)
+	
+
+def policydisplay(request, page):
+	page = int(page)
+	me = getme(request)
+	policy = Policies.current
+	if not policy:
+		return HttpResponse("We're sorry.  We are unable to register you at this time as we have not yet finalized this year's policy agreement.")
+	elif page <= policy.nPages:
+		context = {
+			'page'   : page,
+			'full'   : policy,
+			'content': policy.html(page),
+		}
+		return render(request, 'policydisplay.html', context)
+	else:
+		return redirect('/register/student/{}/'.format(me.owner.children[0].id))
+
+def policyaccept(request, page):
+	page = int(page)
+	if page != int(request.POST.get('page')):
+		return HttpResponse('Page numbers do not match', status=409)
+	year = int(request.POST.get('year'))
+	me = getme(request)
+	me.owner.policyYear = year
+	me.owner.policyPage = page
+	me.owner.policyDate = datetime.now()
+	me.owner.save()
+	return redirect('/register/policy/{}/'.format(page+1))

@@ -30,7 +30,7 @@ import apps.program.views as program
 import apps.rest.views    as rest
 import apps.reports.views as reports
 import apps.rest.seed     as seed
-import apps.radmin.views.main   as radmin_main
+import apps.radmin.views.main   as radmin
 import apps.radmin.views.policy as policy
 import apps.radmin.views.year   as year
 
@@ -50,6 +50,8 @@ urlpatterns = [
 	url(r'^register/parentsinfo/?$', people.parentsinfo),
 	url(r'^myaccount/students/?$', people.studentsinfo),
 	url(r'^register/studentsinfo/?$', people.studentsinfo),
+	url(r'^register/policy/(?P<page>\d+)/?$', people.policy),
+	# url(r'^register/policy/(?P<page>\d+)/accept/(?P<year>\d{4})/?$', people.policyaccept),
 
 	url(r'^myaccount/courses/?$', program.from_myaccount),
 	url(r'^register/student/(?P<id>\d+)/?$', program.courses),
@@ -89,7 +91,7 @@ urlpatterns = [
 	url(r'^reports/students/mass_enroll/register/?$', reports.register),
 	url(r'^reports/students/(?P<year>\d{4})/mass_enroll/register/?$', reports.register),
 
-	url(r'^admin/dashboard/?$', radmin_main.dashboard),
+	url(r'^admin/dashboard/?$', radmin.dashboard),
 
 	url(r'^admin/auditions/?$', program.audition_menu),
 	url(r'^admin/auditions/(?P<id>\d\d\w\w)/?$', program.audition_results),
@@ -111,6 +113,6 @@ urlpatterns = [
 
 ]
 
-DEV = False
+# DEV = False
 if not DEV:
 	urlpatterns.append(url(r'.*', main.dciv))
