@@ -2,7 +2,7 @@ from django.http.request import QueryDict
 # Use IceCream?
 def pretty(arr, delim='  ', indent='', level=0, printout=''):
 	if type(arr) in [dict, QueryDict]:
-		lens = []
+		lens = ['']
 		for key in arr:
 			lens.append(len(key))
 		maxlens = max(lens)

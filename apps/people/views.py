@@ -295,8 +295,9 @@ def policyaccept(request, page):
 		return HttpResponse('Page numbers do not match', status=409)
 	year = int(request.POST.get('year'))
 	me = getme(request)
-	me.owner.policyYear = year
-	me.owner.policyPage = page
-	me.owner.policyDate = datetime.now()
-	me.owner.save()
+	family = me.owner
+	family.policyYear = year
+	family.policyPage = page
+	family.policyDate = datetime.now()
+	family.save()
 	return redirect('/register/policy/{}/'.format(page+1))

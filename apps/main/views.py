@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect, HttpResponse
 
 
-from apps.people.managers import Families, Addresses, Parents, Users, Students
+from apps.people.managers  import Families, Addresses, Parents, Users, Students
 from apps.program.managers import CourseTrads, Courses, Enrollments
+from apps.radmin.managers  import Policies
 
 from Utils.data  import collect, copy, copyatts, Each, equip, find, find_all, sub
 from Utils.debug import pretty, pdir, divs
@@ -77,6 +78,8 @@ def account(request):
 	context = {
 		'me':me,
 		'password':password,
+		'year':getyear(),
+		'policy':Policies.current,
 	}
 	return render(request, 'main/account.html', context)
 
