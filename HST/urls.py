@@ -68,7 +68,7 @@ urlpatterns = [
 	url(r'^hot/?$', dev.hot),
 	url(r'^run/?$', dev.run),
 	url(r'^clear/?$', dev.clear),
-	url(r'^nuke/?$', dev.clearthedatabaselikeanuclearbombandthisnameisverylongsoyoudontcallitbymistake),
+	url(r'^nuke/?$', seed.nuke),
 
 	url(r'^rest/?$', rest.home),
 	url(r'^rest/edit/(?P<model>[a-zA-Z]+)/(?P<id>\d+|(\d\d)?\w\w)/?$', rest.edit),

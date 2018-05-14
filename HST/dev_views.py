@@ -10,7 +10,7 @@ from Utils.data  import collect, copy, copyatts, Each, equip, find, find_all, su
 from Utils.debug import pretty, pdir, divs
 from Utils.fjson import FriendlyEncoder
 from Utils.misc  import namecase, cleanhex, safe_delete
-from Utils.security import getme, getyear, gethist
+from Utils.security import getme, getyear, gethist, restricted
 from Utils.seshinit import seshinit, forminit
 from Utils.snippets import order_coursetrads, make
 
@@ -64,6 +64,9 @@ def add_hids(**kwargs):
 			print student.hid, student
 
 def hot(request):
+	bad = restricted(request,7)
+	if bad:
+		return bad
 	me = getme(request)
 	seshinit(request,'command')
 	context = {
@@ -76,23 +79,18 @@ def hot(request):
 	return render(request, 'main/hot.html', context)
 
 def run(request):
+	bad = restricted(request,7)
+	if bad:
+		return bad
 	me = getme(request)
 	command = request.POST['command']
 	request.session['command'] = command
 	exec(command)
 	return redirect ('/hot')
 
-def clearthedatabaselikeanuclearbombandthisnameisverylongsoyoudontcallitbymistake(request):
-	Users.all().delete()
-	Families.all().delete()
-	Students.all().delete()
-	Parents.all().delete()
-	Addresses.all().delete()
-	Courses.all().delete()
-	# request.session.clear()
-	print '\n\n'+' '*34+'THE RADIANCE OF A THOUSAND SUNS'+'\n\n'
-	return redirect ('/hot')
-
 def clear(request):
+	bad = restricted(request,7)
+	if bad:
+		return bad
 	request.session.clear()
-	return redirect ('/hot')
+	return redirect ('/')

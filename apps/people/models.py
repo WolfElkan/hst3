@@ -174,14 +174,6 @@ class Family(models.Model):
 			newer = clashes.filter(created_at__lt=self.created_at)
 			Each(newer).update_name_num()
 		return self.name_num
-
-	def __setattr__(self, field, value):
-		print field, value
-		return super(Family, self).__setattr__(field, value)
-	def save(self, **kwargs):
-		print pretty(kwargs)
-		return super(Family, self).save(**kwargs)
-
 	def __str__(self):
 		return ('{} Family #{}' if self.name_num else '{} Family').format(self.last,self.name_num)
 	def __getattribute__(self, field):
