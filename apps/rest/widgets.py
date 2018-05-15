@@ -107,20 +107,30 @@ class Enum(object):
 		if TRACE:
 			print '* rest.widgets.Enum'
 		self.field = kwargs.setdefault('field', None)
+		self.items = kwargs.setdefault('items', [])
+		if hasattr(self.items, 'items'):
+			self.items = self.items.items()
 		self.options = kwargs.setdefault('options', [])
-		self.default = kwargs.setdefault('default', self.options[0])
+		self.default = kwargs.setdefault('default', self.items[0][0] if self.items else self.options[0])
 	def widget(self, field, value, **kwargs):
 		if TRACE:
 			print '# rest.widgets.Enum:widget'
 		html = '<select name="{}">'.format(field)
-		for option in self.options:
-			html += '<option value="{}"{}>{}</option>'.format(option,' selected' if value == option else '',option)
+		if self.items:
+			for db, full in self.items:
+				html += '<option value="{}"{}>{}</option>'.format(db,' selected' if value == db else '',full)
+		elif self.options:
+			for option in self.options:
+				html += '<option value="{}"{}>{}</option>'.format(option,' selected' if value == option else '',option)
 		html += '</select>'
 		return html
 	def static(self, field, value):
 		if TRACE:
 			print '# rest.widgets.Enum:static'
-		return value
+		if self.items:
+			return dict(self.items).get(value)
+		else:
+			return value
 	def set(self, thing, field, post, isAttr):
 		if TRACE:
 			print '# rest.widgets.Enum:set'

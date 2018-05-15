@@ -16,6 +16,7 @@ from datetime import datetime
 from trace import DEV
 Q = models.Q
 
+sex_choices = [('M','Male'),('F','Female')]
 
 class Address(models.Model):
 	line1      = models.CharField(null=False, max_length=50)
@@ -45,7 +46,8 @@ class Parent(models.Model):
 	first      = models.CharField(max_length=20)
 	family_id  = models.PositiveIntegerField()
 	alt_last   = models.CharField(default='', max_length=30)
-	sex        = models.CharField(max_length=1, choices=[('M','Male'),('F','Female')])
+	sex_choices= sex_choices
+	sex        = models.CharField(max_length=1, choices=sex_choices)
 	alt_phone  = custom.PhoneNumberField(null=True)
 	phone_type = sqlmod.EnumField(choices=['','Home','Cell','Work'], default='')
 	alt_email  = models.EmailField(default='')
@@ -191,7 +193,8 @@ class Student(models.Model):
 	alt_first = models.CharField(max_length=20, default='')
 	alt_last  = models.CharField(max_length=30, default='')
 	family    = models.ForeignKey(Family)
-	sex       = models.CharField(max_length=1, choices=[('M','Male'),('F','Female')])
+	sex_choices = sex_choices
+	sex       = models.CharField(max_length=1, choices=sex_choices)
 	current   = models.BooleanField(default=True)
 	birthday  = models.DateField()
 	grad_year = models.DecimalField(max_digits=4, decimal_places=0, null=True)

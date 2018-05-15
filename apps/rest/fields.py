@@ -3,6 +3,7 @@ from Utils.custom_fields import Bcrypt, PhoneNumber, ZipCode, DayOfWeek, Dollar
 from Utils.data import collect
 from apps.program.managers import CourseTrads, Enrollments
 from apps.payment.managers import Invoices
+from apps.people.models import Address, Family, Student, Parent, User
 
 FIELDS = {
 	'address'   : [
@@ -27,7 +28,7 @@ FIELDS = {
 		{'field':'first'     , 'template': VarChar(maxlength=20)},
 		{'field':'family'    , 'template': ForeignKey(model='family')},
 		{'field':'alt_last'  , 'template': VarChar(maxlength=30)},
-		{'field':'sex'       , 'template': Enum(options=['M','F'])},
+		{'field':'sex'       , 'template': Enum(items=Parent.sex_choices)},
 		{'field':'alt_phone' , 'template': PhoneNumber()},
 		{'field':'phone_type', 'template': Enum(options=['','Home','Cell','Work'])},
 		{'field':'alt_email' , 'template': VarChar(maxlength=254)},
@@ -38,19 +39,19 @@ FIELDS = {
 		{'field':'alt_first' , 'template': VarChar(maxlength=20)},
 		{'field':'family'    , 'template': ForeignKey(model='family')},
 		{'field':'alt_last'  , 'template': VarChar(maxlength=30)},
-		{'field':'sex'       , 'template': Enum(options=['M','F'])},
+		{'field':'sex'       , 'template': Enum(items=Student.sex_choices)},
 		{'field':'current'   , 'template': Checkbox(suffix='Student is currently in HST')},
 		{'field':'birthday'  , 'template': Date()},
 		{'field':'grad_year' , 'template': Integer()},
 		{'field':'alt_phone' , 'template': PhoneNumber()},
 		{'field':'alt_email' , 'template': VarChar(maxlength=254)},
-		{'field':'tshirt'    , 'template': Enum(options=['','YS','YM','YL','XS','AS','AM','AL','XL','2X','3X'])},
+		{'field':'tshirt'    , 'template': Enum(items=Student.t_shirt_sizes)},
 		{'field':'needs'     , 'template': VarChar()},
 		{'field':'courses_toggle_enrollments', 'template': ToggleSet(field='courses',model='enrollment')},
 	],
 	'user'      : [
 		{'field':'username'  , 'template': Static()},
-		{'field':'permission', 'template': Enum(options=range(8))},
+		{'field':'permission', 'template': Enum(items=User.perm_levels)},
 	],
 	'coursetrad': [
 		{'field':'id'        , 'template': VarChar(maxlength=2)},
@@ -61,7 +62,7 @@ FIELDS = {
 		{'field':'start'     , 'template': Time()},
 		{'field':'end'       , 'template': Time()},
 		{'field':'nMeets'    , 'template': Integer()},
-		{'field':'semester'  , 'template': Enum(options='NFSB')},
+		{'field':'semester'  , 'template': Enum(items=CourseTrads.model.semester_choices)},
 		{'field':'show'      , 'template': VarChar(maxlength=2,default='SC')},
 		{'field':'sa'        , 'template': Checkbox(suffix='This class performs in the Variety Show')},
 		{'field':'min_age'   , 'template': Integer(default= 9)},
@@ -99,7 +100,7 @@ FIELDS = {
 		{'field':'family'    , 'template': ForeignKey(model='family')},
 		{'field':'amount'    , 'template': Dollar()},
 		{'field':'method'    , 'template': Enum(options=['','Cash','Check','PayPal'])},
-		{'field':'status'    , 'template': Enum(options=['','N','P','C'],display=Invoices.model.status_choices)},
+		{'field':'status'    , 'template': Enum(items=Invoices.model.status_choices)},
 		{'field':'items'     , 'template': ForeignSet(model='enrollment')},
 	],
 }

@@ -52,11 +52,11 @@ class Invoice(models.Model):
 	family = models.ForeignKey('people.Family')
 	amount = models.DecimalField(max_digits=6, decimal_places=2, default=0)
 	method = custfd.EnumField(choices=['','Cash','Check','PayPal'], default='')
-	status_choices = {
+	status_choices = [
 		('N','Not Paid'),
 		('P','Paid'),
 		('C','Cancelled'),
-	}
+	]
 	status = models.CharField(max_length=1,default='N',choices=status_choices)
 	year   = models.DecimalField(max_digits=4, decimal_places=0)
 	paypal = models.OneToOneField(PayPal, null=True)
