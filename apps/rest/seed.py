@@ -143,8 +143,9 @@ def load_post(request):
 		print '- assign developer: Wolf Elkan'
 		elkan = Families.fetch(last='Elkan')
 		if elkan:
-			nwe = elkan.children[0]
-			su.owner = nwe
+			su.owner_id = elkan.id
+			su.owner_type = 'Family'
+			su.password = su.password.full
 			su.save()
 	import_duration = datetime.now() - start_import
 	print
@@ -279,8 +280,6 @@ def nuke(request):
 	Enrollments.all().delete()
 	# RAdmin
 	Policies.all().delete()
-	print '*'*100
-	# if DEV:
-	# 	Users.create(username='wolf',password='asdfasdf',permission=7)
+	Users.create(username='wolf',password='$2b$16$vsw.8GUmM.NZxvvRO10VbuW7UmKlEqqa5xIG0DKVAhpa/xSX9O06e',permission=7)
 	print '\n\n'+' '*34+'THE RADIANCE OF A THOUSAND SUNS'+'\n\n'
 	return redirect ('/seed/load')

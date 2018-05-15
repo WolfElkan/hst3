@@ -7,10 +7,12 @@ from . import multi_column_gist as poly
 from datetime import datetime
 from decimal import Decimal
 from trace import TRACE
+import re
 
 EnumField = sqlmod.EnumField
 
 class Bcrypt(object):
+	regex = r'\$(?P<encode>\w+)\$(?P<rounds>\d\d)\$(?P<salt>[A-Za-z0-9./]{22})(?P<hash>[A-Za-z0-9./]{31})'
 	def __init__(self, char60):
 		self.char60 = char60.char60 if type(char60) is Bcrypt else char60
 		self.field = None
@@ -19,7 +21,25 @@ class Bcrypt(object):
 	def __call__(self, pw):
 		return bcrypt.checkpw(bytes(pw), bytes(self.full))
 	def __str__(self):
-		return self.full[:7]+self.full[55:]
+		return self.full
+	def __iter__(self):
+		return iter(re.match(self.regex,self.full).groupdict().items())
+	def encode(self):
+		return dict(self)['encode']
+	def encoding(self):
+		return {
+			'1': 'MD5',
+			'2': 'Bcrypt',
+			's': 'SHA-1',
+			'5': 'SHA-256',
+			'6': 'SHA-512',
+		}[self.encode()[0]]
+	def rounds(self):
+		return int(dict(self)['rounds'])
+	def salt(self):
+		return dict(self)['salt']
+	def hash(self):
+		return dict(self)['hash']
 	def widget(self, field, value, **kwargs):
 		user_id = kwargs['id'] if 'id' in kwargs else 0
 		return '{} <a href="/user/{}/sudochangepassword/">Change</a>'.format(self.html, user_id)
@@ -38,14 +58,16 @@ class BcryptField(models.Field):
 			return 'CHAR(60)' # TODO: Figure out equivalent field in other db softwares
 	def pre_save(self, model_instance, add):
 		plaintext = getattr(model_instance, self.attname)
-		if type(plaintext) == Bcrypt:
+		if type(plaintext) in [str,unicode] and re.match(Bcrypt.regex, str(plaintext)):
+			print 'yes'
+			return plaintext
+		elif type(plaintext) is Bcrypt:
 			plaintext = plaintext.char60
 		hashed = bcrypt.hashpw(plaintext.encode(), bcrypt.gensalt())
 		if len(hashed) == 59:
 			hashed = '+' + hashed
 		return hashed
 	def from_db_value(self, value, col, wrapper, options):
-		# return 'hello'
 		return Bcrypt(value)
 
 

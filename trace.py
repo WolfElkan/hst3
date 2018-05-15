@@ -1,9 +1,9 @@
 TRACE = False
 
-DEV = True
+DEV = False
 # User hijacking
 # Troupe counts as Acting class
-# Assert 2017 registration year
+# Assert registration year
 
 OPEN = True
 # View security disabled.
