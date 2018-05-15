@@ -48,9 +48,9 @@ class VarChar(object):
 	def __init__(self, **kwargs):
 		if TRACE:
 			print '* rest.widgets.VarChar'
-		self.field = kwargs['field'] if 'field' in kwargs else None		
-		self.default = kwargs['default'] if 'default' in kwargs else ''
-		self.maxlength = kwargs['maxlength'] if 'maxlength' in kwargs else None		
+		self.field = kwargs.setdefault('field', None		)
+		self.default = kwargs.setdefault('default', '')
+		self.maxlength = kwargs.setdefault('maxlength', None		)
 	def widget(self, field, value, **kwargs):
 		if TRACE:
 			print '# rest.widgets.VarChar:widget'
@@ -76,9 +76,9 @@ class Integer(object):
 	def __init__(self, **kwargs):
 		if TRACE:
 			print '* rest.widgets.Integer'
-		self.field = kwargs['field'] if 'field' in kwargs else None
-		self.suffix = kwargs['suffix'] if 'suffix' in kwargs else ''
-		self.default = kwargs['default'] if 'default' in kwargs else 0
+		self.field = kwargs.setdefault('field', None)
+		self.suffix = kwargs.setdefault('suffix', '')
+		self.default = kwargs.setdefault('default', 0)
 	def widget(self, field, value, **kwargs):
 		if TRACE:
 			print '# rest.widgets.Integer:widget'
@@ -106,9 +106,9 @@ class Enum(object):
 	def __init__(self, **kwargs):
 		if TRACE:
 			print '* rest.widgets.Enum'
-		self.field = kwargs['field'] if 'field' in kwargs else None
-		self.options = kwargs['options'] if 'options' in kwargs else []
-		self.default = kwargs['default'] if 'default' in kwargs else self.options[0]
+		self.field = kwargs.setdefault('field', None)
+		self.options = kwargs.setdefault('options', [])
+		self.default = kwargs.setdefault('default', self.options[0])
 	def widget(self, field, value, **kwargs):
 		if TRACE:
 			print '# rest.widgets.Enum:widget'
@@ -138,9 +138,9 @@ class Radio(object):
 	def __init__(self, **kwargs):
 		if TRACE:
 			print '* rest.widgets.Radio'
-		self.field = kwargs['field'] if 'field' in kwargs else None
-		self.options = kwargs['options'] if 'options' in kwargs else []
-		self.default = kwargs['default'] if 'default' in kwargs else 0
+		self.field = kwargs.setdefault('field', None)
+		self.options = kwargs.setdefault('options', [])
+		self.default = kwargs.setdefault('default', 0)
 	def widget(self, field, value, **kwargs):
 		if TRACE:
 			print '# rest.widgets.Radio:widget'
@@ -171,9 +171,9 @@ class Checkbox(object):
 	def __init__(self, **kwargs):
 		if TRACE:
 			print '* rest.widgets.Checkbox'
-		self.field = kwargs['field'] if 'field' in kwargs else None
-		self.suffix = kwargs['suffix'] if 'suffix' in kwargs else ''
-		self.default = kwargs['default'] if 'default' in kwargs else False
+		self.field = kwargs.setdefault('field', None)
+		self.suffix = kwargs.setdefault('suffix', '')
+		self.default = kwargs.setdefault('default', False)
 	def widget(self, field, value, **kwargs):
 		if TRACE:
 			print '# rest.widgets.Checkbox:widget'
@@ -204,8 +204,8 @@ class Date(object):
 	def __init__(self, **kwargs):
 		if TRACE:
 			print '* rest.widgets.Date'
-		self.field = kwargs['field'] if 'field' in kwargs else None
-		self.default = kwargs['default'] if 'default' in kwargs else None
+		self.field = kwargs.setdefault('field', None)
+		self.default = kwargs.setdefault('default', None)
 	def widget(self, field, value, **kwargs):
 		if TRACE:
 			print '# rest.widgets.Date:widget'
@@ -232,8 +232,8 @@ class Time(object):
 	def __init__(self, **kwargs):
 		if TRACE:
 			print '* rest.widgets.Time'
-		self.field = kwargs['field'] if 'field' in kwargs else None
-		self.default = kwargs['default'] if 'default' in kwargs else None
+		self.field = kwargs.setdefault('field', None)
+		self.default = kwargs.setdefault('default', None)
 	def widget(self, field, value, **kwargs):
 		if TRACE:
 			print '# rest.widgets.Time:widget'
@@ -260,10 +260,10 @@ class ForeignKey(object):
 	def __init__(self, **kwargs):
 		if TRACE:
 			print '* rest.widgets.ForeignKey'
-		self.field = kwargs['field'] if 'field' in kwargs else None
-		self.model = kwargs['model'] if 'model' in kwargs else None
-		self.null  = kwargs['null']  if 'null'  in kwargs else False
-		self.default = kwargs['default'] if 'default' in kwargs else None
+		self.field = kwargs.setdefault('field', None)
+		self.model = kwargs.setdefault('model', None)
+		self.null  = kwargs.setdefault('null', False)
+		self.default = kwargs.setdefault('default', None)
 	def widget(self, field, value, **kwargs):
 		if TRACE:
 			print '# rest.widgets.ForeignKey:widget'
@@ -317,9 +317,9 @@ class ForeignSet(object):
 	def __init__(self, **kwargs):
 		if TRACE:
 			print '* rest.widgets.ForeignSet'
-		self.field = kwargs['field'] if 'field' in kwargs else None
-		self.model = kwargs['model'] if 'model' in kwargs else None
-		self.default = kwargs['default'] if 'default' in kwargs else None
+		self.field = kwargs.setdefault('field', None)
+		self.model = kwargs.setdefault('model', None)
+		self.default = kwargs.setdefault('default', None)
 	def widget(self, field, qset, **kwargs):
 		if TRACE:
 			print '# rest.widgets.ForeignSet:widget'
@@ -343,9 +343,9 @@ class ToggleSet(object):
 	def __init__(self, **kwargs):
 		if TRACE:
 			print '* rest.widgets.ToggleSet'
-		self.field = kwargs['field'] if 'field' in kwargs else None
-		self.model = kwargs['model'] if 'model' in kwargs else None
-		self.default = kwargs['default'] if 'default' in kwargs else None
+		self.field = kwargs.setdefault('field', None)
+		self.model = kwargs.setdefault('model', None)
+		self.default = kwargs.setdefault('default', None)
 	def widget(self, field, qset, **kwargs):
 		if TRACE:
 			print '# rest.widgets.ToggleSet:widget'
