@@ -1,6 +1,6 @@
 TRACE = False
 
-DEV = False
+DEV = True
 # User hijacking
 # Troupe counts as Acting class
 # Assert registration year

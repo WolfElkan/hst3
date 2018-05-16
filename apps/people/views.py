@@ -273,12 +273,14 @@ def policy(request, **kwargs):
 		return HttpResponse("Unrecognized HTTP Verb", status=405)
 	
 
-def policydisplay(request, page):
+def policydisplay(request, page=None):
+	if not page:
+		return redirect(request.path_info+'/1/')
 	page = int(page)
 	me = getme(request)
 	policy = Policies.current
 	if not policy:
-		return HttpResponse("We're sorry.  We are unable to register you at this time as we have not yet finalized this year's policy agreement.")
+		return HttpResponse("We're sorry.  We are unable to register you at this time as we have not yet finalized this year's policy agreement.  Please check back soon.")
 	elif page <= policy.nPages:
 		context = {
 			'page'   : page,
@@ -295,9 +297,17 @@ def policyaccept(request, page):
 		return HttpResponse('Page numbers do not match', status=409)
 	year = int(request.POST.get('year'))
 	me = getme(request)
-	family = me.owner
-	family.policyYear = year
-	family.policyPage = page
-	family.policyDate = datetime.now()
-	family.save()
-	return redirect('/register/policy/{}/'.format(page+1))
+	path = re.match(r'(.*)(policy/\d+/?)',request.path_info)
+	if path:
+		path = path.groups()[0]
+	if request.POST.get('accept'):
+		family = me.owner
+		family.policyYear = year
+		family.policyPage = page
+		family.policyDate = datetime.now()
+		family.save()
+		return redirect('{}policy/{}/'.format(path,page+1))
+	elif str(path) == '/register/':
+		return redirect('/')
+	else:
+		return redirect(path)

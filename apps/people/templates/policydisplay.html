@@ -11,7 +11,6 @@
 <body>
 <div class="content">{{content|safe}}</div>
 <form method="POST">{% csrf_token %}
-	<input type="hidden" name="accept" value="False">
 	<input type="hidden" name="year" value="{{full.year}}">
 	<input type="hidden" name="page" value="{{page}}">
 	<button>Decline</button>

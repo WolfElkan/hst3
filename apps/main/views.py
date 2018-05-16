@@ -24,6 +24,8 @@ def index(request):
 	}
 	return render(request, 'main/index.html', context)
 
+def slash(request):
+	return redirect(request.path_info+'/')
 
 def login(request, **kwargs):
 	# Do not put any user authorization here!
