@@ -25,6 +25,8 @@ def index(request):
 	return render(request, 'main/index.html', context)
 
 def slash(request):
+	if request.POST:
+		raise Warning('Slash Redirect does not support POST data.  Make sure form action ends with "/"')
 	return redirect(request.path_info+'/')
 
 def login(request, **kwargs):

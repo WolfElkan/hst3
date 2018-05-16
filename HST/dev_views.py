@@ -83,10 +83,10 @@ def run(request):
 	if bad:
 		return bad
 	me = getme(request)
-	command = request.POST['command']
+	command = str(request.POST.get('command'))
 	request.session['command'] = command
 	exec(command)
-	return redirect ('/hot')
+	return redirect('/hot/')
 
 def clear(request):
 	bad = restricted(request,7)

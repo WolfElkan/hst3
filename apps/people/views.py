@@ -18,24 +18,24 @@ import json as JSON
 def reg(request):
 	me = getme(request)
 	if not me or not me.owner:
-		return redirect('/register/familyinfo')
+		return redirect('/register/family')
 	elif not me.owner.mother and not me.owner.father:
-		return redirect('/register/parentsinfo')
+		return redirect('/register/parents')
 	else:
-		return redirect('/register/studentsinfo')
+		return redirect('/register/students')
 
-def familyinfo(request):
+def family(request):
 	forminit(request,'family',['last','phone','email'])
 	forminit(request,'user',['username','password','pw_confm'])
 	seshinit(request,'password_set',False)
 	if request.method == 'GET':
-		return familyinfo_get(request)
+		return family_get(request)
 	elif request.method == 'POST':
-		return familyinfo_post(request)
+		return family_post(request)
 	else:
 		return HttpResponse("Unrecognized HTTP Verb", status=405)
 
-def familyinfo_get(request):
+def family_get(request):
 	me = getme(request)
 	if me and me.owner:
 		request.session['p']['family'].update(copyatts(me.owner, ['last','phone_type','email']))
@@ -43,9 +43,9 @@ def familyinfo_get(request):
 		request.session['p']['user']['username'] = me.username
 		request.session['password_set'] = True
 	context = copy(request.session, ['p','e','password_set'])
-	return render(request, 'familyinfo.html', context)
+	return render(request, 'family.html', context)
 
-def familyinfo_post(request):
+def family_post(request):
 	me = getme(request)
 	if me:
 		me.username = request.POST['username']
@@ -80,7 +80,7 @@ def familyinfo_post(request):
 			me.save()
 		request.session['e'] = {}
 		request.session['meid'] = me.id
-		return redirect('/register/parentsinfo')
+		return redirect('/register/parents')
 	else:
 		request.session['p'] = {
 			'family': new_family,
@@ -90,26 +90,26 @@ def familyinfo_post(request):
 			'family': Families.errors(new_family),
 			'user'  : Users.errors(new_user)
 		}
-		return redirect('/register/familyinfo')
+		return redirect('/register/family')
 
 # if me.owner
-def parentsinfo(request):
+def parents(request):
 	if restricted(request):
 		return redirect('/')
 	forminit(request,'mom',['mom_skipped','mom_first','mom_alt_last','mom_alt_phone','mom_alt_email'])
 	forminit(request,'dad',['dad_skipped','dad_first','dad_alt_last','dad_alt_phone','dad_alt_email'])
 	if request.method == 'GET':
-		return parentsinfo_get(request)
+		return parents_get(request)
 	elif request.method == 'POST':
-		return parentsinfo_post(request)
+		return parents_post(request)
 	else:
 		print "Unrecognized HTTP Verb"
 		return index(request)
 
-def parentsinfo_get(request):
+def parents_get(request):
 	me = getme(request)
 	if not me or not me.owner:
-		return redirect('/register/familyinfo')
+		return redirect('/register/family')
 	if me and me.owner.mother:
 		request.session['p']['mom'].update({
 			'mom_first'     : me.owner.mother.first,
@@ -133,9 +133,9 @@ def parentsinfo_get(request):
 		'p'     : request.session['p'],
 		'e'     : request.session['e'],
 	}
-	return render(request, 'parentsinfo.html', context)
+	return render(request, 'parents.html', context)
 
-def parentsinfo_post(request):
+def parents_post(request):
 	me = getme(request)
 	# Create new Parent objects
 	mom = copy(request.POST, [
@@ -201,7 +201,7 @@ def parentsinfo_post(request):
 				family = me.owner
 				family.father = Parents.create(**father)
 				family.save()
-		return redirect('/register/studentsinfo')
+		return redirect('/register/students')
 	else:
 		request.session['p'] = {
 			'mom':mom,
@@ -211,21 +211,21 @@ def parentsinfo_post(request):
 			'mom':Parents.errors(mother),
 			'dad':Parents.errors(father),
 		}
-		return redirect('/register/parentsinfo')        
+		return redirect('/register/parents')        
 
 # if me.owner.mother or me.owner.father
-def studentsinfo(request):
+def students(request):
 	if restricted(request):
 		return redirect('/')
 	elif request.method == 'GET':
-		return studentsinfo_get(request)
+		return students_get(request)
 	elif request.method == 'POST':
-		return studentsinfo_post(request)
+		return students_post(request)
 	else:
 		print "Unrecognized HTTP Verb"
 		return index(request)
 
-def studentsinfo_get(request):
+def students_get(request):
 	me = getme(request)
 	if not me or not me.owner or not (me.owner.mother or me.owner.father):
 		return redirect('/register')
@@ -241,9 +241,9 @@ def studentsinfo_get(request):
 		'validations'  : JSON.dumps(Students.validations, cls=FriendlyEncoder),
 		'students': JSON.dumps(list(me.owner.children), cls=FriendlyEncoder) if me.owner.children else [],
 	}
-	return render(request, 'studentsinfo.html', context)
+	return render(request, 'students.html', context)
 
-def studentsinfo_post(request):
+def students_post(request):
 	me = getme(request)
 	students = JSON.loads(request.POST['students'])
 	for student in students:
@@ -264,16 +264,16 @@ def studentsinfo_post(request):
 				student_proxy.save()
 	return redirect('/register/policy/1/')
 
+
 def policy(request, **kwargs):
 	if request.method == 'GET':
-		return policydisplay(request, **kwargs)
+		return policy_get(request, **kwargs)
 	elif request.method == 'POST':
-		return policyaccept(request, **kwargs)
+		return policy_post(request, **kwargs)
 	else:
 		return HttpResponse("Unrecognized HTTP Verb", status=405)
 	
-
-def policydisplay(request, page=None):
+def policy_get(request, page=None):
 	if not page:
 		return redirect(request.path_info+'/1/')
 	page = int(page)
@@ -287,11 +287,11 @@ def policydisplay(request, page=None):
 			'full'   : policy,
 			'content': policy.html(page),
 		}
-		return render(request, 'policydisplay.html', context)
+		return render(request, 'policy.html', context)
 	else:
 		return redirect('/register/student/{}/'.format(me.owner.children[0].id))
 
-def policyaccept(request, page):
+def policy_post(request, page):
 	page = int(page)
 	if page != int(request.POST.get('page')):
 		return HttpResponse('Page numbers do not match', status=409)
