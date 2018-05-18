@@ -3,13 +3,21 @@ function $$(arguments) {
 }
 
 function set(selector, value) {
-	var element = $$(selector)
+	value = String(value)
+	var element = type(selector) == String ? $$(selector) : selector
 	if (element.tagName == 'INPUT') {
 		element.value = value
-	} else if (element.tagName == 'SELECT')
-	for (var i = 0; i < element.length; i++) {
-		element[i].selected = element[i].value == value || element[i].innerText == value
-	}	
+		return element.value
+	} else if (element.tagName == 'SELECT') {
+		for (var i = 0; i < element.length; i++) {
+			selected = element[i].value == value || element[i].innerText == value
+			element[i].selected = selected
+			if (selected) {
+				winner = element[i]
+			}
+		}
+		return winner.value
+	}
 }
 
 function custom_parse(json) {
@@ -24,4 +32,38 @@ function custom_parse(json) {
 
 function type(thing) {
 	return thing.__proto__.constructor
+}
+
+function DateET() {
+	if (arguments.length == 1) {
+		arg = arguments[0]
+		if (type(arg) == Number) {
+			return new Date(arg)
+		} else if (type(arg) == String) {
+			ymd = arg.match(/(\d{4})-(\d{2})-(\d{2})/) 
+			if (ymd) {
+				return new Date(ymd[1],ymd[2]-1,ymd[3])
+			}
+		} else if (type(arg) == Date) {
+			if (arg.getTimezoneOffset() == 240 && String(arg).substr(35,3) == 'EDT' ||
+				arg.getTimezoneOffset() == 300 && String(arg).substr(35,3) == 'EST') {
+				return arg
+			} else {
+				return new Date(Number(arg))
+			}
+		}
+	} else {
+		a = arguments
+		return [
+			new Date(),
+			new Date(a[0]),
+			new Date(a[0],a[1]),
+			new Date(a[0],a[1],a[2]),
+			// new Date(a[0],a[1],a[2],a[3]),
+			// new Date(a[0],a[1],a[2],a[3],a[4]),
+			// new Date(a[0],a[1],a[2],a[3],a[4],a[5]),
+			// new Date(a[0],a[1],a[2],a[3],a[4],a[5],a[6]),
+			// new Date(a[0],a[1],a[2],a[3],a[4],a[5],a[6],a[7])
+		][a.length]
+	}
 }

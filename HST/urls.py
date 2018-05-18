@@ -55,7 +55,6 @@ urlpatterns = [
 	url(r'^register/policy/(?P<page>\d+)/$', people.policy),
 	url(r'^myaccount/policy/(?P<page>\d+)/$', people.policy),
 	url(r'^myaccount/policy/$', people.policy),
-	# url(r'^register/policy/(?P<page>\d+)/accept/(?P<year>\d{4})/$', people.policyaccept),
 
 	url(r'^myaccount/courses/$', program.from_myaccount),
 	url(r'^register/student/(?P<id>\d+)/$', program.courses),
