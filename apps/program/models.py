@@ -121,7 +121,7 @@ class CourseTrad(models.Model):
 			return self.genre_codes[code]
 	def check_eligex(self, student, year, **kwargs):
 		if re.match(r'<[^>]*<|{[^}]*{',self.eligex):
-			raise Exception('Nested clauses of the same type are not currently supported.  \nCall Wolf if you need this changed: (267) 380-0597')
+			raise Exception('Nested clauses of the same type are not currently supported.  \nCall Wolf if you need this changed.')
 		kwargs.setdefault('eligex',self.eligex)
 		kwargs.setdefault('conj',True)
 		kwargs.setdefault('aud', False)
@@ -221,6 +221,8 @@ class CourseTrad(models.Model):
 				print query
 			return bool(Enrollments.filter(**query).exclude(course__tradition__id__startswith='K'))
 	def eligible(self, student, year):
+		if not student.family.has_accepted_policy(year):
+			return False
 		course = Courses.fetch(tradition=self, year=year)
 		if course:
 			return course.eligible(student)
@@ -304,6 +306,8 @@ class Course(models.Model):
 	def __str__(self):
 		return self.title+' ('+str(self.year)+')'
 	def eligible(self, student):
+		if not student.family.has_accepted_policy(self.year):
+			return False
 		return self.check_eligex(student)
 	def audible(self, student):
 		return self.check_eligex(student, aud=True)
@@ -395,6 +399,7 @@ class Enrollment(models.Model):
 		("need_cur","{student} will be eligible for {course} once {pronoun} enrolls in at least 1 other class"),              # Unstable
 		("needboth","{student} will be eligible to audition for {course} once {pronoun} enrolls in at least 1 other class"),  # Unstable
 		("nonexist","{student} was enrolled in {course} ({year}) on cancelled invoice #{invoice}"),     # invoice__status='C' # Invisible
+		("nopolicy","{family} must accept HST's {year} Policy Agreement before enrolling students.")
 	]
 	status     = models.CharField(max_length=8,choices=status_choices,default='need_pay')
 	created_at = models.DateTimeField(auto_now_add=True)
@@ -438,6 +443,8 @@ class Enrollment(models.Model):
 			return self.status
 		if not self.course.check_eligex(self.student, aud=True, cur=True):
 			return "not_elig"
+		elif not self.student.family.has_accepted_policy(self.course.year):
+			return "nopolicy"
 		elif any(Each(self.student.courses_in(self.course.year)).conflicts_with(self.course)):
 			return "conflict"
 		elif self.course.check_eligex(self.student):

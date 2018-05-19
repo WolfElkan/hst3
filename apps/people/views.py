@@ -275,7 +275,7 @@ def policy(request, **kwargs):
 	
 def policy_get(request, page=None):
 	if not page:
-		return redirect(request.path_info+'/1/')
+		return redirect(request.path_info+'1/')
 	page = int(page)
 	me = getme(request)
 	policy = Policies.current

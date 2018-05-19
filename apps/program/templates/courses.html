@@ -98,8 +98,10 @@
 	.aud_need td:nth-child(2), .legend .aud_need td:nth-child(1) {font-weight: bold;}
 		.aud_need form.aud button {display: inline;}
 	/*Half Gray*/
-	.need_cur, .needboth {background-color: #aaa}
-		.need_cur button.enroll_disabled, .needboth button.enroll_disabled {display: inline;}
+	.need_cur, .nopolicy, .needboth {background-color: #aaa}
+		.need_cur button.enroll_disabled,
+		.nopolicy button.enroll_disabled, 
+		.needboth button.enroll_disabled {display: inline;}
 	/*Gray*/
 	.not_elig {background-color: #777}
 		.not_elig button.enroll_disabled {display: inline;}
@@ -156,7 +158,7 @@
 						<th>Day</th>
 						<th>Time</th>
 						<th>Tuition</th>
-						<th>Hours</th>
+						<th title="Volunteer hours are NOT cumulitive.  17 + 22 = 22, not 39.  See Policy Agreement for details.">Hours</th>
 					</thead>
 					{% for enr in menu %}
 					<tr class="{{enr.status}}" title="{{enr.public_title}}">
@@ -239,7 +241,7 @@
 						<button {% if not invoiceable %} disabled {% endif %} class="invoice">Generate Invoice</button>
 					</form>
 				</center>
-				<a href="/family/{{family.id}}/invoices/">All Invoices</a>
+				<a href="/family/{{family.id}}/invoices/">View Invoices</a>
 			</div>
 
 		</td>
@@ -260,7 +262,14 @@
 						<td>Student is not eligible for this class.</td>
 					</tr>
 					<tr class="need_cur">
-						<td>Student will be eligible, but must enroll in at least 1 other class first.</td>
+						<td>
+							<!-- Action required before enrolling.  Hover mouse over to see what. -->
+							{% if family.has_accepted_policy %}
+							Student will be eligible, but must enroll in at least 1 other class first.
+							{% else %}
+							You must accept HST's {{year}} Policy Agreement before enrolling.
+							{% endif %}
+						</td>
 					</tr>
 					<tr class="conflict">
 						<td>Student is registered for another class at the same time as this.</td>
@@ -281,6 +290,9 @@
 						<td>Student is successfully enrolled this class.</td>
 					</tr>
 				</table>
+				<div>(F) = Fall Semester only (September - December)</div>
+				<div>(S) = Spring Semester only (January - April)</div>
+				<div>All other classes run September {{reg_year|add:-1}} - April {{reg_year}}</div>
 			</div>
 			
 		</td>

@@ -3,6 +3,7 @@ from django.db import models
 from .managers import Addresses, Families, Parents, Students, Users, NameClashes
 from apps.program.managers import CourseTrads, Courses, Enrollments
 from apps.payment.managers import Invoices
+from apps.radmin.managers  import Policies
 
 from Utils import custom_fields as custom
 from Utils import supermodel as sm
@@ -113,6 +114,9 @@ class Family(models.Model):
 		else:
 			family = None
 		return self.id == family.id
+	def has_accepted_policy(self, year=getyear()):
+		policy = Policies.fetch(year=year)
+		return not policy or self.policyYear == year and self.policyPage == policy.nPages
 	def unique_last(self):
 		return '{} #{}'.format(self.last,self.name_num) if self.name_num else self.last
 	def unique_last_in(self, year):
