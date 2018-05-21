@@ -1,7 +1,7 @@
 from django.db import models
 
 from .managers import Addresses, Families, Parents, Students, Users, NameClashes
-from apps.program.managers import CourseTrads, Courses, Enrollments
+from apps.program.managers import CourseTrads, Courses, Enrollments, Venues
 from apps.payment.managers import Invoices
 from apps.radmin.managers  import Policies
 
@@ -37,6 +37,14 @@ class Address(models.Model):
 		else:
 			family = None
 		return family and family.address.id == self.id
+	def owner(self):
+		return Families.fetch(address=self) or Venues.fetch(address=self) or Teacher.objects.fetch(address=self)
+	def __getattribute__(self, field):
+		if field in ['owner']:
+			call = super(Address, self).__getattribute__(field)
+			return call()
+		else:
+			return super(Address, self).__getattribute__(field)	
 	def __str__(self):
 		title = self.line1 + ('\n'+self.line2 if self.line2 else '') + '\n' + self.city + ', ' + self.state + '\n' + str(self.zipcode)
 		return title

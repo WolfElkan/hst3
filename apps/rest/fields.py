@@ -7,6 +7,7 @@ from apps.people.models import Address, Family, Student, Parent, User
 
 FIELDS = {
 	'address'   : [
+	{'field':'owner'     , 'template': ForeignKey()},
 		{'field':'line1'     , 'template': VarChar(maxlength=50)},
 		{'field':'line2'     , 'template': VarChar(maxlength=50)},
 		{'field':'city'      , 'template': VarChar(maxlength=25)},
