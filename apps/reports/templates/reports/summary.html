@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>HST | Students {{year}}</title>
+	<style type="text/css">
+		td {
+			border: solid black 1px;
+			padding: 3px;
+		}
+		.center {
+			text-align: center;
+		}
+		.enr {
+			width: 35px;
+			text-align: center;
+		}
+	</style>
+</head>
+<body>
+	<h1>HST {{year|add:-1}}-{{year}} Summary Report</h1>
+	<!-- <form method="POST" action="mass_enroll/">{% csrf_token %} -->
+		<!-- <input type="submit"> -->
+	<table>
+		<thead>
+			<th><a href="/rest/new/family/">Family</a></th>
+			<th><a href="/rest/new/student/">Students</a></th>
+			<th>Age</th>
+			<th>Sex</th>
+			<!-- <th colspan="7">Enrollments</th> -->
+			<th>Act</th>
+			<th>Ch.</th>
+			<th>Tap</th>
+			<th>Jazz</th>
+			<th>Irish</th>
+			<!-- <th>Hip.</th> -->
+			<!-- <th>Other</th> -->
+		</thead>
+		{% for row in table %}
+		<tr title="{{row.student}}, #{{row.student.id}}">
+			{% if row.oldest %}
+			<td title="{{row.family}}, #{{row.family.id}}" rowspan="{{row.nchild}}"><a href="/rest/show/family/{{row.family.id}}/">{{row.last}}</a></td>
+			{% endif %}
+			<td>
+				<!-- <input type="checkbox" name="{{row.student.id}}"> -->
+				<a href="/rest/show/student/{{row.student.id}}/">{{row.student.prefer}}</a>
+			</td>
+			<td class="center">{{row.age}}</td>
+			<td class="center">{{row.student.sex}}</td>
+
+			{% if row.Troupe %}
+			<td class="enr {{row.Troupe.enr.status}}">
+				<a href="/rest/show/enrollment/{{row.Troupe.enr.id}}/">{{row.Troupe.ctid}}</a>
+			</td>
+			{% else %}
+			<td class="enr {{row.Acting.enr.status}}">
+				<a href="/rest/show/enrollment/{{row.Acting.enr.id}}/">{{row.Acting.ctid}}</a>
+			</td>
+			{% endif %}
+
+			<td class="enr {{row.Choir.enr.status}}">
+				<a href="/rest/show/enrollment/{{row.Choir.enr.id}}/">{{row.Choir.ctid}}</a>
+			</td>
+
+			<td class="enr {{row.Tap.enr.status}}">
+				<a href="/rest/show/enrollment/{{row.Tap.enr.id}}/">{{row.Tap.ctid}}</a>
+			</td>
+
+			<td class="enr {{row.Jazz.enr.status}} {{row.HipHop.enr.status}}">
+				<a href="/rest/show/enrollment/{{row.Jazz.enr.id}}/">{{row.Jazz.ctid}}</a><a href="/rest/show/enrollment/{{row.HipHop.enr.id}}/">{{row.HipHop.ctid}}</a>
+			</td>
+
+			<td class="enr {{row.Irish.enr.status}}">
+				<a href="/rest/show/enrollment/{{row.Irish.enr.id}}/">{{row.Irish.ctid}}</a>
+			</td>
+			<!-- <td class="enr">{{row.H|safe}}</td> -->
+			<!-- <td>{{row.G|safe}}{{row.W|safe}}{{row.X|safe}}</td> -->
+		</tr>
+		{% endfor %}
+	</table>
+	<!-- </form> -->
+</body>
+</html>

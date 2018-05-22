@@ -70,15 +70,15 @@ class CourseTrad(models.Model):
 		'A':'Acting',
 		'B':'Ballet', # Historical
 		'C':'Choir',
-		'D':'Dance Intensive', # Historical
+		'D':'DanceIntensive', # Historical
 		# 'E':'',
 		'F':'Finale',
-		'G':'General Audition',
-		'H':'Jazz/Hip-Hop',
+		'G':'GeneralAudition',
+		'H':'HipHop',
 		'I':'Irish',
 		'J':'Jazz',
-		'K':'Prepaid Tickets', # Admin
-		'L':'Sign Language', # Historical
+		'K':'PrepaidTickets', # Admin
+		'L':'SignLanguage', # Historical
 		# 'M':'', # Merchandise? Makeup kits? Meeting?
 		# 'N':'',
 		'O':'Overture', # Historical
@@ -380,7 +380,10 @@ class Enrollment(models.Model):
 	role       = models.TextField(null=True)
 	role_type  = sqlmod.EnumField(choices=['','Chorus','Support','Lead'])
 	status_choices = [
+		("enrolled","{student} {proverb} enrolled in {course} ({year})"),                               # invoice__status='P' # Stable
  		("eligible","{student} is eligible for {course}"),                                                                    # Stable
+		("invoiced","{student}'s enrollment in {course} has been added to invoice #{invoice}"),         # invoice__status='N' # Stable
+		("need_pay","{student} is registered for {course} pending tuition payment"),                                          # Stable
 		("not_elig","{student} is not eligible for {course}"),                                                                # Unstable
 		("aud_need","{student} is eligible for {article} {audskil} for {course}."),                                           # Unstable
 		("aud_pend","{student} has scheduled {article} {audskil} for {course} ({year})"),                                     # Stable
@@ -392,9 +395,6 @@ class Enrollment(models.Model):
 		("aud_fail","{student} did not pass the {audskil} for {course}."),                                                    # Invisible
 		("aud_drop","{student} passed the {audskil} for {course} and then dropped it, but {pronoun} may still re-enroll."),   # Stable
 		("aud_lock","{student} has passed the {audskil} for {course} and must enroll."),                                      # Stable
-		("enrolled","{student} {proverb} enrolled in {course} ({year})"),                               # invoice__status='P' # Stable
-		("invoiced","{student}'s enrollment in {course} has been added to invoice #{invoice}"),         # invoice__status='N' # Stable
-		("need_pay","{student} is registered for {course} pending tuition payment"),                                          # Stable
 		("conflict","{student} is in another class at the same time as {course}"),                                            # Unstable
 		("need_cur","{student} will be eligible for {course} once {pronoun} enrolls in at least 1 other class"),              # Unstable
 		("needboth","{student} will be eligible to audition for {course} once {pronoun} enrolls in at least 1 other class"),  # Unstable
@@ -517,6 +517,8 @@ class Enrollment(models.Model):
 			self.save()
 	def tuition(self):
 		return self.course.tuition
+	def __str__(self):
+		return '{} in {}'.format(self.student, self.course)
 	def __getattribute__(self, field):
 		if field in ['paid','eligible','display_student','tuition','title','public_title','public_status']:
 			call = super(Enrollment, self).__getattribute__(field)

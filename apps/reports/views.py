@@ -16,7 +16,7 @@ def index(request, **kwargs):
 		'courses':Courses.filter(year=getyear()).order_by('tradition__order'),
 		'year':getyear()
 	}
-	return render(request, 'index.html', context)
+	return render(request, 'reports/index.html', context)
 
 def roster(request, id):
 	course = Courses.fetch(id=id)
@@ -26,7 +26,7 @@ def roster(request, id):
 	context = {
 		'course':course
 	}
-	return render(request, 'rowspan_roster.html', context)
+	return render(request, 'reports/rowspan_roster.html', context)
 
 def historical(request, **kwargs):
 	history = []
@@ -36,7 +36,7 @@ def historical(request, **kwargs):
 			'courses':Courses.filter(year=year),
 		})
 	context = {'history':history}
-	return render(request, 'historical.html', context)
+	return render(request, 'reports/historical.html', context)
 
 def students(request, **kwargs):
 	bad = restricted(request,5)
@@ -69,13 +69,14 @@ def students(request, **kwargs):
 			oldest = False
 			for enrollment in student.enrollments_in(year):
 				ctid = enrollment.course.tradition.id
-				row[ctid[:1]] = '<a href="/rest/show/enrollment/{}/">{}</a>'.format(enrollment.id, sub(ctid, ctids))
+				# row[ctid[:1]] = '<a href="/rest/show/enrollment/{}/">{}</a>'.format(enrollment.id, sub(ctid, ctids))
+				row[enrollment.course.genre] = {'enr':enrollment,'ctid':sub(ctid,ctids)}
 			table.append(row)
 	context = {
 		'year'  : year,
 		'table' : table,
 	}
-	return render(request, 'students.html', context)
+	return render(request, 'reports/summary.html', context)
 
 def mass_enroll(request, **kwargs):
 	bad = restricted(request,5)
@@ -92,7 +93,7 @@ def mass_enroll(request, **kwargs):
 		'students': students,
 		'courses' : courses,
 	}
-	return render(request, 'mass_enroll.html', context)
+	return render(request, 'reports/mass_enroll.html', context)
 
 def register(request, **kwargs):
 	bad = restricted(request,5)
