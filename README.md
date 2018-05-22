@@ -12,6 +12,8 @@
 
   1. Navigate into project folder (`cd hst3`)
 
+  1. Run `sh HST/setup.sh` and follow the Terminal instructions
+
   1. Run `pip install -r requirements.txt` to install dependencies (This could take a few minutes).
 
   1. Run `python manage.py makemigrations` to create the data migration files.
@@ -28,7 +30,7 @@
 
   1. If application is running successfully, you will see an HST Homepage.  Click [JSON Bulk Data Interface](http://localhost:8000/seed/load/)
 
-  1. Unzip the `hst.json.zip` file. (Note: this file contains confidential contact information for HST's families and, for privacy reasons, is NOT included in this repository or available anywhere on the web.  Contact the developer directly for this file.)
+  1. Unzip the `hst.json.zip` file. (Note: this file contains confidential contact information for HST's families and, for privacy reasons, is **NOT** included in this repository or available anywhere on the web.  Contact the developer directly for this file.)
 
   1. Open `hst.json`, the file that unzips from `hst.json.zip`, in a Text Editor.  Copy the *entire text* of the file and paste it into the "JSON:" window on the application.
 
