@@ -65,12 +65,14 @@ def students(request, **kwargs):
 				'age'    : student.hst_age_in(year),
 				'nchild' : len(children),
 				'oldest' : oldest,
+				'XW'     : [],
 			}
 			oldest = False
 			for enrollment in student.enrollments_in(year):
 				ctid = enrollment.course.tradition.id
-				# row[ctid[:1]] = '<a href="/rest/show/enrollment/{}/">{}</a>'.format(enrollment.id, sub(ctid, ctids))
 				row[enrollment.course.genre] = {'enr':enrollment,'ctid':sub(ctid,ctids)}
+				if ctid[0] in 'XW':
+					row['XW'].append(enrollment)
 			table.append(row)
 	context = {
 		'year'  : year,

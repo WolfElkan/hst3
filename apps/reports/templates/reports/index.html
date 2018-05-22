@@ -13,7 +13,7 @@
 </head>
 <body>
 <h1>Reports</h1>
-<h2><a href="/reports/students/{{year}}/">{{year}} Enrollments</a></h2>
+<h2><a href="/reports/students/{{year}}/">{{year}} Summary Report</a></h2>
 <h2>{{year}} Class Rosters</h2>
 {% for course in courses %}
 <a {% if course.tradition.e %} class="e" {% endif %} href="/reports/roster/{{course.id}}/">{{course.title}}</a>

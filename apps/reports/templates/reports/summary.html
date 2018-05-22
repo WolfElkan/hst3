@@ -1,29 +1,84 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>HST | Students {{year}}</title>
+	<title>HST | {{year}} Summary Report</title>
+	{% load staticfiles %}
+	<link rel="stylesheet" type="text/css" href="{% static 'main/css/status.css' %}">
 	<style type="text/css">
+		table {
+			border-collapse: collapse;
+		}
+		@media print {
+				tr, td {
+					height: 30px;
+					color: blue;
+				    /*page-break-before: all;*/
+				    page-break-after: always;
+				    background-color: transparent !important;
+				}
+			} 
 		td {
 			border: solid black 1px;
 			padding: 3px;
 		}
 		.center {
+			width: 25px;
 			text-align: center;
 		}
 		.enr {
 			width: 35px;
 			text-align: center;
 		}
+		.xw {
+			min-width: 35px;
+		}
 	</style>
+	{% load staticfiles %}
+	<script src="{% static 'main/js/jquery.js' %}" charset="utf-8"></script>
+	<script type="text/javascript">
+		var rows_per_page = 38
+
+		function oldest(row) {
+			if (row.cells.length == 9) {
+				return row
+			} else {
+				return oldest(row.previousElementSibling)
+			}
+		}
+		function family(row) {
+			return oldest(row).cells[0]
+		}
+
+		// $('document').ready(function() {
+		// 	$('tr').css('pageBreakBefore','always')
+		// 	var rows = $('tr')
+		// 	var n = 4
+		// 	for (var i = 0; i < rows.length; i++) {
+		// 		row = rows[i]
+		// 		row.cells[row.cells.length-8].append(n)
+		// 		if (n >= rows_per_page) {
+		// 			fam = oldest(row)
+		// 			$(fam).css('page-break-before','always')
+		// 			n = row.rowIndex - fam.rowIndex + 1
+		// 		}
+		// 		rows[i]
+		// 		n++
+		// 	}
+		// })
+	</script>
 </head>
 <body>
+	<center>
 	<h1>HST {{year|add:-1}}-{{year}} Summary Report</h1>
 	<!-- <form method="POST" action="mass_enroll/">{% csrf_token %} -->
 		<!-- <input type="submit"> -->
 	<table>
 		<thead>
-			<th><a href="/rest/new/family/">Family</a></th>
-			<th><a href="/rest/new/student/">Students</a></th>
+			<th>Family</th>
+			<th>Parents</th>
+			<!-- <th>Phone</th> -->
+			<!-- <th>Main Email</th> -->
+			<th>Students</th>
 			<th>Age</th>
 			<th>Sex</th>
 			<!-- <th colspan="7">Enrollments</th> -->
@@ -33,44 +88,55 @@
 			<th>Jazz</th>
 			<th>Irish</th>
 			<!-- <th>Hip.</th> -->
-			<!-- <th>Other</th> -->
+			<th>Tech</th>
 		</thead>
 		{% for row in table %}
-		<tr title="{{row.student}}, #{{row.student.id}}">
+		<tr>
 			{% if row.oldest %}
-			<td title="{{row.family}}, #{{row.family.id}}" rowspan="{{row.nchild}}"><a href="/rest/show/family/{{row.family.id}}/">{{row.last}}</a></td>
-			{% endif %}
-			<td>
-				<!-- <input type="checkbox" name="{{row.student.id}}"> -->
-				<a href="/rest/show/student/{{row.student.id}}/">{{row.student.prefer}}</a>
+			<td title="{{row.family}}, #{{row.family.id}}" rowspan="{{row.nchild}}">{{row.last}}</td>
+			<td title="{{row.family}}, #{{row.family.id}}" rowspan="{{row.nchild}}">
+				{{row.family.mother.first}}
+				{% if row.family.mother and row.family.father %} &amp; {% endif %}
+				{{row.family.father.first}}
 			</td>
-			<td class="center">{{row.age}}</td>
+<!-- 			<td title="{{row.family}}, #{{row.family.id}}" rowspan="{{row.nchild}}">{{row.family.phone}}</td>
+			<td title="{{row.family}}, #{{row.family.id}}" rowspan="{{row.nchild}}">{{row.family.email}}</td> -->
+			{% endif %}
+			<td title="{{row.student}}, #{{row.student.id}}">
+				{{row.student.prefer}}
+			</td>
+			<td class="center" title="{{row.student.birthday}}">{{row.age}}</td>
 			<td class="center">{{row.student.sex}}</td>
 
 			{% if row.Troupe %}
-			<td class="enr {{row.Troupe.enr.status}}">
-				<a href="/rest/show/enrollment/{{row.Troupe.enr.id}}/">{{row.Troupe.ctid}}</a>
+			<td class="enr {{row.Troupe.enr.status}}" title="{{row.Troupe.enr.status}} #{{row.Troupe.enr.id}}">
+				{{row.Troupe.ctid}}
 			</td>
 			{% else %}
-			<td class="enr {{row.Acting.enr.status}}">
-				<a href="/rest/show/enrollment/{{row.Acting.enr.id}}/">{{row.Acting.ctid}}</a>
+			<td class="enr {{row.Acting.enr.status}}" title="{{row.Acting.enr.status}} #{{row.Acting.enr.id}}">
+				{{row.Acting.ctid}}
 			</td>
 			{% endif %}
 
-			<td class="enr {{row.Choir.enr.status}}">
-				<a href="/rest/show/enrollment/{{row.Choir.enr.id}}/">{{row.Choir.ctid}}</a>
+			<td class="enr {{row.Choir.enr.status}}" title="{{row.Choir.enr.status}} #{{row.Choir.enr.id}}">
+				{{row.Choir.ctid}}
 			</td>
 
-			<td class="enr {{row.Tap.enr.status}}">
-				<a href="/rest/show/enrollment/{{row.Tap.enr.id}}/">{{row.Tap.ctid}}</a>
+			<td class="enr {{row.Tap.enr.status}}" title#="{{row.Tap.enr.status}} #{{row.Tap.enr.id}}">
+				{{row.Tap.ctid}}
 			</td>
 
-			<td class="enr {{row.Jazz.enr.status}} {{row.HipHop.enr.status}}">
-				<a href="/rest/show/enrollment/{{row.Jazz.enr.id}}/">{{row.Jazz.ctid}}</a><a href="/rest/show/enrollment/{{row.HipHop.enr.id}}/">{{row.HipHop.ctid}}</a>
+			<td class="enr {{row.Jazz.enr.status}} {{row.HipHop.enr.status}}" title="{{row.Jazz.enr.status}} {{row.Jazz.enr.id}} {{row.HipHop.enr.status}} {{row.HipHop.enr.id}}">
+				{{row.Jazz.ctid}} {{row.HipHop.ctid}}
 			</td>
 
-			<td class="enr {{row.Irish.enr.status}}">
-				<a href="/rest/show/enrollment/{{row.Irish.enr.id}}/">{{row.Irish.ctid}}</a>
+			<td class="enr {{row.Irish.enr.status}}" title="#{{row.Irish.enr.id}}, {{row.Irish.enr.status}}">
+				{{row.Irish.ctid}}
+			</td>
+			<td class="xw{% for e in row.XW %} {{e.status}}{% endfor %}">
+				{% for e in row.XW %}
+				{{e.course.tradition.id}}
+				{% endfor %}
 			</td>
 			<!-- <td class="enr">{{row.H|safe}}</td> -->
 			<!-- <td>{{row.G|safe}}{{row.W|safe}}{{row.X|safe}}</td> -->
@@ -78,5 +144,6 @@
 		{% endfor %}
 	</table>
 	<!-- </form> -->
+	</center>
 </body>
 </html>
