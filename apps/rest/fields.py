@@ -15,6 +15,7 @@ FIELDS = {
 		{'field':'zipcode'   , 'template': ZipCode()},
 	],
 	'family'    : [
+		{'field':'oid'       , 'template': Static()},
 		{'field':'hid'       , 'template': Static()},
 		{'field':'last'      , 'template': VarChar(maxlength=30)},
 		{'field':'phone'     , 'template': PhoneNumber()},
@@ -52,6 +53,7 @@ FIELDS = {
 	],
 	'user'      : [
 		{'field':'username'  , 'template': Static()},
+		{'field':'password'  , 'template': Bcrypt()},
 		{'field':'permission', 'template': Enum(items=User.perm_levels)},
 	],
 	'coursetrad': [

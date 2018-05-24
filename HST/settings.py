@@ -46,6 +46,8 @@ INSTALLED_APPS = [
     'apps.radmin',
     'apps.rest',
     'apps.reports',
+    'apps.old',
+    'easy_pdf',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

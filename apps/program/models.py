@@ -99,6 +99,16 @@ class CourseTrad(models.Model):
 	objects = CourseTrads
 	def __str__(self):
 		return self.title.upper()
+	def subid(self):
+		return sub(self.id, {
+			'SB':'TT',
+			'SG':'GB',
+			'SJ':'JR',
+			'P1':'BT1',
+			'P2':'BP2',
+			'Z1':'BJ1',
+			'Z2':'BZ2',
+		})
 	def stand(self, me):
 		if me.owner_type == 'Family':
 			return bool(self.courses.filter(enrollment__student__family=me.owner))
@@ -239,7 +249,7 @@ class CourseTrad(models.Model):
 		else:
 			return self.check_eligex(student, year, aud=True)
 	def __getattribute__(self, field):
-		if field in ['courses','genre']:
+		if field in ['courses','genre','subid']:
 			function = super(CourseTrad, self).__getattribute__(field)
 			return function()
 		else:

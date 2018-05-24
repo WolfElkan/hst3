@@ -1,0 +1,106 @@
+{% extends "easy_pdf/base.html" %}
+
+{% block extra_style %}
+<style type="text/css">
+	table {
+		border-collapse: collapse;
+	}
+	tr, td {
+		/*height: 30px;*/
+	    /*page-break-before: all;*/
+	    page-break-after: always;
+	}
+	td {
+		border: solid black 1px;
+		padding: 3px;
+	}
+	.center {
+		width: 25px;
+		text-align: center;
+	}
+	.enr {
+		width: 35px;
+		text-align: center;
+	}
+	.xw {
+		min-width: 35px;
+	}
+</style>
+{% endblock %}
+
+
+{% block content %}
+<center>
+	<h1>HST {{year|add:-1}}-{{year}} Summary Report</h1>
+	<table>
+			<th>Family</th>
+			<th>Parents</th>
+			<th>Students</th>
+			<th>Age</th>
+			<th>Sex</th>
+			<th>Act</th>
+			<th>Ch.</th>
+			<th>Tap</th>
+			<th>Jazz</th>
+			<th>Irish</th>
+			<th>Tech</th>
+		{% for row in table %}
+		<tr>
+			{% if row.oldest %}
+			<td rowspan="{{row.nchild}}">{{row.last}}</td>
+			<td rowspan="{{row.nchild}}">
+				{{row.family.mother.first}}
+				{% if row.family.mother and row.family.father %} &amp; {% endif %}
+				{{row.family.father.first}}
+			</td>
+			{% endif %}
+			<td>
+				{{row.student.prefer}}
+			</td>
+			<td class="center">
+				{{row.age}}
+			</td>
+			<td class="center">
+				{{row.student.sex}}
+			</td>
+
+			{% if row.Troupe %}
+				<td class="enr {{row.Troupe.enr.status}}">
+					{{row.Troupe.ctid}}
+				</td>
+			{% elif row.Overture %}
+				<td class="enr {{row.Overture.enr.status}}">
+					{{row.Overture.ctid}}
+				</td>
+			{% else %}
+				<td class="enr {{row.Acting.enr.status}}">
+					{{row.Acting.ctid}}
+				</td>
+			{% endif %}
+
+			<td class="enr {{row.Choir.enr.status}}">
+				{{row.Choir.ctid}}
+			</td>
+
+			<td class="enr {{row.Tap.enr.status}}">
+				{{row.Tap.ctid}}
+			</td>
+
+			<td class="enr {{row.Jazz.enr.status}} {{row.HipHop.enr.status}}">
+				{{row.Jazz.ctid}} {{row.HipHop.ctid}}
+			</td>
+
+			<td class="enr {{row.Irish.enr.status}}">
+				{{row.Irish.ctid}}
+			</td>
+			<td class="xw{% for e in row.XW %} {{e.status}}{% endfor %}">
+				{% for e in row.XW %}
+				{{e.course.tradition.id}}
+				{% endfor %}
+			</td>
+		</tr>
+		{% endfor %}
+
+	</table>
+</center>
+{% endblock %}

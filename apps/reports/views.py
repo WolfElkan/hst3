@@ -78,7 +78,7 @@ def students(request, **kwargs):
 		'year'  : year,
 		'table' : table,
 	}
-	return render(request, 'reports/summary.html', context)
+	return render(request, 'reports/summary.pdf.html', context)
 
 def mass_enroll(request, **kwargs):
 	bad = restricted(request,5)

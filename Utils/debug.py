@@ -19,6 +19,23 @@ def pretty(arr, delim='  ', indent='', level=0, printout=''):
 def pdir(thing):
 	return pretty(dir(thing))
 
+def dircall(obj):
+	lens = [0]
+	for attr in dir(obj):
+		lens.append(len(attr))
+	maxlens = max(lens)
+	for attr in dir(obj):
+		if attr[0] == '_':
+			continue
+		item = obj.__getattribute__(attr)
+		if hasattr(item,'__call__'):
+			try:
+				item = item()
+			except Exception as e:
+				pass
+			else:
+				print "{}{} : {}".format(attr,' '*(maxlens-len(attr)),item)
+
 def san(s):
 	s = s.replace('<','&lt;')
 	s = s.replace('>','&gt;')

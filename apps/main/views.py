@@ -67,6 +67,7 @@ def login_post(request, path):
 		request.session['p'] = {'login':persist}
 		return redirect('/login{}'.format(path))
 	else:
+		me.save()
 		request.session['meid'] = me.id
 		return redirect(path)
 

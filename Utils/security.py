@@ -9,6 +9,7 @@ def restricted(request, level=0, standing=None, standing_level=0):
 	if not me:
 		return redirect('/login{}'.format(request.path))
 	if me.permission < (standing_level if standing and standing.stand(me) else level):
+		me.perm_levels.append((8,'Eight'))
 		context = {
 			'me':me,
 			'need':dict(me.perm_levels)[level]

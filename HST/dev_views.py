@@ -7,12 +7,14 @@ from apps.radmin.managers  import Policies
 
 from Utils.custom_fields import Bcrypt, PhoneNumber, DayOfWeek
 from Utils.data  import collect, copy, copyatts, Each, equip, find, find_all, sub, cleandate
-from Utils.debug import pretty, pdir, divs
+from Utils.debug import pretty, pdir, divs, dircall
 from Utils.fjson import FriendlyEncoder
 from Utils.misc  import namecase, cleanhex, safe_delete
 from Utils.security import getme, getyear, gethist, restricted
 from Utils.seshinit import seshinit, forminit
 from Utils.snippets import order_coursetrads, make
+
+from apps.old import migrate as old
 
 import datetime
 import re

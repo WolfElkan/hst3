@@ -7,19 +7,26 @@ from . import multi_column_gist as poly
 from datetime import datetime
 from decimal import Decimal
 from trace import TRACE
-import re
+import re, md5
 
 EnumField = sqlmod.EnumField
 
 class Bcrypt(object):
-	regex = r'\$(?P<encode>\w+)\$(?P<rounds>\d\d)\$(?P<salt>[A-Za-z0-9./]{22})(?P<hash>[A-Za-z0-9./]{31})'
-	def __init__(self, char60):
-		self.char60 = char60.char60 if type(char60) is Bcrypt else char60
-		self.field = None
-		self.full = char60 if char60[0] == '$' else char60[1:]
-		self.html = u'<span title="{}">&#x1f512;</span>'.format(self.full)
+	regex = r'\$(?P<encode>\w+)\$((?P<rounds>\d\d)\$(?P<salt>[A-Za-z0-9./]{22}))?(?P<hash>[0-9a-fA-F]{32}|[A-Za-z0-9./]{31})'
+	def __init__(self, char60=None):
+		if char60:
+			self.char60 = char60.char60 if type(char60) is Bcrypt else char60
+			self.field = None
+			self.full = self.char60
+			self.html = u'<span title="{}">{}</span>'.format(self.full,self.emoji) if self.full[0] == '$' else self.full
 	def __call__(self, pw):
-		return bcrypt.checkpw(bytes(pw), bytes(self.full))
+		if self.encode[0] == '2':
+			correct = bcrypt.checkpw(bytes(pw), bytes(self.full))
+		elif self.encode == '1':
+			correct = md5.new(bytes(pw)).hexdigest() == str(self.hash)
+			hashed = bcrypt.hashpw(pw.encode(), bcrypt.gensalt())
+			self.__init__(hashed)
+		return correct
 	def __str__(self):
 		return self.full
 	def __iter__(self):
@@ -30,12 +37,30 @@ class Bcrypt(object):
 		return {
 			'1': 'MD5',
 			'2': 'Bcrypt',
-			's': 'SHA-1',
+			'2a': 'Bcrypt',
+			'2b': 'Bcrypt',
+			'2x': 'Bcrypt',
+			'2y': 'Bcrypt',
+			'sha1':'SHA-1',
 			'5': 'SHA-256',
 			'6': 'SHA-512',
-		}[self.encode()[0]]
+		}[self.encode[0]]
+	def emoji(self):
+		return {
+			'1':  '&#x1f511;',
+			'2':  '&#x1f512;',
+			'2a': '&#x1f513;',
+			'2b': '&#x1f512;',
+			'2x': '&#x1f50f;',
+			'2y': '&#x1f510;',
+			'sha1':'&#x26ab;',
+			'5':  '&#x1f534;',
+			'6':  '&#x1f535;',
+		}[self.encode[0]]
 	def rounds(self):
 		return int(dict(self)['rounds'])
+	def realrounds(self):
+		return 2 ** self.rounds
 	def salt(self):
 		return dict(self)['salt']
 	def hash(self):
@@ -43,8 +68,16 @@ class Bcrypt(object):
 	def widget(self, field, value, **kwargs):
 		user_id = kwargs['id'] if 'id' in kwargs else 0
 		return '{} <a href="/user/{}/sudochangepassword/">Change</a>'.format(self.html, user_id)
-	def static(self):
+	def static(self, field, value):
+		self.__init__(value)
+		self.field = field
 		return self.html
+	def __getattribute__(self, field):
+		if field in ['encode','encoding','emoji','rounds','realrounds','salt','hash']:
+			call = super(Bcrypt, self).__getattribute__(field)
+			return call()
+		else:
+			return super(Bcrypt, self).__getattribute__(field)
 
 class BcryptField(models.Field):
 	def __init__(self):
@@ -58,8 +91,8 @@ class BcryptField(models.Field):
 			return 'CHAR(60)' # TODO: Figure out equivalent field in other db softwares
 	def pre_save(self, model_instance, add):
 		plaintext = getattr(model_instance, self.attname)
-		if type(plaintext) in [str,unicode] and re.match(Bcrypt.regex, str(plaintext)):
-			print 'yes'
+		# if type(plaintext) in [str,unicode] and re.match(Bcrypt.regex, str(plaintext)):
+		if type(plaintext) in [str,unicode] and str(plaintext)[0] == '$':
 			return plaintext
 		elif type(plaintext) is Bcrypt:
 			plaintext = plaintext.char60

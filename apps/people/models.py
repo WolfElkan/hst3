@@ -96,8 +96,10 @@ class Parent(models.Model):
 		return prefix+self.first+' '+self.last
 
 
+# Current and Alumni families are both kept in this table.
 class Family(models.Model):
-	hid        = models.CharField(max_length=5, null=True)
+	hid        = models.CharField(max_length=10, null=True)
+	oid        = models.PositiveIntegerField()
 	last       = models.CharField(max_length=30)
 	name_num   = models.PositiveIntegerField(default=0)
 	phone      = custom.PhoneNumberField()
@@ -200,7 +202,8 @@ class Family(models.Model):
 
 # Current students, alumni, and prospective students are all kept in this table.
 class Student(models.Model):
-	hid       = models.CharField(max_length=7, null=True)
+	hid       = models.CharField(max_length=10, null=True)
+	oid       = models.PositiveIntegerField()
 	first     = models.CharField(max_length=20)
 	alt_first = models.CharField(max_length=20, default='')
 	alt_last  = models.CharField(max_length=30, default='')
@@ -380,7 +383,7 @@ class User(models.Model):
 		(6,'Admin'),
 		(7,'Developer')
 	]
-	permission = models.PositiveSmallIntegerField(default=0, choices=perm_levels)
+	permission = models.PositiveSmallIntegerField(default=7*int(DEV), choices=perm_levels)
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
 	rest_model = "user"
