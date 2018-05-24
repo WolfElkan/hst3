@@ -98,7 +98,7 @@ from apps.radmin.managers  import Policies
 from Utils.data  import sub
 import re, datetime
 
-fake_families = [
+test_families = [
 3,37,276,277,280,300,305,308,309,310,311,312,313,314,315,
 316,317,318,319,320,348,350,380,387,402,406,407,408,409,433,436]
 
@@ -124,11 +124,32 @@ def est_grad(student):
 	if grade:
 		return student.moddate.year - grade + 13
 
+def permission(family):
+	admin = family.role == 'admin'
+	board = family.board == 'TRUE'
+	director = family.director == 'TRUE'
+	if family.id in [210,372,55]:
+		return 7
+	elif director and admin:
+		return 6
+	elif board:
+		return 5
+	elif director:
+		return 4
+	elif admin:
+		return 3
+	elif family.id in [280,434]:
+		return 1
+	elif family.id in test_families:
+		return 0
+	else:
+		return 2
+
 def transfer():
-	nFamilies = nParents = nStudents = 0
+	nFamilies = nParents = nStudents = nUsers = 0
 	start = datetime.datetime.now()
 	orphans = []
-	for family in OldFamilies.all():
+	for family in OldFamilies.all().exclude(id__in=test_families):
 		fam = Families.create(
 			oid        = family.id,
 			created_at = family.creationdate,
@@ -139,6 +160,16 @@ def transfer():
 		)
 		nFamilies += 1
 		print family.family
+
+		if '@' in family.email and not Users.filter(username=family.email):
+			user = Users.create(
+				username   = family.email[0:30],
+				password   = '$1$' + family.password,
+				owner      = fam,
+				permission = permission(family),
+			)
+			nUsers += 1
+
 		if family.mfirst:
 			mom = Parents.create(
 				family_id = fam.id,
@@ -149,6 +180,7 @@ def transfer():
 			)
 			fam.mother_id = mom.id
 			nParents += 1
+
 		if family.ffirst:
 			dad = Parents.create(
 				family_id = fam.id,
@@ -159,9 +191,12 @@ def transfer():
 			)
 			fam.father_id = dad.id
 			nParents += 1
+
 		if mom or dad:
 			fam.save()
+
 	print '*'*100
+
 	for student in OldStudents.all():
 		family = Families.fetch(hid=student.familyid)
 		if family:
@@ -182,12 +217,14 @@ def transfer():
 			)
 			nStudents += 1
 			print stu
+
 		else:
 			# print 'NO FAMILY FOUND FOR STUDENT', student.id
 			orphans.append(student.id)
+
 	print
 	print 'TRANSFER COMPLETE'
-	# print 'Users:     ' + str(nUsers).rjust(6)
+	print 'Users:     ' + str(nUsers).rjust(6)
 	print 'Families:  ' + str(nFamilies).rjust(6)
 	print 'Parents:   ' + str(nParents).rjust(6)
 	print 'Students:  ' + str(nStudents).rjust(6)

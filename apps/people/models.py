@@ -379,7 +379,7 @@ class User(models.Model):
 		(2,'Parent') ,
 		(3,'Captain'),
 		(4,'Teacher'),
-		(5,'Founder'),
+		(5,'Board'),
 		(6,'Admin'),
 		(7,'Developer')
 	]
