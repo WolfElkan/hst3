@@ -66,7 +66,7 @@ class EnrollmentManager(sm.SuperManager):
 		super(EnrollmentManager, self).__init__('program_enrollment')
 	def create(self, **kwargs):
 		already = kwargs.copy()
-		if '+' in kwargs['course'].eligex:
+		if 'course' in kwargs and '+' in kwargs['course'].eligex:
 			student = already.pop('student')
 			already['student__family'] = student.family
 		already = self.fetch(**already)

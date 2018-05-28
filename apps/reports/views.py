@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, HttpResponse
 
 from apps.people.managers import Addresses, Families, Parents, Users, Students
 from apps.program.managers import Courses, CourseTrads, Enrollments
+from apps.program.models import Year
 
 from Utils.data import sub
 from Utils.security import getyear, gethist, restricted
@@ -38,7 +39,7 @@ def historical(request, **kwargs):
 	context = {'history':history}
 	return render(request, 'reports/historical.html', context)
 
-def students(request, **kwargs):
+def enrollment_matrix(request, **kwargs):
 	bad = restricted(request,5)
 	if bad:
 		return bad
@@ -78,7 +79,34 @@ def students(request, **kwargs):
 		'year'  : year,
 		'table' : table,
 	}
-	return render(request, 'reports/summary.pdf.html', context)
+	return render(request, 'reports/enrollment_matrix_edit.html', context)
+
+def summary(request, **kwargs):
+	kwargs.setdefault('year',getyear())
+	context = {}
+	stats = [
+		'nFamilies',
+		'nNewFamilies',
+		'nStudents',
+		'neSB',
+		'neSC',
+		'neSG',
+		'neSH',
+		'neSJ',
+		'neSR',
+		'neAC',
+		'neDC',
+		'neCC',
+		'neXX',
+		'neXM',
+		'neWC',
+		'nSlotsTotal'
+		]
+	for stat in stats:
+		context[datum] = 0
+	for student in Students.current(kwargs['year']):
+		pass
+	return render(request, 'reports/summary.html', context)
 
 def mass_enroll(request, **kwargs):
 	bad = restricted(request,5)

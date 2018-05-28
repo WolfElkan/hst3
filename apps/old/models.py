@@ -71,6 +71,8 @@ class Courses(models.Model):
     show2 = models.CharField(max_length=30)
     notes = models.CharField(max_length=300)
     active = models.CharField(max_length=3)
+    def __str__(self):
+        return self.name
 
     class Meta:
         db_table = 'old_courses'

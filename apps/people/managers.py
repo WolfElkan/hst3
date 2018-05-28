@@ -78,6 +78,8 @@ class StudentManager(sm.SuperManager):
 		if 'alt_last' in kwargs:
 			kwargs['alt_last'] = namecase(kwargs['alt_last'])
 		return super(StudentManager, self).create(**kwargs)
+	def current(self, year=getyear()):
+		return self.filter(enrollment__course__year=year)
 Students = StudentManager()
 
 

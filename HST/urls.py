@@ -24,6 +24,7 @@ from django.conf.urls import include
 
 from . import dev_views   as dev
 import apps.main.views    as main
+import apps.old.views     as old
 import apps.payment.views as payment
 import apps.people.views  as people
 import apps.program.views as program
@@ -85,8 +86,8 @@ urlpatterns = [
 	url(r'^reports/$', reports.index),
 	url(r'^reports/historical/$', reports.historical),
 	url(r'^reports/roster/(?P<id>\d\d\w\w)/$', reports.roster),
-	url(r'^reports/students/$', reports.students),
-	url(r'^reports/students/(?P<year>\d{4})/$', reports.students),
+	url(r'^reports/students/$', reports.enrollment_matrix),
+	url(r'^reports/students/(?P<year>\d{4})/$', reports.enrollment_matrix),
 
 	url(r'^reports/students/mass_enroll/$', reports.mass_enroll),
 	url(r'^reports/students/(?P<year>\d{4})/mass_enroll/$', reports.mass_enroll),
@@ -113,6 +114,7 @@ urlpatterns = [
 	url(r'^seed/load/$', seed.load),
 	url(r'^seed/dump/$', seed.dump),
 	url(r'^seed/nuke/$', seed.nuke),
+	url(r'^seed/old/$', old.old),
 
 ]
 

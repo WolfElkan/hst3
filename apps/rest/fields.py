@@ -58,6 +58,7 @@ FIELDS = {
 	],
 	'coursetrad': [
 		{'field':'id'        , 'template': VarChar(maxlength=2)},
+		{'field':'oid'       , 'template': Static()},
 		{'field':'title'     , 'template': VarChar(maxlength=50)},
 		{'field':'eligex'    , 'template': VarChar(default='~')},
 		{'field':'e'         , 'template': Checkbox(suffix='This is a real (and currently offered) course that may be enrolled in, not a student group for admin purposes')},

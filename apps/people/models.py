@@ -25,6 +25,8 @@ class Address(models.Model):
 	city       = models.CharField(default='', max_length=25)
 	state      = models.CharField(default='', max_length= 2)
 	zipcode    = custom.ZipCodeField()
+	# lattitude  = models.DecimalField(null=True, max_digits=10, decimal_places=6)
+	# longitude  = models.DecimalField(null=True, max_digits=10, decimal_places=6)
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
 	rest_model = "address"
@@ -99,7 +101,7 @@ class Parent(models.Model):
 # Current and Alumni families are both kept in this table.
 class Family(models.Model):
 	hid        = models.CharField(max_length=10, null=True)
-	oid        = models.PositiveIntegerField()
+	oid        = models.PositiveIntegerField(default=0)
 	last       = models.CharField(max_length=30)
 	name_num   = models.PositiveIntegerField(default=0)
 	phone      = custom.PhoneNumberField()
@@ -203,7 +205,7 @@ class Family(models.Model):
 # Current students, alumni, and prospective students are all kept in this table.
 class Student(models.Model):
 	hid       = models.CharField(max_length=10, null=True)
-	oid       = models.PositiveIntegerField()
+	oid       = models.PositiveIntegerField(default=0)
 	first     = models.CharField(max_length=20)
 	alt_first = models.CharField(max_length=20, default='')
 	alt_last  = models.CharField(max_length=30, default='')

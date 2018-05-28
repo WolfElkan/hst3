@@ -32,6 +32,7 @@ class Venue(models.Model):
 class CourseTrad(models.Model):
 	# General:
 	id         = models.CharField(max_length=2, primary_key=True)
+	oid        = models.CharField(max_length=10,default='')
 	title      = models.CharField(max_length=50)
 	alias      = models.ForeignKey('self', null=True)
 	order      = models.FloatField(null=True)
@@ -59,7 +60,6 @@ class CourseTrad(models.Model):
 	eligex  = models.TextField(default="#")
 	# Cost
 	tuition    = models.DecimalField(max_digits=6, decimal_places=2, default=0)
-	redtuit    = models.DecimalField(max_digits=6, decimal_places=2, default=0)
 	vol_hours  = models.FloatField(default=0)
 	the_hours  = models.FloatField(default=0)
 	auto       = models.BooleanField(default=False) # Whether course is automatically added to eligible carts
@@ -409,7 +409,7 @@ class Enrollment(models.Model):
 		("need_cur","{student} will be eligible for {course} once {pronoun} enrolls in at least 1 other class"),              # Unstable
 		("needboth","{student} will be eligible to audition for {course} once {pronoun} enrolls in at least 1 other class"),  # Unstable
 		("nonexist","{student} was enrolled in {course} ({year}) on cancelled invoice #{invoice}"),     # invoice__status='C' # Invisible
-		("nopolicy","{family} must accept HST's {year} Policy Agreement before enrolling students.")
+		("nopolicy","{family} must accept HST's {year} Policy Agreement before enrolling students."),
 	]
 	status     = models.CharField(max_length=8,choices=status_choices,default='need_pay')
 	created_at = models.DateTimeField(auto_now_add=True)
@@ -539,3 +539,16 @@ class Enrollment(models.Model):
 			return self.course.__getattribute__(field)
 		else:
 			return super(Enrollment, self).__getattribute__(field)
+
+class Year(object):
+	def __init__(self, year):
+		self.year = year
+	def season(self):
+		return self.year - 1995
+	def __getattribute__(self, field):
+		if len(field) == 2:
+			return Courses.fetch(year=self.year,tradition__id=field.upper())
+		else:
+			return super(Year, self).__getattribute__(field)
+	def __str__(self):
+		return "HST Year {}-{}".format(self.year-1,self.year)
