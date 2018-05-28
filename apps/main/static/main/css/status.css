@@ -3,37 +3,47 @@
 	.eligible form.enroll button {display: inline;}
 .aud_drop td:nth-child(2), .legend .aud_drop td:nth-child(1) {font-weight: bold;}
 	.aud_drop form.enroll button {display: inline;}
+
+/*Bold Blue on White*/
+.aud_need {color: blue;}
+.aud_need td:nth-child(2), .legend .aud_need td:nth-child(1) {font-weight: bold;}
+	.aud_need form.aud button {display: inline;}
+
 /*Blue*/
 .aud_pend, .pendpass, .pendfail, .pend_pub {background-color: #8af} 
 	.aud_pend form.drop button {display: inline;}
+
 /*Orange*/
 .invoiced {background-color: #fb8}
 	.invoiced form.drop button {display: inline;}
+
 /*Green*/
 .enrolled {background-color: #8f8}
 	.enrolled a.view {display: inline;}
+
 /*Yellow*/
 .need_pay {background-color: #ff8}
 	.need_pay form.drop button {display: inline;}
 .aud_pass {background-color: #ff8}
 	.aud_pass form.drop button {display: inline;}
-/*Blue*/
-.aud_need {color: blue;}
-.aud_need td:nth-child(2), .legend .aud_need td:nth-child(1) {font-weight: bold;}
-	.aud_need form.aud button {display: inline;}
+
 /*Half Gray*/
 .need_cur, .nopolicy, .needboth {background-color: #aaa}
 	.need_cur button.enroll_disabled,
 	.nopolicy button.enroll_disabled, 
 	.needboth button.enroll_disabled {display: inline;}
+
 /*Gray*/
 .not_elig {background-color: #777}
 	.not_elig button.enroll_disabled {display: inline;}
 .aud_fail {background-color: #777}
 .fail_pub {background-color: #777}
+.clasfull {background-color: #777}
+
 /*Red Gray*/
 .conflict {background-color: #a88}
 	.conflict button.enroll_disabled {display: inline;}
+
 /*Purple*/
 .aud_lock {background-color: #b8f}
 	.aud_lock button.drop_disabled {display: inline;}

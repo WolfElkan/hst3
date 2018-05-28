@@ -371,7 +371,11 @@ class PolymorphicField(poly.MultiColumnField):
 			return old_create(**thing)
 		self.manager.create = new_create
 	def __get__(self, thing, model):
-		_type = _(thing , self.attname + '_type').title()
+		_type = _(thing , self.attname + '_type')
+		if _type:
+			_type = _type.title()
+		else:
+			return None
 		_id = _(thing , self.attname + '_id')
 		model_index = self.relatable_names.index(_type)
 		model = self.relatables[model_index]

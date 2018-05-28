@@ -53,6 +53,7 @@ class CourseTrad(models.Model):
 	]
 	semester   = models.CharField(max_length=1,default='N')
 	# Prerequisites
+	nSlots  = models.PositiveIntegerField(default=15)
 	min_age = models.PositiveIntegerField(default=9)
 	max_age = models.PositiveIntegerField(default=18)
 	min_grd = models.PositiveIntegerField(default=1)
@@ -260,6 +261,7 @@ class Course(models.Model):
 	id         = models.CharField(max_length=4, primary_key=True)
 	year       = models.DecimalField(max_digits=4, decimal_places=0)
 	tradition  = models.ForeignKey(CourseTrad, unique_for_year=True, db_column='trad_id')
+	nSlots     = models.PositiveIntegerField(default=15)
 	title      = models.CharField(max_length=50)
 	last_date  = models.DateField(null=True)
 	aud_date   = models.DateField(null=True)
@@ -280,7 +282,7 @@ class Course(models.Model):
 	def enrollments(self):
 		return Enrollments.filter(course_id=self.id)
 	def students(self):
-		return Students.filter(enrollment__course=self).order_by('family__last','birthday')
+		return Students.filter(enrollment__course=self).order_by('family__last','birthday').distinct()
 	def families(self):
 		return Families.filter(student__enrollment__course=self).distinct()
 	def equipped_students(self):
@@ -313,6 +315,8 @@ class Course(models.Model):
 		return self.students.filter(sex='M')
 	def girls(self):
 		return self.students.filter(sex='F')
+	def slots_open(self):
+		return max(self.nSlots - len(self.students), 0)
 	def __str__(self):
 		return self.title+' ('+str(self.year)+')'
 	def eligible(self, student):
@@ -335,7 +339,7 @@ class Course(models.Model):
 			enrollment.save()
 		else:
 			passed_audition = kwargs.setdefault('passed_audition',False)
-			if passed_audition or self.eligible(student):
+			if passed_audition or (self.eligible(student) and self.slots_open):
 				enrollment = Enrollments.create(course=self, student=student)
 				enrollment.save()
 				if self.tradition.trig:
@@ -374,7 +378,7 @@ class Course(models.Model):
 	def prepaid(self):
 		return self.trig
 	def __getattribute__(self, field):
-		if field in ['students_toggle_enrollments','students','enrollments','prepaid']:
+		if field in ['students_toggle_enrollments','students','enrollments','prepaid','slots_open']:
 			call = super(Course, self).__getattribute__(field)
 			return call()
 		elif '_' not in field and field not in ['audible','clean','delete','eligible','enroll','id','objects','pk','save','title','tradition'] and hasattr(CourseTrad, field):
@@ -410,6 +414,7 @@ class Enrollment(models.Model):
 		("needboth","{student} will be eligible to audition for {course} once {pronoun} enrolls in at least 1 other class"),  # Unstable
 		("nonexist","{student} was enrolled in {course} ({year}) on cancelled invoice #{invoice}"),     # invoice__status='C' # Invisible
 		("nopolicy","{family} must accept HST's {year} Policy Agreement before enrolling students."),
+		("clasfull","This class is full."),
 	]
 	status     = models.CharField(max_length=8,choices=status_choices,default='need_pay')
 	created_at = models.DateTimeField(auto_now_add=True)
@@ -455,6 +460,8 @@ class Enrollment(models.Model):
 			return "not_elig"
 		elif not self.student.family.has_accepted_policy(self.course.year):
 			return "nopolicy"
+		elif len(self.course.students) >= self.course.nSlots:
+			return "clasfull"
 		elif any(Each(self.student.courses_in(self.course.year)).conflicts_with(self.course)):
 			return "conflict"
 		elif self.course.check_eligex(self.student):
