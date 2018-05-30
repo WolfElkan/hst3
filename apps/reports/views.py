@@ -83,29 +83,31 @@ def enrollment_matrix(request, **kwargs):
 
 def summary(request, **kwargs):
 	kwargs.setdefault('year',getyear())
-	context = {}
-	stats = [
-		'nFamilies',
-		'nNewFamilies',
-		'nStudents',
-		'neSB',
-		'neSC',
-		'neSG',
-		'neSH',
-		'neSJ',
-		'neSR',
-		'neAC',
-		'neDC',
-		'neCC',
-		'neXX',
-		'neXM',
-		'neWC',
-		'nSlotsTotal'
-		]
-	for stat in stats:
-		context[datum] = 0
-	for student in Students.current(kwargs['year']):
-		pass
+	context = {
+		'year':Year(year)
+	}
+	# stats = [
+	# 	'nFamilies',
+	# 	'nNewFamilies',
+	# 	'nStudents',
+	# 	'neSB',
+	# 	'neSC',
+	# 	'neSG',
+	# 	'neSH',
+	# 	'neSJ',
+	# 	'neSR',
+	# 	'neAC',
+	# 	'neDC',
+	# 	'neCC',
+	# 	'neXX',
+	# 	'neXM',
+	# 	'neWC',
+	# 	'nSlotsTotal'
+	# 	]
+	# for stat in stats:
+	# 	context[datum] = 0
+	# for student in Students.current(kwargs['year']):
+	# 	pass
 	return render(request, 'reports/summary.html', context)
 
 def mass_enroll(request, **kwargs):

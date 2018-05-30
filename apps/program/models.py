@@ -552,10 +552,17 @@ class Year(object):
 		self.year = year
 	def season(self):
 		return self.year - 1995
+	def spring(self):
+		return self.year
+	def fall(self):
+		return self.year - 1
 	def __getattribute__(self, field):
-		if len(field) == 2:
+		if field in ['season','spring','fall']:
+			call = super(Year, self).__getattribute__(field)
+			return call()
+		elif len(field) == 2:
 			return Courses.fetch(year=self.year,tradition__id=field.upper())
 		else:
 			return super(Year, self).__getattribute__(field)
 	def __str__(self):
-		return "HST Year {}-{}".format(self.year-1,self.year)
+		return "HST Year {}-{}".format(self.fall,self.spring)

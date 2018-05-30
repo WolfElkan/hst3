@@ -95,7 +95,7 @@ from apps.program.managers import CourseTrads, Courses, Enrollments, Venues
 from apps.payment.managers import Invoices, PayPals
 from apps.radmin.managers  import Policies
 
-from Utils.data import sub
+from Utils.data import sub, Each
 from Utils.misc import namecase
 from Utils.snippets import order_coursetrads, make
 import re, datetime
@@ -190,11 +190,7 @@ def create_family(family):
 	n = {
 		'families':0,
 		'parents' :0,
-		'students':0,
 		'users'   :0,
-		'trads'   :0,
-		'courses' :0,
-		'enroll'  :0,
 	}
 
 	fam = Families.create(
@@ -220,7 +216,8 @@ def create_family(family):
 	if family.mfirst:
 		mom = Parents.create(
 			family_id = fam.id,
-			first     = family.mnick if family.mnick else family.mfirst,
+			first = family.mfirst,
+			# alt_first = family.mnick,
 			alt_last  = '' if family.mlast == fam.last else family.mlast,
 			sex       = 'F',
 			alt_phone = family.mcell,
@@ -232,7 +229,8 @@ def create_family(family):
 	if family.ffirst:
 		dad = Parents.create(
 			family_id = fam.id,
-			first     = family.fnick if family.fnick else family.ffirst,
+			first = family.ffirst,
+			# alt_first = family.fnick,
 			alt_last  = '' if family.flast == fam.last else family.flast,
 			sex       = 'M',
 			alt_phone = family.fcell,
@@ -245,10 +243,70 @@ def create_family(family):
 
 	return n
 
+def find_existing_family(family):
+	already = Families.filter(last=namecase(family.family))
+	if already:
+	# if len(already) == 1:
+	# 	return already[0]
+	# elif len(already) > 1:
+		old_children = OldStudents.filter(familyid=family.accessid)
+		old_children = set(Each(Each(old_children).first).lower())
+		nMatches = []
+		for fam in already:
+			new_children = set(Each(Each(fam.children).first).lower())
+			new_children |= set(Each(Each(fam.children).alt_first).lower())
+			nMatches.append(len(old_children & new_children))
+		nMatches.append(0)
+		best = max(nMatches)
+		if best:
+			return already[nMatches.index(best)]
+
+def update_existing_family(already, family):
+	if not already.hid:
+		already.hid = family.accessid
+	if not already.phone:
+		already.phone = family.home
+	if not already.email:
+		already.email = family.email
+	if not already.address:
+		already.address = Addresses.create(
+			line1 = family.street,
+			line2 = 'Apt. '+family.apt if family.apt else '',
+			city  = family.city.title(),
+			state = family.state.upper(),
+			zipcode = family.zip,
+		)
+	if not already.mother:
+		already.mother = Parents.create(
+			first = family.mfirst,
+			# alt_first = family.mnick,
+			alt_last = '' if family.mlast == family.family else family.mlast,
+			sex = 'F',
+			alt_phone = 0 if family.mcell == family.home   else family.mcell,
+		)
+	if not already.father:
+		already.father = Parents.create(
+			first = family.ffirst,
+			# alt_first = family.fnick,
+			alt_last = '' if family.flast == family.family else family.flast,
+			sex = 'M',
+			alt_phone = 0 if family.fcell == family.home   else family.fcell,
+		)
+	for student in OldStudents.filter(familyid=family.accessid):
+		alreadyStudent = find_existing_student(already,student)
+		if alreadyStudent:
+			update_existing_student(alreadyStudent,student)
+
+def find_existing_student(alreadyFamily,student):
+	pass
+
+def update_existing_student(already,student):
+	pass
 
 year = 2017
 
 def transfer():
+	start = datetime.datetime.now()
 	n = {
 		'families':0,
 		'parents' :0,
@@ -258,16 +316,24 @@ def transfer():
 		'courses' :0,
 		'enroll'  :0,
 	}
-	start = datetime.datetime.now()
+	u = n.copy()
 	orphans = []
 	for family in OldFamilies.all().exclude(id__in=test_families):
-		cf = create_family(family)
-		for x in cf:
-			n[x] += cf[x]
+		already = find_existing_family(family)
+		if already:
+			uf = update_existing_family(already,family)
+			for x in uf:
+				u[x] += uf[x]
+		else:	
+			cf = create_family(family)
+			for x in cf:
+				n[x] += cf[x]
 	for family in AlumniFamilies.filter(id=76):
-		cf = create_family(family)
-		for x in cf:
-			n[x] += cf[x]
+		already = find_existing_family(family)
+		if already:
+			uf = update_existing_family(already,family)
+			for x in uf:
+				u[x] += uf[x]
 
 	print '*'*100
 
