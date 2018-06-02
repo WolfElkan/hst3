@@ -433,19 +433,19 @@ class Enrollment(models.Model):
 	updated_at = models.DateTimeField(auto_now=True)
 	rest_model = "enrollment"
 	objects = Enrollments
+	# def __init__(self, *args, **kwargs):
+	# 	if hasattr(self, '_state'):
+	# 		self.set_status()
+	# 	return super(Enrollment, self).__init__(*args, **kwargs)
 	def stand(self, me):
 		if me.owner_type == 'Family':
 			return self.student.family.id == me.owner.id
 		elif me.owner_type == 'Student':
 			return self.student.id == me.owner.id
-	def __init__(self, *args, **kwargs):
-		if hasattr(self, '_state'):
-			self.set_status()
-		return super(Enrollment, self).__init__(*args, **kwargs)
 	def title(self):
 		display = self.get_status_display()
 		kwargs = self.title_kwargs()
-		if self.is_prepaid_tickets():
+		if self.byFamily():
 			display = '{family} {proverb} recieving {course} {year}'
 		return display.format(**kwargs)
 	def title_kwargs(self):
@@ -510,12 +510,10 @@ class Enrollment(models.Model):
 		print 'status     :',self.status
 		print 'created_at :',self.created_at
 		print 'updated_at :',self.updated_at
-	def is_prepaid_tickets(self):
+	def byFamily(self):
 		return self.course.tradition.id[0] == 'K'
-	def display_student(self):
-		return '' if self.is_prepaid_tickets() else self.student.prefer
-	def paid(self):
-		return self.invoice.status == 'P' if self.invoice else False
+	# def display_student(self):
+	# 	return '' if self.byFamily() else self.student.prefer
 	def accept(self, user):
 		if self.status in ["aud_pend","pendpass","pendfail"]:
 			if user.permission >= 5:
