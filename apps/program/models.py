@@ -550,8 +550,6 @@ class Enrollment(models.Model):
 		if self.status == "invoiced":
 			self.status = "nonexist"
 			self.save()
-	def tuition(self):
-		return self.course.tuition
 	def __str__(self):
 		return '{} in {}'.format(self.student, self.course)
 	def __getattribute__(self, field):
