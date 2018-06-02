@@ -39,6 +39,7 @@ def load_post(request):
 	bad = restricted(request,6)
 	if bad:
 		return bad
+
 	start_import = datetime.now()
 	nUsers       = 0
 	nFamilies    = 0
@@ -49,9 +50,11 @@ def load_post(request):
 	nCourseTrads = 0
 	nCourses     = 0
 	nEnrollments = 0
+
 	json_dump = request.POST['json_dump']
 	request.session['json_dump'] = ''
 	data = json.loads(json_dump)
+
 	for ct in data['coursetrads']:
 		if 'alias_id' not in ct:
 			already = CourseTrads.fetch(id=ct['id'])
@@ -61,6 +64,7 @@ def load_post(request):
 				print 'Importing '+ct['title'].upper()
 				CourseTrads.create(**ct)
 				nCourseTrads += 1
+
 	for ct in data['coursetrads']:
 		if 'alias_id' in ct:
 			already = CourseTrads.fetch(id=ct['id'])
@@ -72,11 +76,13 @@ def load_post(request):
 				ct['alias'] = alias
 				CourseTrads.create(**ct)
 				nCourseTrads += 1
+
 	# cts = CourseTrads.filter(e=True)
 	# for year in data['years']:
 	# 	for ct in cts:
 	# 		ct.make(year)
 	# 		nCourses += 1
+
 	for fam in data['families']:
 		print fam['last']
 		family = copy(fam,['last','phone','email'])
@@ -131,13 +137,17 @@ def load_post(request):
 				# 	course = Courses.get(id=enrollment['course_id'])
 				# 	Enrollments.create(course=course, student=newStudent, role=enrollment['role'], role_type=enrollment['role_type'])
 			nStudents += 1
+
 	print "- assign name_num's"
 	Each(Families.all()).update_name_num()
+
 	print '- order_coursetrads'
 	order_coursetrads()
-	year = getyear()
-	print '- make {}'.format(year)
-	nCourses += make(year)
+
+	# year = getyear()
+	# print '- make {}'.format(year)
+	# nCourses += make(year)
+
 	su = Users.fetch(username='wolf')
 	if DEV and su:
 		print '- assign developer: Wolf Elkan'
@@ -147,9 +157,10 @@ def load_post(request):
 			su.owner_type = 'Family'
 			su.password = su.password.full
 			su.save()
+
 	import_duration = datetime.now() - start_import
-	print
-	print 'IMPORT COMPLETED'
+	
+	print '\nIMPORT COMPLETED'
 	print 'Users:     ' + str(nUsers).rjust(5)
 	print 'Families:  ' + str(nFamilies).rjust(5)
 	print 'Students:  ' + str(nStudents).rjust(5)
@@ -193,7 +204,7 @@ def dump(request):
 				'max_grd'  : ct.max_grd,
 				'eligex'   : ct.eligex,
 				'tuition'  : float(ct.tuition),
-				'redtuit'  : float(ct.redtuit),
+				'earlytn'  : float(ct.earlytn),
 				'vol_hours': ct.vol_hours,
 				'the_hours': ct.the_hours,
 				'auto'     : ct.auto,

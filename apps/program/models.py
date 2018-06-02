@@ -5,7 +5,7 @@ from Utils import supermodel as sm
 from Utils.data import sub, Each, find_all
 from Utils.security import getyear
 from django_mysql import models as sqlmod
-from .managers import CourseTrads, Courses, Enrollments
+from .managers import CourseTrads, Courses, Enrollments, Venues
 Q = models.Q
 from apps.people.managers import Students, Families
 from trace import TRACE, DEV
@@ -19,8 +19,11 @@ class Venue(models.Model):
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
 	rest_model = "venue"
+	objects = Venues
 	def stand(self, me):
 		return False
+	def __str__(self):
+		return self.id
 	# def __getattribute__(self, field):
 	# 	if field in []:
 	# 		function = super(Venue, self).__getattribute__(field)
@@ -53,7 +56,7 @@ class CourseTrad(models.Model):
 	]
 	semester   = models.CharField(max_length=1,default='N')
 	# Prerequisites
-	nSlots  = models.PositiveIntegerField(default=15)
+	nSlots  = models.PositiveIntegerField(default=0)
 	min_age = models.PositiveIntegerField(default=9)
 	max_age = models.PositiveIntegerField(default=18)
 	min_grd = models.PositiveIntegerField(default=1)
@@ -61,11 +64,13 @@ class CourseTrad(models.Model):
 	eligex  = models.TextField(default="#")
 	# Cost
 	tuition    = models.DecimalField(max_digits=6, decimal_places=2, default=0)
+	earlytn    = models.DecimalField(max_digits=6, decimal_places=2, default=0)
 	vol_hours  = models.FloatField(default=0)
 	the_hours  = models.FloatField(default=0)
 	auto       = models.BooleanField(default=False) # Whether course is automatically added to eligible carts
-	trig       = models.BooleanField(default=False) # Whether course triggers an addition of all eligible auto courses
-	droppable  = models.BooleanField(default=True) # Whether course may be dropped AFTER a successful audition
+	trig       = models.BooleanField(default=True)  # Whether course triggers an addition of all eligible auto courses
+	deferrable = models.BooleanField(default=False) # Whether course may be paid for in October
+	droppable  = models.BooleanField(default=True)  # Whether course may be dropped AFTER a successful audition
 	rest_model = "coursetrad"
 	genre_codes = {
 		'A':'Acting',
@@ -80,12 +85,12 @@ class CourseTrad(models.Model):
 		'J':'Jazz',
 		'K':'PrepaidTickets', # Admin
 		'L':'SignLanguage', # Historical
-		# 'M':'', # Merchandise? Makeup kits? Meeting?
+		'M':'Makeup', 
 		# 'N':'',
 		'O':'Overture', # Historical
 		'P':'Tap', # Broadway (Older Beginners)
 		# 'Q':'',
-		# 'R':'',
+		'R':'RegistrationFee',
 		'S':'Troupe',
 		'T':'Tap',
 		# 'U':'',
@@ -147,7 +152,7 @@ class CourseTrad(models.Model):
 				kwargs['eligex'] = x[1]
 				result = self.check_eligex(student, year, **kwargs)
 				result = not result if x[0] else result
-				if kwargs['debug']:
+				if kwargs.get('debug'):
 					print '{',x[1],'}', result
 					print
 			elif x[3]:
@@ -156,14 +161,14 @@ class CourseTrad(models.Model):
 				kwargs['conj'] = False
 				result = self.check_eligex(student, year, **kwargs)
 				result = not result if x[2] else result
-				if kwargs['debug']:
+				if kwargs.get('debug'):
 					print '<{}>'.format(x[3]), result
 					print
 			elif x[5]:
 				# WORD
 				result = self.check_word(student, year, x[5], **kwargs)
 				result = not result if x[4] else result
-				if kwargs['debug']:
+				if kwargs.get('debug'):
 					print x[5], result
 					print
 			else:
@@ -201,25 +206,25 @@ class CourseTrad(models.Model):
 					'course__tradition': self,
 					'course__year': year,
 				})
-				if kwargs['debug']:
+				if kwargs.get('debug'):
 					print query
 				return bool(Enrollments.filter(**query))
-			if word == 'c':
+			if word == '**':
 				if kwargs['cur']:
 					return True
 				query['course__year'] = year
-				if kwargs['debug']:
+				if kwargs.get('debug'):
 					print query
-				return bool(Enrollments.filter(**query).exclude(course__tradition__id__startswith='K'))
+				return bool(Enrollments.filter(**query))
 			if '*' not in word:
 				query['course__tradition__id'] = word[0:2]
 			elif word[0] != '*':
 				query['course__tradition__id__startswith'] = word[0]
 			elif word[1] != '*':
 				query['course__tradition__id__endswith'] = word[1]
-			if 'c' in word and not kwargs['cur']:
+			if not kwargs['cur'] and '/' not in word:
 				query['course__year'] = year
-			if 'p' in word:
+			if '/' in word:
 				query['course__year__lt'] = year
 			if '$' in word:
 				query.pop('status__in')
@@ -227,10 +232,9 @@ class CourseTrad(models.Model):
 			if '+' in word:
 				query.pop('student')
 				query['student__family'] = student.family
-			if kwargs['debug']:
-				print datetime.now()
+			if kwargs.get('debug'):
 				print query
-			return bool(Enrollments.filter(**query).exclude(course__tradition__id__startswith='K'))
+			return bool(Enrollments.filter(**query))
 	def eligible(self, student, year):
 		if not student.family.has_accepted_policy(year):
 			return False
@@ -261,7 +265,7 @@ class Course(models.Model):
 	id         = models.CharField(max_length=4, primary_key=True)
 	year       = models.DecimalField(max_digits=4, decimal_places=0)
 	tradition  = models.ForeignKey(CourseTrad, unique_for_year=True, db_column='trad_id')
-	nSlots     = models.PositiveIntegerField(default=15)
+	nSlots     = models.PositiveIntegerField(default=0)
 	title      = models.CharField(max_length=50)
 	last_date  = models.DateField(null=True)
 	aud_date   = models.DateField(null=True)
@@ -343,7 +347,7 @@ class Course(models.Model):
 				enrollment = Enrollments.create(course=self, student=student)
 				enrollment.save()
 				if self.tradition.trig:
-					student.fate()
+					student.trigger(self.year)
 		return enrollment
 	def accept(self, student):
 		return self.enroll(student, passed_audition=True)
@@ -353,8 +357,13 @@ class Course(models.Model):
 	def cart(self, student):
 		enrollment = self.enroll(student)
 		if not enrollment:
-			enrollment = Enrollments.create(course=self, student=student, status="aud_pend")
-		student.fate()
+			enrollment = Enrollments.create(course=self, student=student)
+			enrollment.set_status(True)
+			# if self.check_eligex(student):
+			# 	enrollment = Enrollments.create(course=self, student=student, status="need_pay")
+			# elif self.check_eligex(student, aud=True):
+			# 	enrollment = Enrollments.create(course=self, student=student, status="aud_pend")
+		# student.fate()
 		return enrollment
 	def conflicts_with(self, other):
 		if self.id == other.id:
@@ -377,6 +386,8 @@ class Course(models.Model):
 			return True
 	def prepaid(self):
 		return self.trig
+	def __len__(self):
+		return len(self.students)
 	def __getattribute__(self, field):
 		if field in ['students_toggle_enrollments','students','enrollments','prepaid','slots_open']:
 			call = super(Course, self).__getattribute__(field)
@@ -415,8 +426,9 @@ class Enrollment(models.Model):
 		("nonexist","{student} was enrolled in {course} ({year}) on cancelled invoice #{invoice}"),     # invoice__status='C' # Invisible
 		("nopolicy","{family} must accept HST's {year} Policy Agreement before enrolling students."),
 		("clasfull","This class is full."),
+		("deferred","This item must be paid for by October 1"),
 	]
-	status     = models.CharField(max_length=8,choices=status_choices,default='need_pay')
+	status     = models.CharField(max_length=8,choices=status_choices, default = '--------' if DEV else '')
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
 	rest_model = "enrollment"
@@ -453,14 +465,20 @@ class Enrollment(models.Model):
 		title = self.title
 		self.status = real_status
 		return title
-	def calc_status(self):
-		if self.status in ["aud_pass","aud_fail","aud_drop","nonexist"]:
+	def calc_status(self, cart=False):
+		# print self.course.id, self.status
+		if cart:
+			if self.course.check_eligex(self.student):
+				return "need_pay"
+			elif self.course.check_eligex(self.student, aud=True):
+				return "aud_pend"
+		if self.status in ["aud_pass","aud_fail","aud_drop","nonexist","aud_pend"]:
 			return self.status
 		if not self.course.check_eligex(self.student, aud=True, cur=True):
 			return "not_elig"
 		elif not self.student.family.has_accepted_policy(self.course.year):
 			return "nopolicy"
-		elif len(self.course.students) >= self.course.nSlots:
+		elif self.course.nSlots and len(self.course.students) >= self.course.nSlots:
 			return "clasfull"
 		elif any(Each(self.student.courses_in(self.course.year)).conflicts_with(self.course)):
 			return "conflict"
@@ -473,9 +491,10 @@ class Enrollment(models.Model):
 		# elif self.course.check_eligex(self.student, aud=True, cur=True):
 		else:
 			return "needboth"
-	def set_status(self):
-		if not self.id:
-			self.status = self.calc_status()
+	def set_status(self, cart=False):
+		# if not self.id:
+		self.status = self.calc_status(cart)
+		self.save()
 		return self
 	def inspect(self):
 		print
@@ -547,6 +566,17 @@ class Enrollment(models.Model):
 		else:
 			return super(Enrollment, self).__getattribute__(field)
 
+
+class StudentList(object):
+	def __init__(self, students):
+		self.students = students
+	def __iter__(self):
+		for x in self.students:
+			yield x
+	def __len__(self):
+		return len(self.students)
+		
+
 class Year(object):
 	def __init__(self, year):
 		self.year = year
@@ -556,13 +586,43 @@ class Year(object):
 		return self.year
 	def fall(self):
 		return self.year - 1
+	def dash(self):
+		return "{}-{}".format(self.fall,self.spring)
+	def students(self):
+		return Students.filter(enrollment__course__year=self.year).distinct()
+	def families(self):
+		return Families.filter(student__enrollment__course__year=self.year).distinct()
+	def newFamilies(self):
+		return self.families.exclude(student__enrollment__course__year__lt=self.year).distinct()
+	def nMainstageTroupeStudents(self):
+		return sum([len(self.sg),len(self.sh),len(self.sj),len(self.sr)])
+	def nTroupeStudents(self):
+		return self.nMainstageTroupeStudents + len(self.sb)
+	# def dc(self):
+	# 	return self.combined(courses=Courses.filter(year=self.year,tradition__id__in=['J','Z']))
+	# def dt(self):
+	# 	pass
+	# def dw(self):
+	# 	pass
+	def combined(self, **kwargs):
+		letter = kwargs.get('letter')
+		idlist = kwargs.get('idlist')
+		courses = kwargs.get('courses')
+		if letter:
+			courses = Courses.filter(year=self.year,tradition__id__startswith=letter.upper())
+		elif idlist:
+			courses = Courses.filter(year=self.year,tradition__id__in=idlist)
+		students = Students.filter(enrollment__course__in=courses).distinct()
+		return StudentList(students)
+	def __str__(self):
+		return "HST Year {}-{}".format(self.fall,self.spring)
 	def __getattribute__(self, field):
-		if field in ['season','spring','fall']:
+		if field in ['season','spring','fall','dash','students','families','newFamilies','nMainstageTroupeStudents','nTroupeStudents','dc','dt','dw']:
 			call = super(Year, self).__getattribute__(field)
 			return call()
 		elif len(field) == 2:
 			return Courses.fetch(year=self.year,tradition__id=field.upper())
+		elif len(field) == 1:
+			return self.combined(letter=field)
 		else:
 			return super(Year, self).__getattribute__(field)
-	def __str__(self):
-		return "HST Year {}-{}".format(self.fall,self.spring)

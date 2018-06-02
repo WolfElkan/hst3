@@ -1,6 +1,6 @@
 from django.db import models
 
-from .managers import Addresses, Families, Parents, Students, Users, NameClashes
+from .managers import Addresses, Families, Parents, Students, Users, NameClashes, Teachers
 from apps.program.managers import CourseTrads, Courses, Enrollments, Venues
 from apps.payment.managers import Invoices
 from apps.radmin.managers  import Policies
@@ -280,6 +280,9 @@ class Student(models.Model):
 		return self.enrollments.filter(course__year=year)
 	def enrollments_before(self, year):
 		return self.enrollments.filter(course__year__lt=year)
+	def trigger(self, year):
+		for course in Courses.filter(year=year,tradition__auto=True):
+			course.enroll(self)
 
 	def auditions(self):
 		return Enrollments.filter(student=self, status__startswith="aud")
@@ -305,14 +308,15 @@ class Student(models.Model):
 		if not year:
 			year = getyear()
 		for auto_trad in CourseTrads.filter(auto=True):
+			print auto_trad
 			auto_course = Courses.fetch(year=year,tradition=auto_trad)
-			if not auto_course:
-				auto_course = Courses.create(year=year,tradition=auto_trad)
-			enrollment = Enrollments.fetch(student=self,course=auto_course)
-			if enrollment:
-				enrollment.fate()
-			elif auto_course.eligible(self):
-				Enrollments.create(student=self,course=auto_course)
+			if auto_course:
+				# auto_course = Courses.create(year=year,tradition=auto_trad)
+				enrollment = Enrollments.fetch(student=self,course=auto_course)
+				if enrollment:
+					enrollment.fate()
+				elif auto_course.eligible(self):
+					Enrollments.create(student=self,course=auto_course)
 	def __str__(self):
 		return self.prefer+' '+self.last
 	def __json__(self):
@@ -355,6 +359,7 @@ class Teacher(models.Model):
 	address    = models.OneToOneField(Address, null=True, primary_key=False, rel=True)
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
+	objects = Teachers
 	rest_model = "teacher"
 	def stand(self, me):
 		if me.owner_type == 'Family':

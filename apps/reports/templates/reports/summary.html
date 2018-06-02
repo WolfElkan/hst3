@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>HST | Registration Summary</title>
+	<style type="text/css">
+		th {
+			font-size: 16pt;
+			text-align: left;
+		}
+		.stat {
+			text-align: right;
+		}
+	</style>
+</head>
+<body>
+<h1>Registration Summary Report</h1>
+<b>Today's Date: {{date}}</b>
+<table>
+	<thead>
+		<th>Family Totals</th>
+		<th>{{year.dash}}</th>
+		<th>{{prev.dash}}</th>
+	</thead>
+	<tr>
+		<td>Total Number of families:</td>
+		<td class="stat">{{year.families|length}}</td>
+		<td class="stat">{{prev.families|length}}</td>
+	</tr>
+	<tr>
+		<td>Total Number of New families:</td>
+		<td class="stat">{{year.newFamilies|length}}</td>
+		<td class="stat">{{prev.newFamilies|length}}</td>
+	</tr>
+	<thead>
+		<th>Student Totals</th>
+	</thead>
+	<tr>
+		<td>Total Number of students:</td>
+		<td class="stat">{{year.students|length}}</td>
+		<td class="stat">{{prev.students|length}}</td>
+	</tr>
+	<tr>
+		<td>Total Number of Students in Mainstage Troupes: </td>
+		<td class="stat">{{year.s|length}}</td>
+		<td class="stat">{{prev.s|length}}</td>
+	</tr>
+	<tr>
+		<td>Total Number of Students in Travel Troupe: </td>
+		<td class="stat">{{year.sb.students|length}}</td>
+		<td class="stat">{{prev.sb.students|length}}</td>
+	</tr>
+	<tr>
+		<td>Total Number of Students in Acting Classes:</td>
+		<td class="stat">{{year.a.students|length}}</td>
+		<td class="stat">{{prev.a.students|length}}</td>
+	</tr>
+	<tr>
+		<td>Total Number of Students in Dance Classes: </td>
+		<td class="stat">{{year.dc.students|length}}</td>
+		<td class="stat">{{prev.dc.students|length}}</td>
+	</tr>
+	<tr>
+		<td>Total Number of Students in Choir:</td>
+		<td class="stat">{{year.c.students|length}}</td>
+		<td class="stat">{{prev.c.students|length}}</td>
+	</tr>
+	<tr>
+		<td>Total Number of Students in Tech Team:</td>
+		<td class="stat">{{year.xx.students|length}}</td>
+		<td class="stat">{{prev.xx.students|length}}</td>
+	</tr>
+	<tr>
+		<td>Total Number of Students in Tech Make-Up Team:</td>
+		<td class="stat">{{year.xm.students|length}}</td>
+		<td class="stat">{{prev.xm.students|length}}</td>
+	</tr>
+	<tr>
+		<td>Total Number of Students in Tech Workshops</td>
+		<td class="stat">{{year.w.students|length}}</td>
+		<td class="stat">{{prev.w.students|length}}</td>
+	</tr>
+	<tr>
+		<td>Total Number of Students in Showcase: </td>
+		<td class="stat">{{year.sc.students|length}}</td>
+		<td class="stat">{{prev.sc.students|length}}</td>
+	</tr>
+	<thead>
+		<th>Registration Slot Totals</th>
+	</thead>
+	<tr>
+		<td>Total Number of Slots in Troupes, Tech Teams & Classes</td>
+		<td class="stat">{{year.nSlotsSDX}}</td>
+		<td class="stat">{{prev.nSlotsSDX}}</td>
+	</tr>
+	<tr>
+		<td>Total Number of Slots in Workshops</td>
+		<td class="stat">{{year.nSlotsW}}</td>
+		<td class="stat">{{prev.nSlotsW}}</td>
+	</tr>
+</table>
+</body>
+</html>

@@ -153,3 +153,8 @@ class UserManager(sm.SuperManager):
 			kwargs['owner_type'] = owner.__class__.__name__.title()
 		return super(UserManager, self).filter(**kwargs)
 Users = UserManager()
+
+class TeacherManager(sm.SuperManager):
+	def __init__(self):
+		super(TeacherManager, self).__init__('people_teacher')
+Teachers = TeacherManager()

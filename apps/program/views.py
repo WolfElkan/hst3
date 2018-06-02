@@ -67,6 +67,7 @@ def courses(request, **kwargs):
 
 
 def courses_enroll(request, **kwargs):
+	print 'enroll', kwargs
 	student_id = kwargs.setdefault('id',0)
 	student = Students.fetch(id=student_id)
 	course = Courses.fetch(id=request.GET['course_id'])
@@ -74,6 +75,7 @@ def courses_enroll(request, **kwargs):
 	return redirect('/register/student/{}/'.format(student_id))
 
 def courses_audition(request, **kwargs):
+	print 'audition', kwargs
 	student_id = kwargs.setdefault('id',0)
 	student = Students.fetch(id=student_id)
 	course = Courses.fetch(id=request.GET['course_id'])
@@ -82,6 +84,7 @@ def courses_audition(request, **kwargs):
 	return redirect('/register/student/{}/'.format(student_id))
 
 def courses_drop(request, **kwargs):
+	print 'drop', kwargs
 	student_id = kwargs.setdefault('id',0)
 	enrollment = Enrollments.fetch(id=request.GET['enr_id'])
 	if enrollment:

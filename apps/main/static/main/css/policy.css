@@ -1,0 +1,18 @@
+h1 {
+	/*color: red;*/
+	font-family: sans-serif;
+	font-weight: bold;
+	text-decoration: underline;
+}
+
+strong {
+	text-decoration: underline;
+}
+
+form {
+	display: inline;
+}
+
+li ol {
+	list-style: lower-alpha;
+}

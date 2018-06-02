@@ -2,6 +2,8 @@
 <html>
 <head>
 	<title>HST | View Policy</title>
+	{% load staticfiles %}
+	<link rel="stylesheet" type="text/css" href="{% static 'main/css/policy.css' %}">
 </head>
 <body>
 <a href="/admin/policy/edit/{{policy.year}}">Edit</a>

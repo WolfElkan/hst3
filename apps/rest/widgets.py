@@ -1,7 +1,7 @@
 from apps.people.managers import Addresses, Families, Parents, Users, Students
 from apps.people.models import Teacher
 Teachers = Teacher.objects
-from apps.program.managers import Courses, CourseTrads, Enrollments
+from apps.program.managers import Courses, CourseTrads, Enrollments, Venues
 from apps.payment.managers import Invoices
 from trace import TRACE
 
@@ -20,6 +20,7 @@ MODELS = {
 	'enrollment': Enrollments,
 	'audition'  : Enrollments,
 	'invoice'   : Invoices,
+	'venue'     : Venues,
 }
 
 

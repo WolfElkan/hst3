@@ -1,5 +1,4 @@
 from django.db import models
-import bcrypt, re
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django_mysql import models as sqlmod
 from .data import find as _
@@ -7,7 +6,7 @@ from . import multi_column_gist as poly
 from datetime import datetime
 from decimal import Decimal
 from trace import TRACE
-import re, md5
+import bcrypt, re, md5
 
 EnumField = sqlmod.EnumField
 
@@ -20,6 +19,8 @@ class Bcrypt(object):
 			self.full = self.char60
 			self.html = u'<span title="{}">{}</span>'.format(self.full,self.emoji) if self.full[0] == '$' else self.full
 	def __call__(self, pw):
+		pw = bytes(pw)
+		print pw, type(pw)
 		if self.encode[0] == '2':
 			correct = bcrypt.checkpw(bytes(pw), bytes(self.full))
 		elif self.encode == '1':
@@ -35,8 +36,8 @@ class Bcrypt(object):
 		return dict(self)['encode']
 	def encoding(self):
 		return {
-			'1': 'MD5',
-			'2': 'Bcrypt',
+			'1' : 'MD5',
+			'2' : 'Bcrypt',
 			'2a': 'Bcrypt',
 			'2b': 'Bcrypt',
 			'2x': 'Bcrypt',

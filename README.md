@@ -294,14 +294,21 @@
 
   Glyph | Meaning
   :---: | ---
-  `c` | Will match only enrollments in the *current* year
-  `p` | Will match only enrollments in *past* or *previous* years.
+  `/` | Will match enrollments in previous years.  (If omitted, will match only current year)
   `$` | Will match only enrollments for which tuition has been paid
   `+` | Will match enrollments by anyone in student's family
 
-  A student is considered eligible to audition for a course if they *would* be eligible to enroll in it, if they had passed an audition.
+  Note: Formerly, a tradition ID by itself would match enrollments in current *or* past years.  Since commit _______, this now only matches enrollments in the *current* year.  To match a course in current or past years, use [boolean operators](#boolean_operators)
 
-  A common mistake is to think `p` stands for "present", and append it after a `CourseTrad` ID to find present enrollments.  This will not work.  A good mnemonic for this is that presents go under Christmas Trees, not in Eligexes.
+  Desired Result | Old | New |
+  --- | :---: | :---: |
+  Match Jazz 2 this year | `J2c` | `J2` |
+  Match Acting B in a previous year | `ABp` | `AB/` |
+  Match Tech Workshop this year *or* previous years | `WX` | `< WX WX/ >` |
+  Match any course this year | `c` | `**` |
+
+
+  A student is considered eligible to audition for a course if they *would* be eligible to enroll in it, if they had passed an audition.
 
 #### Boolean Operators
 

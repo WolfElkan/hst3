@@ -25,8 +25,12 @@ def index(request, model):
 		field = ftp['field']
 		columns.append(field)
 	query = collect(request.GET, str)
+	order_by = query.get('order_by')
+	if order_by:
+		query.pop('order_by')
 	qset = MODELS[model].filter(**query)
-	# qset.order_by('-updated_at')
+	if order_by:
+		qset = qset.order_by(order_by)
 	display = []
 	for thing in qset:
 		dthing = ['<a href="/rest/show/{}/{}">{}</a>'.format(model, thing.id, thing.id)]

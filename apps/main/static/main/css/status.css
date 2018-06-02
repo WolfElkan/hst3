@@ -13,6 +13,9 @@
 .aud_pend, .pendpass, .pendfail, .pend_pub {background-color: #8af} 
 	.aud_pend form.drop button {display: inline;}
 
+/*Pink*/
+.deferred {background-color: }
+
 /*Orange*/
 .invoiced {background-color: #fb8}
 	.invoiced form.drop button {display: inline;}

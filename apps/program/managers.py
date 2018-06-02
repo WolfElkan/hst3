@@ -27,7 +27,11 @@ class CourseManager(sm.SuperManager):
 			if field not in data:
 				data[field] = data['tradition'].__getattribute__(field)
 		data['id'] = str(int(data['year'])%100).zfill(2)+data['tradition'].id
-		return super(CourseManager, self).create(**data)
+		already = self.fetch(id=data.get('id'))
+		if already:
+			return already
+		else:
+			return super(CourseManager, self).create(**data)
 	def fetch(self, **kwargs):
 		qset = self.filter(**kwargs)
 		if qset and not qset[0].tradition.alias:
@@ -41,10 +45,14 @@ class CourseManager(sm.SuperManager):
 		course = self.fetch(id=course_id)
 		if course:
 			return course
+		if 'tradition' in kwargs and 'year' in kwargs:
+			split = kwargs.copy()
+			if type(split['tradition'] is str):
+				split['tradition'] = CourseTrads.fetch(id=split['tradition'])
 		else:
 			split = self.split_id(course_id)
-			if split:
-				return split['tradition'].make(split['year'])
+		if split:
+			return split['tradition'].make(split['year'])
 	def split_id(self, course_id):
 		course_id = str(course_id)
 		year = course_id[:2]
@@ -86,5 +94,7 @@ class EnrollmentManager(sm.SuperManager):
 		return thing.set_status()
 Enrollments = EnrollmentManager()
 
-from .models import Venue
-Venues = Venue.objects
+class VenueManager(sm.SuperManager):
+	def __init__(self):
+		super(VenueManager, self).__init__('program_venue')
+Venues = VenueManager()

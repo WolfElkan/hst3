@@ -7,7 +7,7 @@ from apps.people.models import Address, Family, Student, Parent, User
 
 FIELDS = {
 	'address'   : [
-	{'field':'owner'     , 'template': ForeignKey()},
+		{'field':'owner'     , 'template': Static()},
 		{'field':'line1'     , 'template': VarChar(maxlength=50)},
 		{'field':'line2'     , 'template': VarChar(maxlength=50)},
 		{'field':'city'      , 'template': VarChar(maxlength=25)},
@@ -59,26 +59,28 @@ FIELDS = {
 	'coursetrad': [
 		{'field':'id'        , 'template': VarChar(maxlength=2)},
 		{'field':'oid'       , 'template': Static()},
+		{'field':'e'         , 'template': Checkbox(suffix='This course will be visible in family enrollment shopping cart.')},
 		{'field':'title'     , 'template': VarChar(maxlength=50)},
-		{'field':'eligex'    , 'template': VarChar(default='~')},
-		{'field':'e'         , 'template': Checkbox(suffix='This is a real (and currently offered) course that may be enrolled in, not a student group for admin purposes')},
 		{'field':'day'       , 'template': DayOfWeek()},
 		{'field':'start'     , 'template': Time()},
 		{'field':'end'       , 'template': Time()},
-		{'field':'nMeets'    , 'template': Integer()},
-		{'field':'semester'  , 'template': Enum(items=CourseTrads.model.semester_choices)},
-		{'field':'show'      , 'template': VarChar(maxlength=2,default='SC')},
-		{'field':'sa'        , 'template': Checkbox(suffix='This class performs in the Variety Show')},
+		{'field':'place'     , 'template': ForeignKey(model='venue',null=True)},
 		{'field':'min_age'   , 'template': Integer(default= 9)},
 		{'field':'max_age'   , 'template': Integer(default=18)},
+		{'field':'eligex'    , 'template': VarChar(default='a')},
+		{'field':'nSlots'    , 'template': Integer()},
+		{'field':'show'      , 'template': VarChar(maxlength=2,default='SC')},
+		{'field':'earlytn'   , 'template': Dollar()},
+		{'field':'tuition'   , 'template': Dollar()},
+		{'field':'vol_hours' , 'template': Integer()},
+		{'field':'semester'  , 'template': Enum(items=CourseTrads.model.semester_choices,default='B')},
+		{'field':'nMeets'    , 'template': Integer(default=20)},
+		{'field':'sa'        , 'template': Checkbox(suffix='This class performs in the Variety Show',default=False)},
 		{'field':'min_grd'   , 'template': Integer(default= 1)},
 		{'field':'max_grd'   , 'template': Integer(default=12)},
-		{'field':'tuition'   , 'template': Dollar()},
-		# {'field':'redtuit'   , 'template': Dollar()},
-		{'field':'vol_hours' , 'template': Integer()},
 		{'field':'the_hours' , 'template': Integer()},
-		{'field':'auto'      , 'template': Checkbox(suffix='Courses in this tradition are automatically added to eligible carts.')},
-		{'field':'trig'      , 'template': Checkbox(suffix='Families must purchase 10 prepaid tickets for $100, not included in tuition')},
+		{'field':'auto'      , 'template': Checkbox(suffix='Eligible students are automatically enrolled in this course when they enroll in another.')},
+		# {'field':'trig'      , 'template': Checkbox(suffix='When a student enrolls in this course, it fires their "trigger", enrolling them in auto courses.')},
 		# {'field':'courses'   , 'template': ForeignSet(model='course')},
 	],
 	'course'    : [
@@ -107,4 +109,9 @@ FIELDS = {
 		{'field':'status'    , 'template': Enum(items=Invoices.model.status_choices)},
 		{'field':'items'     , 'template': ForeignSet(model='enrollment')},
 	],
+	'venue': [
+		{'field':'id'        , 'template': VarChar(maxlength=3)},
+		{'field':'name'      , 'template': VarChar(maxlength=30)},
+		{'field':'address'   , 'template': ForeignKey(model='address', null=True)},		
+	]
 }

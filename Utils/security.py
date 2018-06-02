@@ -35,8 +35,8 @@ def gethist(ago=1):
 			years.append(year)
 	return years
 def getyear():
-	if DEV:
-		return 2017
+	# if DEV:
+	# 	return 2017
 	now = datetime.now()
 	return now.year + (0 if now.month < 5 else 1)
 

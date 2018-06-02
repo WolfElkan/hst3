@@ -75,8 +75,8 @@ urlpatterns = [
 	url(r'^nuke/$', seed.nuke),
 
 	url(r'^rest/$', rest.home),
-	url(r'^rest/edit/(?P<model>[a-zA-Z]+)/(?P<id>\d+|(\d\d)?\w\w)/$', rest.edit),
-	url(r'^rest/show/(?P<model>[a-zA-Z]+)/(?P<id>\d+|(\d\d)?\w\w)/$', rest.show),
+	url(r'^rest/edit/(?P<model>[a-zA-Z]+)/(?P<id>\d+|(\d\d)?\w\w|\w{3})/$', rest.edit),
+	url(r'^rest/show/(?P<model>[a-zA-Z]+)/(?P<id>\d+|(\d\d)?\w\w|\w{3})/$', rest.show),
 	url(r'^rest/update/(?P<model>[a-zA-Z]+)/(?P<id>\d+|(\d\d)?\w\w)/$', rest.update),
 	url(r'^rest/index/(?P<model>[a-zA-Z]+)/$', rest.index),
 	url(r'^rest/new/(?P<model>[a-zA-Z]+)/$', rest.new),
@@ -94,6 +94,8 @@ urlpatterns = [
 
 	url(r'^reports/students/mass_enroll/register/$', reports.register),
 	url(r'^reports/students/(?P<year>\d{4})/mass_enroll/register/$', reports.register),
+
+	url(r'^reports/summary/$', reports.summary),
 
 	url(r'^admin/dashboard/$', radmin.dashboard),
 

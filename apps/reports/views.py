@@ -7,7 +7,7 @@ from apps.program.models import Year
 from Utils.data import sub
 from Utils.security import getyear, gethist, restricted
 
-import re
+import re, datetime
 
 def index(request, **kwargs):
 	bad = restricted(request,5)
@@ -84,30 +84,10 @@ def enrollment_matrix(request, **kwargs):
 def summary(request, **kwargs):
 	kwargs.setdefault('year',getyear())
 	context = {
-		'year':Year(year)
+		'year':Year(int(kwargs['year'])),
+		'prev':Year(int(kwargs['year'])-1),
+		'date':datetime.datetime.now()
 	}
-	# stats = [
-	# 	'nFamilies',
-	# 	'nNewFamilies',
-	# 	'nStudents',
-	# 	'neSB',
-	# 	'neSC',
-	# 	'neSG',
-	# 	'neSH',
-	# 	'neSJ',
-	# 	'neSR',
-	# 	'neAC',
-	# 	'neDC',
-	# 	'neCC',
-	# 	'neXX',
-	# 	'neXM',
-	# 	'neWC',
-	# 	'nSlotsTotal'
-	# 	]
-	# for stat in stats:
-	# 	context[datum] = 0
-	# for student in Students.current(kwargs['year']):
-	# 	pass
 	return render(request, 'reports/summary.html', context)
 
 def mass_enroll(request, **kwargs):

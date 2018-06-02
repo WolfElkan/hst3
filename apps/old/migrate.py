@@ -57,6 +57,8 @@ course_mappings = [None,None,
 	'WP',
 	'HM']
 
+mmxix = ['AA','AB','C2','C1','C0','IH','IS','HA','HB','Z1','Z2','J1','J2','J3','J4','P1','P2','T1','T2','T3','T4','XA','XX','WX','MU','WW','WN','WP','SG','SJ','SB','SR','SH','C0','MW','VP']
+
 from .models import Alumnifamily
 AlumniFamilies = Alumnifamily.objects
 
@@ -404,13 +406,12 @@ def transfer():
 	for reg in Registrations.all():
 		student = Students.fetch(hid=reg.studentid)
 		course  = Courses.fetch(year=year,tradition__oid=reg.courseid)
-		print student, course
 		if student and course:
 			Enrollments.create(student=student, course=course)
 			n['enroll'] += 1
+			print student, 'in', course
 
-	print
-	print 'TRANSFER COMPLETE'
+	print '\nTRANSFER COMPLETE'
 	print 'Users:     ' + str(n['users']).rjust(6)
 	print 'Families:  ' + str(n['families']).rjust(6)
 	print 'Parents:   ' + str(n['parents']).rjust(6)
@@ -422,35 +423,3 @@ def transfer():
 	print 'Courses:   ' + str(n['courses']).rjust(6)
 	print 'Enrollments:'+ str(n['enroll']).rjust(5)
 	print 'Time:     '  + str(datetime.datetime.now() - start)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
