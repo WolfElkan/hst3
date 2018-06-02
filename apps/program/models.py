@@ -512,8 +512,6 @@ class Enrollment(models.Model):
 		print 'updated_at :',self.updated_at
 	def byFamily(self):
 		return self.course.tradition.id[0] == 'K'
-	# def display_student(self):
-	# 	return '' if self.byFamily() else self.student.prefer
 	def accept(self, user):
 		if self.status in ["aud_pend","pendpass","pendfail"]:
 			if user.permission >= 5:
