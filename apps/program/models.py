@@ -444,19 +444,22 @@ class Enrollment(models.Model):
 		return super(Enrollment, self).__init__(*args, **kwargs)
 	def title(self):
 		display = self.get_status_display()
+		kwargs = self.title_kwargs()
 		if self.is_prepaid_tickets():
 			display = '{family} {proverb} recieving {course} {year}'
-		return display.format(
-			student = self.student,
-			family  = self.student.family,
-			course  = self.course.title,
-			year    = self.course.year,
-			invoice = self.invoice.id if self.invoice else 0,
-			pronoun = 'he' if self.student.sex == 'M' else 'she',
-			proverb = 'was' if self.course.year < getyear() else 'is',
-			audskil = 'audition' if self.course.id[2] in 'SC' else 'skill assessment',
-			article = 'an' if self.course.id[2] in 'SC' else 'a',
-		)
+		return display.format(**kwargs)
+	def title_kwargs(self):
+		return {
+			'student' : self.student,
+			'family'  : self.student.family,
+			'course'  : self.course.title,
+			'year'    : self.course.year,
+			'invoice' : self.invoice.id if self.invoice else 0,
+			'pronoun' : 'he' if self.student.sex == 'M' else 'she',
+			'proverb' : 'was' if self.course.year < getyear() else 'is',
+			'audskil' : 'audition' if self.course.id[2] in 'SC' else 'skill assessment',
+			'article' : 'an' if self.course.id[2] in 'SC' else 'a',		
+		}
 	def public_status(self):
 		return sub(self.status, {"pendpass":"aud_pend","pendfail":"aud_pend","aud_fail":"fail_pub"})
 	def public_title(self):
