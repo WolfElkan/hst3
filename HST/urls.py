@@ -60,7 +60,7 @@ urlpatterns = [
 	url(r'^myaccount/courses/$', program.from_myaccount),
 	url(r'^register/student/(?P<id>\d+)/$', program.courses),
 	url(r'^register/student/(?P<id>\d+)/enroll/$', program.courses_enroll),
-	url(r'^register/student/(?P<id>\d+)/audition/$', program.courses_audition),
+	# url(r'^register/student/(?P<id>\d+)/audition/$', program.courses_audition),
 	url(r'^register/student/(?P<id>\d+)/drop/$', program.courses_drop),
 
 	url(r'^register/process/$',payment.invoice_create),

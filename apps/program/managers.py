@@ -88,10 +88,13 @@ class EnrollmentManager(sm.SuperManager):
 		if not phantom:
 			qset = qset.exclude(status='nonexist')
 		return qset
-	def simulate(self, **kwargs):
-		thing = self.fetch(**kwargs)
-		thing = thing if thing else self.model(**kwargs)
-		return thing.set_status()
+	# def simulate(self, **kwargs):
+	# 	thing = self.fetch(**kwargs)
+	# 	if not thing:
+	# 		thing = self.model(**kwargs)
+	# 	# thing.set_status(sim=True)
+	# 	thing.status = calc_status(**kwargs)
+	# 	return thing
 Enrollments = EnrollmentManager()
 
 class VenueManager(sm.SuperManager):

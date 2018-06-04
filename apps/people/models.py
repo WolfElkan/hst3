@@ -5,6 +5,8 @@ from apps.program.managers import CourseTrads, Courses, Enrollments, Venues
 from apps.payment.managers import Invoices
 from apps.radmin.managers  import Policies
 
+from apps.program.eligex import calc_status
+
 from Utils import custom_fields as custom
 from Utils import supermodel as sm
 from Utils.data import collect, copyatts, Each, find_all
@@ -256,14 +258,14 @@ class Student(models.Model):
 		return self.family.father
 
 	# Courtesy functions: student.fxn(course) calls course.fxn(student)
-	def eligible(self, course):
-		return course.eligible(self)
-	def audible(self, course):
-		return course.audible(self)
-	def enroll(self, course):
-		return course.enroll(self)
-	def audition(self, course):
-		return course.audition(self)
+	# def eligible(self, course):
+	# 	return course.eligible(self)
+	# def audible(self, course):
+	# 	return course.audible(self)
+	# def enroll(self, course):
+	# 	return course.enroll(self)
+	# def audition(self, course):
+	# 	return course.audition(self)
 
 	def hst_age_in(self, year):
 		return year - self.birthday.year - 1
@@ -297,12 +299,15 @@ class Student(models.Model):
 		for enrollment in self.enrollments:
 			qset.append({'widget':enrollment,'static':Courses.get(id=enrollment.course_id)})
 		return qset
-	def course_menu(self, **kwargs):
-		year = kwargs.setdefault('year',getyear())
-		courses = Courses.filter(year=year,tradition__e=True).exclude(tradition__id__startswith="K").order_by('tradition__order')
+	def course_menu(self, year=getyear()):
+		courses = Courses.filter(year=year,tradition__e=True)
+		courses = courses.exclude(tradition__id__startswith="K")
+		courses = courses.order_by('tradition__order')
 		for course in courses:
-			enrollment = Enrollments.simulate(student=self,course=course)
-			enrollment.set_status()
+			enrollment = Enrollments.fetch(student=self,course=course)
+			if not enrollment:
+				enrollment = Enrollments.model(student=self,course=course)
+				enrollment.status = calc_status(enrollment)
 			yield enrollment
 	def fate(self, year=None):
 		if not year:

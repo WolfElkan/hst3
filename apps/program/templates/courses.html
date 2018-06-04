@@ -92,7 +92,7 @@
 		padding-bottom: 0;
 	}
 	.course_menu table tr {
-		height: 48px;
+		/*height: 48px;*/
 	}
 
 </style>
@@ -147,11 +147,11 @@
 							</form>
 							<button class="enroll_disabled" disabled>Enroll</button>
 							<a class="view" href="/register/invoice/{{enr.invoice_id}}">Invoice</a>
-							{{enr.status}}
+							<!-- {{enr.status}} -->
 						</td>
 						<td class="center">{{enr.course.title}}</td>
 						<td>{{enr.course.day.short}}</td>
-						<td>{{enr.course.start}} - {{enr.course.end}}{{enr.course.tradition.display_semester}}</td>
+						<td>{{enr.course.start}} to {{enr.course.end}}{{enr.course.tradition.display_semester}}</td>
 						<td class="right">${{enr.course.tuition}}</td>
 						<td class="right">{{enr.course.vol_hours}}</td>
 					</tr>

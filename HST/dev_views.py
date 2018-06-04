@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, HttpResponse
 
 from apps.people.managers  import Families, Addresses, Parents, Users, Students
 from apps.program.managers import CourseTrads, Courses, Enrollments, Venues
+from apps.program.eligex   import check_eligex, check_word, calc_status, eligible, audible
 from apps.payment.managers import Invoices, PayPals
 from apps.radmin.managers  import Policies
 from apps.program.models   import Year

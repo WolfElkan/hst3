@@ -18,12 +18,10 @@ from apps.program.managers import CourseTrads, Courses
 
 def make(year):
 	count = 0
-	qset = CourseTrads.filter(e=True).exclude(id__startswith='W')
-	for q in qset:
-		c = Courses.fetch(year=year,tradition=q)
-		if not c:
+	for tradition in CourseTrads.filter(e=True):
+		if not Courses.fetch(year=year,tradition=tradition):
 			count += 1
-			print q.make(year)
+			print tradition.make(year)
 	return count
 
 orders = [

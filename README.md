@@ -92,6 +92,31 @@
 
 #### Models
 
+  Each `Model` class declaration defines attributes and methods in the following order:
+
+  * Django database attributes
+    * If not generated automatically, primary key is listed first
+    * A static attribute which is a list of tuples used for `choices` in another attribute is defined immediately before that attribute.
+    * `created_at`
+    * `updated_at`
+  * Other static attributes (e.g. `rest_model`)
+  * Model Manager (`objects`)
+  * Auto-call methods which take no arguments (other than `self`), which return:
+    * A single value
+    * A Django QuerySet
+    * Something else
+  * Methods which take multiple arguments whose primary goal is:
+    * to return information
+    * to make changes to the object itself
+    * to make changes to other objects
+  * Magic Methods
+    * `__str__` first
+    * `__getattribute__` last (institutes Auto-call)
+
+An exception is made for methods whose primary purpose is to assist other methods. These are defined immediately after the methods they assist, regardless of the above order.
+
+Methods which serve only to call methods on other objects should be used rarely.
+
 ##### Migrations
 
 #### Views

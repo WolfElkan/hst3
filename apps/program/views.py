@@ -67,21 +67,22 @@ def courses(request, **kwargs):
 
 
 def courses_enroll(request, **kwargs):
-	print 'enroll', kwargs
+	print 'enroll'
 	student_id = kwargs.setdefault('id',0)
 	student = Students.fetch(id=student_id)
 	course = Courses.fetch(id=request.GET['course_id'])
-	course.cart(student)
+	# print student, course
+	print course.cart(student)
 	return redirect('/register/student/{}/'.format(student_id))
 
-def courses_audition(request, **kwargs):
-	print 'audition', kwargs
-	student_id = kwargs.setdefault('id',0)
-	student = Students.fetch(id=student_id)
-	course = Courses.fetch(id=request.GET['course_id'])
-	if course.audible(student):
-		Enrollments.create(course=course, student=student, status="aud_pend")
-	return redirect('/register/student/{}/'.format(student_id))
+# def courses_audition(request, **kwargs):
+# 	print 'audition', kwargs
+# 	student_id = kwargs.setdefault('id',0)
+# 	student = Students.fetch(id=student_id)
+# 	course = Courses.fetch(id=request.GET['course_id'])
+# 	if course.audible(student):
+# 		Enrollments.create(course=course, student=student, status="aud_pend")
+# 	return redirect('/register/student/{}/'.format(student_id))
 
 def courses_drop(request, **kwargs):
 	print 'drop', kwargs
