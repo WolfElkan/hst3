@@ -49,10 +49,10 @@ def courses(request, **kwargs):
 			'unpaid': len(cart_unpaid),
 		},
 		'tuition' : {
-			'total' : sum(collect(cart, lambda enr: enr.course.tuition)),
-			'pend'  : sum(collect(cart_pend, lambda enr: enr.course.tuition)),
-			'paid'  : sum(collect(cart_paid, lambda enr: enr.course.tuition)),
-			'unpaid': sum(collect(cart_unpaid, lambda enr: enr.course.tuition)),
+			'total' : sum(collect(cart, lambda enr: enr.course.tuition())),
+			'pend'  : sum(collect(cart_pend, lambda enr: enr.course.tuition())),
+			'paid'  : sum(collect(cart_paid, lambda enr: enr.course.tuition())),
+			'unpaid': sum(collect(cart_unpaid, lambda enr: enr.course.tuition())),
 		},
 		'hours' : {
 			'total' : me.owner.volunteer_total_in(reg_year),

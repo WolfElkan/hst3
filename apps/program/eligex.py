@@ -66,12 +66,12 @@ def check_eligex(course, student, **kwargs):
 				print x[5],'\n', result
 
 		else:
-			result = conj
+			result = kwargs['conj']
 
-		if result != conj:
+		if result != kwargs['conj']:
 			return result
 
-	return conj
+	return kwargs['conj']
 
 
 def check_word(trad, student, word, **kwargs):

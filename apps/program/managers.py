@@ -7,7 +7,7 @@ from django_mysql import models as sqlmod
 class CourseTradManager(sm.SuperManager):
 	def __init__(self):
 		super(CourseTradManager, self).__init__('program_coursetrad')
-		self.fields = ['year','tradition','last_date','aud_date','teacher','tuition','vol_hours','the_hours','trig','auto']
+		self.fields = ['year','tradition','last_date','aud_date','teacher','early_tuit','after_tuit','vol_hours','the_hours','trig','auto']
 	def get(self, **kwargs):
 		thing = super(CourseTradManager, self).get(**kwargs)
 		return thing.alias if thing.alias else thing

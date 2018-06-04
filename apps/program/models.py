@@ -11,7 +11,7 @@ Q = models.Q
 from apps.people.managers import Students, Families
 from trace import TRACE, DEV
 from datetime import datetime
-import re
+import pytz, re
 
 class Venue(models.Model):
 	id   = models.CharField(max_length=3, primary_key=True)
@@ -64,8 +64,8 @@ class CourseTrad(models.Model):
 	max_grd = models.PositiveIntegerField(default=12)
 	eligex  = models.TextField(default="#")
 	# Cost
-	tuition    = models.DecimalField(max_digits=6, decimal_places=2, default=0)
-	earlytn    = models.DecimalField(max_digits=6, decimal_places=2, default=0)
+	early_tuit = models.DecimalField(max_digits=6, decimal_places=2, default=0)
+	after_tuit = models.DecimalField(max_digits=6, decimal_places=2, default=0)
 	vol_hours  = models.FloatField(default=0)
 	the_hours  = models.FloatField(default=0)
 	auto       = models.BooleanField(default=False) # Whether course is automatically added to eligible carts
@@ -180,7 +180,8 @@ class Course(models.Model):
 	last_date  = models.DateField(null=True)
 	aud_date   = models.DateField(null=True)
 	teacher    = models.ForeignKey('people.Teacher', null=True)
-	tuition    = models.DecimalField(max_digits=6, decimal_places=2)
+	early_tuit = models.DecimalField(max_digits=6, decimal_places=2, default=0)
+	after_tuit = models.DecimalField(max_digits=6, decimal_places=2, default=0)
 	vol_hours  = models.FloatField()
 	the_hours  = models.FloatField()
 	approved   = models.BooleanField(default=False)
@@ -191,6 +192,9 @@ class Course(models.Model):
 	objects = Courses
 	# Single Argument (auto-call)
 	  # Return Single Value
+	def tuition(self, asof=datetime.now()):
+		cutoff = datetime(year=self.year-1,month=7,day=2)
+		return self.early_tuit if asof < cutoff else self.after_tuit
 	def slots_open(self):
 		if self.nSlots == 0:
 			return NotImplemented
@@ -323,6 +327,7 @@ class Enrollment(models.Model):
 	student    = models.ForeignKey('people.Student')
 	course     = models.ForeignKey(Course)
 	invoice    = models.ForeignKey('payment.Invoice', null=True)
+	tuition    = models.DecimalField(max_digits=6, decimal_places=2, default=0)
 	role       = models.TextField(null=True)
 	role_type  = sqlmod.EnumField(choices=['','Chorus','Support','Lead'])
 	status_choices = [
@@ -392,11 +397,20 @@ class Enrollment(models.Model):
 		elif me.owner_type == 'Student':
 			return self.student.id == me.owner.id
 
-	# def set_status(self, cart=False, sim=False):
-	# 	self.status = calc_status(self, cart=cart)
-	# 	if not sim:
-	# 		self.save()
-	# 	return self
+	def price(self):
+		if self.tuition:
+			return self.tuition
+		elif self.status == "enrolled" and self.invoice:
+			return self.course.tuition(self.invoice.updated_at)
+		else:
+			return self.course.tuition()
+		
+	def pay(self):
+		if self.status == "invoiced":
+			self.tuition = self.course.tuition()
+			self.status = "enrolled"
+			self.save()
+		return self.tuition
 
 	def accept(self, user):
 		if self.status in ["aud_pend","pendpass","pendfail"]:
@@ -445,7 +459,7 @@ class Enrollment(models.Model):
 		return '{} in {}'.format(self.student, self.course)
 
 	def __getattribute__(self, field):
-		if field in ['paid','eligible','display_student','tuition','title','public_title','public_status']:
+		if field in ['paid','eligible','display_student','title','public_title','public_status']:
 			call = super(Enrollment, self).__getattribute__(field)
 			return call()
 		elif field in Students.fields:

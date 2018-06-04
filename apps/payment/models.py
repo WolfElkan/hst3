@@ -73,7 +73,7 @@ class Invoice(models.Model):
 		amount = Decimal(0)
 		for q in self.items:
 			if type(q) is Enrollment:
-				amount += q.course.tuition
+				amount += q.course.tuition()
 			elif type(q) is Discount:
 				amount -= q.amount
 		return amount
@@ -94,9 +94,7 @@ class Invoice(models.Model):
 	def pay(self, paypal):
 		if self.confirm(paypal):
 			for item in self.items:
-				if item.status == "invoiced":
-					item.status = "enrolled"
-					item.save()
+				item.pay()
 			self.status = 'P'
 			self.method = 'PayPal'
 			self.paypal =  paypal

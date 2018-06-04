@@ -152,7 +152,7 @@ class Family(models.Model):
 		return sum(Each(Each(self.enrollments_in(year)).course).tuition)
 	def paid_tuition_in(self, year):
 		return sum(Each(Invoices.filter(family=self,status='P')).amount)
-		# return sum(collect(self.enrollments_in(year), lambda enr: 0 if enr.isAudition else enr.course.tuition))
+		# return sum(collect(self.enrollments_in(year), lambda enr: 0 if enr.isAudition else enr.course.tuition()))
 	def pend_tuition_in(self, year):
 		return sum(Each(Each(self.pend_enrollments_in(year)).course).tuition)
 		# return sum(Each(Invoices.filter(family=self,status='N')).amount) + sum(Each(Each(Enrollments.filter(student__family=self, course__year=year, isAudition=True, happened=False)).course).tuition)
