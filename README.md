@@ -302,7 +302,6 @@ Methods which serve only to call methods on other objects should be used rarely.
   `m` | Male: returns `True` for boys and `False` for girls
   `f` | Female: returns `True` for girls and `False` for boys
   `@` | Returns `True` if student has completed a successful audition or skill assessment for this class.  Returns `False` otherwise
-  `%` | Returns the value of the global variable `DEV`.  (`True` in development &amp; testing, `False` in production.)
 
 #### Single-Letter Modifiers
 

@@ -5,8 +5,6 @@ import re, random
 
 def check_eligex(course, student, **kwargs):
 
-	r = random.randint(0,100)
-
 	# Set defaults for omitted keyword arguments
 	eligex = kwargs.setdefault('eligex', None)
 	year   = kwargs.setdefault('year'  , None)
@@ -14,9 +12,6 @@ def check_eligex(course, student, **kwargs):
 	cur    = kwargs.setdefault('cur'   , False)
 	conj   = kwargs.setdefault('conj'  , True)
 	debug  = kwargs.setdefault('debug' , False)
-
-	kw = 'eligex'
-	print kw,kwargs.get(kw)
 
 	# Check for Course or CourseTrad
 	if course.rest_model == 'course':
@@ -41,101 +36,43 @@ def check_eligex(course, student, **kwargs):
 		raise Exception('Nested clauses of the same type are not currently supported.')
 
 	# Find Eligex words and clauses
-	# regex = r' *(?P<not>!?)({(?P<and>.*?)})?(<(?P<or>.*?)>)?(?P<word>[^<>{} ]*) *'
-	# regex = r'(?P<nand>!?){(?P<and>[^}]*)}|(?P<nor>!?)<(?P<or>[^>]*)>|(?P<nword>!?)(?P<word>[^<>{} ]*)'
-	# regex = r'(?P<AND>!?{(?P<and>[^}]*)})|(?P<OR>!?<(?P<or>[^>]*)>)|(?P<WORD>!?(?P<word>[^<>{} ]*))'
-	regex = r'(!?){([^}]*)}|(!?)<([^>]*)>|(!?)([^<>{} ]*)'
-
-	matches = re.finditer(regex, eligex)
-	# print matches.__iter__, dir(matches)
+	matches = re.findall(r'(!?){([^}]*)}|(!?)<([^>]*)>|(!?)([^<>{} ]*)', eligex)
 
 	# Iterate Eligex words and clauses
-	for x in matches.__iter__():
+	for x in matches:
 
-		if not any(x.groups()):
-			continue
-
-		print r
-
-		if kwargs.get('debug'):
-			clause = "''"
-			print x.groupdict()
-
-		if x.groupdict().get('and'):
-			kwargs['eligex'] = x.groupdict().get('and')
+		# AND clause
+		if x[1]:
+			kwargs['eligex'] = x[1]
 			kwargs['conj'] = True
 			result = check_eligex(trad, student, **kwargs)
+			result = not result if x[0] else result
 			if kwargs.get('debug'):
-				clause = x.groups()[1]
-				# print x.groups()[1], '=', result
-		elif x.groupdict().get('or'):
-			kwargs['eligex'] = x.groupdict().get('or')
+				print '{'+x[1]+'} =', result
+
+		# OR clause
+		elif x[3]:
+			kwargs['eligex'] = x[3]
 			kwargs['conj'] = False
 			result = check_eligex(trad, student, **kwargs)
+			result = not result if x[2] else result
 			if kwargs.get('debug'):
-				clause = x.groups()[3]
-				# print x.groups()[3], '=', result
-		elif x.groupdict().get('word'):
-			result = check_word(trad, student, x.groupdict().get('word'), **kwargs)
+				print '<{}> ='.format(x[3]), result
+
+		# Eligex WORD
+		elif x[5]:
+			result = check_word(trad, student, x[5], **kwargs)
+			result = not result if x[4] else result
 			if kwargs.get('debug'):
-				clause = x.groupdict().get('word')
+				print x[5],'=', result
+
 		else:
 			result = kwargs['conj']
 
-		if kwargs.get('debug'):
-			print clause, '=', result
-
-		if x.groupdict().get('not'):
-			result = not result
-			if kwargs.get('debug'):
-				print '!'+clause, '=', result
-
-
-		# result ^= bool(x.groupdict().get('not'))
-
 		if result != kwargs['conj']:
-			if kwargs.get('debug'):
-				print kwargs['eligex'], '=', result
 			return result
 
-		if kwargs.get('debug'):
-			print kwargs['eligex'], '=', result
-		return kwargs['conj']
-
-
-		# print x.groupdict()
-
-	# 	# AND clause
-	# 	if x[1]:
-	# 		kwargs['eligex'] = x[1]
-	# 		result = check_eligex(trad, student, **kwargs)
-	# 		result = not result if x[0] else result
-	# 		if kwargs.get('debug'):
-	# 			print '{',x[1],'}\n', result
-
-	# 	# OR clause
-	# 	elif x[3]:
-	# 		kwargs['eligex'] = x[3]
-	# 		kwargs['conj'] = False
-	# 		result = check_eligex(trad, student, **kwargs)
-	# 		result = not result if x[2] else result
-	# 		if kwargs.get('debug'):
-	# 			print '<{}>\n'.format(x[3]), result
-
-	# 	# Eligex WORD
-	# 	elif x[5]:
-	# 		result = check_word(trad, student, x[5], **kwargs)
-	# 		result = not result if x[4] else result
-	# 		if kwargs.get('debug'):
-	# 			print x[5],'\n', result
-
-	# 	else:
-	# 		result = kwargs['conj']
-
-	# 	if result != kwargs['conj']:
-	# 		return result
-
-	# return kwargs['conj']
+	return kwargs['conj']
 
 
 def check_word(trad, student, word, **kwargs):
@@ -157,10 +94,6 @@ def check_word(trad, student, word, **kwargs):
 		return student.sex == 'M'
 	elif 'f' in word:
 		return student.sex == 'F'
-
-	# Development literal
-	elif word == '%':
-		return DEV
 
 	# Check age
 	elif 'a' in word:
