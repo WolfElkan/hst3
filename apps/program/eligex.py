@@ -128,7 +128,7 @@ def check_word(trad, student, word, **kwargs):
 				})
 			if kwargs.get('debug'):
 				print query
-			return bool(Enrollments.filter(**query))
+			return bool(Enrollments.filter(**query).exclude(student=student,course__tradition=trad,course__year=year))
 
 		# If the word is '**', then you don't care what course it is, as long as it's this year.
 		if word == '**':
@@ -137,7 +137,7 @@ def check_word(trad, student, word, **kwargs):
 			query['course__year'] = year
 			if kwargs.get('debug'):
 				print query
-			return bool(Enrollments.filter(**query))
+			return bool(Enrollments.filter(**query).exclude(student=student,course__tradition=trad,course__year=year))
 
 		# Support * for representing any character
 		if '*' not in word:
@@ -160,7 +160,7 @@ def check_word(trad, student, word, **kwargs):
 			query['student__family'] = student.family
 		if kwargs.get('debug'):
 			print query
-		return bool(Enrollments.filter(**query))
+		return bool(Enrollments.filter(**query).exclude(student=student,course__tradition=trad,course__year=year))
 
 
 def calc_status(enr, cart=False):

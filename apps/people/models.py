@@ -5,7 +5,7 @@ from apps.program.managers import CourseTrads, Courses, Enrollments, Venues
 from apps.payment.managers import Invoices
 from apps.radmin.managers  import Policies
 
-from apps.program.eligex import calc_status
+from apps.program.eligex import calc_status, eligible
 
 from Utils import custom_fields as custom
 from Utils import supermodel as sm
@@ -300,8 +300,7 @@ class Student(models.Model):
 			qset.append({'widget':enrollment,'static':Courses.get(id=enrollment.course_id)})
 		return qset
 	def course_menu(self, year=getyear()):
-		courses = Courses.filter(year=year,tradition__e=True)
-		courses = courses.exclude(tradition__id__startswith="K")
+		courses = Courses.filter(year=year,tradition__e=True,tradition__m=True)
 		courses = courses.order_by('tradition__order')
 		for course in courses:
 			enrollment = Enrollments.fetch(student=self,course=course)
@@ -316,11 +315,10 @@ class Student(models.Model):
 			print auto_trad
 			auto_course = Courses.fetch(year=year,tradition=auto_trad)
 			if auto_course:
-				# auto_course = Courses.create(year=year,tradition=auto_trad)
 				enrollment = Enrollments.fetch(student=self,course=auto_course)
 				if enrollment:
 					enrollment.fate()
-				elif auto_course.eligible(self):
+				elif eligible(auto_course, self):
 					Enrollments.create(student=self,course=auto_course)
 	def __str__(self):
 		return self.prefer+' '+self.last

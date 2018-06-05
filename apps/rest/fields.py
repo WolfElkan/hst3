@@ -60,6 +60,9 @@ FIELDS = {
 		{'field':'id'        , 'template': VarChar(maxlength=2)},
 		{'field':'oid'       , 'template': Static()},
 		{'field':'e'         , 'template': Checkbox(suffix='This course will be visible in family enrollment shopping cart.')},
+		{'field':'m'         , 'template': Checkbox(suffix='This course will be visible on course menu.')},
+		{'field':'auto'      , 'template': Checkbox(suffix='Eligible students are automatically enrolled in this course when they enroll in another.')},
+		{'field':'trig'      , 'template': Checkbox(suffix='When a student enrolls in this course, it fires their "trigger", enrolling them in auto courses.')},
 		{'field':'title'     , 'template': VarChar(maxlength=50)},
 		{'field':'day'       , 'template': DayOfWeek()},
 		{'field':'start'     , 'template': Time()},
@@ -79,8 +82,6 @@ FIELDS = {
 		{'field':'min_grd'   , 'template': Integer(default= 1)},
 		{'field':'max_grd'   , 'template': Integer(default=12)},
 		{'field':'the_hours' , 'template': Integer()},
-		{'field':'auto'      , 'template': Checkbox(suffix='Eligible students are automatically enrolled in this course when they enroll in another.')},
-		# {'field':'trig'      , 'template': Checkbox(suffix='When a student enrolls in this course, it fires their "trigger", enrolling them in auto courses.')},
 		# {'field':'courses'   , 'template': ForeignSet(model='course')},
 	],
 	'course'    : [

@@ -41,6 +41,7 @@ class CourseTrad(models.Model):
 	alias      = models.ForeignKey('self', null=True)
 	order      = models.FloatField(null=True)
 	e          = models.BooleanField(default=True)
+	m          = models.BooleanField(default=True)
 	# Commitment:
 	day        = custom.DayOfWeekField(default='')
 	start      = models.TimeField(default="00:00:00")
@@ -389,7 +390,7 @@ class Enrollment(models.Model):
 		return title
 
 	def byFamily(self):
-		return self.course.tradition.id[0] == 'K'
+		return self.course.tradition.id[0] in 'RK'
 
 	def stand(self, me):
 		if me.owner_type == 'Family':
