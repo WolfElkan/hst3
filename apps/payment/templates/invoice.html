@@ -73,7 +73,7 @@
 			<tr class="{{item.status}}" onclick="">
 				<td>{% if item.byFamily %} N/A {% else %} {{item.student.prefer}} {% endif %} </td>
 				<td>{{item.course}}</td>
-				<td class="money">${{item.tuition}}</td>
+				<td class="money">${{item.price}}</td>
 			</tr>
 			{% endfor %}
 			<thead class="sum">

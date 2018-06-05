@@ -69,8 +69,9 @@ class CourseTrad(models.Model):
 	after_tuit = models.DecimalField(max_digits=6, decimal_places=2, default=0)
 	vol_hours  = models.FloatField(default=0)
 	the_hours  = models.FloatField(default=0)
-	auto       = models.BooleanField(default=False) # Whether course is automatically added to eligible carts
-	trig       = models.BooleanField(default=True)  # Whether course triggers an addition of all eligible auto courses
+	# auto       = models.BooleanField(default=False) # Whether course is automatically added to eligible carts
+	# trig       = models.BooleanField(default=True)  # Whether course triggers an addition of all eligible auto courses
+	action     = sqlmod.EnumField(choices=['none','trig','auto'], default='none')
 	deferrable = models.BooleanField(default=False) # Whether course may be paid for in October
 	droppable  = models.BooleanField(default=True)  # Whether course may be dropped AFTER a successful audition
 	created_at = models.DateTimeField(auto_now_add=True)
