@@ -140,7 +140,7 @@ Methods which serve only to call methods on other objects should be used rarely.
   Each `CourseTrad` object has a 2-character ID, with the first letter indicating the genre or type of course, and the second indicating the course level or some other identifying characteristic.  The yearly `Course` objects have 4-character ID's: the last two digits of the year, followed by the 2-character `CourseTrad` ID.  The first letters of the `CourseTrad` ID's (and by extention, the 3rd character of the `Course` ID's) are as follows:
 
   * Classes in Showcase
-    * `A`: Acting Classes ([note](#note-about-acting-classes))
+    * `A`: Acting Classes
     * `C`: Choirs
     * Dance Classes
       * Jazz
@@ -153,22 +153,21 @@ Methods which serve only to call methods on other objects should be used rarely.
       * `H`: Jazz &amp; Hip Hop
   * `S`: Troupes ([note](#antimony-protocol))
   * Tech Program
-    * `X`: Tech
-    * `W`: Workshops
+    * `X`: Tech Classes
+    * `W`: Tech Workshops
+    * `M`: Makeup
   * Non-Enrollable
-    * `A`: Acting Scenes ([note](#note-about-acting-classes))
+    * `A`: Acting Scenes
+    * `D`: Dance Classes (Combined)
     * `F`: Showcase Finale
-    * `G`: General Audition
     * `K`: Prepaid Tickets
+    * `R`: Statistical
   * Other
+    * Dummy courses for Development purposes (`EP`)
     * Historical courses (needed for Alumni Website)
     * Aliases (see [Antimony Protocol](#antimony-protocol))
 
-  The letters `E`, `M`, `N`, `Q`, `R`, `U`, `V`, and `Y` are not currently in use.
-
-#### Note About Acting Classes
-
-  Ignoring aliases, `A` is the only letter that begins the ID's of both enrollable and non-enrollable courses.  `AA` and `AB` are [enrollable](#enrollable-courses).  `AC`, `A0`-`A9`, `AX`, `AY`, and `AZ` are [non-enrollable](#non-enrollable-courses).
+  The letters `B`, `N`, `Q`, `U`, `V`, and `Y` are not currently in use.
 
 #### Antimony Protocol
 

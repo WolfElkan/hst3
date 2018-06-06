@@ -27,8 +27,7 @@ def courses(request, **kwargs):
 	else:
 		current_student = me.owner.children[0]
 	reg_year = getyear()
-	courses = Courses.filter(year=reg_year,tradition__e=True).order_by('tradition__order')
-	cart = me.owner.enrollments_in(reg_year)
+	cart = me.owner.enrollments_in(reg_year).filter(course__tradition__e=True)
 	cart_pend = cart.filter(status__in=['aud_pend','invoiced','lockedin'])
 	cart_paid = cart.filter(status='enrolled')
 	# cart_unpaid = cart.difference(cart_pend,cart_paid) # Use this line instead of next in Django 1.11+
@@ -67,6 +66,7 @@ def courses(request, **kwargs):
 
 
 def courses_enroll(request, **kwargs):
+	print 69
 	student_id = kwargs.setdefault('id',0)
 	student = Students.fetch(id=student_id)
 	course = Courses.fetch(id=request.GET['course_id'])

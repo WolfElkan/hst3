@@ -174,7 +174,7 @@
 						</thead>
 						{% for enrollment in cart %}
 						<tr {% if enrollment.invoice %} onclick="mo('/register/invoice/{{enrollment.invoice.id}}')" {% endif %} class="{{enrollment.status}}" title="Enrollment #{{enrollment.id}}">
-							<td>{% if not enrollment.byFamily %}{{enrollment.student.prefer}}{% endif %}</td>
+							<td>{% if not enrollment.course.tradition.byFamily %}{{enrollment.student.prefer}}{% endif %}</td>
 							<td class="center">{{enrollment.course.title}}</td>
 							<td class="right">{{enrollment.course.vol_hours}}</td>
 							<td class="right">${{enrollment.course.tuition|floatformat:2}}</td>

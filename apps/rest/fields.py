@@ -92,7 +92,6 @@ FIELDS = {
 		{'field':'after_tuit', 'template': Dollar()},
 		{'field':'vol_hours' , 'template': Integer()},
 		{'field':'the_hours' , 'template': Integer()},
-		{'field':'prepaid'   , 'template': Checkbox()},
 		{'field':'teacher'   , 'template': ForeignKey(model='teacher')},
 		{'field':'tradition' , 'template': ForeignKey(model='coursetrad')},
 		{'field':'aud_date'  , 'template': Date()},

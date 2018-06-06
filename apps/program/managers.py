@@ -74,7 +74,8 @@ class EnrollmentManager(sm.SuperManager):
 		super(EnrollmentManager, self).__init__('program_enrollment')
 	def create(self, **kwargs):
 		already = kwargs.copy()
-		if 'course' in kwargs and '+' in kwargs['course'].eligex:
+		course = kwargs.get('course')
+		if course and course.tradition.byFamily():
 			student = already.pop('student')
 			already['student__family'] = student.family
 		already = self.fetch(**already)
@@ -82,19 +83,6 @@ class EnrollmentManager(sm.SuperManager):
 			return already
 		else:
 			return super(EnrollmentManager, self).create(**kwargs)
-	# def filter(self, **kwargs):
-	# 	phantom = 'phantom' in kwargs and kwargs.pop('phantom')
-	# 	qset = super(EnrollmentManager, self).filter(**kwargs)
-	# 	if not phantom:
-	# 		qset = qset.exclude(status='nonexist')
-	# 	return qset
-	# def simulate(self, **kwargs):
-	# 	thing = self.fetch(**kwargs)
-	# 	if not thing:
-	# 		thing = self.model(**kwargs)
-	# 	# thing.set_status(sim=True)
-	# 	thing.status = calc_status(**kwargs)
-	# 	return thing
 Enrollments = EnrollmentManager()
 
 class VenueManager(sm.SuperManager):

@@ -192,6 +192,9 @@ def calc_status(enr, cart=False):
 
 
 def eligible(course, student):
+	enrollment = Enrollments.fetch(course=course,student=student)
+	if enrollment and enrollment.status in ["aud_pass","aud_pend"]:
+		return True
 	return student.family.has_accepted_policy(course.year) and check_eligex(course, student)
 
 

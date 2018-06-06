@@ -71,7 +71,7 @@
 			</thead>
 			{% for item in invoice.items %}
 			<tr class="{{item.status}}" onclick="">
-				<td>{% if item.byFamily %} N/A {% else %} {{item.student.prefer}} {% endif %} </td>
+				<td>{% if item.course.tradition.byFamily %} N/A {% else %} {{item.student.prefer}} {% endif %} </td>
 				<td>{{item.course}}</td>
 				<td class="money">${{item.price}}</td>
 			</tr>

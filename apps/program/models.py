@@ -127,6 +127,9 @@ class CourseTrad(models.Model):
 		sem = self.semester
 		return ' ({})'.format(sem) if sem in 'FS' else ''
 
+	def byFamily(self):
+		return '+' in self.eligex
+
 	def courses(self):
 		return Courses.filter(tradition_id=self.id)
 
@@ -248,6 +251,8 @@ class Course(models.Model):
 			return False
 		elif self.year != other.year:
 			return False
+		elif self.nMeets < 10 or other.nMeets < 10:
+			return False
 		elif self.semester == 'N' or  other.semester == 'N':
 			return False
 		elif self.semester == 'F' and other.semester == 'S':
@@ -269,18 +274,16 @@ class Course(models.Model):
 			return bool(self.students.filter(id=me.owner.id))
 	  # Make changes to self
 	  # Make changes to others
-	def accept(self, student):
-		return self.enroll(student, passed_audition=True)
 	# Magic
 	def __str__(self):
 		return '{} ({})'.format(self.title,self.year)
 
 
 	def cart(self, student):
-		if eligible(self, student):
-			return self.enroll(student)
-		elif audible(self, student):
-			return self.audition(student)
+		# if eligible(self, student):
+		return self.enroll(student)
+		# elif audible(self, student):
+		# 	return self.audition(student)
 
 	def enroll(self, student, **kwargs):
 		enrollment = Enrollments.fetch(course=self,student=student)
@@ -290,9 +293,12 @@ class Course(models.Model):
 			})
 			enrollment.save()
 		else:
-			if kwargs.get('passed_audition') or (eligible(self, student) and self.slots_open):
+			if eligible(self, student) and self.slots_open:
 				enrollment = Enrollments.create(course=self, student=student, status="need_pay")
-				enrollment.save()
+			elif kwargs.get('passed_audition'):
+				enrollment = Enrollments.create(course=self, student=student, status="aud_pass")
+			elif audible(self, student) and self.slots_open:
+				return Enrollments.create(course=self, student=student, status="aud_pend")
 		if self.tradition.action == 'trig':
 			# This would be so much more elegant if Python had a native do-while loop
 			while True:
@@ -308,9 +314,25 @@ class Course(models.Model):
 					break
 		return enrollment
 
-	def audition(self, student):
-		if audible(self,student):
-			return Enrollments.create(course=self, student=student, status="aud_pend")
+	# def audition(self, student):
+	# 	if audible(self,student):
+	# 		return Enrollments.create(course=self, student=student, status="aud_pend")
+
+	# def accept(self, student, user):
+	# 	enrollment = Enrollments.fetch(course=self, student=student)
+	# 	enrollment.accept(user)
+	# 	# enrollment.status = "aud_pass"
+	# 	# print enrollment, enrollment.id
+	# 	# enrollment.save()
+	# 	# print enrollment
+	# 	# return enrollment
+
+	# def reject(self, student, user):
+	# 	enrollment = Enrollments.fetch(course=self, student=student)
+	# 	enrollment.reject(user)
+	# 	# enrollment.status = "aud_fail"
+		# enrollment.save()
+		# return enrollment
 
 	def __len__(self):
 		return len(self.students)
@@ -364,7 +386,7 @@ class Enrollment(models.Model):
 	def title(self):
 		display = self.get_status_display()
 		kwargs = self.title_kwargs()
-		if self.byFamily():
+		if self.course.tradition.byFamily():
 			display = '{family} {proverb} recieving {course} {year}'
 		return display.format(**kwargs)
 	def title_kwargs(self):
@@ -388,9 +410,6 @@ class Enrollment(models.Model):
 		title = self.title
 		self.status = real_status
 		return title
-
-	def byFamily(self):
-		return self.course.tradition.id[0] in 'RK'
 
 	def stand(self, me):
 		if me.owner_type == 'Family':
@@ -416,12 +435,12 @@ class Enrollment(models.Model):
 	def accept(self, user):
 		if self.status in ["aud_pend","pendpass","pendfail"]:
 			if user.permission >= 5:
-				self.course.accept(self.student)
+				# self.course.accept(self.student)
 				self.status = "aud_pass" if self.course.tradition.droppable else "aud_lock"
 			elif user.permission >= 4:
 				self.status = "pendpass"
 			self.save()
-			self.student.fate()
+			self.student.trigger(self.course.year)
 
 	def reject(self, user):
 		if self.status in ["aud_pend","pendpass","pendfail"]:
@@ -430,7 +449,7 @@ class Enrollment(models.Model):
 			elif user.permission >= 4:
 				self.status = "pendfail"
 			self.save()
-			self.student.fate()
+			self.student.trigger(self.course.year)
 
 	def fate(self):
 		self.status = calc_status(self)
@@ -493,41 +512,41 @@ class Year(object):
 		return self.year - 1
 	def dash(self):
 		return "{}-{}".format(self.fall,self.spring)
-	def students(self):
-		return Students.filter(enrollment__course__year=self.year).distinct()
-	def families(self):
-		return Families.filter(student__enrollment__course__year=self.year).distinct()
-	def newFamilies(self):
-		return self.families.exclude(student__enrollment__course__year__lt=self.year).distinct()
-	def nMainstageTroupeStudents(self):
-		return sum([len(self.sg),len(self.sh),len(self.sj),len(self.sr)])
-	def nTroupeStudents(self):
-		return self.nMainstageTroupeStudents + len(self.sb)
+	# def students(self):
+	# 	return Students.filter(enrollment__course__year=self.year).distinct()
+	# def families(self):
+	# 	return Families.filter(student__enrollment__course__year=self.year).distinct()
+	# def newFamilies(self):
+	# 	return self.families.exclude(student__enrollment__course__year__lt=self.year).distinct()
+	# def nMainstageTroupeStudents(self):
+	# 	return sum([len(self.sg),len(self.sh),len(self.sj),len(self.sr)])
+	# def nTroupeStudents(self):
+	# 	return self.nMainstageTroupeStudents + len(self.sb)
 	# def dc(self):
 	# 	return self.combined(courses=Courses.filter(year=self.year,tradition__id__in=['J','Z']))
 	# def dt(self):
 	# 	pass
 	# def dw(self):
 	# 	pass
-	def combined(self, **kwargs):
-		letter = kwargs.get('letter')
-		idlist = kwargs.get('idlist')
-		courses = kwargs.get('courses')
-		if letter:
-			courses = Courses.filter(year=self.year,tradition__id__startswith=letter.upper())
-		elif idlist:
-			courses = Courses.filter(year=self.year,tradition__id__in=idlist)
-		students = Students.filter(enrollment__course__in=courses).distinct()
-		return StudentList(students)
+	# def combined(self, **kwargs):
+	# 	letter = kwargs.get('letter')
+	# 	idlist = kwargs.get('idlist')
+	# 	courses = kwargs.get('courses')
+	# 	if letter:
+	# 		courses = Courses.filter(year=self.year,tradition__id__startswith=letter.upper())
+	# 	elif idlist:
+	# 		courses = Courses.filter(year=self.year,tradition__id__in=idlist)
+	# 	students = Students.filter(enrollment__course__in=courses).distinct()
+	# 	return StudentList(students)
 	def __str__(self):
 		return "HST Year {}-{}".format(self.fall,self.spring)
 	def __getattribute__(self, field):
-		if field in ['season','spring','fall','dash','students','families','newFamilies','nMainstageTroupeStudents','nTroupeStudents','dc','dt','dw']:
+		if field in ['season','spring','fall','dash']: # ,'students','families','newFamilies','nMainstageTroupeStudents','nTroupeStudents','dc','dt','dw']:
 			call = super(Year, self).__getattribute__(field)
 			return call()
 		elif len(field) == 2:
 			return Courses.fetch(year=self.year,tradition__id=field.upper())
-		elif len(field) == 1:
-			return self.combined(letter=field)
+		# elif len(field) == 1:
+		# 	return self.combined(letter=field)
 		else:
 			return super(Year, self).__getattribute__(field)
