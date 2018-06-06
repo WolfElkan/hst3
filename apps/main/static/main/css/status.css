@@ -29,6 +29,8 @@
 	.need_pay form.drop button {display: inline;}
 .aud_pass {background-color: #ff8}
 	.aud_pass form.drop button {display: inline;}
+.maydefer {background-color: #ff8}
+	.maydefer td form.defer button {display: inline;}
 
 /*Half Gray*/
 .need_cur, .nopolicy, .needboth {background-color: #aaa}
@@ -48,5 +50,9 @@
 	.conflict button.enroll_disabled {display: inline;}
 
 /*Purple*/
-.aud_lock {background-color: #b8f}
+.deferred {background-color: #b8f}
+	.deferred td form.add button {display: inline;}
+
+/*Yellow-Gray*/
+.aud_lock {background-color: #cc8}
 	.aud_lock button.drop_disabled {display: inline;}

@@ -200,3 +200,29 @@ def eligible(course, student):
 
 def audible(course, student):
 	return check_eligex(course, student, aud=True)
+
+status_choices = [
+	("enrolled","{student} {proverb} enrolled in {course} ({year})"),                               # invoice__status='P' # Stable
+	("eligible","{student} is eligible for {course}"),                                                                    # Stable
+	("invoiced","{student}'s enrollment in {course} has been added to invoice #{invoice}"),         # invoice__status='N' # Stable
+	("need_pay","{student} is registered for {course} pending tuition payment"),                                          # Stable
+	("not_elig","{student} is not eligible for {course}"),                                                                # Unstable
+	("aud_need","{student} is eligible for {article} {audskil} for {course}."),                                           # Unstable
+	("aud_pend","{student} has scheduled {article} {audskil} for {course} ({year})"),                                     # Stable
+	("pendpass","{student} has completed the {audskil} and is recommended for {course} {year}, pending executive approval."),  # Stable
+	("pendfail","{student} has completed the {audskil} but is not recommended for {course} {year}, pending executive approval."),  # Stable
+	("pend_pub","{student} has completed {article} {audskil} for {course} and is awaiting the results."),                 
+	("fail_pub",""),
+	("aud_pass","{student} has passed the {audskil} for {course}!"),                                                      # Stable
+	("aud_fail","{student} did not pass the {audskil} for {course}."),                                                    # Invisible
+	("aud_drop","{student} passed the {audskil} for {course} and then dropped it, but {pronoun} may still re-enroll."),   # Stable
+	("aud_lock","{student} has passed the {audskil} for {course} and must enroll."),                                      # Stable
+	("conflict","{student} is in another class at the same time as {course}"),                                            # Unstable
+	("need_cur","{student} will be eligible for {course} once {pronoun} enrolls in at least 1 other class"),              # Unstable
+	("needboth","{student} will be eligible to audition for {course} once {pronoun} enrolls in at least 1 other class"),  # Unstable
+	("nonexist","{student} was enrolled in {course} ({year}) on cancelled invoice #{invoice}"),     # invoice__status='C' # Invisible
+	("nopolicy","{family} must accept HST's {year} Policy Agreement before enrolling students."),
+	("clasfull","This class is full."),
+	("maydefer","This item may be deferred until October 1"),
+	("deferred","This item must be paid for by October 1"),
+]

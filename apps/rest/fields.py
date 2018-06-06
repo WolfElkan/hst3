@@ -2,8 +2,9 @@ from .widgets import VarChar, Integer, Enum, Radio, Checkbox, Date, Time, Foreig
 from Utils.custom_fields import Bcrypt, PhoneNumber, ZipCode, DayOfWeek, Dollar
 from Utils.data import collect
 from apps.program.managers import CourseTrads, Enrollments
+from apps.program.eligex   import status_choices
 from apps.payment.managers import Invoices
-from apps.people.models import Address, Family, Student, Parent, User
+from apps.people.models    import Address, Family, Student, Parent, User
 
 FIELDS = {
 	'address'   : [
@@ -61,11 +62,10 @@ FIELDS = {
 		{'field':'oid'       , 'template': Static()},
 		{'field':'m'         , 'template': Checkbox(suffix='This course will be visible on course menu.')},
 		{'field':'e'         , 'template': Checkbox(suffix='This course will be visible in family enrollment shopping cart.')},
-		# {'field':'auto'      , 'template': Checkbox(suffix='Eligible students are automatically enrolled in this course when they enroll in another.')},
-		# {'field':'trig'      , 'template': Checkbox(suffix='When a student enrolls in this course, it fires their "trigger", enrolling them in auto courses.')},
 		{'field':'action'    , 'template': Enum(options=['none','trig','auto'],default='none')},
 		{'field':'title'     , 'template': VarChar(maxlength=50)},
 		{'field':'eligex'    , 'template': VarChar(default='a')},
+		{'field':'default'   , 'template': Enum(options=dict(status_choices).keys())},
 		{'field':'day'       , 'template': DayOfWeek()},
 		{'field':'start'     , 'template': Time()},
 		{'field':'end'       , 'template': Time()},
@@ -102,7 +102,7 @@ FIELDS = {
 		{'field':'course'    , 'template': ForeignKey(model='course')},
 		{'field':'role'      , 'template': VarChar()},
 		{'field':'role_type' , 'template': Enum(options=['','Chorus','Support','Lead'])},
-		{'field':'status'    , 'template': Enum(options=['']+collect(Enrollments.model.status_choices, lambda choice: choice[0]))},
+		{'field':'status'    , 'template': Enum(options=dict(status_choices).keys())},
 	],
 	'invoice': [
 		{'field':'family'    , 'template': ForeignKey(model='family')},

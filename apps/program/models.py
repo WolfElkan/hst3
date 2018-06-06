@@ -6,7 +6,7 @@ from Utils.data import sub, Each, find_all
 from Utils.security import getyear
 from django_mysql import models as sqlmod
 from .managers import CourseTrads, Courses, Enrollments, Venues
-from .eligex import check_eligex, check_word, calc_status, eligible, audible
+from .eligex import check_eligex, check_word, calc_status, eligible, audible, status_choices
 Q = models.Q
 from apps.people.managers import Students, Families
 from trace import TRACE, DEV
@@ -64,6 +64,7 @@ class CourseTrad(models.Model):
 	min_grd = models.PositiveIntegerField(default=1)
 	max_grd = models.PositiveIntegerField(default=12)
 	eligex  = models.TextField(default="#")
+	default = models.CharField(max_length=8,choices=status_choices)
 	# Cost
 	early_tuit = models.DecimalField(max_digits=6, decimal_places=2, default=0)
 	after_tuit = models.DecimalField(max_digits=6, decimal_places=2, default=0)
@@ -97,7 +98,7 @@ class CourseTrad(models.Model):
 		'O':'Overture', # Historical
 		'P':'Tap', # Broadway (Older Beginners)
 		# 'Q':'',
-		'R':'RegistrationFee',
+		'R':'Statistical',
 		'S':'Troupe',
 		'T':'Tap',
 		# 'U':'',
@@ -290,6 +291,7 @@ class Course(models.Model):
 		if enrollment:
 			enrollment.status = sub(enrollment.status, {
 				'aud_drop':'aud_pass',
+				'deferred':'maydefer',
 			})
 			enrollment.save()
 		else:
@@ -309,7 +311,7 @@ class Course(models.Model):
 					elif not eligible(auto, student):
 						autos = autos.exclude(id=auto.id)
 					else:
-						Enrollments.create(course=auto,student=student,status=enrollment.status)
+						Enrollments.create(course=auto,student=student)
 				if not autos:
 					break
 		return enrollment
@@ -353,31 +355,8 @@ class Enrollment(models.Model):
 	tuition    = models.DecimalField(max_digits=6, decimal_places=2, default=0)
 	role       = models.TextField(null=True)
 	role_type  = sqlmod.EnumField(choices=['','Chorus','Support','Lead'])
-	status_choices = [
-		("enrolled","{student} {proverb} enrolled in {course} ({year})"),                               # invoice__status='P' # Stable
- 		("eligible","{student} is eligible for {course}"),                                                                    # Stable
-		("invoiced","{student}'s enrollment in {course} has been added to invoice #{invoice}"),         # invoice__status='N' # Stable
-		("need_pay","{student} is registered for {course} pending tuition payment"),                                          # Stable
-		("not_elig","{student} is not eligible for {course}"),                                                                # Unstable
-		("aud_need","{student} is eligible for {article} {audskil} for {course}."),                                           # Unstable
-		("aud_pend","{student} has scheduled {article} {audskil} for {course} ({year})"),                                     # Stable
-		("pendpass","{student} has completed the {audskil} and is recommended for {course} {year}, pending executive approval."),  # Stable
-		("pendfail","{student} has completed the {audskil} but is not recommended for {course} {year}, pending executive approval."),  # Stable
-		("pend_pub","{student} has completed {article} {audskil} for {course} and is awaiting the results."),                 
-		("fail_pub",""),
-		("aud_pass","{student} has passed the {audskil} for {course}!"),                                                      # Stable
-		("aud_fail","{student} did not pass the {audskil} for {course}."),                                                    # Invisible
-		("aud_drop","{student} passed the {audskil} for {course} and then dropped it, but {pronoun} may still re-enroll."),   # Stable
-		("aud_lock","{student} has passed the {audskil} for {course} and must enroll."),                                      # Stable
-		("conflict","{student} is in another class at the same time as {course}"),                                            # Unstable
-		("need_cur","{student} will be eligible for {course} once {pronoun} enrolls in at least 1 other class"),              # Unstable
-		("needboth","{student} will be eligible to audition for {course} once {pronoun} enrolls in at least 1 other class"),  # Unstable
-		("nonexist","{student} was enrolled in {course} ({year}) on cancelled invoice #{invoice}"),     # invoice__status='C' # Invisible
-		("nopolicy","{family} must accept HST's {year} Policy Agreement before enrolling students."),
-		("clasfull","This class is full."),
-		("deferred","This item must be paid for by October 1"),
-	]
-	status     = models.CharField(max_length=8,choices=status_choices, default = '--------' if DEV else '')
+	status_choices = status_choices
+	status     = models.CharField(max_length=8,choices=status_choices)
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
 	rest_model = "enrollment"
@@ -469,6 +448,11 @@ class Enrollment(models.Model):
 			invoice = self.invoice
 			self.delete()
 			invoice.update_amount()
+
+	def defer(self):
+		if self.status == "maydefer":
+			self.status = "deferred"
+			self.save()
 
 	def cancel(self):
 		if self.status == "invoiced":

@@ -18,6 +18,10 @@ def courses(request, **kwargs):
 	me = getme(request)
 	if not me or not me.owner or not me.owner.children:
 		return redirect('/register')
+	if request.GET.get('action') == u'add':
+		return add(request, **kwargs)
+	elif request.GET.get('action') == u'defer':
+		return defer(request, **kwargs)
 	current_id = kwargs.setdefault('id',0)
 	if 'id' in kwargs:
 		current_id = kwargs['id']
@@ -28,10 +32,10 @@ def courses(request, **kwargs):
 		current_student = me.owner.children[0]
 	reg_year = getyear()
 	cart = me.owner.enrollments_in(reg_year).filter(course__tradition__e=True)
-	cart_pend = cart.filter(status__in=['aud_pend','invoiced','lockedin'])
+	cart_pend = cart.filter(status__in=['aud_pend','invoiced','deferred'])
 	cart_paid = cart.filter(status='enrolled')
 	# cart_unpaid = cart.difference(cart_pend,cart_paid) # Use this line instead of next in Django 1.11+
-	cart_unpaid = cart.exclude(status__in=['aud_pend','invoiced','lockedin','enrolled'])
+	cart_unpaid = cart.exclude(status__in=['aud_pend','invoiced','deferred','enrolled'])
 	volunteer_total = me.owner.volunteer_total_in(reg_year)
 	context = {
 		'invoiceable' : bool(cart_unpaid), # TODO: This is simple enough now to be calculated in the HTML page
@@ -66,11 +70,26 @@ def courses(request, **kwargs):
 
 
 def courses_enroll(request, **kwargs):
-	print 69
 	student_id = kwargs.setdefault('id',0)
 	student = Students.fetch(id=student_id)
 	course = Courses.fetch(id=request.GET['course_id'])
 	course.cart(student)
+	return redirect('/register/student/{}/'.format(student_id))
+
+def add(request, **kwargs):
+	student_id = kwargs.setdefault('id',0)
+	enrollment = Enrollments.fetch(id=request.GET.get('enrollment'))
+	if enrollment and enrollment.status == "deferred":
+		enrollment.status = "maydefer"
+		enrollment.save()
+	return redirect('/register/student/{}/'.format(student_id))
+
+def defer(request, **kwargs):
+	student_id = kwargs.setdefault('id',0)
+	enrollment = Enrollments.fetch(id=request.GET.get('enrollment'))
+	if enrollment and enrollment.status == "maydefer":
+		enrollment.status = "deferred"
+		enrollment.save()
 	return redirect('/register/student/{}/'.format(student_id))
 
 # def courses_audition(request, **kwargs):
