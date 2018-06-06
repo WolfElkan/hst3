@@ -43,11 +43,11 @@ def new(request, method=None):
 		for key in request.GET:
 			if request.GET[key] == 'on':
 				Courses.create_by_id(key)
-		return redirect('/admin/newyear/year/')
+		return redirect('/admin/year/')
 	return render(request, 'radmin/newyear/year.html', context)
 
 def create(request, id, method=None):
 	bad = restricted(request,5)
 	if bad:
 		return bad
-	return redirect('/admin/newyear/year/'.format(year.id))
+	return redirect('/admin/year/'.format(year.id))

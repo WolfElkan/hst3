@@ -283,7 +283,7 @@ class Student(models.Model):
 	def enrollments_before(self, year):
 		return self.enrollments.filter(course__year__lt=year)
 	def trigger(self, year):
-		for course in Courses.filter(year=year,tradition__auto=True):
+		for course in Courses.filter(year=year,tradition__action='auto'):
 			course.enroll(self)
 
 	def auditions(self):
@@ -311,15 +311,28 @@ class Student(models.Model):
 	def fate(self, year=None):
 		if not year:
 			year = getyear()
-		for auto_trad in CourseTrads.filter(auto=True):
-			print auto_trad
-			auto_course = Courses.fetch(year=year,tradition=auto_trad)
-			if auto_course:
-				enrollment = Enrollments.fetch(student=self,course=auto_course)
-				if enrollment:
-					enrollment.fate()
-				elif eligible(auto_course, self):
-					Enrollments.create(student=self,course=auto_course)
+		for enrollment in self.enrollments_in(year):
+			if not eligible(enrollment.course, self):
+				enrollment.delete()
+		while True:
+			drops = self.enrollments_in(year)
+			for drop in drops:
+				if eligible(drop.course, self):
+					drops = drops.exclude(id=drop.id)
+				else:
+					drop.delete()
+			if not drops:
+				break
+
+		# for auto_trad in CourseTrads.filter(action='auto'):
+		# 	# print auto_trad
+		# 	auto_course = Courses.fetch(year=year,tradition=auto_trad)
+		# 	if auto_course:
+		# 		enrollment = Enrollments.fetch(student=self,course=auto_course)
+		# 		if enrollment:
+		# 			enrollment.fate()
+		# 		elif eligible(auto_course, self):
+		# 			Enrollments.create(student=self,course=auto_course)
 	def __str__(self):
 		return self.prefer+' '+self.last
 	def __json__(self):

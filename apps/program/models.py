@@ -293,26 +293,25 @@ class Course(models.Model):
 			if kwargs.get('passed_audition') or (eligible(self, student) and self.slots_open):
 				enrollment = Enrollments.create(course=self, student=student, status="need_pay")
 				enrollment.save()
-				if self.tradition.trig:
-					student.trigger(self.year)
+		if self.tradition.action == 'trig':
+			# This would be so much more elegant if Python had a native do-while loop
+			while True:
+				autos = Courses.filter(year=self.year,tradition__action='auto')
+				for auto in autos:
+					if Enrollments.filter(course=auto,student=student):
+						autos = autos.exclude(id=auto.id)
+					elif not eligible(auto, student):
+						autos = autos.exclude(id=auto.id)
+					else:
+						Enrollments.create(course=auto,student=student,status=enrollment.status)
+				if not autos:
+					break
 		return enrollment
 
 	def audition(self, student):
 		if audible(self,student):
 			return Enrollments.create(course=self, student=student, status="aud_pend")
 
-		# enrollment = self.enroll(student)
-		# if not enrollment:
-		# 	enrollment = Enrollments.create(course=self, student=student)
-		# 	enrollment.set_status(cart=True)
-		# 	if self.check_eligex(student):
-		# 		enrollment = Enrollments.create(course=self, student=student, status="need_pay")
-		# 	elif self.check_eligex(student, aud=True):
-		# 		enrollment = Enrollments.create(course=self, student=student, status="aud_pend")
-		# student.fate()
-		# return enrollment
-	def prepaid(self):
-		return self.trig
 	def __len__(self):
 		return len(self.students)
 	def __getattribute__(self, field):
@@ -473,14 +472,14 @@ class Enrollment(models.Model):
 
 # FAUX MODELS
 
-class StudentList(object):
-	def __init__(self, students):
-		self.students = students
-	def __iter__(self):
-		for x in self.students:
-			yield x
-	def __len__(self):
-		return len(self.students)
+# class StudentList(object):
+# 	def __init__(self, students):
+# 		self.students = students
+# 	def __iter__(self):
+# 		for x in self.students:
+# 			yield x
+# 	def __len__(self):
+# 		return len(self.students)
 		
 
 class Year(object):

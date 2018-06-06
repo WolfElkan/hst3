@@ -7,7 +7,7 @@ from django_mysql import models as sqlmod
 class CourseTradManager(sm.SuperManager):
 	def __init__(self):
 		super(CourseTradManager, self).__init__('program_coursetrad')
-		self.fields = ['year','tradition','last_date','aud_date','teacher','early_tuit','after_tuit','vol_hours','the_hours','trig','auto']
+		self.fields = ['year','tradition','last_date','aud_date','teacher','early_tuit','after_tuit','vol_hours','the_hours']
 	def get(self, **kwargs):
 		thing = super(CourseTradManager, self).get(**kwargs)
 		return thing.alias if thing.alias else thing
@@ -41,7 +41,7 @@ class CourseManager(sm.SuperManager):
 			if split:
 				kwargs.update(split)
 				return self.fetch(**kwargs)
-	def create_by_id(self, course_id):
+	def create_by_id(self, course_id, **kwargs):
 		course = self.fetch(id=course_id)
 		if course:
 			return course
@@ -82,12 +82,12 @@ class EnrollmentManager(sm.SuperManager):
 			return already
 		else:
 			return super(EnrollmentManager, self).create(**kwargs)
-	def filter(self, **kwargs):
-		phantom = 'phantom' in kwargs and kwargs.pop('phantom')
-		qset = super(EnrollmentManager, self).filter(**kwargs)
-		if not phantom:
-			qset = qset.exclude(status='nonexist')
-		return qset
+	# def filter(self, **kwargs):
+	# 	phantom = 'phantom' in kwargs and kwargs.pop('phantom')
+	# 	qset = super(EnrollmentManager, self).filter(**kwargs)
+	# 	if not phantom:
+	# 		qset = qset.exclude(status='nonexist')
+	# 	return qset
 	# def simulate(self, **kwargs):
 	# 	thing = self.fetch(**kwargs)
 	# 	if not thing:
