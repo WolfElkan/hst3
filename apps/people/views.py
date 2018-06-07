@@ -18,23 +18,23 @@ import json as JSON
 def reg(request, ref, step, id=None):
 	me = getme(request)
 	if step == 'family':
-		pass
+		return family(request, ref)
 	elif step == 'parents':
-		pass
+		return parents(request, ref)
 	elif step == 'students':
-		pass
+		return students(request, ref, id)
 	elif step == 'policy':
-		pass
+		return policy(request, ref)
 	elif step == 'classes':
-		pass
+		return classes(request, ref)
 
 
-	if not me or not me.owner:
-		return redirect('/register/family')
-	elif not me.owner.mother and not me.owner.father:
-		return redirect('/register/parents')
-	else:
-		return redirect('/register/students')
+	# if not me or not me.owner:
+	# 	return redirect('/register/family/')
+	# elif not me.owner.mother and not me.owner.father:
+	# 	return redirect('/register/parents/')
+	# else:
+	# 	return redirect('/register/students/')
 
 def family(request, ref):
 	forminit(request,'family',['last','phone','email'])
@@ -226,36 +226,18 @@ def parents_post(request, ref):
 		return redirect('/register/parents')        
 
 # if me.owner.mother or me.owner.father
-def students(request, ref):
+def students(request, ref, id):
 	if restricted(request):
 		return redirect('/')
 	elif request.method == 'GET':
-		return students_get2(request, ref)
+		return students_get2(request, ref, id)
 	elif request.method == 'POST':
-		return students_post(request, ref)
+		return students_post2(request, ref, id)
 	else:
 		print "Unrecognized HTTP Verb"
 		return index(request, ref)
 
-# def students_get(request, ref):
-# 	me = getme(request)
-# 	if not me or not me.owner or not (me.owner.mother or me.owner.father):
-# 		return redirect('/register')
-# 	reg_year = getyear()
-# 	grades = []
-# 	for x in range(1,13):
-# 		grades += [{'grade':x,'grad_year':reg_year - x + 12}]
-# 	context = {
-# 		'reg_year': reg_year,
-# 		'grades'  : grades,
-# 		'family'  : me.owner,
-# 		't_shirt_sizes': collect(Students.model.t_shirt_sizes, lambda obj: dict(collect(obj,lambda val, index: ['no'+str(index),val]))),
-# 		'validations'  : JSON.dumps(Students.validations, cls=FriendlyEncoder),
-# 		'students': JSON.dumps(list(me.owner.children), cls=FriendlyEncoder) if me.owner.children else [],
-# 	}
-# 	return render(request, 'students.html', context)
-
-def students_get2(request, ref):
+def students_get(request, ref):
 	me = getme(request)
 	if not me or not me.owner or not (me.owner.mother or me.owner.father):
 		return redirect('/register')
@@ -269,11 +251,31 @@ def students_get2(request, ref):
 		'family'  : me.owner,
 		't_shirt_sizes': collect(Students.model.t_shirt_sizes, lambda obj: dict(collect(obj,lambda val, index: ['no'+str(index),val]))),
 		'validations'  : JSON.dumps(Students.validations, cls=FriendlyEncoder),
-		'students': me.owner.children
+		'students': JSON.dumps(list(me.owner.children), cls=FriendlyEncoder) if me.owner.children else [],
+	}
+	return render(request, 'students.html', context)
+
+def students_get2(request, ref, id):
+	me = getme(request)
+	if not me or not me.owner or not (me.owner.mother or me.owner.father):
+		return redirect('/register')
+	reg_year = getyear()
+	grades = []
+	for x in range(1,13):
+		grades += [{'grade':x,'grad_year':reg_year - x + 12}]
+	context = {
+		'reg_year': reg_year,
+		'grades'  : grades,
+		'family'  : me.owner,
+		't_shirt_sizes': collect(Students.model.t_shirt_sizes, lambda obj: dict(collect(obj,lambda val, index: ['no'+str(index),val]))),
+		# 'validations'  : JSON.dumps(Students.validations, cls=FriendlyEncoder),
+		'students': me.owner.children,
+		'ref':ref,
+		'current_student':Students.fetch(id=id)
 	}
 	return render(request, 'students2.html', context)
 
-def students_post(request, ref):
+def students_post(request, ref, id):
 	me = getme(request)
 	students = JSON.loads(request.POST['students'])
 	for student in students:
@@ -293,6 +295,14 @@ def students_post(request, ref):
 					student_proxy.current = False
 				student_proxy.save()
 	return redirect('/register/policy/1/')
+
+def students_post2(request, ref, id):
+	student = Students.fetch(id=id)
+	for field in ['first','alt_last','alt_first','sex','birthday','grad_year','tshirt','alt_phone','alt_email','needs']:
+		student.__setattr__(field,request.POST[field])
+	student.save()
+	print student
+	return redirect('/{}/students/{}'.format(ref,request.POST['next']))
 
 
 def policy(request, **kwargs):
