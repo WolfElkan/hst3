@@ -252,7 +252,7 @@ class Course(models.Model):
 			return False
 		elif self.year != other.year:
 			return False
-		elif self.nMeets < 10 or other.nMeets < 10:
+		elif self.nMeets < 5 or other.nMeets < 5:
 			return False
 		elif self.semester == 'N' or  other.semester == 'N':
 			return False

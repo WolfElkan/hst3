@@ -1,6 +1,6 @@
 from .managers import Courses, Enrollments
 from Utils.data import Each
-import re, random
+import re, random, datetime
 
 
 def check_eligex(course, student, **kwargs):
@@ -28,8 +28,8 @@ def check_eligex(course, student, **kwargs):
 		eligex = trad.eligex
 
 	# If this course's audition date has already passed, don't check for audition eligibility
-	if course and course.aud_date and datetime.now().date() > course.aud_date:
-		aud = False
+	if course.aud_date and datetime.datetime.now().date() > course.aud_date:
+		kwargs['aud'] = False
 
 	# Checks to make sure Eligex is valid
 	if re.match(r'<[^>]*<|{[^}]*{',trad.eligex):
@@ -158,6 +158,7 @@ def check_word(trad, student, word, **kwargs):
 		if '+' in word:
 			query.pop('student')
 			query['student__family'] = student.family
+			qStudents = word.count('+') 
 		if kwargs.get('debug'):
 			print query
 		return bool(Enrollments.filter(**query).exclude(student=student,course__tradition=trad,course__year=year))
@@ -218,8 +219,8 @@ status_choices = [
 	("aud_drop","{student} passed the {audskil} for {course} and then dropped it, but {pronoun} may still re-enroll."),   # Stable
 	("aud_lock","{student} has passed the {audskil} for {course} and must enroll."),                                      # Stable
 	("conflict","{student} is in another class at the same time as {course}"),                                            # Unstable
-	("need_cur","{student} will be eligible for {course} once {pronoun} enrolls in at least 1 other class"),              # Unstable
-	("needboth","{student} will be eligible to audition for {course} once {pronoun} enrolls in at least 1 other class"),  # Unstable
+	("need_cur","{student} will be eligible for {course} once {pronoun} enrolls in at least 1 other {year} class"),              # Unstable
+	("needboth","{student} will be eligible to audition for {course} once {pronoun} enrolls in at least 1 other {year} class"),  # Unstable
 	("nonexist","{student} was enrolled in {course} ({year}) on cancelled invoice #{invoice}"),     # invoice__status='C' # Invisible
 	("nopolicy","{family} must accept HST's {year} Policy Agreement before enrolling students."),
 	("clasfull","This class is full."),

@@ -96,7 +96,7 @@ FIELDS = {
 		{'field':'teacher'   , 'template': ForeignKey(model='teacher')},
 		{'field':'tradition' , 'template': ForeignKey(model='coursetrad')},
 		{'field':'aud_date'  , 'template': Date()},
-		{'field':'students_toggle_enrollments','template': ToggleSet(field='students')},
+		# {'field':'students_toggle_enrollments','template': ToggleSet(field='students')},
 	],
 	'enrollment': [
 		{'field':'student'   , 'template': ForeignKey(model='student')},
