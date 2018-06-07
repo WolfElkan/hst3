@@ -4,7 +4,8 @@
 	<title>HST | Registration</title>
 	{% load staticfiles %}
 </head>
-<link rel="stylesheet" type="text/css" href="{% static 'main/css/status.css' %}">
+<script src="{% static 'main/js/jquery.js' %}" charset="utf-8"></script>
+<script src="{% static 'main/js/script.js' %}" charset="utf-8"></script>
 <style type="text/css">
 	* {
 		/*vertical-align: top;*/
@@ -72,12 +73,6 @@
 	.center {
 		text-align: center;
 	}
-	button, a.view {
-		display: none;
-	}
-/*	.invoiced {
-		background-color: #ff8
-	}*/
 	.invoice {
 		margin: 15px;
 		display: block;
@@ -97,12 +92,15 @@
 
 </style>
 <script type="text/javascript">
-	function go(url) {
-		window.location.replace(url)
+	function go(next) {
+		$('#next').val(next)
+		$('#student_info').submit()
 	}
-	function mo(url) {
-		window.location.href = url
-	}
+	$(document).ready(function() {
+		set('#sex','{{current_student.sex}}')
+		set('#tshirt','{{current_student.tshirt}}')
+		set('#grad_year','{{current_student.grad_year}}')
+	})
 </script>
 <body>
 	<div class="student_menu">
@@ -113,7 +111,58 @@
 		{% endfor %}
 	</div>
 	<div class="course_menu">
-		hello
+		<form id="student_info" method="POST">{% csrf_token %}
+			<input id="next" type="hidden" name="next">
+
+			 First<input type="text" name="first" value="{{current_student.first}}"><br>
+			
+			Last<input type="text" name="alt_last" value="{{current_student.alt_last}}" placeholder="{{family.last}}"><br>
+			
+			Nickname<input type="text" name="alt_first" value="{{current_student.alt_first}}"><br>
+			
+			Sex<select id="sex" name="sex">
+				<option value="M">Male</option>
+				<option value="F">Female</option>
+			</select><br>
+			
+			Birthday<input type="text" name="birthday" value="{{current_student.birthday|date:'Y-m-d'}}"><br>
+			
+			Grade
+			<!-- <input type="text" name="grad_year" value="{{current_student.grad_year}}"> -->
+			<select id="grad_year" name="grad_year">
+				<option value="0000"></option>
+				<option value="{{reg_year|add:-12}}">K</option>
+				<option value="{{reg_year|add:-11}}">1</option>
+				<option value="{{reg_year|add:-10}}">2</option>
+				<option value="{{reg_year|add:-9}}">3</option>
+				<option value="{{reg_year|add:-8}}">4</option>
+				<option value="{{reg_year|add:-7}}">5</option>
+				<option value="{{reg_year|add:-6}}">6</option>
+				<option value="{{reg_year|add:-5}}">7</option>
+				<option value="{{reg_year|add:-4}}">8</option>
+				<option value="{{reg_year|add:-3}}">9</option>
+				<option value="{{reg_year|add:-2}}">10</option>
+				<option value="{{reg_year|add:-1}}">11</option>
+				<option value="{{reg_year|add:0}}">12</option>
+			</select>
+			<br>
+			
+			tshirt<!-- <input type="text" name="tshirt" value="{{current_student.tshirt}}"> -->
+			<select type="text" name="tshirt" id="tshirt">
+				<option></option>
+				{% for size in t_shirt_sizes %}
+				<option value="{{size.no0}}" id="{{size.no0}}">{{size.no1}}</option>
+				{% endfor %}
+			</select><br>
+			
+			Phone<input type="text" name="alt_phone" value="{{current_student.alt_phone}}" placeholder="Use Family Phone"><br>
+			
+			Email<input type="text" name="alt_email" value="{{current_student.alt_email}}" placeholder="Use Family Email"><br>
+			
+			Special Needs or Allergies<textarea name="needs" placeholder="None">{{current_student.needs}}</textarea> 
+
+		</form>
+	<button onclick="go('{{current_student.id}}')">Save</button>
 	</div>
 </body>
 </html>
