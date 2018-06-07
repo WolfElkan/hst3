@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>HST | Registration</title>
+	{% load staticfiles %}
+</head>
+<link rel="stylesheet" type="text/css" href="{% static 'main/css/status.css' %}">
+<style type="text/css">
+	* {
+		/*vertical-align: top;*/
+	}
+	h2 {
+		text-decoration: underline;
+		text-align: center;
+	}
+	.student_menu {
+		padding: 5px;
+		padding-bottom: 0px;
+		font-size: 0;
+	}
+	.tab {
+		font-size: 16px;
+		display: inline-block;
+		border: solid black 1px;
+		border-top-left-radius: 10px;
+		border-top-right-radius: 10px;
+		border-bottom: solid black;
+		text-align: center;
+		padding: 5px;
+		text-decoration: none;
+		width: calc(100% / {{students|length}} - 12px)
+	}
+	.tab div {
+		color: black;
+	}
+	.selected_tab {
+		border-bottom: solid white;
+		text-decoration: none;
+		font-weight: bold;
+	}
+	.selected_tab div {
+		color: black;
+	}
+	.course_menu {
+		border: solid;
+		border-top: none;
+		padding: 2px;
+		margin: 0 5px 5px 5px;
+	}
+	table {
+		display: inline-block;
+		border-spacing: 0;
+	}
+	.outlined tr {
+		outline: solid black 1px;
+	}
+	td {
+		padding: 5px;
+	}
+	.ib {
+		display: inline-block;
+	}
+	.il {
+		display: inline;
+	}
+	.pane {
+		display: block;
+	}
+	.right {
+		text-align: right;
+	}
+	.center {
+		text-align: center;
+	}
+	button, a.view {
+		display: none;
+	}
+/*	.invoiced {
+		background-color: #ff8
+	}*/
+	.invoice {
+		margin: 15px;
+		display: block;
+	}
+
+	/*.legend {display: none;}*/
+	td.cart {
+		vertical-align: top;
+	}
+	td.legend {
+		vertical-align: bottom;
+		padding-bottom: 0;
+	}
+	.course_menu table tr {
+		/*height: 48px;*/
+	}
+
+</style>
+<script type="text/javascript">
+	function go(url) {
+		window.location.replace(url)
+	}
+	function mo(url) {
+		window.location.href = url
+	}
+</script>
+<body>
+	<div class="student_menu">
+		{% for student in students %}
+		<div onclick="go('{{student.id}}')" class="tab{% if student.id|add:0 == current_student.id|add:0 %} selected_tab {% endif %}" title="{{student}}, age {{student.age}}">
+			{{student.prefer}}
+		</div>
+		{% endfor %}
+	</div>
+	<div class="course_menu">
+		hello
+	</div>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+

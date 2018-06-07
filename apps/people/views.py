@@ -15,8 +15,20 @@ import re
 from datetime import datetime
 import json as JSON
 
-def reg(request):
+def reg(request, ref, step, id=None):
 	me = getme(request)
+	if step == 'family':
+		pass
+	elif step == 'parents':
+		pass
+	elif step == 'students':
+		pass
+	elif step == 'policy':
+		pass
+	elif step == 'classes':
+		pass
+
+
 	if not me or not me.owner:
 		return redirect('/register/family')
 	elif not me.owner.mother and not me.owner.father:
@@ -24,18 +36,18 @@ def reg(request):
 	else:
 		return redirect('/register/students')
 
-def family(request):
+def family(request, ref):
 	forminit(request,'family',['last','phone','email'])
 	forminit(request,'user',['username','password','pw_confm'])
 	seshinit(request,'password_set',False)
 	if request.method == 'GET':
-		return family_get(request)
+		return family_get(request, ref)
 	elif request.method == 'POST':
-		return family_post(request)
+		return family_post(request, ref)
 	else:
 		return HttpResponse("Unrecognized HTTP Verb", status=405)
 
-def family_get(request):
+def family_get(request, ref):
 	me = getme(request)
 	if me and me.owner:
 		request.session['p']['family'].update(copyatts(me.owner, ['last','phone_type','email']))
@@ -45,7 +57,7 @@ def family_get(request):
 	context = copy(request.session, ['p','e','password_set'])
 	return render(request, 'family.html', context)
 
-def family_post(request):
+def family_post(request, ref):
 	me = getme(request)
 	if me:
 		me.username = request.POST['username']
@@ -93,20 +105,20 @@ def family_post(request):
 		return redirect('/register/family')
 
 # if me.owner
-def parents(request):
+def parents(request, ref):
 	if restricted(request):
 		return redirect('/')
 	forminit(request,'mom',['mom_skipped','mom_first','mom_alt_last','mom_alt_phone','mom_alt_email'])
 	forminit(request,'dad',['dad_skipped','dad_first','dad_alt_last','dad_alt_phone','dad_alt_email'])
 	if request.method == 'GET':
-		return parents_get(request)
+		return parents_get(request, ref)
 	elif request.method == 'POST':
-		return parents_post(request)
+		return parents_post(request, ref)
 	else:
 		print "Unrecognized HTTP Verb"
-		return index(request)
+		return index(request, ref)
 
-def parents_get(request):
+def parents_get(request, ref):
 	me = getme(request)
 	if not me or not me.owner:
 		return redirect('/register/family')
@@ -135,7 +147,7 @@ def parents_get(request):
 	}
 	return render(request, 'parents.html', context)
 
-def parents_post(request):
+def parents_post(request, ref):
 	me = getme(request)
 	# Create new Parent objects
 	mom = copy(request.POST, [
@@ -214,18 +226,36 @@ def parents_post(request):
 		return redirect('/register/parents')        
 
 # if me.owner.mother or me.owner.father
-def students(request):
+def students(request, ref):
 	if restricted(request):
 		return redirect('/')
 	elif request.method == 'GET':
-		return students_get(request)
+		return students_get2(request, ref)
 	elif request.method == 'POST':
-		return students_post(request)
+		return students_post(request, ref)
 	else:
 		print "Unrecognized HTTP Verb"
-		return index(request)
+		return index(request, ref)
 
-def students_get(request):
+# def students_get(request, ref):
+# 	me = getme(request)
+# 	if not me or not me.owner or not (me.owner.mother or me.owner.father):
+# 		return redirect('/register')
+# 	reg_year = getyear()
+# 	grades = []
+# 	for x in range(1,13):
+# 		grades += [{'grade':x,'grad_year':reg_year - x + 12}]
+# 	context = {
+# 		'reg_year': reg_year,
+# 		'grades'  : grades,
+# 		'family'  : me.owner,
+# 		't_shirt_sizes': collect(Students.model.t_shirt_sizes, lambda obj: dict(collect(obj,lambda val, index: ['no'+str(index),val]))),
+# 		'validations'  : JSON.dumps(Students.validations, cls=FriendlyEncoder),
+# 		'students': JSON.dumps(list(me.owner.children), cls=FriendlyEncoder) if me.owner.children else [],
+# 	}
+# 	return render(request, 'students.html', context)
+
+def students_get2(request, ref):
 	me = getme(request)
 	if not me or not me.owner or not (me.owner.mother or me.owner.father):
 		return redirect('/register')
@@ -239,11 +269,11 @@ def students_get(request):
 		'family'  : me.owner,
 		't_shirt_sizes': collect(Students.model.t_shirt_sizes, lambda obj: dict(collect(obj,lambda val, index: ['no'+str(index),val]))),
 		'validations'  : JSON.dumps(Students.validations, cls=FriendlyEncoder),
-		'students': JSON.dumps(list(me.owner.children), cls=FriendlyEncoder) if me.owner.children else [],
+		'students': me.owner.children
 	}
-	return render(request, 'students.html', context)
+	return render(request, 'students2.html', context)
 
-def students_post(request):
+def students_post(request, ref):
 	me = getme(request)
 	students = JSON.loads(request.POST['students'])
 	for student in students:
