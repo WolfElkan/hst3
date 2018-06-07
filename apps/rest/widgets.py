@@ -216,7 +216,7 @@ class Date(object):
 		if TRACE:
 			print '* rest.widgets.Date'
 		self.field = kwargs.setdefault('field', None)
-		self.default = kwargs.setdefault('default', None)
+		# self.default = kwargs.setdefault('default', None)
 	def widget(self, field, value, **kwargs):
 		if TRACE:
 			print '# rest.widgets.Date:widget'
@@ -231,12 +231,11 @@ class Date(object):
 			print '# rest.widgets.Date:set'
 		if field in post:
 			value = post[field]
-		else:
-			value = self.default
-		if isAttr:
-			thing.__setattr__(field, str(value) if value else '0000-00-00')
-		else:
-			thing.__setitem__(field, str(value) if value else '0000-00-00')
+		if value:
+			if isAttr:
+				thing.__setattr__(field, str(value))
+			else:
+				thing.__setitem__(field, str(value))
 		return thing
 
 class Time(object):

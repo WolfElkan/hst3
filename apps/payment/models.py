@@ -68,7 +68,7 @@ class Invoice(models.Model):
 	def stand(self, me):
 		return self.family.id == me.id
 	def items(self):
-		return Enrollments.filter(invoice=self, phantom=True)
+		return Enrollments.filter(invoice=self)
 	def calc_amount(self):
 		amount = Decimal(0)
 		for q in self.items:

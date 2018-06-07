@@ -86,6 +86,7 @@ FIELDS = {
 		# {'field':'courses'   , 'template': ForeignSet(model='course')},
 	],
 	'course'    : [
+		{'field':'title'     , 'template': VarChar(maxlength=50)},
 		{'field':'year'      , 'template': Integer()},
 		{'field':'last_date' , 'template': Date()},
 		{'field':'early_tuit', 'template': Dollar()},
