@@ -8,7 +8,7 @@
 <script src="{% static 'main/js/script.js' %}" charset="utf-8"></script>
 <style type="text/css">
 	* {
-		/*vertical-align: top;*/
+		vertical-align: middle;
 	}
 	h2 {
 		text-decoration: underline;
@@ -32,7 +32,7 @@
 		width: calc(100% / {{students|length}} - 12px)
 	}
 	.tab div {
-		color: black;
+		color: black; 
 	}
 	.selected_tab {
 		border-bottom: solid white;
@@ -42,61 +42,92 @@
 	.selected_tab div {
 		color: black;
 	}
-	.course_menu {
+	.tab_page {
 		border: solid;
 		border-top: none;
 		padding: 2px;
 		margin: 0 5px 5px 5px;
 	}
-	table {
-		display: inline-block;
-		border-spacing: 0;
-	}
-	.outlined tr {
-		outline: solid black 1px;
-	}
-	td {
-		padding: 5px;
-	}
-	.ib {
-		display: inline-block;
-	}
-	.il {
-		display: inline;
-	}
-	.pane {
-		display: block;
-	}
-	.right {
-		text-align: right;
-	}
-	.center {
-		text-align: center;
-	}
-	.invoice {
-		margin: 15px;
-		display: block;
-	}
 
-	/*.legend {display: none;}*/
-	td.cart {
-		vertical-align: top;
+	.input {
+		margin: 5px;
 	}
-	td.legend {
-		vertical-align: bottom;
-		padding-bottom: 0;
-	}
-	.course_menu table tr {
-		/*height: 48px;*/
+	.static_birthday {
+		display: inline;
 	}
 
 </style>
 <script type="text/javascript">
-	function go(next) {
+	function go(next, birthday_input) {
 		$('#next').val(next)
+		// set('#birthday',get_birthday(birthday_input))
+		$('#birthday').val(get_birthday())
 		$('#student_info').submit()
 	}
+	function isDateSupported() {
+	    var i = document.createElement("input");
+	    i.setAttribute("type", "date");
+	    return i.type !== "text";
+	}
+	function determine_birthday_input(student) {
+		if ({% if family.policyDate < current_student.created_at %} true {% else %} false {% endif %}) {
+			if (isDateSupported()) {
+				$('.native_birthday').show()
+				$('.manual_birthday').hide()
+				return '.native_birthday'
+			} else {
+				$('.manual_birthday').show()
+				$('.native_birthday').hide()
+				return '.manual_birthday'
+			}
+			$('.static_birthday').hide()
+		} else {
+			$('.static_birthday').show()
+			$('.native_birthday').hide()
+			$('.manual_birthday').hide()
+			return '.static_birthday'
+		}
+	}
+	function feb(year) {
+	    leap = (year % 4 == 0) && (year % 100 != 0) || (year % 400 == 0)
+	    return leap ? 29 : 28
+	}
+	function validate_date(element) {
+		year  = $$('#manual_year')
+		month = $$('#manual_month')
+		date  = $$('#manual_date')
+		if (element) {
+			element[0].hidden = true
+		}
+		y = Number(year.value)
+		m = Number(month.value)
+		d = Number(date.value)
+		nDays = [31,feb(y),31,30,31,30,31,31,30,31,30,31][m-1]
+		for (var i = 28; i <= 31; i++) {
+			date[i].hidden = i > nDays
+		}
+		if (y && m && d) {
+			if (d > nDays) {
+				d = set(date,nDays)
+			}
+			return new Date(y,m-1,d)
+		}
+	}
+	function get_birthday(birthday_input) {
+		if (birthday_input == '.manual_birthday') {
+			return validate_date().toISOString().substr(0,10)
+		} else {
+			return $$(birthday_input).value
+		}
+	}
 	$(document).ready(function() {
+		determine_birthday_input()
+		$('.mds').on('change',function() {
+			current = validate_date(this)
+			if (current) {
+				console.log(current.toISOString().substr(0,10))
+			}
+		})
 		set('#sex','{{current_student.sex}}')
 		set('#tshirt','{{current_student.tshirt}}')
 		set('#grad_year','{{current_student.grad_year}}')
@@ -105,61 +136,152 @@
 <body>
 	<div class="student_menu">
 		{% for student in students %}
-		<div onclick="go('{{student.id}}')" class="tab{% if student.id|add:0 == current_student.id|add:0 %} selected_tab {% endif %}" title="{{student}}, age {{student.age}}">
+		<div onclick="go('{{student.id}}', determine_birthday_input())" class="tab{% if student.id|add:0 == current_student.id|add:0 %} selected_tab {% endif %}" title="{{student}}, age {{student.age}}">
 			{{student.prefer}}
 		</div>
 		{% endfor %}
 	</div>
-	<div class="course_menu">
+	<div class="tab_page">
 		<form id="student_info" method="POST">{% csrf_token %}
 			<input id="next" type="hidden" name="next">
 
-			 First<input type="text" name="first" value="{{current_student.first}}"><br>
-			
-			Last<input type="text" name="alt_last" value="{{current_student.alt_last}}" placeholder="{{family.last}}"><br>
-			
-			Nickname<input type="text" name="alt_first" value="{{current_student.alt_first}}"><br>
-			
-			Sex<select id="sex" name="sex">
-				<option value="M">Male</option>
-				<option value="F">Female</option>
-			</select><br>
-			
-			Birthday<input type="text" name="birthday" value="{{current_student.birthday|date:'Y-m-d'}}"><br>
-			
-			Grade
-			<!-- <input type="text" name="grad_year" value="{{current_student.grad_year}}"> -->
-			<select id="grad_year" name="grad_year">
-				<option value="0000"></option>
-				<option value="{{reg_year|add:-12}}">K</option>
-				<option value="{{reg_year|add:-11}}">1</option>
-				<option value="{{reg_year|add:-10}}">2</option>
-				<option value="{{reg_year|add:-9}}">3</option>
-				<option value="{{reg_year|add:-8}}">4</option>
-				<option value="{{reg_year|add:-7}}">5</option>
-				<option value="{{reg_year|add:-6}}">6</option>
-				<option value="{{reg_year|add:-5}}">7</option>
-				<option value="{{reg_year|add:-4}}">8</option>
-				<option value="{{reg_year|add:-3}}">9</option>
-				<option value="{{reg_year|add:-2}}">10</option>
-				<option value="{{reg_year|add:-1}}">11</option>
-				<option value="{{reg_year|add:0}}">12</option>
-			</select>
-			<br>
-			
-			tshirt<!-- <input type="text" name="tshirt" value="{{current_student.tshirt}}"> -->
+			<div class="input">
+				First:
+				<input type="text" name="first" value="{{current_student.first}}">
+			</div>
+
+			<div class="input">
+				Last:
+				<input type="text" name="alt_last" value="{{current_student.alt_last}}" placeholder="{{family.last}}">
+			</div>
+
+			<div class="input">
+				Nickname:
+				<input type="text" name="alt_first" value="{{current_student.alt_first}}">
+			</div>
+
+			<div class="input">
+				Sex:
+				<select id="sex" name="sex">
+					<option value="M">Male</option>
+					<option value="F">Female</option>
+				</select>
+			</div>
+
+			<div class="input">
+				Birthday: 
+				<input type="hidden" name="birthday">
+				<div title="Student birthdays cannot be edited.  Please email HST if you have entered it incorrectly." class="static_birthday">
+					{{current_student.birthday}}
+				<input type="hidden" name="static_birthday" value="{{current_student.birthday|date:'Y-m-d'}}">
+				</div>
+				<input class="native_birthday" type="date" id="birthday" placeholder="YYYY-MM-DD">
+				<div class="manual_birthday">
+					<select class="mds" id="manual_month" name="month">
+						<option value="00"></option>
+						<option value="01">Jan</option>
+						<option value="02">Feb</option>
+						<option value="03">Mar</option>
+						<option value="04">Apr</option>
+						<option value="05">May</option>
+						<option value="06">Jun</option>
+						<option value="07">Jul</option>
+						<option value="08">Aug</option>
+						<option value="09">Sep</option>
+						<option value="10">Oct</option>
+						<option value="11">Nov</option>
+						<option value="12">Dec</option>
+					</select>
+					<select class="mds" id="manual_date" name="date">
+						<option value="00"></option>
+						<option value="01">1</option>
+						<option value="02">2</option>
+						<option value="03">3</option>
+						<option value="04">4</option>
+						<option value="05">5</option>
+						<option value="06">6</option>
+						<option value="07">7</option>
+						<option value="08">8</option>
+						<option value="09">9</option>
+						<option value="10">10</option>
+						<option value="11">11</option>
+						<option value="12">12</option>
+						<option value="13">13</option>
+						<option value="14">14</option>
+						<option value="15">15</option>
+						<option value="16">16</option>
+						<option value="17">17</option>
+						<option value="18">18</option>
+						<option value="19">19</option>
+						<option value="20">20</option>
+						<option value="21">21</option>
+						<option value="22">22</option>
+						<option value="23">23</option>
+						<option value="24">24</option>
+						<option value="25">25</option>
+						<option value="26">26</option>
+						<option value="27">27</option>
+						<option value="28">28</option>
+						<option value="29">29</option>
+						<option value="30">30</option>
+						<option value="31">31</option>
+					</select>
+					<select class="mds" id="manual_year" name="year">
+						<option value="0000"></option>
+						<option value="{{reg_year|add:-19}}">{{reg_year|add:-19}}</option>
+						<option value="{{reg_year|add:-18}}">{{reg_year|add:-18}}</option>
+						<option value="{{reg_year|add:-17}}">{{reg_year|add:-17}}</option>
+						<option value="{{reg_year|add:-16}}">{{reg_year|add:-16}}</option>
+						<option value="{{reg_year|add:-15}}">{{reg_year|add:-15}}</option>
+						<option value="{{reg_year|add:-14}}">{{reg_year|add:-14}}</option>
+						<option value="{{reg_year|add:-13}}">{{reg_year|add:-13}}</option>
+						<option value="{{reg_year|add:-12}}">{{reg_year|add:-12}}</option>
+						<option value="{{reg_year|add:-11}}">{{reg_year|add:-11}}</option>
+						<option value="{{reg_year|add:-10}}">{{reg_year|add:-10}}</option>
+						<option value="{{reg_year|add:-9}}">{{reg_year|add:-9}}</option>
+					</select>
+				</div>
+			</div>
+			<div class="input">
+				Grade:
+				<select id="grad_year" name="grad_year">
+					<option value="0000"></option>
+					<option value="{{reg_year|add:-12}}">K</option>
+					<option value="{{reg_year|add:-11}}">1</option>
+					<option value="{{reg_year|add:-10}}">2</option>
+					<option value="{{reg_year|add:-9}}">3</option>
+					<option value="{{reg_year|add:-8}}">4</option>
+					<option value="{{reg_year|add:-7}}">5</option>
+					<option value="{{reg_year|add:-6}}">6</option>
+					<option value="{{reg_year|add:-5}}">7</option>
+					<option value="{{reg_year|add:-4}}">8</option>
+					<option value="{{reg_year|add:-3}}">9</option>
+					<option value="{{reg_year|add:-2}}">10</option>
+					<option value="{{reg_year|add:-1}}">11</option>
+					<option value="{{reg_year|add:0}}">12</option>
+				</select>
+			</div>
+			<div class="input">
+				T-Shirt Size:
 			<select type="text" name="tshirt" id="tshirt">
 				<option></option>
 				{% for size in t_shirt_sizes %}
 				<option value="{{size.no0}}" id="{{size.no0}}">{{size.no1}}</option>
 				{% endfor %}
-			</select><br>
-			
-			Phone<input type="text" name="alt_phone" value="{{current_student.alt_phone}}" placeholder="Use Family Phone"><br>
-			
-			Email<input type="text" name="alt_email" value="{{current_student.alt_email}}" placeholder="Use Family Email"><br>
-			
-			Special Needs or Allergies<textarea name="needs" placeholder="None">{{current_student.needs}}</textarea> 
+			</select>
+			</div>
+			<div class="input">
+				Phone:
+				<input type="text" name="alt_phone" value="{{current_student.alt_phone}}" placeholder="Use Family Phone">
+			</div>
+			<div class="input">
+				Email:
+				<input type="text" name="alt_email" value="{{current_student.alt_email}}" placeholder="Use Family Email">
+			</div>
+			<div class="input">
+				Special Needs or Allergies:
+				<textarea name="needs" placeholder="None">{{current_student.needs}}</textarea>
+			</div>
 
 		</form>
 	<button onclick="go('{{current_student.id}}')">Save</button>
