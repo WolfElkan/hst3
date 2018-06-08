@@ -264,6 +264,7 @@ def students_get2(request, ref, id):
 	grades = []
 	for x in range(1,13):
 		grades += [{'grade':x,'grad_year':reg_year - x + 12}]
+		student = Students.fetch(id=id)
 	context = {
 		'reg_year': reg_year,
 		'grades'  : grades,
@@ -272,7 +273,7 @@ def students_get2(request, ref, id):
 		# 'validations'  : JSON.dumps(Students.validations, cls=FriendlyEncoder),
 		'students': me.owner.children,
 		'ref':ref,
-		'current_student':Students.fetch(id=id)
+		'current_student':student,
 	}
 	return render(request, 'students2.html', context)
 
