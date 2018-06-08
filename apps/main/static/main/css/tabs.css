@@ -1,0 +1,33 @@
+.tabs {
+	padding: 5px;
+	padding-bottom: 0px;
+	font-size: 0;
+}
+.tab {
+	font-size: 16px;
+	display: inline-block;
+	border: solid black 1px;
+	border-top-left-radius: 10px;
+	border-top-right-radius: 10px;
+	border-bottom: solid black;
+	text-align: center;
+	padding: 5px;
+	text-decoration: none;
+}
+.tab div {
+	color: black; 
+}
+.selected_tab {
+	border-bottom: solid white;
+	text-decoration: none;
+	font-weight: bold;
+}
+.selected_tab div {
+	color: black;
+}
+.tab_page {
+	border: solid;
+	border-top: none;
+	padding: 2px;
+	margin: 0 5px 5px 5px;
+}
