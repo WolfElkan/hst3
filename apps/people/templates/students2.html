@@ -117,6 +117,7 @@
 		if (birthday_input == '.manual_birthday') {
 			return validate_date().toISOString().substr(0,10)
 		} else {
+			console.log(birthday_input)
 			return $$(birthday_input).value
 		}
 	}
@@ -136,7 +137,7 @@
 <body>
 	<div class="student_menu">
 		{% for student in students %}
-		<div onclick="go('{{student.id}}', determine_birthday_input())" class="tab{% if student.id|add:0 == current_student.id|add:0 %} selected_tab {% endif %}" title="{{student}}, age {{student.age}}">
+		<div onclick="go('{{student.id}}', determine_birthday_input())" class="tab{% if student.id|add:0 == current_student.id|add:0 %} selected_tab {% endif %}">
 			{{student.prefer}}
 		</div>
 		{% endfor %}
@@ -284,18 +285,7 @@
 			</div>
 
 		</form>
-	<button onclick="go('{{current_student.id}}')">Save</button>
+	<button onclick="go('{{current_student.id}}',determine_birthday_input())">Save</button>
 	</div>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
