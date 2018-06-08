@@ -222,16 +222,12 @@ class Student(models.Model):
 	needs     = models.TextField(default='')
 	rest_model = "student"
 	t_shirt_sizes = [
-		('YS','Youth Small'),
 		('YM','Youth Medium'),
 		('YL','Youth Large'),
-		('XS','Adult Extra Small'),
 		('AS','Adult Small'),
 		('AM','Adult Medium'),
 		('AL','Adult Large'),
-		('XL','Adult Extra Large'),
-		('2X','Adult 2XL'),
-		('3X','Adult 3XL'),
+		('XL','Adult XL'),
 	]
 	tshirt     = models.CharField(max_length=2, choices=t_shirt_sizes, null=True)
 	created_at = models.DateTimeField(auto_now_add=True)
