@@ -2,13 +2,14 @@ function $$(arguments) {
 	return $(arguments)[0]
 }
 
-function set(selector, value) {
+function set(selector, value, create=false) {
 	value = String(value)
 	var element = type(selector) == String ? $$(selector) : selector
 	if (element.tagName == 'INPUT') {
 		element.value = value
 		return element.value
 	} else if (element.tagName == 'SELECT') {
+		var winner = undefined
 		for (var i = 0; i < element.length; i++) {
 			selected = element[i].value == value || element[i].innerText == value
 			element[i].selected = selected
@@ -16,7 +17,13 @@ function set(selector, value) {
 				winner = element[i]
 			}
 		}
-		return winner.value
+		if (winner) {
+			return winner.value
+		} else if (create) {
+			created = new Option(value, value, true, true)
+			element.add(created)
+			return value
+		}
 	}
 }
 

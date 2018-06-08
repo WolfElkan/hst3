@@ -225,9 +225,10 @@ def parents_post(request, ref):
 		}
 		return redirect('/register/parents')        
 
+student_fields = ['first','alt_last','alt_first','sex','birthday','grad_year','tshirt','alt_phone','alt_email','needs']
+
 # if me.owner.mother or me.owner.father
 def students(request, ref, id):
-	print dict(request.POST)
 	if restricted(request):
 		return redirect('/')
 	elif request.method == 'GET':
@@ -261,19 +262,17 @@ def students_get2(request, ref, id):
 	if not me or not me.owner or not (me.owner.mother or me.owner.father):
 		return redirect('/register')
 	reg_year = getyear()
-	grades = []
-	for x in range(1,13):
-		grades += [{'grade':x,'grad_year':reg_year - x + 12}]
-		student = Students.fetch(id=id)
+	student = Students.fetch(id=id)
+	forminit(request,'student',student_fields,obj=student)
 	context = {
 		'reg_year': reg_year,
-		'grades'  : grades,
 		'family'  : me.owner,
 		't_shirt_sizes': collect(Students.model.t_shirt_sizes, lambda obj: dict(collect(obj,lambda val, index: ['no'+str(index),val]))),
-		# 'validations'  : JSON.dumps(Students.validations, cls=FriendlyEncoder),
 		'students': me.owner.children,
 		'ref':ref,
 		'current_student':student,
+		'e':request.session['e'],
+		'p':request.session['p'],
 	}
 	return render(request, 'students2.html', context)
 
@@ -299,13 +298,19 @@ def students_post(request, ref, id):
 	return redirect('/register/policy/1/')
 
 def students_post2(request, ref, id):
-	print request.POST['birthday']
 	student = Students.fetch(id=id)
-	for field in ['first','alt_last','alt_first','sex','birthday','grad_year','tshirt','alt_phone','alt_email','needs']:
-		student.__setattr__(field,request.POST[field])
-	student.save()
-	print student
-	return redirect('/{}/students/{}'.format(ref,request.POST['next']))
+	data = copy(request.POST, student_fields)
+	print Students.isValid(data)
+	if not Students.isValid(data):
+		request.session['e'] = Students.errors(data)
+		request.session['p'] = data.copy()
+		return redirect('/{}/students/{}/'.format(ref,student.id))
+	else:
+		request.session['e'] = {}
+		for field in student_fields:
+			student.__setattr__(field,data[field])
+		student.save()
+		return redirect('/{}/students/{}/'.format(ref,request.POST['next']))
 
 
 def policy(request, **kwargs):

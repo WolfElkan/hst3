@@ -258,7 +258,7 @@ class Student(models.Model):
 		return self.family.father
 
 	def infolock(self):
-		return self.family.policyDate > self.created_at
+		return getyear() != 2019 and self.family.policyDate > self.created_at
 
 	# Courtesy functions: student.fxn(course) calls course.fxn(student)
 	# def eligible(self, course):

@@ -4,6 +4,7 @@
 	<title>HST | Registration</title>
 	{% load staticfiles %}
 </head>
+
 <script src="{% static 'main/js/jquery.js' %}" charset="utf-8"></script>
 <script src="{% static 'main/js/script.js' %}" charset="utf-8"></script>
 <script type="text/javascript">
@@ -18,13 +19,19 @@
 			}
 		})
 
-		set('#sex','{{current_student.sex}}')
-		set('#tshirt','{{current_student.tshirt}}')
-		set('#grad_year','{{current_student.grad_year}}')
+		set('#sex','{{p.student.sex}}')
+		set('#tshirt','{{p.student.tshirt}}')
+		set('#grad_year','{{p.student.grad_year}}',true)
+		set('.native_birthday','{{p.student.birthday|date:"Y-m-d"}}')
+		set('#manual_year','{{p.student.birthday|date:"Y"}}',true)
+		set('#manual_month','{{p.student.birthday|date:"m"}}')
+		set('#manual_date','{{p.student.birthday|date:"d"}}')
 
 	})
 </script>
 <script src="{% static 'people/js/students2.js' %}" charset="utf-8"></script>
+
+<link rel="stylesheet" type="text/css" href="{% static 'main/css/style.css' %}">
 <link rel="stylesheet" type="text/css" href="{% static 'main/css/tabs.css' %}">
 <style type="text/css">
 	* {
@@ -44,6 +51,7 @@
 		display: inline;
 	}
 
+
 </style>
 <body>
 	<div class="tabs">
@@ -59,25 +67,30 @@
 
 			<div class="input">
 				First:
-				<input type="text" name="first" value="{{current_student.first}}">
+				<input type="text" name="first" value="{{p.student.first}}">
+				<span class="error" id="first_error">{{e.first}}</span>
 			</div>
 
 			<div class="input">
 				Last:
-				<input type="text" name="alt_last" value="{{current_student.alt_last}}" placeholder="{{family.last}}">
+				<input type="text" name="alt_last" value="{{p.student.alt_last}}" placeholder="{{family.last}}">
+				<span class="error" id="alt_last_error">{{e.alt_last}}</span>
 			</div>
 
 			<div class="input">
 				Nickname:
-				<input type="text" name="alt_first" value="{{current_student.alt_first}}">
+				<input type="text" name="alt_first" value="{{p.student.alt_first}}">
+				<span class="error" id="alt_first_error">{{e.alt_first}}</span>
 			</div>
 
 			<div class="input">
 				Sex:
 				<select id="sex" name="sex">
+					<option></option>
 					<option value="M">Male</option>
 					<option value="F">Female</option>
 				</select>
+				<span class="error" id="sex_error">{{e.sex}}</span>
 			</div>
 
 			<div class="input">
@@ -85,7 +98,7 @@
 				<input type="hidden" id="birthday" name="birthday">
 				<div title="Student birthdays cannot be edited.  Please email HST if you have entered it incorrectly." class="static_birthday">
 					{{current_student.birthday|date:'F j, Y'}}
-				<input type="hidden" class="frozen_birthday" name="frozen_birthday" value="{{current_student.birthday|date:'Y-m-d'}}">
+				<input type="hidden" class="frozen_birthday" name="frozen_birthday"  value="{{current_student.birthday|date:'Y-m-d'}}">
 				</div>
 				<input class="native_birthday" type="date" id="birthday" placeholder="YYYY-MM-DD">
 				<div class="manual_birthday">
@@ -153,46 +166,57 @@
 						<option value="{{reg_year|add:-9}}">{{reg_year|add:-9}}</option>
 					</select>
 				</div>
+				<span class="error" id="birthday_error">{{e.birthday}}</span>
 			</div>
+
 			<div class="input">
 				Grade:
 				<select id="grad_year" name="grad_year">
 					<option value="0000"></option>
-					<option value="{{reg_year|add:-12}}">K</option>
-					<option value="{{reg_year|add:-11}}">1</option>
-					<option value="{{reg_year|add:-10}}">2</option>
-					<option value="{{reg_year|add:-9}}">3</option>
-					<option value="{{reg_year|add:-8}}">4</option>
-					<option value="{{reg_year|add:-7}}">5</option>
-					<option value="{{reg_year|add:-6}}">6</option>
-					<option value="{{reg_year|add:-5}}">7</option>
-					<option value="{{reg_year|add:-4}}">8</option>
-					<option value="{{reg_year|add:-3}}">9</option>
-					<option value="{{reg_year|add:-2}}">10</option>
-					<option value="{{reg_year|add:-1}}">11</option>
+					<option value="{{reg_year|add:12}}">K</option>
+					<option value="{{reg_year|add:11}}">1</option>
+					<option value="{{reg_year|add:10}}">2</option>
+					<option value="{{reg_year|add:9}}">3</option>
+					<option value="{{reg_year|add:8}}">4</option>
+					<option value="{{reg_year|add:7}}">5</option>
+					<option value="{{reg_year|add:6}}">6</option>
+					<option value="{{reg_year|add:5}}">7</option>
+					<option value="{{reg_year|add:4}}">8</option>
+					<option value="{{reg_year|add:3}}">9</option>
+					<option value="{{reg_year|add:2}}">10</option>
+					<option value="{{reg_year|add:1}}">11</option>
 					<option value="{{reg_year|add:0}}">12</option>
 				</select>
+				<span class="error" id="grad_year_error">{{e.grad_year}}</span>
 			</div>
+
 			<div class="input">
 				T-Shirt Size:
-			<select type="text" name="tshirt" id="tshirt">
-				<option></option>
-				{% for size in t_shirt_sizes %}
-				<option value="{{size.no0}}" id="{{size.no0}}">{{size.no1}}</option>
-				{% endfor %}
-			</select>
+				<select type="text" name="tshirt" id="tshirt">
+					<option></option>
+					{% for size in t_shirt_sizes %}
+					<option value="{{size.no0}}" id="{{size.no0}}">{{size.no1}}</option>
+					{% endfor %}
+				</select>
+				<span class="error" id="tshirt_error">{{e.tshirt}}</span>
 			</div>
+
 			<div class="input">
 				Phone:
-				<input type="text" name="alt_phone" value="{{current_student.alt_phone}}" placeholder="Use Family Phone">
+				<input type="text" name="alt_phone" value="{{p.student.alt_phone}}" placeholder="Use Family Phone">
+				<span class="error" id="alt_phone_error">{{e.alt_phone}}</span>
 			</div>
+
 			<div class="input">
 				Email:
-				<input type="text" name="alt_email" value="{{current_student.alt_email}}" placeholder="Use Family Email">
+				<input type="text" name="alt_email" value="{{p.student.alt_email}}" placeholder="Use Family Email">
+				<span class="error" id="alt_email_error">{{e.alt_email}}</span>
 			</div>
+
 			<div class="input">
 				Special Needs or Allergies:
-				<textarea name="needs" placeholder="None">{{current_student.needs}}</textarea>
+				<textarea name="needs" placeholder="None">{{p.student.needs}}</textarea>
+				<span class="error" id="needs_error">{{e.needs}}</span>
 			</div>
 
 		</form>
