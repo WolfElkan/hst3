@@ -49,8 +49,11 @@ urlpatterns = [
 	# url(r'^myaccount/changepassword/$', main.changepassword),
 	# url(r'^register/changepassword/$', main.changepassword),
 	
-	url(r'^(?P<ref>register|myaccount)/(?P<step>family|parents|students|policy|classes)/(?P<id>.*)/$',people.reg),
-	url(r'^(?P<ref>register|myaccount)/(?P<step>family|parents|students|policy|classes)/$',people.reg),
+	url(r'^(?P<ref>register|myaccount)/(?P<step>family|parents|students|policy)/(?P<id>.*)/$',people.reg),
+	url(r'^(?P<ref>register|myaccount)/(?P<step>family|parents|students|policy)/$',people.reg),
+
+	url(r'^(?P<ref>register|myaccount)/classes/(?P<id>.*)/$',program.courses),
+	url(r'^(?P<ref>register|myaccount)/classes/$',program.oldest_student),
 
 	# url(r'^register/$', people.reg),
 	# url(r'^register/family/$', people.family),

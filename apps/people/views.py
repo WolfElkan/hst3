@@ -25,8 +25,6 @@ def reg(request, ref, step, id=None):
 		return students(request, ref, id)
 	elif step == 'policy':
 		return policy(request, ref, id)
-	elif step == 'classes':
-		return classes(request, ref)
 
 
 	# if not me or not me.owner:
@@ -337,7 +335,7 @@ def policy_get(request, ref, page=None):
 		}
 		return render(request, 'policy.html', context)
 	else:
-		return redirect('/register/student/{}/'.format(me.owner.children[0].id))
+		return redirect('/register/classes/{}/'.format(me.owner.children[0].id))
 
 def policy_post(request, ref, page):
 	page = int(page)

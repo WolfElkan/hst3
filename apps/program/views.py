@@ -14,6 +14,12 @@ def from_myaccount(request, **kwargs):
 	else:
 		return redirect('/register/studentsinfo/')
 
+def oldest_student(request, ref):
+	me = getme(request)
+	if me.owner.children:
+		return redirect('/{}/classes/{}/'.format(ref,me.owner.children[0].id))
+
+
 def courses(request, **kwargs):
 	me = getme(request)
 	if not me or not me.owner or not me.owner.children:
@@ -38,6 +44,7 @@ def courses(request, **kwargs):
 	cart_unpaid = cart.exclude(status__in=['aud_pend','invoiced','deferred','enrolled'])
 	volunteer_total = me.owner.volunteer_total_in(reg_year)
 	context = {
+		'ref':kwargs.get('ref'),
 		'invoiceable' : bool(cart_unpaid), # TODO: This is simple enough now to be calculated in the HTML page
 		'reg_year': reg_year,
 		'family'  : me.owner,

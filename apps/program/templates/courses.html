@@ -82,7 +82,7 @@
 			
 			<div class="tabs">
 				{% for student in students %}
-				<div onclick="go('/register/student/{{student.id}}/')" class="tab{% if student.id|add:0 == current_student.id|add:0 %} selected_tab {% endif %}" title="{{student}}, age {{student.age}}">
+				<div onclick="go('/{{ref}}/classes/{{student.id}}/')" class="tab{% if student.id|add:0 == current_student.id|add:0 %} selected_tab {% endif %}" title="{{student}}, age {{student.age}}">
 					{{student.prefer}}
 				</div>
 				{% endfor %}
@@ -191,6 +191,8 @@
 						<button {% if not invoiceable %} disabled {% endif %} class="invoice">Generate Invoice</button>
 					</form>
 				</center>
+				<a href="/">Home</a>
+				<a href="/myaccount/">My Account</a>
 				<a href="/family/{{family.id}}/invoices/">View Invoices</a>
 			</div>
 
