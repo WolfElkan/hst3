@@ -5,47 +5,17 @@
 	{% load staticfiles %}
 </head>
 <link rel="stylesheet" type="text/css" href="{% static 'main/css/status.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'main/css/tabs.css' %}">
 <style type="text/css">
 	* {
 		/*vertical-align: top;*/
 	}
+	.tab {
+		width: calc(100% / {{students|length}} - 12px)
+	}
 	h2 {
 		text-decoration: underline;
 		text-align: center;
-	}
-	.student_menu {
-		padding: 5px;
-		padding-bottom: 0px;
-		font-size: 0;
-	}
-	.tab {
-		font-size: 16px;
-		display: inline-block;
-		border: solid black 1px;
-		border-top-left-radius: 10px;
-		border-top-right-radius: 10px;
-		border-bottom: solid black;
-		text-align: center;
-		padding: 5px;
-		text-decoration: none;
-		width: calc(100% / {{students|length}} - 12px)
-	}
-	.tab div {
-		color: black;
-	}
-	.selected_tab {
-		border-bottom: solid white;
-		text-decoration: none;
-		font-weight: bold;
-	}
-	.selected_tab div {
-		color: black;
-	}
-	.tab_page {
-		border: solid;
-		border-top: none;
-		padding: 2px;
-		margin: 0 5px 5px 5px;
 	}
 	table {
 		display: inline-block;
@@ -110,7 +80,7 @@
 	<tr>
 		<td rowspan="2">
 			
-			<div class="student_menu">
+			<div class="tabs">
 				{% for student in students %}
 				<div onclick="go('/register/student/{{student.id}}/')" class="tab{% if student.id|add:0 == current_student.id|add:0 %} selected_tab {% endif %}" title="{{student}}, age {{student.age}}">
 					{{student.prefer}}

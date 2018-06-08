@@ -6,6 +6,26 @@
 </head>
 <script src="{% static 'main/js/jquery.js' %}" charset="utf-8"></script>
 <script src="{% static 'main/js/script.js' %}" charset="utf-8"></script>
+<script type="text/javascript">
+	var infolock = {% if current_student.infolock %} true {% else %} false {% endif %}
+	$(document).ready(function() {
+
+		determine_birthday_input()
+		$('.mds').on('change',function() {
+			current = validate_date(this)
+			if (current) {
+				console.log(current.toISOString().substr(0,10))
+			}
+		})
+
+		set('#sex','{{current_student.sex}}')
+		set('#tshirt','{{current_student.tshirt}}')
+		set('#grad_year','{{current_student.grad_year}}')
+
+	})
+</script>
+<script src="{% static 'people/js/students2.js' %}" charset="utf-8"></script>
+<link rel="stylesheet" type="text/css" href="{% static 'main/css/tabs.css' %}">
 <style type="text/css">
 	* {
 		vertical-align: middle;
@@ -14,41 +34,9 @@
 		text-decoration: underline;
 		text-align: center;
 	}
-	.student_menu {
-		padding: 5px;
-		padding-bottom: 0px;
-		font-size: 0;
-	}
 	.tab {
-		font-size: 16px;
-		display: inline-block;
-		border: solid black 1px;
-		border-top-left-radius: 10px;
-		border-top-right-radius: 10px;
-		border-bottom: solid black;
-		text-align: center;
-		padding: 5px;
-		text-decoration: none;
 		width: calc(100% / {{students|length}} - 12px)
 	}
-	.tab div {
-		color: black; 
-	}
-	.selected_tab {
-		border-bottom: solid white;
-		text-decoration: none;
-		font-weight: bold;
-	}
-	.selected_tab div {
-		color: black;
-	}
-	.tab_page {
-		border: solid;
-		border-top: none;
-		padding: 2px;
-		margin: 0 5px 5px 5px;
-	}
-
 	.input {
 		margin: 5px;
 	}
@@ -57,90 +45,8 @@
 	}
 
 </style>
-
-<script type="text/javascript">
-
-	function go(next) {
-		$('#next').val(next)
-		// set('#birthday',get_birthday(birthday_input))
-		$('#birthday').val(get_birthday())
-		$('#student_info').submit()
-	}
-
-	function isDateSupported() {
-	    var i = document.createElement("input");
-	    i.setAttribute("type", "date");
-	    return i.type !== "text";
-	}
-
-	function determine_birthday_input() {
-		if ({% if current_student.infolock %} true {% else %} false {% endif %}) {
-			$('.static_birthday').show()
-			$('.native_birthday').hide()
-			$('.manual_birthday').hide()
-			return '.frozen_birthday'
-		} else {
-			$('.static_birthday').hide()
-			if (isDateSupported()) {
-				$('.native_birthday').show()
-				$('.manual_birthday').hide()
-				return '.native_birthday'
-			} else {
-				$('.manual_birthday').show()
-				$('.native_birthday').hide()
-				return '.manual_birthday'
-			}
-		}
-	}
-
-	function feb(year) {
-	    leap = (year % 4 == 0) && (year % 100 != 0) || (year % 400 == 0)
-	    return leap ? 29 : 28
-	}
-	function validate_date(element) {
-		year  = $$('#manual_year')
-		month = $$('#manual_month')
-		date  = $$('#manual_date')
-		if (element) {
-			element[0].hidden = true
-		}
-		y = Number(year.value)
-		m = Number(month.value)
-		d = Number(date.value)
-		nDays = [31,feb(y),31,30,31,30,31,31,30,31,30,31][m-1]
-		for (var i = 28; i <= 31; i++) {
-			date[i].hidden = i > nDays
-		}
-		if (y && m && d) {
-			if (d > nDays) {
-				d = set(date,nDays)
-			}
-			return new Date(y,m-1,d)
-		}
-	}
-	function get_birthday() {
-		birthday_input = determine_birthday_input()
-		if (birthday_input == '.manual_birthday') {
-			return validate_date().toISOString().substr(0,10)
-		} else {
-			return $$(birthday_input).value
-		}
-	}
-	$(document).ready(function() {
-		determine_birthday_input()
-		$('.mds').on('change',function() {
-			current = validate_date(this)
-			if (current) {
-				console.log(current.toISOString().substr(0,10))
-			}
-		})
-		set('#sex','{{current_student.sex}}')
-		set('#tshirt','{{current_student.tshirt}}')
-		set('#grad_year','{{current_student.grad_year}}')
-	})
-</script>
 <body>
-	<div class="student_menu">
+	<div class="tabs">
 		{% for student in students %}
 		<div onclick="go('{{student.id}}')" class="tab{% if student.id|add:0 == current_student.id|add:0 %} selected_tab {% endif %}">
 			{{student.prefer}}
@@ -178,7 +84,7 @@
 				Birthday: 
 				<input type="hidden" id="birthday" name="birthday">
 				<div title="Student birthdays cannot be edited.  Please email HST if you have entered it incorrectly." class="static_birthday">
-					{{current_student.birthday}}
+					{{current_student.birthday|date:'F j, Y'}}
 				<input type="hidden" class="frozen_birthday" name="frozen_birthday" value="{{current_student.birthday|date:'Y-m-d'}}">
 				</div>
 				<input class="native_birthday" type="date" id="birthday" placeholder="YYYY-MM-DD">
