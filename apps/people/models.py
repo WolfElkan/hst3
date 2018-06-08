@@ -257,6 +257,9 @@ class Student(models.Model):
 	def father(self):
 		return self.family.father
 
+	def infolock(self):
+		return self.family.policyDate > self.created_at
+
 	# Courtesy functions: student.fxn(course) calls course.fxn(student)
 	# def eligible(self, course):
 	# 	return course.eligible(self)
