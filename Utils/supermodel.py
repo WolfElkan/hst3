@@ -15,7 +15,7 @@ class Validation(object):
 	def __mistype(self, data):
 		return type(data[self.field]) not in self.types
 	def isValid(self, data, **kwargs):
-		andLast = kwargs['andLast'] if 'andLast' in kwargs else True
+		andLast = kwargs.setdefault('andLast',True)
 		return andLast and self.__valid(data)
 	def errors(self, data, messages):
 		if not self.__valid(data):
@@ -40,9 +40,9 @@ class Regular(Validation):
 		return type(data[self.field]) not in self.types
 	def __valid(self, data):
 		datum = find(data, self.field)
-		return self.__mistype(data) or re.match(self.regex, datum)
+		return self.__mistype(data) or bool(re.match(self.regex, datum))
 	def isValid(self, data, **kwargs):
-		andLast = kwargs['andLast'] if 'andLast' in kwargs else True
+		andLast = kwargs.setdefault('andLast',True)
 		return andLast and self.__valid(data)
 	def errors(self, data, messages):
 		if not self.__valid(data):
@@ -61,7 +61,7 @@ class Present(Regular):
 		datum = find(data, self.field)
 		return self.__mistype(data) or re.match(self.regex, datum)
 	def isValid(self, data, **kwargs):
-		andLast = kwargs['andLast'] if 'andLast' in kwargs else True
+		andLast = kwargs.setdefault('andLast',True)
 		return andLast and self.__valid(data)
 	def errors(self, data, messages):
 		if not self.__valid(data):
@@ -82,10 +82,10 @@ class Unique(Validation):
 	def __valid(self, data):
 		return not self.manager.filter(**{self.field:data[self.field]})
 	def isValid(self, data, **kwargs):
-		andLast = kwargs['andLast'] if 'andLast' in kwargs else True
+		andLast = kwargs.setdefault('andLast',True)
 		return andLast and self.__valid(data)
 	def isValid(self, data, **kwargs):
-		andLast = kwargs['andLast'] if 'andLast' in kwargs else True
+		andLast = kwargs.setdefault('andLast',True)
 		return andLast and self.__valid(data)
 	# 	return messages
 	def errors(self, data, messages):
@@ -107,7 +107,7 @@ class Confirm(Validation):
 	def __valid(self, data):
 		return self.__mistype(data) or data[self.field] == data[self.other]
 	def isValid(self, data, **kwargs):
-		andLast = kwargs['andLast'] if 'andLast' in kwargs else True
+		andLast = kwargs.setdefault('andLast',True)
 		return andLast and self.__valid(data)
 	def errors(self, data, messages):
 		if not self.__valid(data):
@@ -161,14 +161,14 @@ class SuperManager(models.Manager):
 		self.fields = []
 		self.validations = []
 	def isValid(self, data, **kwargs):
-		partial = 'partial' in kwargs and kwargs['partial']
+		partial = kwargs.get('partial')
 		valid = True
 		for x in self.validations:
 			if not partial or x.field in data:
 				valid = x.isValid(data, andLast=valid)
 		return valid
 	def errors(self, data, **kwargs):
-		partial = 'partial' in kwargs and kwargs['partial']
+		partial = kwargs.get('partial')
 		messages = {}
 		for x in self.validations:
 			if not partial or x.field in data:
