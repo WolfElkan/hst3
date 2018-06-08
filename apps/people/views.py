@@ -24,7 +24,7 @@ def reg(request, ref, step, id=None):
 	elif step == 'students':
 		return students(request, ref, id)
 	elif step == 'policy':
-		return policy(request, ref)
+		return policy(request, ref, id)
 	elif step == 'classes':
 		return classes(request, ref)
 
@@ -313,15 +313,15 @@ def students_post2(request, ref, id):
 		return redirect('/{}/students/{}/'.format(ref,request.POST['next']))
 
 
-def policy(request, **kwargs):
+def policy(request, ref, page):
 	if request.method == 'GET':
-		return policy_get(request, **kwargs)
+		return policy_get(request, ref, page)
 	elif request.method == 'POST':
-		return policy_post(request, **kwargs)
+		return policy_post(request, ref, page)
 	else:
 		return HttpResponse("Unrecognized HTTP Verb", status=405)
 	
-def policy_get(request, page=None):
+def policy_get(request, ref, page=None):
 	if not page:
 		return redirect(request.path_info+'1/')
 	page = int(page)
@@ -339,7 +339,7 @@ def policy_get(request, page=None):
 	else:
 		return redirect('/register/student/{}/'.format(me.owner.children[0].id))
 
-def policy_post(request, page):
+def policy_post(request, ref, page):
 	page = int(page)
 	if page != int(request.POST.get('page')):
 		return HttpResponse('Page numbers do not match', status=409)

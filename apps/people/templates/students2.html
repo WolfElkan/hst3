@@ -222,5 +222,10 @@
 		</form>
 	<button onclick="go('{{current_student.id}}')">Save</button>
 	</div>
+	{% if ref == 'myaccount' %}
+	<a href="/myaccount/">Return to My Account</a>
+	{% elif ref == 'register' %}
+	<a href="/register/policy/1/">Continue Registration</a>
+	{% endif %}
 </body>
 </html>
