@@ -227,6 +227,7 @@ def parents_post(request, ref):
 
 # if me.owner.mother or me.owner.father
 def students(request, ref, id):
+	print dict(request.POST)
 	if restricted(request):
 		return redirect('/')
 	elif request.method == 'GET':
@@ -297,6 +298,7 @@ def students_post(request, ref, id):
 	return redirect('/register/policy/1/')
 
 def students_post2(request, ref, id):
+	print request.POST['birthday']
 	student = Students.fetch(id=id)
 	for field in ['first','alt_last','alt_first','sex','birthday','grad_year','tshirt','alt_phone','alt_email','needs']:
 		student.__setattr__(field,request.POST[field])
