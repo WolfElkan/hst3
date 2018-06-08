@@ -21,7 +21,7 @@
 
 		set('#sex','{{p.student.sex}}')
 		set('#tshirt','{{p.student.tshirt}}')
-		set('#grad_year','{{p.student.grad_year}}',true)
+		set('#grad_year','{{p.student.grad_year}}',Number('{{student.grad_year}}'))
 		set('.native_birthday','{{p.student.birthday|date:"Y-m-d"}}')
 		set('#manual_year','{{p.student.birthday|date:"Y"}}',true)
 		set('#manual_month','{{p.student.birthday|date:"m"}}')
@@ -42,7 +42,10 @@
 		text-align: center;
 	}
 	.tab {
-		width: calc(100% / {{students|length}} - 12px)
+		width: calc((100% {% if not new %} - 44px {% endif %} ) / {{students|length}} - 12px)
+	}
+	.short_tab {
+		width: 32px;
 	}
 	.input {
 		margin: 5px;
@@ -60,6 +63,11 @@
 			{{student.prefer}}
 		</div>
 		{% endfor %}
+		{% if not new %}
+		<div onclick="go('new')" class="tab short_tab">
+			+
+		</div>
+		{% endif %}
 	</div>
 	<div class="tab_page">
 		<form id="student_info" method="POST">{% csrf_token %}

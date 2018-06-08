@@ -230,40 +230,28 @@ def students(request, ref, id):
 	if restricted(request):
 		return redirect('/')
 	elif request.method == 'GET':
-		return students_get2(request, ref, id)
+		if id == 'new':
+			return students_new(request, ref)
+		else:
+			return students_edit(request, ref, id)
 	elif request.method == 'POST':
-		return students_post2(request, ref, id)
+		if id == 'new':
+			return students_create(request, ref)
+		else:
+			return students_update(request, ref, id)
 	else:
 		print "Unrecognized HTTP Verb"
 		return index(request, ref)
 
-def students_get(request, ref):
+def students_edit(request, ref, id):
 	me = getme(request)
 	if not me or not me.owner or not (me.owner.mother or me.owner.father):
 		return redirect('/register')
-	reg_year = getyear()
-	grades = []
-	for x in range(1,13):
-		grades += [{'grade':x,'grad_year':reg_year - x + 12}]
-	context = {
-		'reg_year': reg_year,
-		'grades'  : grades,
-		'family'  : me.owner,
-		't_shirt_sizes': collect(Students.model.t_shirt_sizes, lambda obj: dict(collect(obj,lambda val, index: ['no'+str(index),val]))),
-		'validations'  : JSON.dumps(Students.validations, cls=FriendlyEncoder),
-		'students': JSON.dumps(list(me.owner.children), cls=FriendlyEncoder) if me.owner.children else [],
-	}
-	return render(request, 'students.html', context)
-
-def students_get2(request, ref, id):
-	me = getme(request)
-	if not me or not me.owner or not (me.owner.mother or me.owner.father):
-		return redirect('/register')
-	reg_year = getyear()
 	student = Students.fetch(id=id)
 	forminit(request,'student',student_fields,obj=student)
 	context = {
-		'reg_year': reg_year,
+		'new':False,
+		'reg_year': getyear(),
 		'family'  : me.owner,
 		't_shirt_sizes': collect(Students.model.t_shirt_sizes, lambda obj: dict(collect(obj,lambda val, index: ['no'+str(index),val]))),
 		'students': me.owner.children,
@@ -274,31 +262,9 @@ def students_get2(request, ref, id):
 	}
 	return render(request, 'students2.html', context)
 
-def students_post(request, ref, id):
-	me = getme(request)
-	students = JSON.loads(request.POST['students'])
-	for student in students:
-		current = student.pop('exists')
-		if student.pop('isNew'):
-			student['family'] = me.owner
-			student['current'] = True
-			Students.create(**student)
-		else:
-			student_proxy = Students.fetch(id=student['id'])
-			if student_proxy:
-				if current:
-					for key in ['first','alt_last','alt_first','sex','grad_year','height','alt_phone','alt_email','tshirt','needs']:
-						if key in student:
-							student_proxy.__setattr__(key, student[key])
-				else:
-					student_proxy.current = False
-				student_proxy.save()
-	return redirect('/register/policy/1/')
-
-def students_post2(request, ref, id):
+def students_update(request, ref, id):
 	student = Students.fetch(id=id)
 	data = copy(request.POST, student_fields)
-	print Students.isValid(data)
 	if not Students.isValid(data):
 		request.session['e'] = Students.errors(data)
 		request.session['p'] = data.copy()
@@ -310,6 +276,47 @@ def students_post2(request, ref, id):
 		student.save()
 		return redirect('/{}/students/{}/'.format(ref,request.POST['next']))
 
+new_student = {'prefer':'New Student','id':'new'}
+
+def students_new(request, ref):
+	me = getme(request)
+	if not me or not me.owner or not (me.owner.mother or me.owner.father):
+		return redirect('/register')
+	students = list(me.owner.children)
+	students.append(new_student)
+	context = {
+		'new':True,
+		'reg_year': getyear(),
+		'family'  : me.owner,
+		't_shirt_sizes': collect(Students.model.t_shirt_sizes, lambda obj: dict(collect(obj,lambda val, index: ['no'+str(index),val]))),
+		'students': students,
+		'ref':ref,
+		'current_student':new_student,
+		'e':request.session['e'],
+		'p':request.session['p'],
+	}
+	return render(request, 'students2.html', context)
+
+def students_create(request, ref):
+	me = getme(request)
+	data = copy(request.POST, student_fields)
+	if not Students.isValid(data):
+		if request.POST['next'] == 'new':
+			request.session['e'] = Students.errors(data)
+			request.session['p'] = data.copy()
+			return redirect('/{}/students/new/'.format(ref))
+		else:
+			request.session['e'] = {}
+			return redirect('/{}/students/{}/'.format(ref,request.POST['next']))
+	else:
+		data['family'] = me.owner
+		new_student = Students.create(**data)
+		request.session['e'] = {}
+		if request.POST['next'] == 'new':
+			return redirect('/{}/students/{}/'.format(ref,new_student.id))
+		else:
+			return redirect('/{}/students/{}/'.format(ref,request.POST['next']))
+	
 
 def policy(request, ref, page):
 	if request.method == 'GET':
