@@ -57,20 +57,30 @@
 	}
 
 </style>
+
 <script type="text/javascript">
-	function go(next, birthday_input) {
+
+	function go(next) {
 		$('#next').val(next)
 		// set('#birthday',get_birthday(birthday_input))
 		$('#birthday').val(get_birthday())
 		$('#student_info').submit()
 	}
+
 	function isDateSupported() {
 	    var i = document.createElement("input");
 	    i.setAttribute("type", "date");
 	    return i.type !== "text";
 	}
-	function determine_birthday_input(student) {
-		if ({% if family.policyDate < current_student.created_at %} true {% else %} false {% endif %}) {
+
+	function determine_birthday_input() {
+		if ({% if current_student.infolock %} true {% else %} false {% endif %}) {
+			$('.static_birthday').show()
+			$('.native_birthday').hide()
+			$('.manual_birthday').hide()
+			return '.frozen_birthday'
+		} else {
+			$('.static_birthday').hide()
 			if (isDateSupported()) {
 				$('.native_birthday').show()
 				$('.manual_birthday').hide()
@@ -80,14 +90,9 @@
 				$('.native_birthday').hide()
 				return '.manual_birthday'
 			}
-			$('.static_birthday').hide()
-		} else {
-			$('.static_birthday').show()
-			$('.native_birthday').hide()
-			$('.manual_birthday').hide()
-			return '.static_birthday'
 		}
 	}
+
 	function feb(year) {
 	    leap = (year % 4 == 0) && (year % 100 != 0) || (year % 400 == 0)
 	    return leap ? 29 : 28
@@ -113,11 +118,11 @@
 			return new Date(y,m-1,d)
 		}
 	}
-	function get_birthday(birthday_input) {
+	function get_birthday() {
+		birthday_input = determine_birthday_input()
 		if (birthday_input == '.manual_birthday') {
 			return validate_date().toISOString().substr(0,10)
 		} else {
-			console.log(birthday_input)
 			return $$(birthday_input).value
 		}
 	}
@@ -137,7 +142,7 @@
 <body>
 	<div class="student_menu">
 		{% for student in students %}
-		<div onclick="go('{{student.id}}', determine_birthday_input())" class="tab{% if student.id|add:0 == current_student.id|add:0 %} selected_tab {% endif %}">
+		<div onclick="go('{{student.id}}')" class="tab{% if student.id|add:0 == current_student.id|add:0 %} selected_tab {% endif %}">
 			{{student.prefer}}
 		</div>
 		{% endfor %}
@@ -171,10 +176,10 @@
 
 			<div class="input">
 				Birthday: 
-				<input type="hidden" name="birthday">
+				<input type="hidden" id="birthday" name="birthday">
 				<div title="Student birthdays cannot be edited.  Please email HST if you have entered it incorrectly." class="static_birthday">
 					{{current_student.birthday}}
-				<input type="hidden" name="static_birthday" value="{{current_student.birthday|date:'Y-m-d'}}">
+				<input type="hidden" class="frozen_birthday" name="frozen_birthday" value="{{current_student.birthday|date:'Y-m-d'}}">
 				</div>
 				<input class="native_birthday" type="date" id="birthday" placeholder="YYYY-MM-DD">
 				<div class="manual_birthday">
@@ -285,7 +290,7 @@
 			</div>
 
 		</form>
-	<button onclick="go('{{current_student.id}}',determine_birthday_input())">Save</button>
+	<button onclick="go('{{current_student.id}}')">Save</button>
 	</div>
 </body>
 </html>
