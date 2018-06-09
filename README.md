@@ -36,7 +36,15 @@
 
   1. Making sure you have the Terminal window visible (because it looks cool), click IMPORT.
 
-  1. Once the data is successfully imported, navigate back to the [homepage](localhost:8000), and explore the website!
+  1. Once the data is successfully imported, navigate back to the [homepage](localhost:8000), and log in... somehow.
+
+  1. Click [My Account](http://localhost:8000/myaccount/), [Admin Dashboard](http://localhost:8000/admin/dashboard/), [Create New Year's Courses](http://localhost:8000/admin/year/)
+
+  1. Select the spring of the current year and click Continue
+
+  1. Select all the HST Classes you want to run this year (including prepaid tickets) and click Create Courses
+
+  1. Navigate back to the homepage.  The website is ready for use.
 
 # Technical Documentation
 
