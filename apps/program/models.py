@@ -281,10 +281,9 @@ class Course(models.Model):
 
 
 	def cart(self, student):
-		# if eligible(self, student):
-		return self.enroll(student)
-		# elif audible(self, student):
-		# 	return self.audition(student)
+		enr = self.enroll(student)
+		student.family.fate()
+		return enr
 
 	def enroll(self, student, **kwargs):
 		enrollment = Enrollments.fetch(course=self,student=student)
@@ -365,8 +364,8 @@ class Enrollment(models.Model):
 	def title(self):
 		display = self.get_status_display()
 		kwargs = self.title_kwargs()
-		if self.course.tradition.byFamily():
-			display = '{family} {proverb} recieving {course} {year}'
+		# if self.course.tradition.byFamily():
+		# 	display = '{family} {proverb} recieving {course} {year}'
 		return display.format(**kwargs)
 	def title_kwargs(self):
 		return {

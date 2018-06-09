@@ -1,4 +1,5 @@
 from .managers import Courses, Enrollments
+from apps.people.managers import Students
 from Utils.data import Each
 import re, random, datetime
 
@@ -113,7 +114,7 @@ def check_word(trad, student, word, **kwargs):
 	else:
 		query = {
 			'student':student,
-			'status__in':["enrolled","invoiced","need_pay","aud_pass"],
+			'status__in':["enrolled","invoiced","need_pay","aud_pass","maydefer"],
 		}
 
 		# Check for auditions
@@ -126,8 +127,8 @@ def check_word(trad, student, word, **kwargs):
 					'course__tradition': trad,
 					'course__year': year,
 				})
-			if kwargs.get('debug'):
-				print query
+			# if kwargs.get('debug'):
+				# print query
 			return bool(Enrollments.filter(**query).exclude(student=student,course__tradition=trad,course__year=year))
 
 		# If the word is '**', then you don't care what course it is, as long as it's this year.
@@ -135,8 +136,8 @@ def check_word(trad, student, word, **kwargs):
 			if kwargs['cur']:
 				return True
 			query['course__year'] = year
-			if kwargs.get('debug'):
-				print query
+			# if kwargs.get('debug'):
+				# print query
 			return bool(Enrollments.filter(**query).exclude(student=student,course__tradition=trad,course__year=year))
 
 		# Support * for representing any character
@@ -158,10 +159,22 @@ def check_word(trad, student, word, **kwargs):
 		if '+' in word:
 			query.pop('student')
 			query['student__family'] = student.family
-			qStudents = word.count('+') 
-		if kwargs.get('debug'):
-			print query
-		return bool(Enrollments.filter(**query).exclude(student=student,course__tradition=trad,course__year=year))
+		query_result = Enrollments.filter(**query).exclude(student=student,course__tradition=trad,course__year=year)
+		# if kwargs.get('debug'):
+			# print query
+			# print 'Quota:',word.count('+')
+		if '+' in word:
+			# return True
+			# print word.count('+')
+			# print len(set(Each(Each(query_result).student).id))
+			return len(set(Each(Each(query_result).student).id))
+			# return len(set(Each(Each(query_result).student).id)) >= word.count('+')
+			# print ids
+			# return False
+			# return len(Students.filter(enrollment__id__in=ids).distinct())
+			# return len(Students.filter(enrollment__in=query_result).distinct()) >= word.count('+')
+		else:
+			return bool(query_result)
 
 
 def calc_status(enr, cart=False):
@@ -193,10 +206,15 @@ def calc_status(enr, cart=False):
 
 
 def eligible(course, student):
+	superdebug = False
+	if superdebug:
+		print
+		print '_'*100
+		print student, course
 	enrollment = Enrollments.fetch(course=course,student=student)
 	if enrollment and enrollment.status in ["aud_pass","aud_pend"]:
 		return True
-	return student.family.has_accepted_policy(course.year) and check_eligex(course, student)
+	return student.family.has_accepted_policy(course.year) and check_eligex(course, student, debug=superdebug)
 
 
 def audible(course, student):
@@ -216,7 +234,7 @@ status_choices = [
 	("fail_pub",""),
 	("aud_pass","{student} has passed the {audskil} for {course}!"),                                                      # Stable
 	("aud_fail","{student} did not pass the {audskil} for {course}."),                                                    # Invisible
-	("aud_drop","{student} passed the {audskil} for {course} and then dropped it, but {pronoun} may still re-enroll."),   # Stable
+	("aud_drop","{student} passed the {audskil} for {course} and may now enroll."),   # Stable
 	("aud_lock","{student} has passed the {audskil} for {course} and must enroll."),                                      # Stable
 	("conflict","{student} is in another class at the same time as {course}"),                                            # Unstable
 	("need_cur","{student} will be eligible for {course} once {pronoun} enrolls in at least 1 other {year} class"),              # Unstable
@@ -224,6 +242,6 @@ status_choices = [
 	("nonexist","{student} was enrolled in {course} ({year}) on cancelled invoice #{invoice}"),     # invoice__status='C' # Invisible
 	("nopolicy","{family} must accept HST's {year} Policy Agreement before enrolling students."),
 	("clasfull","This class is full."),
-	("maydefer","This item may be deferred until October 1"),
-	("deferred","This item must be paid for by October 1"),
+	("maydefer","{course} may be deferred until Fall Parent Meeting"),
+	("deferred","{course} has been deferred, but must be paid for by Fall Parent Meeting"),
 ]

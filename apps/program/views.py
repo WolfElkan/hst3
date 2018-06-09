@@ -7,13 +7,6 @@ from apps.payment.managers import Invoices
 from Utils.data  import equip, find_all, Each, collect
 from Utils.security import getme, getyear, restricted
 
-def from_myaccount(request, **kwargs):
-	me = getme(request)
-	if me.owner.children:
-		return redirect('/register/student/{}/'.format(me.owner.children[0].id))
-	else:
-		return redirect('/register/studentsinfo/')
-
 def oldest_student(request, ref):
 	me = getme(request)
 	if me.owner.children:
@@ -21,6 +14,7 @@ def oldest_student(request, ref):
 
 
 def courses(request, **kwargs):
+	print 'load'
 	me = getme(request)
 	if not me or not me.owner or not me.owner.children:
 		return redirect('/register')
@@ -81,7 +75,7 @@ def courses_enroll(request, **kwargs):
 	student = Students.fetch(id=student_id)
 	course = Courses.fetch(id=request.GET['course_id'])
 	course.cart(student)
-	return redirect('/register/student/{}/'.format(student_id))
+	return redirect('/{}/classes/{}'.format(kwargs.get('ref'),student_id))
 
 def add(request, **kwargs):
 	student_id = kwargs.setdefault('id',0)
@@ -89,7 +83,7 @@ def add(request, **kwargs):
 	if enrollment and enrollment.status == "deferred":
 		enrollment.status = "maydefer"
 		enrollment.save()
-	return redirect('/register/student/{}/'.format(student_id))
+	return redirect('/{}/classes/{}/'.format(kwargs.get('ref'),student_id))
 
 def defer(request, **kwargs):
 	student_id = kwargs.setdefault('id',0)
@@ -97,7 +91,7 @@ def defer(request, **kwargs):
 	if enrollment and enrollment.status == "maydefer":
 		enrollment.status = "deferred"
 		enrollment.save()
-	return redirect('/register/student/{}/'.format(student_id))
+	return redirect('/{}/classes/{}/'.format(kwargs.get('ref'),student_id))
 
 # def courses_audition(request, **kwargs):
 # 	print 'audition', kwargs
@@ -106,14 +100,14 @@ def defer(request, **kwargs):
 # 	course = Courses.fetch(id=request.GET['course_id'])
 # 	if course.audible(student):
 # 		Enrollments.create(course=course, student=student, status="aud_pend")
-# 	return redirect('/register/student/{}/'.format(student_id))
+# 	return redirect('/{}/classes/{}/'.format(kwargs.get('ref'),student_id))
 
 def courses_drop(request, **kwargs):
 	student_id = kwargs.setdefault('id',0)
 	enrollment = Enrollments.fetch(id=request.GET['enr_id'])
 	if enrollment:
 		enrollment.drop()
-	return redirect('/register/student/{}/'.format(student_id))
+	return redirect('/{}/classes/{}/'.format(kwargs.get('ref'),student_id))
 
 def audition_menu(request, **kwargs):
 	bad = restricted(request,4)
