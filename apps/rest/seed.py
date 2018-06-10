@@ -124,7 +124,7 @@ def load_post(request):
 				enrollment_kwargs = {
 					'student': newStudent,
 					'course' : course,
-					'status' : "enrolled"
+					'status' : enrollment.setdefault('status','enrolled')
 				}
 				if rolled:
 					enrollment_kwargs['role']      = enrollment['role']
@@ -263,6 +263,7 @@ def dump(request):
 								'course_id': enrollment.course_id,
 								'role'     : enrollment.role,
 								'role_type': enrollment.role_type,
+								'status'   : enrollment.status,
 							})
 						else:
 							student_obj['enrollments'].append(enrollment.course_id)

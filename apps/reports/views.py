@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect, HttpResponse
 
-from apps.people.managers import Addresses, Families, Parents, Users, Students
+from apps.people.managers  import Addresses, Families, Parents, Users, Students
 from apps.program.managers import Courses, CourseTrads, Enrollments
-from apps.program.models import Year
+from apps.program.eligex   import status_choices
+from apps.program.models   import Year
 
 from Utils.data import sub
 from Utils.security import getyear, gethist, restricted
@@ -98,12 +99,13 @@ def mass_enroll(request, **kwargs):
 	courses = Courses.filter(year=kwargs['year'])
 	students = []
 	for x in request.POST:
-		if re.match(r'^\d+$', x):
+		if x.isdigit():
 			students.append(Students.fetch(id=int(x)))
 	students.sort(key=lambda student: student.last)
 	context = {
 		'students': students,
 		'courses' : courses,
+		'status_choices': dict(status_choices).keys(),
 	}
 	return render(request, 'reports/mass_enroll.html', context)
 
