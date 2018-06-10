@@ -75,6 +75,9 @@
 	}
 </script>
 <body>
+<a href="/">Home</a>
+<a href="/myaccount/">My Account</a>
+<a href="/family/{{family.id}}/invoices/">View Invoices</a>
 
 <table>
 	<tr>
@@ -191,9 +194,6 @@
 						<button {% if not invoiceable %} disabled {% endif %} class="invoice">Generate Invoice</button>
 					</form>
 				</center>
-				<a href="/">Home</a>
-				<a href="/myaccount/">My Account</a>
-				<a href="/family/{{family.id}}/invoices/">View Invoices</a>
 			</div>
 
 		</td>
