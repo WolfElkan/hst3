@@ -29,8 +29,11 @@ def lookup_student(obj):
 		student = Students.fetch(alt_first=first,family__last=last)
 	return student
 
-def reset(user):
-	Enrollments.filter(student__family=user.owner,course__year=getyear()).delete()
+def reset(user=None):
+	if user:
+		Enrollments.filter(student__family=user.owner,course__year=getyear()).delete()
+	else:
+		Enrollments.filter(course__year=getyear()).delete()
 
 def add_hids(**kwargs):
 	for family in Families.filter(**kwargs):
