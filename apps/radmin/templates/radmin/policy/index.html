@@ -9,7 +9,8 @@
 	</style>
 </head>
 <body>
-Previous Policy Agreements
+<a href="/admin/dashboard/">&larr; Return to Admin Dashboard</a>
+<h1>Previous Policy Agreements</h1>
 <ul>
 	{% for policy in policies reversed %}
 	<li {% if policy.clean %} class="clean" {% endif %} ><a href="/admin/policy/show/{{policy.year}}/">{{policy.year}}</a></li>
