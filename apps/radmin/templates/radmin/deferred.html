@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>HST | Deferred Items</title>
+	<style type="text/css">
+		tr td:first-child, thead th:first-child {
+			text-align: left;
+		}
+		tr td {
+			text-align: right;
+		}
+		button {
+			display: block;
+		}
+		tr.total td {
+			font-weight: bold;
+		}
+	</style>
+</head>
+<body>
+<h1>Prepaid Tickets</h1>
+<table>
+	<thead>
+		<th>Show:</th>
+		<th title="Travel Troupe Coffee House">TT</th>
+		<th title="Showcase">SC</th>
+		<th title="Gaithersburg Troupe">GB</th>
+		<th title="Junior Troupe">JR</th>
+		<th title="Shakespeare Troupe">SH</th>
+		<th title="Senior Troupe">SR</th>
+	</thead>
+	<tr><td>Paid:</td>
+		<td title="{{SB.enrolled.10}} tables for 10 at Coffee House">{{SB.enrolled.total}}</td>
+		<td title="{{SC.enrolled.10}} x 10 tickets to Showcase">{{SC.enrolled.total}}</td>
+		<td title="{{SG.enrolled.10}}x10 + {{SG.enrolled.15}}x15 + {{SG.enrolled.20}}x20 paid tickets to Gaithersburg Troupe">{{SG.enrolled.total}}</td>
+		<td title="{{SJ.enrolled.10}}x10 + {{SJ.enrolled.15}}x15 + {{SJ.enrolled.20}}x20 paid tickets to Junior Troupe">{{SJ.enrolled.total}}</td>
+		<td title="{{SH.enrolled.10}}x10 + {{SH.enrolled.15}}x15 + {{SH.enrolled.20}}x20 paid tickets to Shakespeare Troupe">{{SH.enrolled.total}}</td>
+		<td title="{{SR.enrolled.10}}x10 + {{SR.enrolled.15}}x15 + {{SR.enrolled.20}}x20 paid tickets to Senior Troupe">{{SR.enrolled.total}}</td>
+	</tr>
+	<tr><td>Invoiced:</td>
+		<td title="{{SB.invoiced.10}} tables for 10 at Coffee House">{{SB.invoiced.total}}</td>
+		<td title="{{SC.invoiced.10}} x 10 tickets to Showcase">{{SC.invoiced.total}}</td>
+		<td title="{{SG.invoiced.10}}x10 + {{SG.invoiced.15}}x15 + {{SG.invoiced.20}}x20 invoiced tickets to Gaithersburg Troupe">{{SG.invoiced.total}}</td>
+		<td title="{{SJ.invoiced.10}}x10 + {{SJ.invoiced.15}}x15 + {{SJ.invoiced.20}}x20 invoiced tickets to Junior Troupe">{{SJ.invoiced.total}}</td>
+		<td title="{{SH.invoiced.10}}x10 + {{SH.invoiced.15}}x15 + {{SH.invoiced.20}}x20 invoiced tickets to Shakespeare Troupe">{{SH.invoiced.total}}</td>
+		<td title="{{SR.invoiced.10}}x10 + {{SR.invoiced.15}}x15 + {{SR.invoiced.20}}x20 invoiced tickets to Senior Troupe">{{SR.invoiced.total}}</td>
+	</tr>
+	<tr><td>In Cart:</td>
+		<td title="{{SB.in_cart.10}} tables for 10 at Coffee Houses">{{SB.in_cart.total}}</td>
+		<td title="{{SC.in_cart.10}} x 10 tickets to Showcase">{{SC.in_cart.total}}</td>
+		<td title="{{SG.in_cart.10}}x10 + {{SG.in_cart.15}}x15 + {{SG.in_cart.20}}x20 tickets to Gaithersburg Troupe in shopping carts">{{SG.in_cart.total}}</td>
+		<td title="{{SJ.in_cart.10}}x10 + {{SJ.in_cart.15}}x15 + {{SJ.in_cart.20}}x20 tickets to Junior Troupe in shopping carts">{{SJ.in_cart.total}}</td>
+		<td title="{{SH.in_cart.10}}x10 + {{SH.in_cart.15}}x15 + {{SH.in_cart.20}}x20 tickets to Shakespeare Troupe in shopping carts">{{SH.in_cart.total}}</td>
+		<td title="{{SR.in_cart.10}}x10 + {{SR.in_cart.15}}x15 + {{SR.in_cart.20}}x20 tickets to Senior Troupe in shopping carts">{{SR.in_cart.total}}</td>
+	</tr>
+	<tr><td>Deferred:</td>
+		<td title="{{SB.deferred.10}} tables for 10 at Coffee House">{{SB.deferred.total}}</td>
+		<td title="{{SC.deferred.10}} x 10 tickets to Showcase">{{SC.deferred.total}}</td>
+		<td title="{{SG.deferred.10}}x10 + {{SG.deferred.15}}x15 + {{SG.deferred.20}}x20 deferred tickets to Gaithersburg Troupe">{{SG.deferred.total}}</td>
+		<td title="{{SJ.deferred.10}}x10 + {{SJ.deferred.15}}x15 + {{SJ.deferred.20}}x20 deferred tickets to Junior Troupe">{{SJ.deferred.total}}</td>
+		<td title="{{SH.deferred.10}}x10 + {{SH.deferred.15}}x15 + {{SH.deferred.20}}x20 deferred tickets to Shakespeare Troupe">{{SH.deferred.total}}</td>
+		<td title="{{SR.deferred.10}}x10 + {{SR.deferred.15}}x15 + {{SR.deferred.20}}x20 deferred tickets to Senior Troupe">{{SR.deferred.total}}</td>
+	</tr>
+	<tr class="total"><td>Total:</td>
+		<td>{{SB.total}}</td>
+		<td>{{SC.total}}</td>
+		<td>{{SG.total}}</td>
+		<td>{{SJ.total}}</td>
+		<td>{{SH.total}}</td>
+		<td>{{SR.total}}</td>
+	</tr>
+</table>
+</body>
+<!-- Click the button below to rescind the ability to defer purchasing prepaid tickets from all families who have already enrolled.  Families who enroll in the future will still be able to defer paying for their tickets.  This cannot be undone.
+<button>Rescind</button> -->
+</html>
