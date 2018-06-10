@@ -20,3 +20,42 @@ def dashboard(request, **kwargs):
 		return bad
 	context = {}
 	return render(request, 'radmin/dashboard.html', context)
+
+K = {
+	'SB':{'10':'KB', '15':'KD','20':'KE'},
+	'SC':{'10':'KC', '15':'KM','20':'KN'},
+	'SG':{'10':'KG','15':'KS','20':'KW'},
+	'SH':{'10':'KH','15':'KT','20':'KX'},
+	'SJ':{'10':'KJ','15':'KU','20':'KY'},
+	'SR':{'10':'KR','15':'KV','20':'KZ'},
+}
+
+def deferred(request, **kwargs):
+	context = {}
+	for show_id in K:
+		total = 0
+		context[show_id] = {}
+		for status in ['enrolled','invoiced','deferred']:
+			new = get_stat(show_id, status)
+			total += new['total']
+			context[show_id][status] = new
+		new = get_stat(show_id,['need_pay','maydefer'])
+		context[show_id]['in_cart'] = get_stat(show_id,['need_pay','maydefer'])
+		context[show_id]['total'] = total + new['total']
+	return render(request, 'radmin/deferred.html', context)
+
+def get_stat(show_id, status):
+	if type(status) is not list:
+		status = [status]
+	x  = len(Enrollments.filter(course__year=getyear(),course__tradition=K[show_id]['10'],status__in=status))
+	xv = len(Enrollments.filter(course__year=getyear(),course__tradition=K[show_id]['15'],status__in=status))
+	xx = len(Enrollments.filter(course__year=getyear(),course__tradition=K[show_id]['20'],status__in=status))
+	return {
+		'10':x,
+		'15':xv,
+		'20':xx,
+		'total': (x * 10) + (xv * 15) + (xx * 20)
+	}
+
+
+
