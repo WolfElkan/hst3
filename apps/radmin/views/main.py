@@ -57,5 +57,9 @@ def get_stat(show_id, status):
 		'total': (x * 10) + (xv * 15) + (xx * 20)
 	}
 
-
+def rescind(request, **kwargs):
+	for enrollment in Enrollments.filter(status__in=['deferred','maydefer']):
+		enrollment.status = 'need_pay'
+		enrollment.save()
+	return redirect('/admin/deferred/')
 
