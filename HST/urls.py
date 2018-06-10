@@ -112,6 +112,7 @@ urlpatterns = [
 	url(r'^admin/auditions/(?P<id>\d\d\w\w)/process/$', program.audition_process),
 
 	url(r'^admin/deferred/$', radmin.deferred),
+	url(r'^admin/deferred/rescind/$', radmin.rescind),
 
 	url(r'^admin/policy/edit/$', policy.mod),
 	url(r'^admin/policy/edit/(?P<year>\d{4})/$', policy.mod),
