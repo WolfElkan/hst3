@@ -19,6 +19,12 @@ def pretty(arr, delim='  ', indent='', level=0, printout=''):
 def pdir(thing):
 	return pretty(dir(thing))
 
+def kwargle(obj):
+	result = ''
+	for k in obj:
+		result += '{}={}, '.format(k,obj[k])
+	return result
+
 def dircall(obj):
 	lens = [0]
 	for attr in dir(obj):
