@@ -103,6 +103,7 @@ urlpatterns = [
 	url(r'^reports/students/mass_enroll/register/$', reports.register),
 	url(r'^reports/students/(?P<year>\d{4})/mass_enroll/register/$', reports.register),
 
+	url(r'^reports/summary/(?P<year>\d{4})/$', reports.summary),
 	url(r'^reports/summary/$', reports.summary),
 
 	url(r'^admin/dashboard/$', radmin.dashboard),

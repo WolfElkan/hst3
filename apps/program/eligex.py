@@ -1,10 +1,12 @@
 from .managers import Courses, Enrollments
 from apps.people.managers import Students
 from Utils.data import Each
+from Utils.debug import kwargle
 import re, random, datetime
 
 
 def check_eligex(course, student, **kwargs):
+	print 'check_eligex', course, student, kwargle(kwargs)
 
 	# Set defaults for omitted keyword arguments
 	eligex = kwargs.setdefault('eligex', None)
@@ -77,6 +79,7 @@ def check_eligex(course, student, **kwargs):
 
 
 def check_word(trad, student, word, **kwargs):
+	print 'check_word', trad, student, word, kwargle(kwargs)
 	
 	# Set defaults for omitted keyword arguments
 	year   = kwargs.setdefault('year'  , None)
@@ -178,6 +181,7 @@ def check_word(trad, student, word, **kwargs):
 
 
 def calc_status(enr, cart=False):
+	print 'calc_status',enr,cart
 	# print enr.course.id, enr.status
 	if cart:
 		if check_eligex(enr.course, enr.student):
@@ -206,6 +210,7 @@ def calc_status(enr, cart=False):
 
 
 def eligible(course, student):
+	print 'eligible',course,student
 	superdebug = False
 	if superdebug:
 		print
@@ -218,6 +223,7 @@ def eligible(course, student):
 
 
 def audible(course, student):
+	print 'audible',course,student
 	return check_eligex(course, student, aud=True)
 
 status_choices = [

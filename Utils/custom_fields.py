@@ -11,6 +11,9 @@ import bcrypt, re, md5
 EnumField = sqlmod.EnumField
 
 class Bcrypt(object):
+	default = ''
+	html = '<input name="password">'
+	field = 'password'
 	regex = r'\$(?P<encode>\w+)\$((?P<rounds>\d\d)\$(?P<salt>[A-Za-z0-9./]{22}))?(?P<hash>[0-9a-fA-F]{32}|[A-Za-z0-9./]{31})'
 	def __init__(self, char60=None):
 		if char60:
