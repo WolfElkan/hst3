@@ -4,9 +4,11 @@ from Utils.data import Each
 from Utils.debug import kwargle
 import re, random, datetime
 
+TRACE = True
 
 def check_eligex(course, student, **kwargs):
-	print 'check_eligex', course, student, kwargle(kwargs)
+	if kwargs.get('debug'):
+		print 'check_eligex', course, student, kwargle(kwargs)
 
 	# Set defaults for omitted keyword arguments
 	eligex = kwargs.setdefault('eligex', None)
@@ -14,7 +16,7 @@ def check_eligex(course, student, **kwargs):
 	aud    = kwargs.setdefault('aud'   , False)
 	cur    = kwargs.setdefault('cur'   , False)
 	conj   = kwargs.setdefault('conj'  , True)
-	debug  = kwargs.setdefault('debug' , False)
+	debug  = kwargs.setdefault('debug' , TRACE)
 
 	# Check for Course or CourseTrad
 	if course.rest_model == 'course':
@@ -79,13 +81,14 @@ def check_eligex(course, student, **kwargs):
 
 
 def check_word(trad, student, word, **kwargs):
-	print 'check_word', trad, student, word, kwargle(kwargs)
+	if kwargs.get('debug'):
+		print 'check_word', trad, student, word, kwargle(kwargs)
 	
 	# Set defaults for omitted keyword arguments
 	year   = kwargs.setdefault('year'  , None)
 	aud    = kwargs.setdefault('aud'   , False)
 	cur    = kwargs.setdefault('cur'   , False)
-	debug  = kwargs.setdefault('debug' , False)
+	debug  = kwargs.setdefault('debug' , TRACE)
 
 	# Boolean literals
 	if '#' in word:

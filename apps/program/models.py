@@ -6,10 +6,10 @@ from Utils.data import sub, Each, find_all
 from Utils.security import getyear
 from django_mysql import models as sqlmod
 from .managers import CourseTrads, Courses, Enrollments, Venues
-from .eligex import check_eligex, check_word, calc_status, eligible, audible, status_choices
+from .eligex import check_eligex, check_word, calc_status, eligible, audible, status_choices, TRACE
 Q = models.Q
 from apps.people.managers import Students, Families
-from trace import TRACE, DEV
+from trace import DEV
 from datetime import datetime
 import pytz, re
 
@@ -369,7 +369,7 @@ class Enrollment(models.Model):
 		return display.format(**kwargs)
 	def title_kwargs(self):
 		return {
-			'student' : self.student,
+			'student' : self.student.family if self.course.tradition.byFamily() else self.student,
 			'family'  : self.student.family,
 			'course'  : self.course.title,
 			'year'    : self.course.year,

@@ -22,7 +22,7 @@ def pdir(thing):
 def kwargle(obj):
 	result = ''
 	for k in obj:
-		result += '{}={}, '.format(k,obj[k])
+		result += '{}={}, '.format(k,str(obj[k]))
 	return result
 
 def dircall(obj):
