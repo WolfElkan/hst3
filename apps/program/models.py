@@ -72,7 +72,8 @@ class CourseTrad(models.Model):
 	the_hours  = models.FloatField(default=0)
 	# auto       = models.BooleanField(default=False) # Whether course is automatically added to eligible carts
 	# trig       = models.BooleanField(default=True)  # Whether course triggers an addition of all eligible auto courses
-	action     = sqlmod.EnumField(choices=['none','trig','auto'], default='none')
+	action_choices = ['none','trig','casc','stat']
+	action     = sqlmod.EnumField(choices=action_choices, default='none')
 	deferrable = models.BooleanField(default=False) # Whether course may be paid for in October
 	droppable  = models.BooleanField(default=True)  # Whether course may be dropped AFTER a successful audition
 	created_at = models.DateTimeField(auto_now_add=True)
@@ -302,17 +303,25 @@ class Course(models.Model):
 				return Enrollments.create(course=self, student=student, status="aud_pend")
 		if self.tradition.action == 'trig':
 			# This would be so much more elegant if Python had a native do-while loop
-			while True:
-				autos = Courses.filter(year=self.year,tradition__action='auto')
-				for auto in autos:
-					if Enrollments.filter(course=auto,student=student):
-						autos = autos.exclude(id=auto.id)
-					elif not eligible(auto, student):
-						autos = autos.exclude(id=auto.id)
-					else:
-						Enrollments.create(course=auto,student=student)
-				if not autos:
-					break
+			for casc in Courses.filter(year=self.year,tradition__action='casc'):
+				if eligible(casc, student):
+					Enrollments.create(course=casc,student=student)
+			for stat in Courses.filter(year=self.year,tradition__action='stat'):
+				if eligible(stat, student):
+					Enrollments.create(course=stat,student=student)
+			# while True:
+			# 	autos = Courses.filter(year=self.year,tradition__action='auto')
+			# 	for auto in autos:
+			# 		if Enrollments.filter(course=auto,student=student):
+			# 			autos = autos.exclude(id=auto.id)
+			# 		elif not eligible(auto, student):
+			# 			autos = autos.exclude(id=auto.id)
+			# 		else:
+			# 			Enrollments.create(course=auto,student=student)
+			# 	if TRACE:
+			# 		print Each(autos).id
+			# 	if not autos:
+			# 		break
 		return enrollment
 
 	# def audition(self, student):
