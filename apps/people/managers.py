@@ -41,6 +41,8 @@ class FamilyManager(sm.SuperManager):
 				if family.id not in ids:
 					ids.append(family.id)
 					result.append(family)
+		for family in Families.all().exclude(id__in=ids):
+			result.append(family)
 		return result
 Families = FamilyManager()
 

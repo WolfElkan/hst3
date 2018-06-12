@@ -204,9 +204,9 @@ class Course(models.Model):
 			return max(self.nSlots - len(self.students), 0)
 
 	def enrollments(self):
-		return Enrollments.filter(course_id=self.id)
+		return Enrollments.filter(course_id=self.id,status='enrolled')
 	def students(self):
-		return Students.filter(enrollment__course=self).order_by('family__last','birthday').distinct()
+		return Students.filter(enrollment__course=self,enrollment__status='enrolled').order_by('family__last','birthday').distinct()
 	def boys(self):
 		return self.students.filter(sex='M')
 	def girls(self):

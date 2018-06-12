@@ -123,7 +123,8 @@ def audition_results(request, **kwargs):
 	if bad:
 		return bad
 	context = {
-		'course' : course,
+		'course'  : course,
+		'students': Enrollments.filter(course=course,status__in=['aud_pend','pendpass','pendfail']).order_by('student__family__last','student__birthday'),
 		'me' : getme(request),
 	}
 	return render(request, 'audition_results.html', context)

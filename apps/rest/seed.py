@@ -62,6 +62,7 @@ def load_post(request):
 				print 'Exists:   '+ct['title'].upper()
 			else:
 				print 'Importing '+ct['title'].upper()
+				ct.setdefault('default','enrolled' if ct['after_tuit'] == 0 else 'need_pay')
 				CourseTrads.create(**ct)
 				nCourseTrads += 1
 
@@ -72,6 +73,7 @@ def load_post(request):
 				print 'Exists:   '+ct['title'].upper()
 			else:
 				print 'Importing '+ct['title'].upper()
+				ct.setdefault('default','--------')
 				alias = CourseTrads.get(id=ct.pop('alias_id'))
 				ct['alias'] = alias
 				CourseTrads.create(**ct)
@@ -96,6 +98,15 @@ def load_post(request):
 		family = Families.create(**family)
 		family.update_name_num()
 		nFamilies += 1
+		if 'password' in fam:
+			Users.create(
+				owner_type = 'Family',
+				owner_id   = family.id,
+				username   = family.last + (str(family.name_num) if family.name_num else ''),
+				password   = fam['password'],
+				permission = 2,
+			)
+			nUsers += 1
 		if 'mother' in fam:
 			mother = copy(fam['mother'])
 			mother['family_id'] = family.id
@@ -108,35 +119,36 @@ def load_post(request):
 			nParents += 1
 		family.save()
 		for stu in fam['students']:
-			print '  '+stu['first']
-			student = copy(stu)
-			enrollments = student.pop('enrollments') if 'enrollments' in student else []
-			student['family'] = family
-			newStudent = Students.create(**student)
-			for enrollment in enrollments:
-				rolled = type(enrollment) in [object,dict]
-				course_id = enrollment['course_id'] if rolled else enrollment
-				print '    '+course_id
-				course = Courses.fetch(id=course_id)
-				if not course:
-					course = Courses.create_by_id(course_id)
-					nCourses += 1
-				enrollment_kwargs = {
-					'student': newStudent,
-					'course' : course,
-					'status' : enrollment.setdefault('status','enrolled')
-				}
-				if rolled:
-					enrollment_kwargs['role']      = enrollment['role']
-					enrollment_kwargs['role_type'] = enrollment['role_type']
-				Enrollments.create(**enrollment_kwargs)
-				nEnrollments += 1
-				# if type(enrollment) in [str,unicode]:
-				# 	Courses.get(id=enrollment).sudo_enroll(newStudent)
-				# else:
-				# 	course = Courses.get(id=enrollment['course_id'])
-				# 	Enrollments.create(course=course, student=newStudent, role=enrollment['role'], role_type=enrollment['role_type'])
-			nStudents += 1
+			if 'first' in stu:
+				print '  '+stu['first']
+				student = copy(stu)
+				enrollments = student.pop('enrollments') if 'enrollments' in student else []
+				student['family'] = family
+				newStudent = Students.create(**student)
+				for enrollment in enrollments:
+					rolled = type(enrollment) in [object,dict]
+					course_id = enrollment['course_id'] if rolled else enrollment
+					print '    '+course_id
+					course = Courses.fetch(id=course_id)
+					if not course:
+						course = Courses.create_by_id(course_id)
+						nCourses += 1
+					enrollment_kwargs = {
+						'student': newStudent,
+						'course' : course,
+						'status' : enrollment.setdefault('status','enrolled') if hasattr(enrollment,'setdefault') else 'enrolled'
+					}
+					if rolled:
+						enrollment_kwargs['role']      = enrollment['role']
+						enrollment_kwargs['role_type'] = enrollment['role_type']
+					Enrollments.create(**enrollment_kwargs)
+					nEnrollments += 1
+					# if type(enrollment) in [str,unicode]:
+					# 	Courses.get(id=enrollment).sudo_enroll(newStudent)
+					# else:
+					# 	course = Courses.get(id=enrollment['course_id'])
+					# 	Enrollments.create(course=course, student=newStudent, role=enrollment['role'], role_type=enrollment['role_type'])
+				nStudents += 1
 
 	print "- assign name_num's"
 	Each(Families.all()).update_name_num()
@@ -228,6 +240,10 @@ def dump(request):
 			'phone_type':family.phone_type,
 			'email':family.email,
 		}
+		user = Users.fetch(owner_id=family.id)
+		print family
+		if user:
+			family_obj['password'] = user.password
 		if family.mother_id:
 			family_obj['mother'] = copyatts(family.mother,['first','sex'])
 			if family.mother.alt_last:

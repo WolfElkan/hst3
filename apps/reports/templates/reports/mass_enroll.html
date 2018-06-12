@@ -6,7 +6,7 @@
 <body>
 <h1>Mass Enrollment Interface</h1>
 <form method="POST" action="register/" >{% csrf_token %}
-<select>
+<select name="status">
 	<option value="--------">--------</option>
 	{% for status in status_choices %}
 	<option value="{{status}}">{{status}}</option>
