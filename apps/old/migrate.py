@@ -285,6 +285,7 @@ def update_existing_family(already, family):
 			alt_last = '' if family.mlast == family.family else family.mlast,
 			sex = 'F',
 			alt_phone = 0 if family.mcell == family.home   else family.mcell,
+			family_id = already.id,
 		)
 	if not already.father:
 		already.father = Parents.create(
@@ -293,17 +294,47 @@ def update_existing_family(already, family):
 			alt_last = '' if family.flast == family.family else family.flast,
 			sex = 'M',
 			alt_phone = 0 if family.fcell == family.home   else family.fcell,
+			family_id = already.id,
 		)
 	for student in OldStudents.filter(familyid=family.accessid):
 		alreadyStudent = find_existing_student(already,student)
 		if alreadyStudent:
 			update_existing_student(alreadyStudent,student)
+		else:
+			stu = Students.create(
+				oid        = student.id,
+				hid        = student.studentid,
+				created_at = student.creationdate,
+				updated_at = student.moddate,
+				family     = already,
+				first      = namecase(student.first),
+				alt_last   = '' if (not already) or already.last  == student.last  else student.last,
+				alt_email  = '' if (not already) or already.email == student.email else student.email,
+				sex        = student.sex,
+				birthday   = student.dob if student.dob else '2020-12-31',
+				grad_year  = est_grad(student),
+				tshirt     = sub(student.tshirt,{'AXL':'XL'}),
+				needs      = student.needsdescribe
+			)
+
 
 def find_existing_student(alreadyFamily,student):
-	pass
+	qset = alreadyFamily.children.filter(first=student.first)
+	if qset:
+		return qset[0]
+
 
 def update_existing_student(already,student):
-	pass
+	already.oid = student.id
+	already.hid = student.studentid
+	if student.dob:
+		already.birthday = student.dob
+	if not already.grad_year:
+		already.grad_year = est_grad(student)
+	if not already.tshirt:
+		already.tshirt = sub(student.tshirt,{'AXL':'XL'})
+	already.needs = student.needsdescribe
+	already.save()
 
 year = 2017
 
@@ -324,45 +355,46 @@ def transfer():
 		already = find_existing_family(family)
 		if already:
 			uf = update_existing_family(already,family)
-			for x in uf:
-				u[x] += uf[x]
+			if uf:
+				for x in uf:
+					u[x] += uf[x]
 		else:	
 			cf = create_family(family)
 			for x in cf:
 				n[x] += cf[x]
-	for family in AlumniFamilies.filter(id=76):
-		already = find_existing_family(family)
-		if already:
-			uf = update_existing_family(already,family)
-			for x in uf:
-				u[x] += uf[x]
+	# for family in AlumniFamilies.filter(id=76):
+	# 	already = find_existing_family(family)
+	# 	if already:
+	# 		uf = update_existing_family(already,family)
+	# 		for x in uf:
+	# 			u[x] += uf[x]
 
 	print '*'*100
 
-	for student in OldStudents.all():
-		family = Families.fetch(hid=student.familyid)
-		if family:
-			stu = Students.create(
-				oid        = student.id,
-				hid        = student.studentid,
-				created_at = student.creationdate,
-				updated_at = student.moddate,
-				family     = family,
-				first      = namecase(student.first),
-				alt_last   = '' if (not family) or family.last  == student.last  else student.last,
-				alt_email  = '' if (not family) or family.email == student.email else student.email,
-				sex        = student.sex,
-				birthday   = student.dob if student.dob else '2020-12-31',
-				grad_year  = est_grad(student),
-				tshirt     = sub(student.tshirt,{'AXL':'XL'}),
-				needs      = student.needsdescribe
-			)
-			n['students'] += 1
-			print stu
+	# for student in OldStudents.all():
+	# 	family = Families.fetch(hid=student.familyid)
+	# 	if family:
+	# 		stu = Students.create(
+	# 			oid        = student.id,
+	# 			hid        = student.studentid,
+	# 			created_at = student.creationdate,
+	# 			updated_at = student.moddate,
+	# 			family     = family,
+	# 			first      = namecase(student.first),
+	# 			alt_last   = '' if (not family) or family.last  == student.last  else student.last,
+	# 			alt_email  = '' if (not family) or family.email == student.email else student.email,
+	# 			sex        = student.sex,
+	# 			birthday   = student.dob if student.dob else '2020-12-31',
+	# 			grad_year  = est_grad(student),
+	# 			tshirt     = sub(student.tshirt,{'AXL':'XL'}),
+	# 			needs      = student.needsdescribe
+	# 		)
+	# 		n['students'] += 1
+	# 		print stu
 
-		else:
-			# print 'NO FAMILY FOUND FOR STUDENT', student.id
-			orphans.append(student.id)
+	# 	else:
+	# 		# print 'NO FAMILY FOUND FOR STUDENT', student.id
+	# 		orphans.append(student.id)
 
 	print '*'*100
 
@@ -373,43 +405,47 @@ def transfer():
 			if new:
 				new.oid = old.courseid
 				new.place = parse_venue(old.location)
-				new.tuition = old.cost
+				# new.early_tuit = old.cost
+				# new.after_tuit = old.cost
 				new.save()
-			else:
-				new = CourseTrads.create(
-					id         = course_mappings[x],
-					oid        = old.courseid,
-					title      = old.name.title(),
-					# e          = False,
-					day        = old.day,
-					start      = old.start,
-					end        = old.end,
-					place      = parse_venue(old.location),
-					show       = parse_show(old.show),
-					sa         = bool(old.show2),
-					semester   = parse_semester(old),
-					min_age    = old.minage,
-					max_age    = old.maxage,
-					tuition    = old.cost,
-					vol_hours  = old.volhours,
-					the_hours  = 2*bool(old.volhours),
-					created_at = old.creationdate,
-					updated_at = old.moddate
-				)
-				print new
-				n['trads'] += 1
+			# else:
+			# 	new = CourseTrads.create(
+			# 		id         = course_mappings[x],
+			# 		oid        = old.courseid,
+			# 		title      = old.name.title(),
+			# 		e          = False,
+			# 		m          = False,
+			# 		default    = 'historic',
+			# 		day        = old.day,
+			# 		start      = old.start,
+			# 		end        = old.end,
+			# 		place      = parse_venue(old.location),
+			# 		show       = parse_show(old.show),
+			# 		sa         = bool(old.show2),
+			# 		semester   = parse_semester(old),
+			# 		min_age    = old.minage,
+			# 		max_age    = old.maxage,
+			# 		early_tuit = old.cost,
+			# 		after_tuit = old.cost,
+			# 		vol_hours  = old.volhours,
+			# 		the_hours  = 2*bool(old.volhours),
+			# 		created_at = old.creationdate,
+			# 		updated_at = old.moddate
+			# 	)
+			# 	print new
+			# 	n['trads'] += 1
 
 	print '*'*100
 
 	n['courses'] += make(year)
 
-	for reg in Registrations.all():
-		student = Students.fetch(hid=reg.studentid)
-		course  = Courses.fetch(year=year,tradition__oid=reg.courseid)
-		if student and course:
-			Enrollments.create(student=student, course=course)
-			n['enroll'] += 1
-			print student, 'in', course
+	# for reg in Registrations.all():
+	# 	student = Students.fetch(hid=reg.studentid)
+	# 	course  = Courses.fetch(year=year,tradition__oid=reg.courseid)
+	# 	if student and course:
+	# 		Enrollments.create(student=student, course=course)
+	# 		n['enroll'] += 1
+	# 		print student, 'in', course
 
 	print '\nTRANSFER COMPLETE'
 	print 'Users:     ' + str(n['users']).rjust(6)

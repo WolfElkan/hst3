@@ -271,7 +271,8 @@ class Student(models.Model):
 	def hst_age(self):
 		return self.hst_age_in(getyear())
 	def grade_in(self, year):
-		return year - self.grad_year + 12
+		if self.grad_year:
+			return year - self.grad_year + 12
 	def grade(self):
 		return self.grade_in(getyear())
 

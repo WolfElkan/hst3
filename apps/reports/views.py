@@ -109,6 +109,7 @@ def mass_enroll(request, **kwargs):
 	}
 	return render(request, 'reports/mass_enroll.html', context)
 
+# From mass_enroll
 def register(request, **kwargs):
 	bad = restricted(request,5)
 	if bad:
@@ -130,6 +131,6 @@ def register(request, **kwargs):
 			new_enrollments[student_id]['role_type'] = request.POST[x]
 	for x in new_enrollments:
 		student = Students.fetch(id=int(x))
-		Enrollments.create(student=student, course=course, role=new_enrollments[x]['role'], role_type=new_enrollments[x]['role_type'])
+		Enrollments.create(student=student, course=course, role=new_enrollments[x]['role'], role_type=new_enrollments[x]['role_type'], status=request.POST['status'])
 	return redirect('/reports/students/2016/')
 	

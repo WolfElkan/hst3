@@ -16,7 +16,8 @@
 	<title>HST | {{thing}}</title>
 </head>
 <body>
-	<a href="/reports/students/2016/">2016</a>
+	<a href="/rest/">REST</a>
+	<a href="/rest/index/{{model}}/">{{model|title}} Index</a>
 	<h1>{{thing}}</h1>
 	{% if model == "course" %}<a href="/reports/roster/{{thing.id}}/">Roster</a>{% endif %}
 	<h2><a href="/rest/index/{{model}}/">{{Model}}</a></h2>

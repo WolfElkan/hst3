@@ -157,7 +157,7 @@ def update(request, model, id):
 		value = request.POST[field] if field in request.POST else template.default
 		thing = template.set(thing, field, request.POST, True)
 	thing.save()
-	return redirect("/rest/index/coursetrad?e=True")
+	# return redirect("/rest/index/coursetrad?e=True")
 	return redirect("/rest/show/{}/{}".format(model, thing.id))
 
 def delete(request, model, id):

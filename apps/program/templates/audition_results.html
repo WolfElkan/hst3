@@ -40,14 +40,12 @@
 <a href="/admin/auditions/">Cancel</a>
 <h1>HST Audition Results Interface</h1>
 <p>You are logged in with a {{me.get_permission_display}}-level account.  When you click submit, 
-	{% if me.permission == 7 %}
-	the results will be finalized, but hopefully you're not using actual students.
-	{% elif me.permission >= 5 %}
+	{% if me.permission >= 5 %}
 	the results will be finalized, and all students will immediately be able to see the result of their audition.
 	{% elif me.permission >= 4 %}
 	you will still be able to edit your choices until the results are finalized and approved by the Executive Director.
 	{% else %}
-	nothing will happen because you shouldn't be able to access this page in the first place.
+	nothing will happen because you shouldn't have been able to access this page in the first place.
 {% endif %}</p>
 <h2>{{course}}</h2>
 <form action="process/" method="POST">{% csrf_token %}
@@ -60,7 +58,7 @@
 			<th>Sex</th>
 			<th>Grade</th>
 		</thead>
-	{% for enrollment in course.enrollments %}
+	{% for enrollment in students %}
 		<tr>
 			<td class="{{enrollment.status}}" title="{{enrollment}}">{{enrollment.student}} {% if enrollment.status is "enrolled" %}checked{% endif %}</td>
 			<td class="center">

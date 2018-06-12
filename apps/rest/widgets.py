@@ -49,9 +49,9 @@ class VarChar(object):
 	def __init__(self, **kwargs):
 		if TRACE:
 			print '* rest.widgets.VarChar'
-		self.field = kwargs.setdefault('field', None		)
+		self.field = kwargs.setdefault('field', None)
 		self.default = kwargs.setdefault('default', '')
-		self.maxlength = kwargs.setdefault('maxlength', None		)
+		self.maxlength = kwargs.setdefault('maxlength', None)
 	def widget(self, field, value, **kwargs):
 		if TRACE:
 			print '# rest.widgets.VarChar:widget'
@@ -227,7 +227,7 @@ class Date(object):
 		if value:
 			return value.strftime('%B %-d, %Y')
 	def set(self, thing, field, post, isAttr):
-		return thing
+		# return thing
 		if TRACE:
 			print '# rest.widgets.Date:set'
 		if field in post:
