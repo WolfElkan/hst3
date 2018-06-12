@@ -14,7 +14,6 @@ def oldest_student(request, ref):
 
 
 def courses(request, **kwargs):
-	print 'load'
 	me = getme(request)
 	if not me or not me.owner or not me.owner.children:
 		return redirect('/register')

@@ -70,16 +70,22 @@ class CourseTrad(models.Model):
 	after_tuit = models.DecimalField(max_digits=6, decimal_places=2, default=0)
 	vol_hours  = models.FloatField(default=0)
 	the_hours  = models.FloatField(default=0)
-	# auto       = models.BooleanField(default=False) # Whether course is automatically added to eligible carts
-	# trig       = models.BooleanField(default=True)  # Whether course triggers an addition of all eligible auto courses
+	# Behavior
 	action_choices = ['none','trig','casc','stat']
 	action     = sqlmod.EnumField(choices=action_choices, default='none')
 	deferrable = models.BooleanField(default=False) # Whether course may be paid for in October
 	droppable  = models.BooleanField(default=True)  # Whether course may be dropped AFTER a successful audition
+	# Meta
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
 	rest_model = "coursetrad"
 	objects = CourseTrads
+
+	def stand(self, me):
+		if me.owner_type == 'Family':
+			return bool(self.courses.filter(enrollment__student__family=me.owner))
+		elif me.owner_type == 'Student':
+			return bool(self.courses.filter(enrollment__student=me.owner))
 
 	genre_codes = {
 		'A':'Acting',
@@ -135,12 +141,6 @@ class CourseTrad(models.Model):
 	def courses(self):
 		return Courses.filter(tradition_id=self.id)
 
-	def stand(self, me):
-		if me.owner_type == 'Family':
-			return bool(self.courses.filter(enrollment__student__family=me.owner))
-		elif me.owner_type == 'Student':
-			return bool(self.courses.filter(enrollment__student=me.owner))
-
 	def make(self, year):
 		course = Courses.fetch(tradition=self, year=year)
 		if course:
@@ -165,16 +165,6 @@ class CourseTrad(models.Model):
 			return course.eligible(student)
 		else:
 			return self.check_eligex(student, year)
-	# def enroll(self, student, year):
-	# 	course = Courses.fetch(tradition=self, year=year)
-	# 	if course and course.eligible(student):
-	# 		return course.enroll(student)
-	# def audition(self, student, year):
-	# 	course = Courses.fetch(tradition=self, year=year)
-	# 	if course and course.audible(student):
-	# 		return course.audition(student)
-	# 	else:
-	# 		return self.check_eligex(student, year, aud=True)
 
 
 class Course(models.Model):
@@ -194,20 +184,25 @@ class Course(models.Model):
 	approved   = models.BooleanField(default=False)
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
-	# Other Static Attributes
 	rest_model = "course"
 	objects = Courses
-	# Single Argument (auto-call)
-	  # Return Single Value
+
+	def stand(self, me):
+		if me.owner_type == 'Family':
+			return bool(self.students.filter(family=me.owner))
+		elif me.owner_type == 'Student':
+			return bool(self.students.filter(id=me.owner.id))
+
 	def tuition(self, asof=datetime.now()):
 		cutoff = datetime(year=self.year-1,month=7,day=2)
 		return self.early_tuit if asof < cutoff else self.after_tuit
+
 	def slots_open(self):
 		if self.nSlots == 0:
 			return NotImplemented
 		else:
 			return max(self.nSlots - len(self.students), 0)
-	  # Return Django QuerySet
+
 	def enrollments(self):
 		return Enrollments.filter(course_id=self.id)
 	def students(self):
@@ -218,7 +213,7 @@ class Course(models.Model):
 		return self.students.filter(sex='F')
 	def families(self):
 		return Families.filter(student__enrollment__course=self).distinct()
-	# Move this to StudentList
+
 	def equipped_students(self):
 		result = []
 		students = self.students.reverse()
@@ -240,14 +235,13 @@ class Course(models.Model):
 			})
 		result.reverse()
 		return result
+
 	def students_toggle_enrollments(self):
 		result = []
 		for enrollment in self.enrollments:
 			result.append({'widget':enrollment,'static':Students.get(id=enrollment.student_id)})
 		return result
-	  # Return Something Else
-	# Multi Argument
-	  # Return Info
+
 	def conflicts_with(self, other):
 		if self.id == other.id:
 			return False
@@ -269,17 +263,6 @@ class Course(models.Model):
 			return False
 		else:
 			return True
-	def stand(self, me):
-		if me.owner_type == 'Family':
-			return bool(self.students.filter(family=me.owner))
-		elif me.owner_type == 'Student':
-			return bool(self.students.filter(id=me.owner.id))
-	  # Make changes to self
-	  # Make changes to others
-	# Magic
-	def __str__(self):
-		return '{} ({})'.format(self.title,self.year)
-
 
 	def cart(self, student):
 		enr = self.enroll(student)
@@ -302,50 +285,23 @@ class Course(models.Model):
 			elif audible(self, student) and self.slots_open:
 				return Enrollments.create(course=self, student=student, status="aud_pend")
 		if self.tradition.action == 'trig':
-			# This would be so much more elegant if Python had a native do-while loop
-			for casc in Courses.filter(year=self.year,tradition__action='casc'):
-				if eligible(casc, student):
-					Enrollments.create(course=casc,student=student)
-			for stat in Courses.filter(year=self.year,tradition__action='stat'):
-				if eligible(stat, student):
-					Enrollments.create(course=stat,student=student)
-			# while True:
-			# 	autos = Courses.filter(year=self.year,tradition__action='auto')
-			# 	for auto in autos:
-			# 		if Enrollments.filter(course=auto,student=student):
-			# 			autos = autos.exclude(id=auto.id)
-			# 		elif not eligible(auto, student):
-			# 			autos = autos.exclude(id=auto.id)
-			# 		else:
-			# 			Enrollments.create(course=auto,student=student)
-			# 	if TRACE:
-			# 		print Each(autos).id
-			# 	if not autos:
-			# 		break
+			self.trig(student)
 		return enrollment
 
-	# def audition(self, student):
-	# 	if audible(self,student):
-	# 		return Enrollments.create(course=self, student=student, status="aud_pend")
+	def trig(self, student):
+		for casc in Courses.filter(year=self.year,tradition__action='casc'):
+			if eligible(casc, student):
+				Enrollments.create(course=casc,student=student)
+		for stat in Courses.filter(year=self.year,tradition__action='stat'):
+			if eligible(stat, student):
+				Enrollments.create(course=stat,student=student)
 
-	# def accept(self, student, user):
-	# 	enrollment = Enrollments.fetch(course=self, student=student)
-	# 	enrollment.accept(user)
-	# 	# enrollment.status = "aud_pass"
-	# 	# print enrollment, enrollment.id
-	# 	# enrollment.save()
-	# 	# print enrollment
-	# 	# return enrollment
-
-	# def reject(self, student, user):
-	# 	enrollment = Enrollments.fetch(course=self, student=student)
-	# 	enrollment.reject(user)
-	# 	# enrollment.status = "aud_fail"
-		# enrollment.save()
-		# return enrollment
+	def __str__(self):
+		return '{} ({})'.format(self.title,self.year)
 
 	def __len__(self):
 		return len(self.students)
+
 	def __getattribute__(self, field):
 		if field in ['students_toggle_enrollments','students','enrollments','prepaid','slots_open']:
 			call = super(Course, self).__getattribute__(field)
@@ -456,6 +412,8 @@ class Enrollment(models.Model):
 			invoice = self.invoice
 			self.delete()
 			invoice.update_amount()
+		if self.course.tradition.action == 'trig':
+			self.fate()
 
 	def defer(self):
 		if self.status == "maydefer":
@@ -481,64 +439,32 @@ class Enrollment(models.Model):
 		else:
 			return super(Enrollment, self).__getattribute__(field)
 
-# FAUX MODELS
-
-# class StudentList(object):
-# 	def __init__(self, students):
-# 		self.students = students
-# 	def __iter__(self):
-# 		for x in self.students:
-# 			yield x
-# 	def __len__(self):
-# 		return len(self.students)
-		
 
 class Year(object):
+
 	def __init__(self, year):
 		self.year = year
+
 	def season(self):
 		return self.year - 1995
+
 	def spring(self):
 		return self.year
+
 	def fall(self):
 		return self.year - 1
+
 	def dash(self):
 		return "{}-{}".format(self.fall,self.spring)
-	# def students(self):
-	# 	return Students.filter(enrollment__course__year=self.year).distinct()
-	# def families(self):
-	# 	return Families.filter(student__enrollment__course__year=self.year).distinct()
-	# def newFamilies(self):
-	# 	return self.families.exclude(student__enrollment__course__year__lt=self.year).distinct()
-	# def nMainstageTroupeStudents(self):
-	# 	return sum([len(self.sg),len(self.sh),len(self.sj),len(self.sr)])
-	# def nTroupeStudents(self):
-	# 	return self.nMainstageTroupeStudents + len(self.sb)
-	# def dc(self):
-	# 	return self.combined(courses=Courses.filter(year=self.year,tradition__id__in=['J','Z']))
-	# def dt(self):
-	# 	pass
-	# def dw(self):
-	# 	pass
-	# def combined(self, **kwargs):
-	# 	letter = kwargs.get('letter')
-	# 	idlist = kwargs.get('idlist')
-	# 	courses = kwargs.get('courses')
-	# 	if letter:
-	# 		courses = Courses.filter(year=self.year,tradition__id__startswith=letter.upper())
-	# 	elif idlist:
-	# 		courses = Courses.filter(year=self.year,tradition__id__in=idlist)
-	# 	students = Students.filter(enrollment__course__in=courses).distinct()
-	# 	return StudentList(students)
+
 	def __str__(self):
 		return "HST Year {}-{}".format(self.fall,self.spring)
+
 	def __getattribute__(self, field):
 		if field in ['season','spring','fall','dash']: # ,'students','families','newFamilies','nMainstageTroupeStudents','nTroupeStudents','dc','dt','dw']:
 			call = super(Year, self).__getattribute__(field)
 			return call()
 		elif len(field) == 2:
 			return Courses.fetch(year=self.year,tradition__id=field.upper())
-		# elif len(field) == 1:
-		# 	return self.combined(letter=field)
 		else:
 			return super(Year, self).__getattribute__(field)
