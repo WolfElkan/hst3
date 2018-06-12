@@ -173,12 +173,12 @@ def check_word(trad, student, word, **kwargs):
 			# return True
 			# print word.count('+')
 			# print len(set(Each(Each(query_result).student).id))
-			return len(set(Each(Each(query_result).student).id))
+			# return len(set(Each(Each(query_result).student).id))
 			# return len(set(Each(Each(query_result).student).id)) >= word.count('+')
 			# print ids
 			# return False
 			# return len(Students.filter(enrollment__id__in=ids).distinct())
-			# return len(Students.filter(enrollment__in=query_result).distinct()) >= word.count('+')
+			return len(Students.filter(enrollment__in=query_result).distinct()) >= word.count('+')
 		else:
 			return bool(query_result)
 
@@ -232,6 +232,21 @@ def audible(course, student):
 		print 'audible',course,student
 	return check_eligex(course, student, aud=True)
 
+
+def enroll(course, student):
+	pass
+
+def drop(course, student):
+	pass
+
+def defer(enrollment):
+	pass
+
+def accept(course,student):
+	pass
+
+def reject(course,student):
+	pass
 
 status_choices = [
 	("enrolled","{student} {proverb} enrolled in {course} ({year})"),                               # invoice__status='P' # Stable
