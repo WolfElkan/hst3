@@ -4,12 +4,9 @@ from Utils.data import Each
 from Utils.debug import kwargle
 import re, random, datetime
 
-TRACE = True
+TRACE = False
 
 def check_eligex(course, student, **kwargs):
-	if kwargs.get('debug'):
-		print 'check_eligex', course, student, kwargle(kwargs)
-
 	# Set defaults for omitted keyword arguments
 	eligex = kwargs.setdefault('eligex', None)
 	year   = kwargs.setdefault('year'  , None)
@@ -17,6 +14,9 @@ def check_eligex(course, student, **kwargs):
 	cur    = kwargs.setdefault('cur'   , False)
 	conj   = kwargs.setdefault('conj'  , True)
 	debug  = kwargs.setdefault('debug' , TRACE)
+
+	if kwargs.get('debug'):
+		print 'check_eligex', course, student, kwargle(kwargs)
 
 	# Check for Course or CourseTrad
 	if course.rest_model == 'course':
@@ -81,15 +81,15 @@ def check_eligex(course, student, **kwargs):
 
 
 def check_word(trad, student, word, **kwargs):
-	if kwargs.get('debug'):
-		print 'check_word', trad, student, word, kwargle(kwargs)
-	
 	# Set defaults for omitted keyword arguments
 	year   = kwargs.setdefault('year'  , None)
 	aud    = kwargs.setdefault('aud'   , False)
 	cur    = kwargs.setdefault('cur'   , False)
 	debug  = kwargs.setdefault('debug' , TRACE)
 
+	if kwargs.get('debug'):
+		print 'check_word', trad, student, word, kwargle(kwargs)
+	
 	# Boolean literals
 	if '#' in word:
 		return True
@@ -184,7 +184,8 @@ def check_word(trad, student, word, **kwargs):
 
 
 def calc_status(enr, cart=False):
-	print 'calc_status',enr,cart
+	if TRACE:
+		print 'calc_status',enr,cart
 	# print enr.course.id, enr.status
 	if cart:
 		if check_eligex(enr.course, enr.student):
@@ -213,7 +214,8 @@ def calc_status(enr, cart=False):
 
 
 def eligible(course, student):
-	print 'eligible',course,student
+	if TRACE:
+		print 'eligible',course,student
 	superdebug = False
 	if superdebug:
 		print
@@ -226,8 +228,10 @@ def eligible(course, student):
 
 
 def audible(course, student):
-	print 'audible',course,student
+	if TRACE:
+		print 'audible',course,student
 	return check_eligex(course, student, aud=True)
+
 
 status_choices = [
 	("enrolled","{student} {proverb} enrolled in {course} ({year})"),                               # invoice__status='P' # Stable

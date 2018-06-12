@@ -62,7 +62,7 @@ FIELDS = {
 		{'field':'oid'       , 'template': Static()},
 		{'field':'m'         , 'template': Checkbox(suffix='This course will be visible on course menu.')},
 		{'field':'e'         , 'template': Checkbox(suffix='This course will be visible in family enrollment shopping cart.')},
-		{'field':'action'    , 'template': Enum(options=['none','trig','auto'],default='none')},
+		{'field':'action'    , 'template': Enum(options=CourseTrads.model.action_choices,default='none')},
 		{'field':'title'     , 'template': VarChar(maxlength=50)},
 		{'field':'eligex'    , 'template': VarChar(default='a')},
 		{'field':'default'   , 'template': Enum(options=dict(status_choices).keys())},
