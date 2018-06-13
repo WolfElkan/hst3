@@ -25,14 +25,15 @@ def reg(request, ref, step, id=None):
 		return students(request, ref, id)
 	elif step == 'policy':
 		return policy(request, ref, id)
+	elif step == 'redirect':
+		if not me or not me.owner:
+			return redirect('/register/family/')
+		elif not me.owner.mother and not me.owner.father:
+			return redirect('/register/parents/')
+		else:
+			return redirect('/register/students/')
 
 
-	# if not me or not me.owner:
-	# 	return redirect('/register/family/')
-	# elif not me.owner.mother and not me.owner.father:
-	# 	return redirect('/register/parents/')
-	# else:
-	# 	return redirect('/register/students/')
 
 def family(request, ref):
 	forminit(request,'family',['last','phone','email'])
