@@ -23,10 +23,7 @@ class Bcrypt(object):
 			self.html = u'<span title="{}">{}</span>'.format(self.full,self.emoji) if self.full[0] == '$' else self.full
 	def __call__(self, pw):
 		pw = bytes(pw)
-		# print pw, type(pw)
-		pw = 'Password123!'
 		if self.encode[0] == '2':
-			print self.full
 			correct = bcrypt.checkpw(bytes(pw), bytes(self.full))
 		elif self.encode == '1':
 			correct = md5.new(bytes(pw)).hexdigest() == str(self.hash)

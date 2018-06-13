@@ -4,20 +4,20 @@ X	Check all REST routes
 
 Student Interface
 	Make titles of required fields bold automatically
-	Support date field on other browsers
-	BUG: Dynamic methods not being applied when elements are saved
+X	Support date field on other browsers
+XX	BUG: Dynamic methods not being applied when elements are saved
 
 Parent Interface
 	Make validations work
 	Make titles of required fields bold automatically
 	
-	create PolyRole table
+>	create PolyRole table
 
-	Provide validation to CourseTrad model to make infinite aliasing impossible
+>	Provide validation to CourseTrad model to make infinite aliasing impossible
 
 rest
-	support /add/[mo|fa]ther
-	Give Widgets control over whether static values are rendered safely
+>	support /add/[mo|fa]ther
+>	Give Widgets control over whether static values are rendered safely
 
 >	LINK WITH PAYPAL
 

@@ -195,7 +195,8 @@ class Family(models.Model):
 			Each(newer).update_name_num()
 		return self.name_num
 	def __str__(self):
-		return ('{} Family #{}' if self.name_num else '{} Family').format(self.last,self.name_num)
+		# return ('{} Family #{}' if self.name_num else '{} Family').format(self.last,self.name_num)
+		return '{} Family'.format(self.last)
 	def __getattribute__(self, field):
 		if field in ['unique_last','children','enrollments','hours_worked']:
 			call = super(Family, self).__getattribute__(field)

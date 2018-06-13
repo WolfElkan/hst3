@@ -50,24 +50,14 @@ def login_post(request, path):
 	me = Users.fetch(username=request.POST['username'])
 	persist = copy(request.POST, ['username','password'])
 	if not me:
-		family = Families.fetch(last=namecase(request.POST['username']))
-		if DEV and family:
-			new_user = copy(request.POST,['username','password'])
-			new_user['owner'] = family
-			new_user['permission'] = 7
-			Users.create(**new_user)
-			request.session['meid'] = new_user['id']
-			return redirect(path)
-		else:
-			request.session['e'] = {'login':{'username': "You do not have an account.  Please register."}}
-			request.session['p'] = {'login':persist}
-			return redirect('/login{}'.format(path))
+		request.session['e'] = {'login':{'username': "You do not have an account.  Please register."}}
+		request.session['p'] = {'login':persist}
+		return redirect('/login{}'.format(path))
 	elif not me.password(request.POST['password']):
 		request.session['e'] = {'login':{'password': "Your password is incorrect"}}
 		request.session['p'] = {'login':persist}
 		return redirect('/login{}'.format(path))
 	else:
-		me.save()
 		request.session['meid'] = me.id
 		return redirect(path)
 
@@ -79,6 +69,8 @@ def logout(request):
 
 def account(request):
 	me = getme(request)
+	if not me:
+		return redirect('/')
 	password = unicode(me.password.html)
 	context = {
 		'me':me,
