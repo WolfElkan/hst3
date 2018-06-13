@@ -44,6 +44,9 @@
 	.tab {
 		width: calc((100% {% if not new %} - 44px {% endif %} ) / {{students|length}} - 12px)
 	}
+	.only_tab {
+		width: calc((100% - 12px));
+	}
 	.short_tab {
 		width: 32px;
 	}
@@ -233,7 +236,7 @@
 	{% if ref == 'myaccount' %}
 	<a href="/myaccount/">Return to My Account</a>
 	{% elif ref == 'register' %}
-	<a href="/register/policy/0/">Continue Registration</a>
+	<a href="/register/policy/0/">Continue Registration &rarr;</a>
 	{% endif %}
 </body>
 </html>
