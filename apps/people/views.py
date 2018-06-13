@@ -247,7 +247,7 @@ def students(request, ref, id):
 def students_edit(request, ref, id):
 	me = getme(request)
 	if not me or not me.owner or not (me.owner.mother or me.owner.father):
-		return redirect('/register')
+		return redirect('/register/redirect/')
 	student = Students.fetch(id=id)
 	forminit(request,'student',student_fields,obj=student)
 	context = {
@@ -282,7 +282,7 @@ new_student = {'prefer':'New Student','id':'new'}
 def students_new(request, ref):
 	me = getme(request)
 	if not me or not me.owner or not (me.owner.mother or me.owner.father):
-		return redirect('/register')
+		return redirect('/register/redirect/')
 	students = list(me.owner.children)
 	students.append(new_student)
 	context = {

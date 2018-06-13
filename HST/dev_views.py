@@ -15,6 +15,7 @@ from Utils.misc  import namecase, cleanhex, safe_delete
 from Utils.security import getme, getyear, gethist, restricted
 from Utils.seshinit import seshinit, forminit
 from Utils.snippets import order_coursetrads, make
+from Utils.password import generate, assign_temporary_passwords
 
 from apps.old import migrate as old
 

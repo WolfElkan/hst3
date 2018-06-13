@@ -16,7 +16,7 @@ import json
 
 def load(request):
 	bad = restricted(request,6)
-	if bad:
+	if bad and len(Users.all()):
 		return bad
 	if request.method == 'GET':
 		return load_get(request)
@@ -26,9 +26,6 @@ def load(request):
 		return HttpResponse("Unrecognized HTTP Verb")
 
 def load_get(request):
-	bad = restricted(request,6)
-	if bad:
-		return bad
 	seshinit(request,'json_dump')
 	context = {
 		'json_dump': request.session['json_dump']
@@ -36,10 +33,6 @@ def load_get(request):
 	return render(request, 'json/seed.html', context)
 
 def load_post(request):
-	bad = restricted(request,6)
-	if bad:
-		return bad
-
 	start_import = datetime.now()
 	nUsers       = 0
 	nFamilies    = 0
@@ -98,13 +91,14 @@ def load_post(request):
 		family = Families.create(**family)
 		family.update_name_num()
 		nFamilies += 1
-		if 'password' in fam:
+		user_obj = fam.get('user')
+		if user_obj:
 			Users.create(
 				owner_type = 'Family',
 				owner_id   = family.id,
-				username   = family.last + (str(family.name_num) if family.name_num else ''),
-				password   = fam['password'],
-				permission = 2,
+				username   = user_obj['username'],
+				password   = user_obj['password'],
+				permission = user_obj['permission'],
 			)
 			nUsers += 1
 		if 'mother' in fam:
@@ -160,15 +154,16 @@ def load_post(request):
 	# print '- make {}'.format(year)
 	# nCourses += make(year)
 
-	su = Users.fetch(username='wolf')
-	if DEV and su:
-		print '- assign developer: Wolf Elkan'
-		elkan = Families.fetch(last='Elkan')
-		if elkan:
-			su.owner_id = elkan.id
-			su.owner_type = 'Family'
-			su.password = su.password.full
-			su.save()
+	# print '- assign developer: Wolf Elkan'
+	# elkan = Families.fetch(last='Elkan')
+	# if elkan:
+	# 	Users.create(
+	# 		username='wolf',
+	# 		password='$2b$16$vsw.8GUmM.NZxvvRO10VbuW7UmKlEqqa5xIG0DKVAhpa/xSX9O06e',
+	# 		permission=7,
+	# 		owner_type='Family',
+	# 		owner_id=elkan.id
+	# 		)
 
 	import_duration = datetime.now() - start_import
 	
@@ -241,9 +236,13 @@ def dump(request):
 			'email':family.email,
 		}
 		user = Users.fetch(owner_id=family.id)
-		print family
+		# print family
 		if user:
-			family_obj['password'] = user.password
+			family_obj['user'] = {
+				'username'  : user.username,
+				'password'  : user.password,
+				'permission': user.permission,
+			}
 		if family.mother_id:
 			family_obj['mother'] = copyatts(family.mother,['first','sex'])
 			if family.mother.alt_last:
@@ -312,6 +311,5 @@ def nuke(request):
 	Enrollments.all().delete()
 	# RAdmin
 	Policies.all().delete()
-	Users.create(username='wolf',password='$2b$16$vsw.8GUmM.NZxvvRO10VbuW7UmKlEqqa5xIG0DKVAhpa/xSX9O06e',permission=7)
 	print '\n\n'+' '*34+'THE RADIANCE OF A THOUSAND SUNS'+'\n\n'
 	return redirect ('/seed/load')
