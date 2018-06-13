@@ -91,6 +91,17 @@ def summary(request, **kwargs):
 	}
 	return render(request, 'reports/summary.html', context)
 
+def refresh_summary(request, **kwargs):
+	kwargs.setdefault('year',getyear())
+	for course in Courses.filter(year__in=[kwargs['year'],kwargs['year']-1],tradition__action='trig'):
+		for student in Students.filter(enrollment__course=course):
+			course.trig(student)
+	return redirect('/reports/summary/')
+
+def generate_summary(request, **kwargs):
+	Courses.create_by_id(request.GET['course_id'])
+	return redirect('/reports/summary/')	
+
 def mass_enroll(request, **kwargs):
 	bad = restricted(request,5)
 	if bad:

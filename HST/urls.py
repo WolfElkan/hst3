@@ -105,6 +105,10 @@ urlpatterns = [
 
 	url(r'^reports/summary/(?P<year>\d{4})/$', reports.summary),
 	url(r'^reports/summary/$', reports.summary),
+	url(r'^reports/summary/(?P<year>\d{4})/refresh/$', reports.refresh_summary),
+	url(r'^reports/summary/refresh/$', reports.refresh_summary),
+	url(r'^reports/summary/generate/$', reports.generate_summary),
+	url(r'^reports/summary/\d{4}/generate/$', reports.generate_summary),
 
 	url(r'^admin/dashboard/$', radmin.dashboard),
 
