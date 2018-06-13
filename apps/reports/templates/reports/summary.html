@@ -10,6 +10,21 @@
 		.stat {
 			text-align: right;
 		}
+		img {
+			height: 20px;
+			vertical-align: middle;
+			display: none;
+		}
+		th, td {
+			border: solid black 1px;
+			padding: 2px 5px;
+		}
+		table {
+			border-collapse: collapse;
+			/*display: block;*/
+			margin: 10px;
+		}
+
 	</style>
 </head>
 <body>
@@ -23,74 +38,94 @@
 	</thead>
 	<tr>
 		<td>Total Number of families:</td>
-		<td class="stat">{{year.rf|length}}</td>
-		<td class="stat">{{prev.rf|length}}</td>
+		<td class="stat">{% if year.rf.id %}{{year.rf|length}}{% else %}<a href="generate/?course_id={{year.nocent}}RF">Generate</a>{% endif %}</td>
+		<td class="stat">{% if prev.rf.id %}{{prev.rf|length}}{% else %}<a href="generate/?course_id={{prev.nocent}}RF">Generate</a>{% endif %}</td>
 	</tr>
 	<tr>
 		<td>Total Number of New families:</td>
-		<td class="stat">{{year.rn|length}}</td>
-		<td class="stat">{{prev.rn|length}}</td>
+		<td class="stat">{% if year.rn.id %}{{year.rn|length}}{% else %}<a href="generate/?course_id={{year.nocent}}RN">Generate</a>{% endif %}</td>
+		<td class="stat">{% if prev.rn.id %}{{prev.rn|length}}{% else %}<a href="generate/?course_id={{prev.nocent}}RN">Generate</a>{% endif %}</td>
 	</tr>
 	<thead>
 		<th>Student Totals</th>
 	</thead>
 	<tr>
-		<td>Total Number of students:</td>
-		<td class="stat">{{year.rs|length}}</td>
-		<td class="stat">{{prev.rs|length}}</td>
+		<td>Total Number of Students:</td>
+		<td class="stat">{% if year.rs.id %}{{year.rs|length}}{% else %}<a href="generate/?course_id={{year.nocent}}RS">Generate</a>{% endif %}</td>
+		<td class="stat">{% if prev.rs.id %}{{prev.rs|length}}{% else %}<a href="generate/?course_id={{prev.nocent}}RS">Generate</a>{% endif %}</td>
 	</tr>
 	<tr>
 		<td>Total Number of Students in Mainstage Troupes: </td>
-		<td class="stat">{{year.sm.students|length}}</td>
-		<td class="stat">{{prev.sm.students|length}}</td>
+		<td class="stat">{% if year.sm.id %}{{year.sm.students|length}}{% else %}<a href="generate/?course_id={{year.nocent}}SM">Generate</a>{% endif %}</td>
+		<td class="stat">{% if prev.sm.id %}{{prev.sm.students|length}}{% else %}<a href="generate/?course_id={{prev.nocent}}SM">Generate</a>{% endif %}</td>
 	</tr>
 	<tr>
 		<td>Total Number of Students in Travel Troupe: </td>
-		<td class="stat">{{year.sb.students|length}}</td>
-		<td class="stat">{{prev.sb.students|length}}</td>
+		<td class="stat">{% if year.sb.id %}{{year.sb.students|length}}{% else %}<a href="generate/?course_id={{year.nocent}}SB">Generate</a>{% endif %}</td>
+		<td class="stat">{% if prev.sb.id %}{{prev.sb.students|length}}{% else %}<a href="generate/?course_id={{prev.nocent}}SB">Generate</a>{% endif %}</td>
 	</tr>
 	<tr>
 		<td>Total Number of Students in Acting Classes:</td>
-		<td class="stat">{{year.ac.students|length}}</td>
-		<td class="stat">{{prev.ac.students|length}}</td>
+		<td class="stat">{% if year.ac.id %}{{year.ac.students|length}}{% else %}<a href="generate/?course_id={{year.nocent}}AC">Generate</a>{% endif %}</td>
+		<td class="stat">{% if prev.ac.id %}{{prev.ac.students|length}}{% else %}<a href="generate/?course_id={{prev.nocent}}AC">Generate</a>{% endif %}</td>
 	</tr>
 	<tr>
-		<td>Total Number of Students in Dance Classes: </td>
-		<td class="stat">{{year.dc.students|length}}</td>
-		<td class="stat">{{prev.dc.students|length}}</td>
+		<td>Total Number of Students in Tuesday Dance Classes: </td>
+		<td class="stat">{% if year.dt.id %}{{year.dt.students|length}}{% else %}<a href="generate/?course_id={{year.nocent}}DT">Generate</a>{% endif %}</td>
+		<td class="stat">{% if prev.dt.id %}{{prev.dt.students|length}}{% else %}<a href="generate/?course_id={{prev.nocent}}DT">Generate</a>{% endif %}</td>
+	</tr>
+	<tr>
+		<td>Total Number of Students in Wednesday Dance Classes: </td>
+		<td class="stat">{% if year.dw.id %}{{year.dw.students|length}}{% else %}<a href="generate/?course_id={{year.nocent}}DW">Generate</a>{% endif %}</td>
+		<td class="stat">{% if prev.dw.id %}{{prev.dw.students|length}}{% else %}<a href="generate/?course_id={{prev.nocent}}DW">Generate</a>{% endif %}</td>
+	</tr>
+	<tr>
+		<td>Total Number of Students in All Dance Classes: </td>
+		<td class="stat">{% if year.dc.id %}{{year.dc.students|length}}{% else %}<a href="generate/?course_id={{year.nocent}}DC">Generate</a>{% endif %}</td>
+		<td class="stat">{% if prev.dc.id %}{{prev.dc.students|length}}{% else %}<a href="generate/?course_id={{prev.nocent}}DC">Generate</a>{% endif %}</td>
 	</tr>
 	<tr>
 		<td>Total Number of Students in Choir:</td>
-		<td class="stat">{{year.cc.students|length}}</td>
-		<td class="stat">{{prev.cc.students|length}}</td>
+		<td class="stat">{% if year.cc.id %}{{year.cc.students|length}}{% else %}<a href="generate/?course_id={{year.nocent}}CC">Generate</a>{% endif %}</td>
+		<td class="stat">{% if prev.cc.id %}{{prev.cc.students|length}}{% else %}<a href="generate/?course_id={{prev.nocent}}CC">Generate</a>{% endif %}</td>
 	</tr>
 	<tr>
 		<td>Total Number of Students in Tech Team:</td>
-		<td class="stat">{{year.xx.students|length}}</td>
-		<td class="stat">{{prev.xx.students|length}}</td>
+		<td class="stat">{% if year.xx.id %}{{year.xx.students|length}}{% else %}<a href="generate/?course_id={{year.nocent}}XX">Generate</a>{% endif %}</td>
+		<td class="stat">{% if prev.xx.id %}{{prev.xx.students|length}}{% else %}<a href="generate/?course_id={{prev.nocent}}XX">Generate</a>{% endif %}</td>
 	</tr>
 	<tr>
 		<td>Total Number of Students in Tech Make-Up Team:</td>
-		<td class="stat">{{year.mu.students|length}}</td>
-		<td class="stat">{{prev.mu.students|length}}</td>
+		<td class="stat">{% if year.mu.id %}{{year.mu.students|length}}{% else %}<a href="generate/?course_id={{year.nocent}}MU">Generate</a>{% endif %}</td>
+		<td class="stat">{% if prev.mu.id %}{{prev.mu.students|length}}{% else %}<a href="generate/?course_id={{prev.nocent}}MU">Generate</a>{% endif %}</td>
 	</tr>
 	<tr>
 		<td>Total Number of Students in Tech Workshops</td>
-		<td class="stat">{{year.wc.students|length}}</td>
-		<td class="stat">{{prev.wc.students|length}}</td>
+		<td class="stat">{% if year.wc.id %}{{year.wc.students|length}}{% else %}<a href="generate/?course_id={{year.nocent}}WC">Generate</a>{% endif %}</td>
+		<td class="stat">{% if prev.wc.id %}{{prev.wc.students|length}}{% else %}<a href="generate/?course_id={{prev.nocent}}WC">Generate</a>{% endif %}</td>
 	</tr>
 	<tr>
 		<td>Total Number of Students in Showcase: </td>
-		<td class="stat">{{year.sc.students|length}}</td>
-		<td class="stat">{{prev.sc.students|length}}</td>
+		<td class="stat">{% if year.sc.id %}{{year.sc.students|length}}{% else %}<a href="generate/?course_id={{year.nocent}}SC">Generate</a>{% endif %}</td>
+		<td class="stat">{% if prev.sc.id %}{{prev.sc.students|length}}{% else %}<a href="generate/?course_id={{prev.nocent}}SC">Generate</a>{% endif %}</td>
 	</tr>
 	<thead>
 		<th>Registration Slot Totals</th>
 	</thead>
 	<tr>
-		<td>Total Number of Slots in Troupes, Tech Teams & Classes</td>
-		<td class="stat">{{year.nSlotsSDX}}</td>
-		<td class="stat">{{prev.nSlotsSDX}}</td>
+		<td>Total Number of Slots in Troupes</td>
+		<td class="stat">{{year.nSlotsS}}</td>
+		<td class="stat">{{prev.nSlotsS}}</td>
+	</tr>
+	<tr>
+		<td>Total Number of Slots in Dance Classes</td>
+		<td class="stat">{{year.nSlotsD}}</td>
+		<td class="stat">{{prev.nSlotsD}}</td>
+	</tr>
+	<tr>
+		<td>Total Number of Slots in Tech Teams</td>
+		<td class="stat">{{year.nSlotsX}}</td>
+		<td class="stat">{{prev.nSlotsX}}</td>
 	</tr>
 	<tr>
 		<td>Total Number of Slots in Workshops</td>
@@ -98,5 +133,14 @@
 		<td class="stat">{{prev.nSlotsW}}</td>
 	</tr>
 </table>
+<button onclick="mo('refresh')">Refresh</button>
+<img src="https://zippy.gfycat.com/SkinnySeveralAsianlion.gif">
+<br>(This takes about a minute)
 </body>
+<script type="text/javascript">
+	function mo(url) {
+		window.location.href = url
+		document.getElementsByTagName('img')[0].style.display = 'inline'
+	}
+</script>
 </html>

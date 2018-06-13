@@ -457,11 +457,36 @@ class Year(object):
 	def dash(self):
 		return "{}-{}".format(self.fall,self.spring)
 
+	def nocent(self):
+		return str(self.year)[2:]
+
+	def nSlotsW(self):
+		return sum(Each(Courses.filter(year=self.year,tradition__e=True,tradition__id__startswith='W')).nSlots)
+
+	def nSlotsS(self):
+		return sum(Each(Courses.filter(year=self.year,tradition__e=True,tradition__id__startswith='S')).nSlots)
+
+	def nSlotsD(self):
+		return sum([
+			Each(Courses.filter(year=self.year,tradition__e=True,tradition__id__startswith='H')).nSlots,
+			Each(Courses.filter(year=self.year,tradition__e=True,tradition__id__startswith='I')).nSlots,
+			Each(Courses.filter(year=self.year,tradition__e=True,tradition__id__startswith='J')).nSlots,
+			Each(Courses.filter(year=self.year,tradition__e=True,tradition__id__startswith='Z')).nSlots,
+			Each(Courses.filter(year=self.year,tradition__e=True,tradition__id__startswith='T')).nSlots,
+			Each(Courses.filter(year=self.year,tradition__e=True,tradition__id__startswith='P')).nSlots,
+		])
+
+	def nSlotsX(self):
+		return sum(Each(Courses.filter(year=self.year,tradition__e=True,tradition__id__startswith='X')).nSlots)
+
+	def nSlotsSDX(self):
+		return sum([self.nSlotsS,self.nSlotsD,self.nSlotsX])
+
 	def __str__(self):
 		return "HST Year {}-{}".format(self.fall,self.spring)
 
 	def __getattribute__(self, field):
-		if field in ['season','spring','fall','dash']: # ,'students','families','newFamilies','nMainstageTroupeStudents','nTroupeStudents','dc','dt','dw']:
+		if field in ['season','spring','fall','dash','nocent','nSlotsW','nSlotsS','nSlotsD','nSlotsX','nSlotsSDX']:
 			call = super(Year, self).__getattribute__(field)
 			return call()
 		elif len(field) == 2:
