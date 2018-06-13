@@ -249,6 +249,8 @@ def students_edit(request, ref, id):
 	if not me or not me.owner or not (me.owner.mother or me.owner.father):
 		return redirect('/register/redirect/')
 	student = Students.fetch(id=id)
+	if not student:
+		return redirect('/{}/students/new/'.format(ref))
 	forminit(request,'student',student_fields,obj=student)
 	context = {
 		'new':False,
