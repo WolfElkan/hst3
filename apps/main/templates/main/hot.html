@@ -9,6 +9,7 @@
 	}
 	.session, .request {
 		font-family: monospace;
+		display: none;
 	}
 		.number {
 			color: blue;
@@ -59,6 +60,10 @@
 		.object {}
 			.type {}
 			.strobj {}
+	div.log {
+		font-family: monospace;
+		padding: 1px 0;
+	}
 </style>
 <script src="{% static 'main/js/jquery.js' %}" charset="utf-8"></script>
 <script type="text/javascript">
@@ -76,6 +81,18 @@
 			$('.request').hide()
 		})
 
+		$('.show_ses').click(function() {
+			$('.show_ses').hide()
+			$('.hide_ses').show()
+			$('.session').show()
+		})
+
+		$('.hide_ses').click(function() {
+			$('.show_ses').show()
+			$('.hide_ses').hide()
+			$('.session').hide()
+		})
+
 	})
 </script>
 <div class="enlarge">
@@ -85,10 +102,28 @@ Python Hot Code:
 	<textarea name="command" rows="20" cols="100" style="font-family: monospace;">{{ command }}</textarea>
 	<input type="submit" value="RUN">
 </form>
-<div class="session">{{session|safe}}</div>
+<button class="show_req">Show Request</button>
+<button style="display: none;" class="hide_req">Hide Request</button>
+<button class="show_ses">Show Session</button>
+<button style="display: none;" class="hide_ses">Hide Session</button>
+<div class="log">
+  {% for call in log %}
+	<div class="log">
+	  {% for arg in call %}
+		<div class="log">
+		  {% for line in arg %}
+			<div class="log">
+			  {{line}}
+			</div>
+		  {% endfor %}
+		</div>
+	  {% endfor %}
+	</div>
+  {% endfor %}
+</div>
+<div class="session">{{session|safe}}
 <a href="/clear">Clear Session</a>
 </div>
+</div>
 <div style="text-align: right;"><a href="/nuke">Nuke Database</a></div>
-<button class="show_req">Show Full Request</button>
-<button style="display: none;" class="hide_req">Hide Request</button>
-<div style="display: none;" class="request">{{request|safe}}</div>
+<div class="request">{{request|safe}}</div>
