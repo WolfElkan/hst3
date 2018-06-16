@@ -22,6 +22,11 @@ from apps.old import migrate as old
 import datetime
 import re
 
+def log(request, *items):
+	items = Each(items).__str__()
+	items = Each(items).split('\n')
+	request.session['log'].append(list(items))
+
 def lookup_student(obj):
 	first = namecase(obj['first'])
 	last = namecase(obj['last'])
@@ -77,7 +82,9 @@ def hot(request):
 		return bad
 	me = getme(request)
 	seshinit(request,'command')
+	seshinit(request, 'log', [])
 	context = {
+		'log':request.session['log'],
 		'command': request.session['command'],
 		'session': divs(request.session.__dict__['_session_cache']),
 		'request': divs(request.__dict__.copy()),
@@ -92,8 +99,10 @@ def run(request):
 		return bad
 	me = getme(request)
 	command = str(request.POST.get('command'))
+	modified_command = command.replace('log(','log(request,')
 	request.session['command'] = command
-	exec(command)
+	request.session['log'] = []
+	exec(modified_command)
 	return redirect('/hot/')
 
 def clear(request):
