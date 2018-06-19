@@ -3,8 +3,7 @@ alpha64=ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/
 
 echo "Enter PayPal recipient account business email:"
 read email
-echo "Enter ngrok or other host address as"
-echo "00000000.ngrok.io"
+echo "Enter host address:"
 read ngrok
 echo "Enter MySQL database password: (or leave blank to have one generated)"
 read mysql
