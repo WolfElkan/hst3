@@ -9,7 +9,8 @@ from .managers import CourseTrads, Courses, Enrollments, Venues
 from .eligex import check_eligex, check_word, calc_status, eligible, audible, status_choices, TRACE
 Q = models.Q
 from apps.people.managers import Students, Families
-from trace import DEV
+#from trace import DEV
+import trace
 from datetime import datetime
 import pytz, re
 

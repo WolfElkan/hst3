@@ -10,7 +10,7 @@ from Utils import supermodel as sm
 from Utils.data import Each, collect
 
 import datetime
-from trace import DEV, OPEN
+#from trace import DEV, OPEN
 import markdown2, re
 
 class Policy(models.Model):

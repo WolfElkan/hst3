@@ -5,9 +5,9 @@ from .data import find as _
 from . import multi_column_gist as poly
 from datetime import datetime
 from decimal import Decimal
-from trace import TRACE
+#from trace import TRACE
 import bcrypt, re, md5
-
+TRACE = False
 EnumField = sqlmod.EnumField
 
 class Bcrypt(object):

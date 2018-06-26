@@ -12,7 +12,7 @@ from Utils.misc  import namecase, safe_delete
 from Utils.security import getme, getyear
 from Utils.seshinit import seshinit, forminit
 
-from trace import DEV
+#from trace import DEV
 
 import re
 

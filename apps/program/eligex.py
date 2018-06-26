@@ -3,7 +3,6 @@ from apps.people.managers import Students
 from Utils.data import Each
 from Utils.debug import kwargle
 import re, random, datetime
-# from HST.dev_views import log
 
 TRACE = False
 
