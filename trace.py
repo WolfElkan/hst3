@@ -5,5 +5,5 @@ DEV = True
 # Troupe counts as Acting class
 # Assert registration year
 
-OPEN = False
+OPEN = True
 # View security disabled.

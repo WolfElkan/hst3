@@ -19,6 +19,7 @@ FIELDS = {
 		{'field':'oid'       , 'template': Static()},
 		{'field':'hid'       , 'template': Static()},
 		{'field':'last'      , 'template': VarChar(maxlength=30)},
+		{'field':'user'      , 'template': ForeignKey(model='user', null=True)},
 		{'field':'phone'     , 'template': PhoneNumber()},
 		{'field':'phone_type', 'template': Enum(options=['','Home','Cell','Work'])},
 		{'field':'email'     , 'template': VarChar(maxlength=254)},
