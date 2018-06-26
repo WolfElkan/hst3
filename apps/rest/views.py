@@ -167,5 +167,4 @@ def delete(request, model, id):
 	manager = MODELS[model]
 	thing = manager.get(id=id)
 	thing.delete()
-	return redirect('/rest/index/{}/'.format(model))
-	# return redirect('/reports/students/2017/')
+	return redirect('/reports/students/2017/')

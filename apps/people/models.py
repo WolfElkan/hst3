@@ -16,7 +16,8 @@ from Utils.debug import pretty
 
 from django_mysql import models as sqlmod
 from datetime import datetime
-from trace import DEV
+#from trace import DEV
+import trace
 Q = models.Q
 
 sex_choices = [('M','Male'),('F','Female')]
@@ -139,8 +140,6 @@ class Family(models.Model):
 			return self.unique_last
 		else:
 			return self.last
-	def user(self):
-		return Users.fetch(owner_type='Family',owner_id=self.id)
 	def children(self):
 		return Students.filter(family_id=self.id).order_by('birthday')
 	def children_enrolled_in(self,year):
@@ -200,7 +199,7 @@ class Family(models.Model):
 		# return ('{} Family #{}' if self.name_num else '{} Family').format(self.last,self.name_num)
 		return '{} Family'.format(self.last)
 	def __getattribute__(self, field):
-		if field in ['unique_last','children','enrollments','hours_worked','user']:
+		if field in ['unique_last','children','enrollments','hours_worked']:
 			call = super(Family, self).__getattribute__(field)
 			return call()
 		else:
@@ -409,7 +408,8 @@ class User(models.Model):
 		(6,'Admin'),
 		(7,'Developer')
 	]
-	permission = models.PositiveSmallIntegerField(default=7*int(DEV), choices=perm_levels)
+	default_val = 7 * int(False)
+	permission = models.PositiveSmallIntegerField(default=default_val, choices=perm_levels)
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
 	rest_model = "user"
