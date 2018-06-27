@@ -39,7 +39,7 @@ class PayPal(models.Model):
 		self.save()
 		return self.verified
 	def stand(self, me):
-		return self.invoice.family.id == me.id
+		return self.invoice.family.id == me.owner.id
 	def __getattribute__(self, field):
 		if field in ['invoice','family']:
 			call = super(PayPal, self).__getattribute__(field)
@@ -66,7 +66,7 @@ class Invoice(models.Model):
 	def __str__(self):
 		return "Invoice #{}".format(self.id)
 	def stand(self, me):
-		return self.family.id == me.id
+		return self.family.id == me.owner.id
 	def items(self):
 		return Enrollments.filter(invoice=self)
 	def calc_amount(self):
