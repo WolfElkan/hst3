@@ -345,7 +345,10 @@ def policy_get(request, ref, page=None):
 		}
 		return render(request, 'policy.html', context)
 	else:
-		return redirect('/register/classes/{}/'.format(me.owner.children[0].id))
+		if me.owner.children:
+			return redirect('/{}/classes/{}/'.format(ref,me.owner.children[0].id))
+		else:
+			return redirect('/{}/students/new/')
 
 def policy_post(request, ref, page):
 	page = int(page)
