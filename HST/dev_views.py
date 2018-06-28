@@ -22,10 +22,7 @@ from apps.old import migrate as old
 import datetime
 import re
 
-def log(request, *items):
-	items = Each(items).__str__()
-	items = Each(items).split('\n')
-	request.session['log'].append(list(items))
+from .hotlog import log
 
 def lookup_student(obj):
 	first = namecase(obj['first'])
