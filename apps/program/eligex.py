@@ -3,7 +3,7 @@ from apps.people.managers import Students
 from Utils.data import Each
 from Utils.debug import kwargle
 import re, random, datetime
-# from HST.dev_views import log
+from HST.hotlog import log
 
 TRACE = False
 
@@ -17,7 +17,11 @@ def check_eligex(course, student, **kwargs):
 	debug  = kwargs.setdefault('debug' , TRACE)
 
 	if kwargs.get('debug'):
-		print 'check_eligex', course, student, kwargle(kwargs)
+		if str(type(kwargs['debug'])) == "<class 'django.core.handlers.wsgi.WSGIRequest'>":
+			request = kwargs['debug']
+			log(request, " ".join(['CHECK ELIGEX:', str(course), str(student), kwargle(kwargs)]))
+		else:
+			print 'CHECK ELIGEX:', course, student, kwargle(kwargs)
 
 	# Check for Course or CourseTrad
 	if course.rest_model == 'course':
@@ -54,7 +58,11 @@ def check_eligex(course, student, **kwargs):
 			result = check_eligex(trad, student, **kwargs)
 			result = not result if x[0] else result
 			if kwargs.get('debug'):
-				print '{'+x[1]+'} =', result
+				if str(type(kwargs['debug'])) == "<class 'django.core.handlers.wsgi.WSGIRequest'>":
+					request = kwargs['debug']
+					log(request,'{'+x[1]+'} = '+result)
+				else:
+					print '{'+x[1]+'} =', result
 
 		# OR clause
 		elif x[3]:
@@ -63,14 +71,22 @@ def check_eligex(course, student, **kwargs):
 			result = check_eligex(trad, student, **kwargs)
 			result = not result if x[2] else result
 			if kwargs.get('debug'):
-				print '<{}> ='.format(x[3]), result
+				if str(type(kwargs['debug'])) == "<class 'django.core.handlers.wsgi.WSGIRequest'>":
+					request = kwargs['debug']
+					log(request,'<{}> = {}'.format(x[3], result))
+				else:
+					print '<{}> ='.format(x[3]), result
 
 		# Eligex WORD
 		elif x[5]:
 			result = check_word(trad, student, x[5], **kwargs)
 			result = not result if x[4] else result
 			if kwargs.get('debug'):
-				print x[5],'=', result
+				if str(type(kwargs['debug'])) == "<class 'django.core.handlers.wsgi.WSGIRequest'>":
+					request = kwargs['debug']
+					log(request," ".join([x[5],'=', str(result)]))
+				else:
+					print x[5],'=', result
 
 		else:
 			result = kwargs['conj']
@@ -89,7 +105,11 @@ def check_word(trad, student, word, **kwargs):
 	debug  = kwargs.setdefault('debug' , TRACE)
 
 	if kwargs.get('debug'):
-		print 'check_word', trad, student, word, kwargle(kwargs)
+		if str(type(kwargs['debug'])) == "<class 'django.core.handlers.wsgi.WSGIRequest'>":
+			request = kwargs['debug']
+			log(request," ".join(['CHECK WORD:', str(trad), str(student), str(word), kwargle(kwargs)]))
+		else:
+			print 'CHECK WORD:', trad, student, word, kwargle(kwargs)
 	
 	# Boolean literals
 	if '#' in word:
@@ -134,8 +154,12 @@ def check_word(trad, student, word, **kwargs):
 					'course__tradition': trad,
 					'course__year': year,
 				})
-			# if kwargs.get('debug'):
-				# print query
+			if kwargs.get('debug'):
+				if str(type(kwargs['debug'])) == "<class 'django.core.handlers.wsgi.WSGIRequest'>":
+					request = kwargs['debug']
+					log(request,query)
+				else:
+					print query
 			return bool(Enrollments.filter(**query).exclude(student=student,course__tradition=trad,course__year=year))
 
 		# If the word is '**', then you don't care what course it is, as long as it's this year.
@@ -143,8 +167,12 @@ def check_word(trad, student, word, **kwargs):
 			if kwargs['cur']:
 				return True
 			query['course__year'] = year
-			# if kwargs.get('debug'):
-				# print query
+			if kwargs.get('debug'):
+				if str(type(kwargs['debug'])) == "<class 'django.core.handlers.wsgi.WSGIRequest'>":
+					request = kwargs['debug']
+					log(request,query)
+				else:
+					print query
 			return bool(Enrollments.filter(**query).exclude(student=student,course__tradition=trad,course__year=year))
 
 		# Support * for representing any character
@@ -167,8 +195,12 @@ def check_word(trad, student, word, **kwargs):
 			query.pop('student')
 			query['student__family'] = student.family
 		query_result = Enrollments.filter(**query).exclude(student=student,course__tradition=trad,course__year=year)
-		# if kwargs.get('debug'):
-			# print query
+		if kwargs.get('debug'):
+			if str(type(kwargs['debug'])) == "<class 'django.core.handlers.wsgi.WSGIRequest'>":
+				request = kwargs['debug']
+				log(request,query)
+			else:
+				print query
 			# print 'Quota:',word.count('+')
 		if '+' in word:
 			# return True
