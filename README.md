@@ -357,133 +357,32 @@ Methods which serve only to call methods on other objects should be used rarely.
 
 The relationship between the `Student` table and the `Course` table is [many-to-many](https://en.wikipedia.org/wiki/Many-to-many_%28data_model%29) with an `Enrollment` table serving as the intermediate table.  Each `Enrollment` object contains `ForeignKey` links to the `Student` and `Course`, standard information about when the object was created and updated, as well as the `Enrollment`'s status.  The `status` field is an 8-character `CharField` that (currently) can have one of 24 values:
 
-<table class="status">
-  <thead>
-    <th>Status</th>
-    <th>Appearance</th>
-    <th>Note</th>
-  </thead>
-  <tr>
-    <td><code>--------</code></td>
-    <td>invisible</td>
-    <td>Default status, should not exist</td>
-  </tr>
-  <tr>
-    <td><code>enrolled</code></td>
-    <td>Green</td>
-    <td>Student is enrolled and paid</td>
-  </tr>
-  <tr>
-    <td><code>eligible</code></td>
-    <td>Bold on White</td>
-    <td>Student is currently eligible</td>
-  </tr>
-  <tr>
-    <td><code>invoiced</code></td>
-    <td>Orange</td>
-    <td>Enrollment is on an unpaid invoice</td>
-  </tr>
-  <tr>
-    <td><code>need_pay</code></td>
-    <td>Yellow</td>
-    <td>Enrollment has been added to cart</td>
-  </tr>
-  <tr>
-    <td><code>not_elig</code></td>
-    <td>Dark Gray</td>
-    <td>Student is not eligible</td>
-  </tr>
-  <tr>
-    <td><code>aud_need</code></td>
-    <td>Blue on White</td>
-    <td>Student is eligible for an Audition or Skill Assessment</td>
-  </tr>
-  <tr>
-    <td><code>aud_pend</code></td>
-    <td>Blue</td>
-    <td>Student has scheduled an Audition or Skill Assessment</td>
-  </tr>
-  <tr>
-    <td><code>pendpass</code></td>
-    <td>Blue</td>
-    <td>Deprecated: Teacher says student passed audition, but E.D. has not yet approved</td>
-  </tr>
-  <tr>
-    <td><code>pendfail</code></td>
-    <td>Blue</td>
-    <td>Deprecated: Teacher says student failed audition, but E.D. has not yet approved</td>
-  </tr>
-  <tr>
-    <td><code>pend_pub</code></td>
-    <td>Blue</td>
-    <td>Deprecated: Public-facing status for `pendpass` and `pendfail`</td>
-  </tr>
-  <tr>
-    <td><code>fail_pub</code></td>
-    <td>Dark Gray</td>
-    <td>Public-facing status for failed audition, no title text</td>
-  </tr>
-  <tr>
-    <td><code>aud_pass</code></td>
-    <td>Yellow</td>
-    <td>Student has passed Audition or Skill Assessment</td>
-  </tr>
-  <tr>
-    <td><code>aud_fail</code></td>
-    <td>Dark Gray</td>
-    <td>Student did not pass Audition or Skill Assessment</td>
-  </tr>
-  <tr>
-    <td><code>aud_drop</code></td>
-    <td>Bold on White</td>
-    <td>Student passed the Audition and then dropped course, but may re-enroll</td>
-  </tr>
-  <tr>
-    <td><code>aud_lock</code></td>
-    <td>Gold</td>
-    <td>Not in Use: Student has passed the Audition and *must* enroll</td>
-  </tr>
-  <tr>
-    <td><code>conflict</code></td>
-    <td>Red-Gray</td>
-    <td>Student is in another class at the same time</td>
-  </tr>
-  <tr>
-    <td><code>need_cur</code></td>
-    <td>Light Gray</td>
-    <td>Student will be eligible once they enroll in at least 1 other class</td>
-  </tr>
-  <tr>
-    <td><code>needboth</code></td>
-    <td>Light Gray</td>
-    <td>Student will be eligible to audition once they enroll in at least 1 other class</td>
-  </tr>
-  <tr>
-    <td><code>nonexist</code></td>
-    <td>invisible</td>
-    <td>Enrollment was added to invoice, and invoice was cancelled</td>
-  </tr>
-  <tr>
-    <td><code>nopolicy</code></td>
-    <td>Light Gray</td>
-    <td>Family has not yet accepted current HST Policy Agreement</td>
-  </tr>
-  <tr>
-    <td><code>clasfull</code></td>
-    <td>Dark Gray</td>
-    <td>The number of enrollments in this class meets or exceeds the class's capacity</td>
-  </tr>
-  <tr>
-    <td><code>maydefer</code></td>
-    <td>Yellow</td>
-    <td>Prepaid Tickets: This item may be deferred until Fall Parent Meeting</td>
-  </tr>
-  <tr>
-    <td><code>deferred</code></td>
-    <td>Purple</td>
-    <td>Prepaid Tickets: This item has been deferred until Fall Parent Meeting</td>
-  </tr>
-</table>
+  Status   | Appearance | Note
+---------- | :--------: | ----
+`--------` | invisible | Default status, should not exist
+`enrolled` | Green | Student is enrolled and paid
+`eligible` | Bold on White | Student is currently eligible
+`invoiced` | Orange | Enrollment is on an unpaid invoice
+`need_pay` | Yellow | Enrollment has been added to cart
+`not_elig` | Dark Gray | Student is not eligible
+`aud_need` | Blue on White | Student is eligible for an Audition or Skill Assessment
+`aud_pend` | Blue | Student has scheduled an Audition or Skill Assessment
+`pendpass` | Blue | Deprecated: Teacher says student passed audition, but E.D. has not yet approved
+`pendfail` | Blue | Deprecated: Teacher says student failed audition, but E.D. has not yet approved
+`pend_pub` | Blue | Deprecated: Public-facing status for `pendpass` and `pendfail`
+`fail_pub` | Dark Gray | Public-facing status for failed audition, no title text
+`aud_pass` | Yellow | Student has passed Audition or Skill Assessment
+`aud_fail` | Dark Gray | Student did not pass Audition or Skill Assessment
+`aud_drop` | Bold on White | Student passed the Audition and then dropped course, but may re-enroll
+`aud_lock` | Gold | Not in Use: Student has passed the Audition and *must* enroll
+`conflict` | Red-Gray | Student is in another class at the same time
+`need_cur` | Light Gray | Student will be eligible once they enroll in at least 1 other class
+`needboth` | Light Gray | Student will be eligible to audition once they enroll in at least 1 other class
+`nonexist` | invisible | Enrollment was added to invoice, and invoice was cancelled
+`nopolicy` | Light Gray | Family has not yet accepted current HST Policy Agreement
+`clasfull` | Dark Gray | The number of enrollments in this class meets or exceeds the class's capacity
+`maydefer` | Yellow | Prepaid Tickets: This item may be deferred until Fall Parent Meeting
+`deferred` | Purple | Prepaid Tickets: This item has been deferred until Fall Parent Meeting
 
 ## `radmin` app
 
