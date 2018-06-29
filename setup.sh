@@ -1,3 +1,17 @@
+touch .gitignore
+echo "*/*.pem" >> .gitignore
+echo "*.pyc" >> .gitignore
+echo "apps/payment/migrations/*" >> .gitignore
+echo "!apps/payment/migrations/__init__.py" >> .gitignore
+echo "apps/people/migrations/*"  >> .gitignore
+echo "!apps/people/migrations/__init__.py"  >> .gitignore
+echo "apps/program/migrations/*" >> .gitignore
+echo "!apps/program/migrations/__init__.py" >> .gitignore
+echo "apps/radmin/migrations/*"  >> .gitignore
+echo "!apps/radmin/migrations/__init__.py"  >> .gitignore
+echo "*/*/password.py" >> .gitignore
+echo "ignored.py" >> .gitignore
+
 touch HST/ignored.py
 alpha64=ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/
 

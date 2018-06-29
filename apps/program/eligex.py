@@ -3,10 +3,7 @@ from apps.people.managers import Students
 from Utils.data import Each
 from Utils.debug import kwargle
 import re, random, datetime
-<<<<<<< HEAD
-=======
 from HST.hotlog import log
->>>>>>> 01b14eabf49397f9c069fb264d10a25b57138a0c
 
 TRACE = False
 
