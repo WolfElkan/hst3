@@ -355,7 +355,7 @@ Methods which serve only to call methods on other objects should be used rarely.
 
 ### Enrollments
 
-The relationship between the `Student` table and the `Course` table is [many-to-many](https://en.wikipedia.org/wiki/Many-to-many_(data_model%29) with an `Enrollment` table serving as the intermediate table.  Each `Enrollment` object contains `ForeignKey` links to the `Student` and `Course`, standard information about when the object was created and updated, as well as the `Enrollment`'s status.  The `status` field is an 8-character `CharField` that (currently) can have one of 24 values:
+The relationship between the `Student` table and the `Course` table is [many-to-many](https://en.wikipedia.org/wiki/Many-to-many_%28data_model%29) with an `Enrollment` table serving as the intermediate table.  Each `Enrollment` object contains `ForeignKey` links to the `Student` and `Course`, standard information about when the object was created and updated, as well as the `Enrollment`'s status.  The `status` field is an 8-character `CharField` that (currently) can have one of 24 values:
 
 <table class="status">
   <thead>
@@ -365,122 +365,122 @@ The relationship between the `Student` table and the `Course` table is [many-to-
   </thead>
   <tr>
     <td><code>--------</code></td>
-    <td style="text-align:center;background-color:#8f8;">invisible</td>
+    <td>invisible</td>
     <td>Default status, should not exist</td>
   </tr>
   <tr>
     <td><code>enrolled</code></td>
-    <td style="text-align:center;background-color:#8f8;">Green</td>
+    <td>Green</td>
     <td>Student is enrolled and paid</td>
   </tr>
   <tr>
     <td><code>eligible</code></td>
-    <td style="text-align:center;background-color:#8f8;">Bold on White</td>
+    <td>Bold on White</td>
     <td>Student is currently eligible</td>
   </tr>
   <tr>
     <td><code>invoiced</code></td>
-    <td style="text-align:center;background-color:#8f8;">Orange</td>
+    <td>Orange</td>
     <td>Enrollment is on an unpaid invoice</td>
   </tr>
   <tr>
     <td><code>need_pay</code></td>
-    <td style="text-align:center;background-color:#8f8;">Yellow</td>
+    <td>Yellow</td>
     <td>Enrollment has been added to cart</td>
   </tr>
   <tr>
     <td><code>not_elig</code></td>
-    <td style="text-align:center;background-color:#8f8;">Dark Gray</td>
+    <td>Dark Gray</td>
     <td>Student is not eligible</td>
   </tr>
   <tr>
     <td><code>aud_need</code></td>
-    <td style="text-align:center;background-color:#8f8;">Blue on White</td>
+    <td>Blue on White</td>
     <td>Student is eligible for an Audition or Skill Assessment</td>
   </tr>
   <tr>
     <td><code>aud_pend</code></td>
-    <td style="text-align:center;background-color:#8f8;">Blue</td>
+    <td>Blue</td>
     <td>Student has scheduled an Audition or Skill Assessment</td>
   </tr>
   <tr>
     <td><code>pendpass</code></td>
-    <td style="text-align:center;background-color:#8f8;">Blue</td>
+    <td>Blue</td>
     <td>Deprecated: Teacher says student passed audition, but E.D. has not yet approved</td>
   </tr>
   <tr>
     <td><code>pendfail</code></td>
-    <td style="text-align:center;background-color:#8f8;">Blue</td>
+    <td>Blue</td>
     <td>Deprecated: Teacher says student failed audition, but E.D. has not yet approved</td>
   </tr>
   <tr>
     <td><code>pend_pub</code></td>
-    <td style="text-align:center;background-color:#8f8;">Blue</td>
+    <td>Blue</td>
     <td>Deprecated: Public-facing status for `pendpass` and `pendfail`</td>
   </tr>
   <tr>
     <td><code>fail_pub</code></td>
-    <td style="text-align:center;background-color:#8f8;">Dark Gray</td>
+    <td>Dark Gray</td>
     <td>Public-facing status for failed audition, no title text</td>
   </tr>
   <tr>
     <td><code>aud_pass</code></td>
-    <td style="text-align:center;background-color:#8f8;">Yellow</td>
+    <td>Yellow</td>
     <td>Student has passed Audition or Skill Assessment</td>
   </tr>
   <tr>
     <td><code>aud_fail</code></td>
-    <td style="text-align:center;background-color:#8f8;">Dark Gray</td>
+    <td>Dark Gray</td>
     <td>Student did not pass Audition or Skill Assessment</td>
   </tr>
   <tr>
     <td><code>aud_drop</code></td>
-    <td style="text-align:center;background-color:#8f8;">Bold on White</td>
+    <td>Bold on White</td>
     <td>Student passed the Audition and then dropped course, but may re-enroll</td>
   </tr>
   <tr>
     <td><code>aud_lock</code></td>
-    <td style="text-align:center;background-color:#8f8;">Gold</td>
+    <td>Gold</td>
     <td>Not in Use: Student has passed the Audition and *must* enroll</td>
   </tr>
   <tr>
     <td><code>conflict</code></td>
-    <td style="text-align:center;background-color:#8f8;">Red-Gray</td>
+    <td>Red-Gray</td>
     <td>Student is in another class at the same time</td>
   </tr>
   <tr>
     <td><code>need_cur</code></td>
-    <td style="text-align:center;background-color:#8f8;">Light Gray</td>
+    <td>Light Gray</td>
     <td>Student will be eligible once they enroll in at least 1 other class</td>
   </tr>
   <tr>
     <td><code>needboth</code></td>
-    <td style="text-align:center;background-color:#8f8;">Light Gray</td>
+    <td>Light Gray</td>
     <td>Student will be eligible to audition once they enroll in at least 1 other class</td>
   </tr>
   <tr>
     <td><code>nonexist</code></td>
-    <td style="text-align:center;background-color:#8f8;">invisible</td>
+    <td>invisible</td>
     <td>Enrollment was added to invoice, and invoice was cancelled</td>
   </tr>
   <tr>
     <td><code>nopolicy</code></td>
-    <td style="text-align:center;background-color:#8f8;">Light Gray</td>
+    <td>Light Gray</td>
     <td>Family has not yet accepted current HST Policy Agreement</td>
   </tr>
   <tr>
     <td><code>clasfull</code></td>
-    <td style="text-align:center;background-color:#8f8;">Dark Gray</td>
+    <td>Dark Gray</td>
     <td>The number of enrollments in this class meets or exceeds the class's capacity</td>
   </tr>
   <tr>
     <td><code>maydefer</code></td>
-    <td style="text-align:center;background-color:#8f8;">Yellow</td>
+    <td>Yellow</td>
     <td>Prepaid Tickets: This item may be deferred until Fall Parent Meeting</td>
   </tr>
   <tr>
     <td><code>deferred</code></td>
-    <td style="text-align:center;background-color:#8f8;">Purple</td>
+    <td>Purple</td>
     <td>Prepaid Tickets: This item has been deferred until Fall Parent Meeting</td>
   </tr>
 </table>
