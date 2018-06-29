@@ -357,8 +357,6 @@ Methods which serve only to call methods on other objects should be used rarely.
 
 The relationship between the `Student` table and the `Course` table is [many-to-many](https://en.wikipedia.org/wiki/Many-to-many_(data_model%29) with an `Enrollment` table serving as the intermediate table.  Each `Enrollment` object contains `ForeignKey` links to the `Student` and `Course`, standard information about when the object was created and updated, as well as the `Enrollment`'s status.  The `status` field is an 8-character `CharField` that (currently) can have one of 24 values:
 
-</style>
-
 <table class="status">
   <thead>
     <th>Status</th>
