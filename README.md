@@ -151,14 +151,14 @@ Methods which serve only to call methods on other objects should be used rarely.
     * `A`: Acting Classes
     * `C`: Choirs
     * Dance Classes
-      * Jazz
-        * `J`: Jazz
-        * `Z`: Broadway Jazz
-      * Tap
-        * `T`: Tap
-        * `P`: Broadway Tap
-      * `I`: Irish Dance
-      * `H`: Jazz &amp; Hip Hop
+* Jazz
+* `J`: Jazz
+* `Z`: Broadway Jazz
+* Tap
+* `T`: Tap
+* `P`: Broadway Tap
+* `I`: Irish Dance
+* `H`: Jazz &amp; Hip Hop
   * `S`: Troupes ([note](#antimony-protocol))
   * Tech Program
     * `X`: Tech Classes
@@ -189,41 +189,41 @@ Methods which serve only to call methods on other objects should be used rarely.
 
 #### Enrollable Courses
 
-   ID  | Title                   | Ages    | Grades | Eligex                          | Notes
+   ID  | Title| Ages    | Grades | Eligex| Notes
   :---:|-------------------------|:-------:|:------:|:-------------------------------:|:------------:
-  `AA` | Acting A                |  9 - 11 |        | `a`                             |  [1](#notes)
-  `AB` | Acting B                | 12 - 18 |        | `a`                             |  [1](#notes)
-  `C1` | Broadway Choir          | 10 - 18 |        | `a f`                           |  [2](#notes), [14](#notes)
-  `C2` | A Cappella Choir        | 14 - 18 |        | `a c @`                         |  [4](#notes), [14](#notes)
-  `J1` | Jazz 1                  |  9 - 12 |        | `< a { ay @ } >`                |  [5](#notes)
-  `J2` | Jazz 2                  | 11 - 12 |        | `a < J2p { @ J1p } >`           |  [6](#notes)
-  `J3` | Jazz 3                  | 14 - 18 |        | `a < J3p { @ J2p } { @ Z2p } >` |  [7](#notes)
-  `J4` | Jazz 4                  | 16 - 18 |        | `a < J4p { @ J3p } >`           |  [6](#notes)
-  `Z1` | Broadway Jazz 1         | 13 - 18 |        | `a`                             |  [1](#notes), [15](#notes)
-  `Z2` | Broadway Jazz 2         | 13 - 18 |        | `a @`                           |  [3](#notes), [15](#notes)
-  `T1` | Tap 1                   |  9 - 12 |        | `a`                             |  [1](#notes)
-  `T2` | Tap 2                   | 11 - 12 |        | `a < T2p { @ T1p } >`           |  [6](#notes)
-  `T3` | Tap 3                   | 14 - 18 |        | `a < T3p { @ T2p } { @ P2p } >` |  [7](#notes)
-  `T4` | Tap 4                   | 16 - 18 |        | `a < T4p { @ T3p } >`           |  [6](#notes)
-  `P1` | Broadway Tap 1          | 13 - 18 |        | `a`                             |  [1](#notes), [15](#notes)
-  `P2` | Broadway Tap 2          | 13 - 18 |        | `a @`                           |  [3](#notes), [15](#notes)
-  `IS` | Irish Dance Soft Shoe   |  9 - 18 |        | `a`                             |  [1](#notes)
-  `IH` | Irish Dance Hard Shoe   | 11 - 18 |        | `a < I*p T*p P*p >`             |  [8](#notes)
-  `HB` | Boys Jazz &amp; Hip-Hop |  9 - 12 |        | `a m`                           |  [2](#notes)
-  `HJ` | Jazz &amp; Hip-Hop      | 13 - 18 |        | `a`                             |  [1](#notes)
-  `SG` | Gaithersburg Troupe     | 10 - 13 | 4 -  8 | `a g A*p S*p @`                 |  [9](#notes)
-  `SJ` | Junior Troupe           | 10 - 13 | 4 -  8 | `a g A*p S*p @`                 |  [9](#notes)
-  `SB` | Travel Troupe           | 14 - 18 |        | `a A*p`                         | [11](#notes)
-  `SH` | Shakespeare Troupe      | 14 - 18 | 9 - 12 | `a g A*p @`                     | [12](#notes)
-  `SR` | Senior Troupe           | 14 - 18 | 9 - 12 | `a g A*p @`                     | [12](#notes)
-  `WN` | Painting Workshop       | 14 - 18 |        | `a`                             |  [1](#notes)
-  `WP` | Prop Workshop           | 14 - 18 |        | `a`                             |  [1](#notes)
-  `WW` | Wig Workshop            | 14 - 18 |        | `a`                             |  [1](#notes)
-  `WX` | Tech Crew Workshop      | 12 - 18 |        | `a`                             |  [1](#notes)
-  `XA` | Tech Apps               | 12 - 18 |        | `a`                             |  [1](#notes)
-  `XM` | Makeup Team             | 14 - 18 |        | `a`                             |  [1](#notes)
-  `XX` | Tech Team               | 12 - 18 |        | `a WX`                          | [13](#notes)
-  `GA` | JR/GB General Audition  | 10 - 13 | 4 -  8 | `a g A*p !S*p @`                | [10](#notes)
+  `AA` | Acting A|  9 - 11 || `a`|  [1](#notes)
+  `AB` | Acting B| 12 - 18 || `a`|  [1](#notes)
+  `C1` | Broadway Choir| 10 - 18 || `a f`|  [2](#notes), [14](#notes)
+  `C2` | A Cappella Choir| 14 - 18 || `a c @`|  [4](#notes), [14](#notes)
+  `J1` | Jazz 1|  9 - 12 || `< a { ay @ } >`|  [5](#notes)
+  `J2` | Jazz 2| 11 - 12 || `a < J2p { @ J1p } >`|  [6](#notes)
+  `J3` | Jazz 3| 14 - 18 || `a < J3p { @ J2p } { @ Z2p } >` |  [7](#notes)
+  `J4` | Jazz 4| 16 - 18 || `a < J4p { @ J3p } >`|  [6](#notes)
+  `Z1` | Broadway Jazz 1| 13 - 18 || `a`|  [1](#notes), [15](#notes)
+  `Z2` | Broadway Jazz 2| 13 - 18 || `a @`|  [3](#notes), [15](#notes)
+  `T1` | Tap 1|  9 - 12 || `a`|  [1](#notes)
+  `T2` | Tap 2| 11 - 12 || `a < T2p { @ T1p } >`|  [6](#notes)
+  `T3` | Tap 3| 14 - 18 || `a < T3p { @ T2p } { @ P2p } >` |  [7](#notes)
+  `T4` | Tap 4| 16 - 18 || `a < T4p { @ T3p } >`|  [6](#notes)
+  `P1` | Broadway Tap 1| 13 - 18 || `a`|  [1](#notes), [15](#notes)
+  `P2` | Broadway Tap 2| 13 - 18 || `a @`|  [3](#notes), [15](#notes)
+  `IS` | Irish Dance Soft Shoe   |  9 - 18 || `a`|  [1](#notes)
+  `IH` | Irish Dance Hard Shoe   | 11 - 18 || `a < I*p T*p P*p >`|  [8](#notes)
+  `HB` | Boys Jazz &amp; Hip-Hop |  9 - 12 || `a m`|  [2](#notes)
+  `HJ` | Jazz &amp; Hip-Hop| 13 - 18 || `a`|  [1](#notes)
+  `SG` | Gaithersburg Troupe| 10 - 13 | 4 -  8 | `a g A*p S*p @`|  [9](#notes)
+  `SJ` | Junior Troupe| 10 - 13 | 4 -  8 | `a g A*p S*p @`|  [9](#notes)
+  `SB` | Travel Troupe| 14 - 18 || `a A*p`| [11](#notes)
+  `SH` | Shakespeare Troupe| 14 - 18 | 9 - 12 | `a g A*p @`| [12](#notes)
+  `SR` | Senior Troupe| 14 - 18 | 9 - 12 | `a g A*p @`| [12](#notes)
+  `WN` | Painting Workshop| 14 - 18 || `a`|  [1](#notes)
+  `WP` | Prop Workshop| 14 - 18 || `a`|  [1](#notes)
+  `WW` | Wig Workshop| 14 - 18 || `a`|  [1](#notes)
+  `WX` | Tech Crew Workshop| 12 - 18 || `a`|  [1](#notes)
+  `XA` | Tech Apps| 12 - 18 || `a`|  [1](#notes)
+  `XM` | Makeup Team| 14 - 18 || `a`|  [1](#notes)
+  `XX` | Tech Team| 12 - 18 || `a WX`| [13](#notes)
+  `GA` | JR/GB General Audition  | 10 - 13 | 4 -  8 | `a g A*p !S*p @`| [10](#notes)
 
 ##### Notes:
 
@@ -352,6 +352,208 @@ Methods which serve only to call methods on other objects should be used rarely.
   `!` | Not: May be appended before a word to return the opposite value.
 
   Note that enclosing symbols may not be nested within symbols of the same type.  `a < J2p { @ < J1p Z1p > } >` is an invalid expression because it contains trackets within trackets.  The expression `a < J2p { @ J1p } { @ Z1p } >` should be used instead, with the `@` distributed.
+
+### Enrollments
+
+The relationship between the `Student` table and the `Course` table is [many-to-many](https://en.wikipedia.org/wiki/Many-to-many_(data_model%29) with an `Enrollment` table serving as the intermediate table.  Each `Enrollment` object contains `ForeignKey` links to the `Student` and `Course`, standard information about when the object was created and updated, as well as the `Enrollment`'s status.  The `status` field is an 8-character `CharField` that (currently) can have one of 24 values:
+
+<style type="text/css">
+  /*Bold Black on White*/
+  .eligible {font-weight: bold;} 
+    .eligible form.enroll button {display: inline;}
+  .aud_drop {font-weight: bold;}
+    .aud_drop form.enroll button {display: inline;}
+
+  /*Bold Blue on White*/
+  .aud_need {color: blue;}
+  .aud_need {font-weight: bold;}
+    .aud_need form.aud button {display: inline;}
+
+  /*Blue*/
+  .aud_pend, .pendpass, .pendfail, .pend_pub {background-color: #8af} 
+    .aud_pend form.drop button {display: inline;}
+
+  /*Pink*/
+  .deferred {background-color: }
+
+  /*Orange*/
+  .invoiced {background-color: #fb8}
+    .invoiced form.drop button {display: inline;}
+
+  /*Green*/
+  .enrolled {background-color: #8f8}
+    .enrolled a.view {display: inline;}
+
+  /*Yellow*/
+  .need_pay {background-color: #ff8}
+    .need_pay form.drop button {display: inline;}
+  .aud_pass {background-color: #ff8}
+    .aud_pass form.drop button {display: inline;}
+  .maydefer {background-color: #ff8}
+    .maydefer td form.defer button {display: inline;}
+
+  /*Half Gray*/
+  .need_cur, .nopolicy, .needboth {background-color: #aaa}
+    .need_cur button.enroll_disabled,
+    .nopolicy button.enroll_disabled, 
+    .needboth button.enroll_disabled {display: inline;}
+
+  /*Gray*/
+  .not_elig {background-color: #777}
+    .not_elig button.enroll_disabled {display: inline;}
+  .aud_fail {background-color: #777}
+  .fail_pub {background-color: #777}
+  .clasfull {background-color: #777}
+
+  /*Red Gray*/
+  .conflict {background-color: #a88}
+    .conflict button.enroll_disabled {display: inline;}
+
+  /*Purple*/
+  .deferred {background-color: #b8f}
+    .deferred td form.add button {display: inline;}
+
+  /*Yellow-Gray*/
+  .aud_lock {background-color: #cc8}
+    .aud_lock button.drop_disabled {display: inline;}
+
+  .nonexist {
+    color: gray;
+    font-style: italic;
+  }
+  .status tr td:nth-child(2) {
+    text-align: center;
+  }
+
+</style>
+
+<table class="status">
+  <thead>
+    <th>Status</th>
+    <th>Appearance</th>
+    <th>Note</th>
+  </thead>
+  <tr>
+    <td><code>--------</code></td>
+    <td class="nonexist">invisible</td>
+    <td>Default status, should not exist</td>
+  </tr>
+  <tr>
+    <td><code>enrolled</code></td>
+    <td class="enrolled">Green</td>
+    <td>Student is enrolled and paid</td>
+  </tr>
+  <tr>
+    <td><code>eligible</code></td>
+    <td class="eligible">Bold on White</td>
+    <td>Student is currently eligible</td>
+  </tr>
+  <tr>
+    <td><code>invoiced</code></td>
+    <td class="invoiced">Orange</td>
+    <td>Enrollment is on an unpaid invoice</td>
+  </tr>
+  <tr>
+    <td><code>need_pay</code></td>
+    <td class="need_pay">Yellow</td>
+    <td>Enrollment has been added to cart</td>
+  </tr>
+  <tr>
+    <td><code>not_elig</code></td>
+    <td class="not_elig">Dark Gray</td>
+    <td>Student is not eligible</td>
+  </tr>
+  <tr>
+    <td><code>aud_need</code></td>
+    <td class="aud_need">Blue on White</td>
+    <td>Student is eligible for an Audition or Skill Assessment</td>
+  </tr>
+  <tr>
+    <td><code>aud_pend</code></td>
+    <td class="aud_pend">Blue</td>
+    <td>Student has scheduled an Audition or Skill Assessment</td>
+  </tr>
+  <tr>
+    <td><code>pendpass</code></td>
+    <td class="pendpass">Blue</td>
+    <td>Deprecated: Teacher says student passed audition, but E.D. has not yet approved</td>
+  </tr>
+  <tr>
+    <td><code>pendfail</code></td>
+    <td class="pendfail">Blue</td>
+    <td>Deprecated: Teacher says student failed audition, but E.D. has not yet approved</td>
+  </tr>
+  <tr>
+    <td><code>pend_pub</code></td>
+    <td class="pend_pub">Blue</td>
+    <td>Deprecated: Public-facing status for `pendpass` and `pendfail`</td>
+  </tr>
+  <tr>
+    <td><code>fail_pub</code></td>
+    <td class="fail_pub">Dark Gray</td>
+    <td>Public-facing status for failed audition, no title text</td>
+  </tr>
+  <tr>
+    <td><code>aud_pass</code></td>
+    <td class="aud_pass">Yellow</td>
+    <td>Student has passed Audition or Skill Assessment</td>
+  </tr>
+  <tr>
+    <td><code>aud_fail</code></td>
+    <td class="aud_fail">Dark Gray</td>
+    <td>Student did not pass Audition or Skill Assessment</td>
+  </tr>
+  <tr>
+    <td><code>aud_drop</code></td>
+    <td class="aud_drop">Bold on White</td>
+    <td>Student passed the Audition and then dropped course, but may re-enroll</td>
+  </tr>
+  <tr>
+    <td><code>aud_lock</code></td>
+    <td class="aud_lock">Gold</td>
+    <td>Student has passed the Audition and *must* enroll</td>
+  </tr>
+  <tr>
+    <td><code>conflict</code></td>
+    <td class="conflict">Red-Gray</td>
+    <td>Student is in another class at the same time</td>
+  </tr>
+  <tr>
+    <td><code>need_cur</code></td>
+    <td class="need_cur">Light Gray</td>
+    <td>Student will be eligible once they enroll in at least 1 other class</td>
+  </tr>
+  <tr>
+    <td><code>needboth</code></td>
+    <td class="needboth">Light Gray</td>
+    <td>Student will be eligible to audition once they enroll in at least 1 other class</td>
+  </tr>
+  <tr>
+    <td><code>nonexist</code></td>
+    <td class="nonexist">invisible</td>
+    <td>Enrollment was added to invoice, and invoice was cancelled</td>
+  </tr>
+  <tr>
+    <td><code>nopolicy</code></td>
+    <td class="nopolicy">Light Gray</td>
+    <td>Family has not yet accepted current HST Policy Agreement</td>
+  </tr>
+  <tr>
+    <td><code>clasfull</code></td>
+    <td class="clasfull">Dark Gray</td>
+    <td>The number of enrollments in this class meets or exceeds the class's capacity</td>
+  </tr>
+  <tr>
+    <td><code>maydefer</code></td>
+    <td class="maydefer">Yellow</td>
+    <td>Prepaid Tickets: This item may be deferred until Fall Parent Meeting</td>
+  </tr>
+  <tr>
+    <td><code>deferred</code></td>
+    <td class="deferred">Purple</td>
+    <td>Prepaid Tickets: This item has been deferred until Fall Parent Meeting</td>
+  </tr>
+</table>
 
 ## `radmin` app
 
