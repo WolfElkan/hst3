@@ -25,16 +25,11 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = ignored.SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = [
-    u'localhost',
-    ignored.NGROK_URL,
-    '127.0.0.1',
-    '192.168.1.6',
-]
+ALLOWED_HOSTS = [u'www.families.hstonline.org', u'families.hstonline.org']
 
-CURRENT_HOST = ALLOWED_HOSTS[1]
+CURRENT_HOST = ALLOWED_HOSTS[0]
 
 # Application definition
 
@@ -98,10 +93,10 @@ DATABASES = {
     # }
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'HST',
-        'USER': 'django',
+        'NAME': 'hstdata',
+        'USER': 'hstalents',
         'PASSWORD': ignored.DB_PASSWORD,
-        'HOST': '127.0.0.1',
+        'HOST': 'hstdata.hstonline.org',
         'PORT': '3306',
         'OPTIONS': {
             'charset': 'utf8mb4',
@@ -148,5 +143,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.dirname(BASE_DIR) + '/static/'
 
 PAYPAL_BUSINESS_EMAIL = ignored.PAYPAL_BUSINESS_EMAIL

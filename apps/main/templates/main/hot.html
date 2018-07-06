@@ -110,13 +110,11 @@ Python Hot Code:
   {% for call in log %}
 	<div class="log">
 	  {% for arg in call %}
-		<div class="log">
 		  {% for line in arg %}
-			<div class="log">
-			  {{line}}
-			</div>
+		  <div class="log">
+		  {{line}}
+		  </div>
 		  {% endfor %}
-		</div>
 	  {% endfor %}
 	</div>
   {% endfor %}

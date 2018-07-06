@@ -235,7 +235,7 @@
 	</div>
 	{% if ref == 'myaccount' %}
 	<a href="/myaccount/">Return to My Account</a>
-	{% elif ref == 'register' %}
+	{% elif ref == 'register' and students.first %}
 	<a href="/register/policy/0/">Continue Registration &rarr;</a>
 	{% endif %}
 </body>

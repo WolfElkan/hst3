@@ -3,7 +3,8 @@ from apps.people.models import Teacher
 Teachers = Teacher.objects
 from apps.program.managers import Courses, CourseTrads, Enrollments, Venues
 from apps.payment.managers import Invoices
-from trace import TRACE
+#from trace import TRACE
+TRACE = False
 
 MODELS = {
 	'address'   : Addresses,

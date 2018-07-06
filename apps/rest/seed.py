@@ -9,7 +9,7 @@ from Utils.fjson import FriendlyEncoder
 from Utils.seshinit import seshinit
 from Utils.snippets import order_coursetrads, make
 from Utils.security import getyear, restricted
-from trace import DEV
+#from trace import DEV
 
 from datetime import datetime
 import json
