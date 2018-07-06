@@ -9,7 +9,8 @@ from .managers import CourseTrads, Courses, Enrollments, Venues
 from .eligex import check_eligex, check_word, calc_status, eligible, audible, status_choices, TRACE
 Q = models.Q
 from apps.people.managers import Students, Families
-from trace import DEV
+#from trace import DEV
+import trace
 from datetime import datetime
 import pytz, re
 
@@ -194,7 +195,7 @@ class Course(models.Model):
 			return bool(self.students.filter(id=me.owner.id))
 
 	def tuition(self, asof=datetime.now()):
-		cutoff = datetime(year=self.year-1,month=7,day=2)
+		cutoff = datetime(year=self.year-1,month=8,day=1)
 		return self.early_tuit if asof < cutoff else self.after_tuit
 
 	def slots_open(self):

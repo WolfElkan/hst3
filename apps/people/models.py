@@ -16,7 +16,8 @@ from Utils.debug import pretty
 
 from django_mysql import models as sqlmod
 from datetime import datetime
-from trace import DEV
+#from trace import DEV
+import trace
 Q = models.Q
 
 sex_choices = [('M','Male'),('F','Female')]
@@ -407,7 +408,8 @@ class User(models.Model):
 		(6,'Admin'),
 		(7,'Developer')
 	]
-	permission = models.PositiveSmallIntegerField(default=7*int(DEV), choices=perm_levels)
+	default_val = 7 * int(False)
+	permission = models.PositiveSmallIntegerField(default=default_val, choices=perm_levels)
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
 	rest_model = "user"

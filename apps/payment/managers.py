@@ -7,7 +7,8 @@ from dateparser import parse
 from Utils.data import Each
 from django_mysql import models as sqlmod
 from datetime import datetime
-from trace import DEV
+#from trace import DEV
+import trace
 import json
 
 from apps.program.managers import Enrollments

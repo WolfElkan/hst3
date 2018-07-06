@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
-from trace import DEV
+#from trace import DEV
 
 # urlpatterns = [
 #     url(r'^admin/', admin.site.urls),
@@ -40,7 +40,6 @@ urlpatterns = [
 	url(r'^.*[^/]$', main.slash),
 
 	url(r'^$', main.index),
-
 	url(r'^login(?P<path>.*)/$', main.login),
 	url(r'^logout/$', main.logout),
 	url(r'^myaccount/$', main.account),
@@ -134,8 +133,5 @@ urlpatterns = [
 	url(r'^seed/nuke/$', seed.nuke),
 	url(r'^seed/old/$', old.old),
 
+#	url(r'.*', main.dciv),
 ]
-
-# DEV = False
-if not DEV:
-	urlpatterns.append(url(r'.*', main.dciv))
