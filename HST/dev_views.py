@@ -21,7 +21,9 @@ from apps.old import migrate as old
 
 import datetime
 import re
+
 edit = 3
+
 from .hotlog import log
 
 def lookup_student(obj):
