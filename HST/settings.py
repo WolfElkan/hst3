@@ -22,9 +22,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = ignored.SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = [u'www.families.hstonline.org', u'families.hstonline.org']
+ALLOWED_HOSTS = [u'localhost',u'www.families.hstonline.org', u'families.hstonline.org']
 
 CURRENT_HOST = ALLOWED_HOSTS[0]
 
@@ -90,11 +90,11 @@ DATABASES = {
     # }
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'hstdata',
-        'USER': 'hstalents',
+        'NAME': ignored.DB_NAME,
+        'USER': ignored.DB_USER,
         'PASSWORD': ignored.DB_PASSWORD,
-        'HOST': 'hstdata.hstonline.org',
-        'PORT': '3306',
+        'HOST': ignored.DB_HOST,
+        'PORT': ignored.DB_PORT,
         'OPTIONS': {
             'charset': 'utf8mb4',
             'init_command': "SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED"
