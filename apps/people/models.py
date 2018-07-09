@@ -129,9 +129,11 @@ class Family(models.Model):
 		else:
 			family = None
 		return self.id == family.id
+
 	def has_accepted_policy(self, year=getyear()):
 		policy = Policies.fetch(year=year)
 		return not policy or self.policyYear == year and self.policyPage == policy.nPages
+
 	def unique_last(self):
 		return '{} #{}'.format(self.last,self.name_num) if self.name_num else self.last
 	def unique_last_in(self, year):
@@ -140,15 +142,32 @@ class Family(models.Model):
 			return self.unique_last
 		else:
 			return self.last
+
 	def children(self):
 		return Students.filter(family_id=self.id).order_by('birthday')
 	def children_enrolled_in(self,year):
 		return self.children.filter(enrollment__course__year=year).distinct()
+
+	def all_enrollments_in(self, year):
+		return Enrollments.filter(student__family=self, course__year=year)
+	def all_enrollments(self):
+		return self.all_enrollments_in(getyear())
 	def enrollments_in(self, year):
-		qset = Enrollments.filter(student__family=self, course__year=year)
+		qset = self.all_enrollments_in(year)
 		qset = qset.exclude(status__in=['nonexist','aud_fail','aud_drop'])
 		qset = qset.order_by('created_at')
 		return qset
+	def enrollments(self):
+		return self.enrollments_in(getyear())
+	def live_enrollments_in(self, year):
+		qset = self.all_enrollments_in(year)
+		qset = qset.filter(status__in=['enrolled','invoiced','need_pay','aud_pend','pendpass','pendfail','pend_pub','fail_pub','aud_pass','aud_drop','aud_lock','maydefer','deferred'])
+		qset = qset.order_by('created_at')
+		return qset
+	def live_enrollments(self):
+		return self.live_enrollments_in(getyear())
+
+
 	def total_tuition_in(self, year):
 		return sum(Each(Each(self.enrollments_in(year)).course).tuition)
 	def paid_tuition_in(self, year):
@@ -306,7 +325,7 @@ class Student(models.Model):
 		courses = courses.order_by('tradition__order')
 		for course in courses:
 			enrollment = Enrollments.fetch(student=self,course=course)
-			if not enrollment:
+			if not enrollment or enrollment.status == 'nonexist':
 				enrollment = Enrollments.model(student=self,course=course)
 				enrollment.status = calc_status(enrollment)
 			yield enrollment

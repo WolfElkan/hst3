@@ -276,6 +276,9 @@ class Course(models.Model):
 			enrollment.status = sub(enrollment.status, {
 				'aud_drop':'aud_pass',
 				'deferred':'maydefer',
+				'eligible':'need_pay',
+				'aud_need':'aud_pend',
+				'nonexist':'need_pay',
 			})
 			enrollment.save()
 		else:
@@ -405,10 +408,12 @@ class Enrollment(models.Model):
 		if self.status == "aud_pass" and self.course.tradition.droppable:
 			self.status = "aud_drop"
 			self.save()
-			self.student.family.fate()
+			self.student.family.fate(self.course.year)
 		elif self.status in ["aud_pend","need_pay"]:
+			print 410
 			self.delete()
-			self.student.family.fate()
+			self.student.family.fate(self.course.year)
+			print self.status
 		elif self.status == "invoiced":
 			invoice = self.invoice
 			self.delete()
@@ -421,10 +426,14 @@ class Enrollment(models.Model):
 			self.status = "deferred"
 			self.save()
 
+	# def cancel(self):
+	# 	if self.status == "invoiced":
+	# 		self.status = "nonexist"
+	# 		self.save()
+
 	def cancel(self):
-		if self.status == "invoiced":
-			self.status = "nonexist"
-			self.save()
+		if self.status == "invoiced" and self.invoice:
+			self.invoice.cancel()
 
 	def __str__(self):
 		return '{} in {}'.format(self.student, self.course)

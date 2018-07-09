@@ -115,7 +115,7 @@
 								<input type="hidden" name="enr_id" value="{{enr.id}}">
 								<button>Drop</button>
 							</form>
-							<form class="cancel" action="cancel/">
+							<form class="cancel" action="cancel/" title="Invoices may not be edited once they have been created. Click this button to cancel the entire invoice. Then, you may add the desired courses to a new invoice.">
 								<input type="hidden" name="enr_id" value="{{enr.id}}">
 								<button>Cancel</button>
 							</form>
@@ -192,7 +192,8 @@
 						</tr>
 					</table>
 					<form method="POST" action="/register/process/">{% csrf_token %}
-						<button {% if not invoiceable %} disabled {% endif %} class="invoice">Generate Invoice</button>
+						<button title="Note: when you click this button, you will not be able to remove classes except by canceling the entire invoice.  If you do not click the button, your progress will still be saved." {% if not invoiceable %} disabled {% endif %} class="invoice">Generate Invoice</button>
+						(Invoices cannot be modified once created.)
 					</form>
 				</center>
 			</div>
@@ -233,7 +234,7 @@
 					<tr class="need_pay">
 						<td>This class has been added to the cart, pending tuition payment.</td>
 					</tr>
-					<tr class="invoiced">
+					<tr class="invoiced" title="Note: Invoices may not be edited once they have been created.  To remove a course from an invoice, cancel the entire invoice and re-add the desired courses.">
 						<td>This enrollment is on an invoice that has not yet been paid.</td>
 					</tr>
 					<tr class="deferred">
