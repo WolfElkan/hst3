@@ -56,6 +56,7 @@ urlpatterns = [
 	url(r'^(?P<ref>register|myaccount)/classes/(?P<id>\d+)/enroll/$', program.courses_enroll),
 	# url(r'^(?P<ref>register|myaccount)/classes/(?P<id>\d+)/audition/$', program.courses_audition),
 	url(r'^(?P<ref>register|myaccount)/classes/(?P<id>\d+)/drop/$', program.courses_drop),
+	url(r'^(?P<ref>register|myaccount)/classes/(?P<id>\d+)/cancel/$', program.courses_cancel),
 
 	# url(r'^register/$', people.reg),
 	# url(r'^register/family/$', people.family),

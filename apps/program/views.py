@@ -109,6 +109,14 @@ def courses_drop(request, **kwargs):
 		enrollment.drop()
 	return redirect('/{}/classes/{}/'.format(kwargs.get('ref'),student_id))
 
+def courses_cancel(request, **kwargs):
+	student_id = kwargs.setdefault('id',0)
+	enrollment = Enrollments.fetch(id=request.GET['enr_id'])
+	if enrollment:
+		enrollment.cancel()
+	return redirect('/{}/classes/{}/'.format(kwargs.get('ref'),student_id))
+
+
 def audition_menu(request, **kwargs):
 	bad = restricted(request,4)
 	if bad:
