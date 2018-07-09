@@ -18,7 +18,7 @@
 
 /*Orange*/
 .invoiced {background-color: #fb8}
-	.invoiced form.drop button {display: inline;}
+	.invoiced form.cancel button {display: inline;}
 
 /*Green*/
 .enrolled {background-color: #8f8}

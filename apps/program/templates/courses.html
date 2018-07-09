@@ -45,9 +45,9 @@
 	button, a.view {
 		display: none;
 	}
-	.invoiced {
+/*	.invoiced {
 		background-color: #ff8
-	}
+	}*/
 	.invoice {
 		margin: 15px;
 		display: block;
@@ -105,18 +105,19 @@
 						<td class="center">
 							<form class="enroll" action="enroll/">
 								<input type="hidden" name="course_id" value="{{enr.course.id}}">
-								<!-- <input type="hidden" name="status" value="{{enr.status}}"> -->
 								<button>Enroll</button>
 							</form>
 							<form class="aud" action="enroll/">
 								<input type="hidden" name="course_id" value="{{enr.course.id}}">
-								<!-- <input type="hidden" name="status" value="{{enr.status}}"> -->
 								<button>Audition</button>
 							</form>
 							<form class="drop" action="drop/">
 								<input type="hidden" name="enr_id" value="{{enr.id}}">
-								<!-- <input type="hidden" name="status" value="{{enr.status}}"> -->
 								<button>Drop</button>
+							</form>
+							<form class="cancel" action="cancel/">
+								<input type="hidden" name="enr_id" value="{{enr.id}}">
+								<button>Cancel</button>
 							</form>
 							<button class="enroll_disabled" disabled>Enroll</button>
 							<a class="view" href="/register/invoice/{{enr.invoice_id}}">Invoice</a>
@@ -232,9 +233,9 @@
 					<tr class="need_pay">
 						<td>This class has been added to the cart, pending tuition payment.</td>
 					</tr>
-<!-- 					<tr class="aud_lock">
-						<td>Student has passed the audition and may no longer drop this class.</td>
-					</tr> -->
+					<tr class="invoiced">
+						<td>This enrollment is on an invoice that has not yet been paid.</td>
+					</tr>
 					<tr class="deferred">
 						<td>This item must be paid at or before the Fall Parent Meeting.</td>
 					</tr>					
