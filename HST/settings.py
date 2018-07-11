@@ -24,9 +24,9 @@ SECRET_KEY = ignored.SECRET_KEY
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [u'localhost',u'www.families.hstonline.org', u'families.hstonline.org']
-
 CURRENT_HOST = ignored.NGROK_URL
+
+ALLOWED_HOSTS = [CURRENT_HOST,u'localhost',u'www.families.hstonline.org', u'families.hstonline.org']
 
 # Application definition
 

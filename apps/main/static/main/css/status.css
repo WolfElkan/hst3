@@ -22,7 +22,7 @@
 
 /*Green*/
 .enrolled {background-color: #8f8}
-	.enrolled a.view {display: inline;}
+	.enrolled button.view {display: inline;}
 
 /*Yellow*/
 .need_pay {background-color: #ff8}
