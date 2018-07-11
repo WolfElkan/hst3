@@ -19,12 +19,12 @@ from Utils.seshinit import seshinit, forminit
 
 from datetime import datetime
 
-def invoice_create(request):
+def invoice_create(request, ref):
 	me = getme(request)
 	invoice = Invoices.create(family=me.owner)
-	return redirect('/register/invoice/{}'.format(invoice.id))
+	return redirect('/{}/invoice/{}'.format(ref,invoice.id))
 
-def invoice_show(request, id):
+def invoice_show(request, ref, id):
 	# me = getme(request)
 	invoice = Invoices.fetch(id=id)
 	bad = restricted(request,5,invoice)
@@ -32,6 +32,7 @@ def invoice_show(request, id):
 		return bad
 	context = {
 		'invoice': invoice,
+		'ref'    : ref, # Note: There are two 'ref' variables here.  They mean different things.
 		'email'  : PAYPAL_BUSINESS_EMAIL,
 		'host'   : 'https://{}'.format(CURRENT_HOST),
 		'waiting': invoice.status == 'N' and request.GET.get('ref') == 'paypal',

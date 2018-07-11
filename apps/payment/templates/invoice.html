@@ -92,8 +92,8 @@
         <input type="hidden" name="currency_code" value="USD"> 
         <input type="hidden" name="invoice" value="{{invoice.id}}" id="invoice"> 
         <input type="hidden" name="notify_url" value='{{host}}/ipn/' /> 
-        <input type='hidden' name='cancel_return' value="{{host}}/register/invoice/{{invoice.id}}" /> 
-        <input type='hidden' name='return' value="{{host}}/register/invoice/{{invoice.id}}?ref=paypal" /> 
+        <input type='hidden' name='cancel_return' value="{{host}}/{{ref}}/invoice/{{invoice.id}}/" /> 
+        <input type='hidden' name='return' value="{{host}}/{{ref}}/invoice/{{invoice.id}}/?ref=paypal" /> 
         <button id="paypal" title="PayPal - The safer, easier way to pay online">Pay with PayPal</button>
     </form>
 	{% endif %}
