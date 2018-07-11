@@ -90,7 +90,7 @@ class Invoice(models.Model):
 			self.status = 'C'
 			self.save()
 	def confirm(self, paypal):
-		return self.status == 'N' and paypal['amount'] == self.amount and paypal['invoice'] == self.id
+		return self.status == 'N' and Decimal(paypal['payment_gross']) == Decimal(self.amount) and int(paypal['invoice']) == int(self.id)
 	def pay(self, paypal):
 		if self.confirm(paypal):
 			for item in self.items:

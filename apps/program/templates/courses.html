@@ -120,7 +120,8 @@
 								<button>Cancel</button>
 							</form>
 							<button class="enroll_disabled" disabled>Enroll</button>
-							<a class="view" href="/register/invoice/{{enr.invoice_id}}">Invoice</a>
+							<button class="view" onclick="mo('/register/invoice/{{enr.invoice_id}}')">View</button>
+							<!-- <a class="view" href="/register/invoice/{{enr.invoice_id}}">Invoice</a> -->
 							<!-- {{enr.status}} -->
 						</td>
 						<td class="center">{{enr.course.title}}</td>
