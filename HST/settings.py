@@ -26,7 +26,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = [u'localhost',u'www.families.hstonline.org', u'families.hstonline.org']
 
-CURRENT_HOST = ALLOWED_HOSTS[0]
+CURRENT_HOST = ignored.NGROK_URL
 
 # Application definition
 
