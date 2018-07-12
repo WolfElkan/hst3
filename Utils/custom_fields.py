@@ -94,11 +94,10 @@ class BcryptField(models.Field):
 			return 'CHAR(60)' # TODO: Figure out equivalent field in other db softwares
 	def pre_save(self, model_instance, add):
 		plaintext = getattr(model_instance, self.attname)
-		# if type(plaintext) in [str,unicode] and re.match(Bcrypt.regex, str(plaintext)):
-		if type(plaintext) in [str,unicode] and str(plaintext)[0] == '$':
-			return plaintext
-		elif type(plaintext) is Bcrypt:
+		if type(plaintext) is Bcrypt:
 			plaintext = plaintext.char60
+		if plaintext[0] == '$':
+			return plaintext
 		hashed = bcrypt.hashpw(plaintext.encode(), bcrypt.gensalt())
 		if len(hashed) == 59:
 			hashed = '+' + hashed
