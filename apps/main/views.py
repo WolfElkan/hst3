@@ -90,11 +90,11 @@ def changepassword(request, **kwargs):
 	else:
 		return HttpResponse("Unrecognized HTTP Verb")
 
-def changepassword_get(request):
+def changepassword_get(request, **kwargs):
 	context = copy(request.session,'pe')
 	return render(request, 'main/changepassword.html', context)
 
-def changepassword_post(request):
+def changepassword_post(request, ref, **kwargs):
 	me = getme(request)
 	if not me:
 		return redirect('/')
@@ -109,7 +109,7 @@ def changepassword_post(request):
 		request.session['e'] = {}
 		me.password = request.POST['password']
 		me.save()
-		return redirect(re.match(r'^.*/',request.META['HTTP_REFERER']).group())
+		return redirect('/{}/'.format(ref))
 	else:
 		return redirect(request.META['HTTP_REFERER'])
 
