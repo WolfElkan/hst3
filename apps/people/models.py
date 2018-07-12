@@ -77,7 +77,7 @@ class Parent(models.Model):
 	def email(self):
 		return self.alt_email if self.alt_email else self.family.email
 	def family(self):
-		return Families.get(id=self.family_id)
+		return Families.fetch(id=self.family_id)
 
 	def stand(self, me):
 		if me.owner_type == 'Family':
@@ -318,7 +318,7 @@ class Student(models.Model):
 	def courses_toggle_enrollments(self):
 		qset = []
 		for enrollment in self.enrollments:
-			qset.append({'widget':enrollment,'static':Courses.get(id=enrollment.course_id)})
+			qset.append({'widget':enrollment,'static':Courses.fetch(id=enrollment.course_id)})
 		return qset
 	def course_menu(self, year=getyear()):
 		courses = Courses.filter(year=year,tradition__e=True,tradition__m=True)
