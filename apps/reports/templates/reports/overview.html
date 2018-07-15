@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>HST | {{year}} Overview Report</title>
+	{% load staticfiles %}
+	<script src="{% static 'main/js/script.js' %}" charset="utf-8"></script>
+	<link rel="stylesheet" type="text/css" href="{% static 'main/css/style.css' %}">
+</head>
+<body id="overview" class="admin">
+	<img id="logo" src="//www.hstonline.org/wp-content/uploads/2017/05/cropped-cropped-HST-LOGO-10.png">
+	<table>
+		<thead>
+			<th>ID</th>
+			<th>Course</th>
+			<th>Slots</th>
+			<th>Filled</th>
+			<th>Roster</th>
+		</thead>
+		{% for course in courses %}
+		<tr>
+			<td>{{course.tradition.id}}</td>
+			<td>{{course.title}}</td>
+			<td>{{course.nSlots}}</td>
+			<td>{{course.students|length}}</td>
+			<td><a href="/reports/roster/{{course.id}}">{{course}}</a></td>
+		</tr>
+		{% endfor %}
+	</table>
+	<button class="close" onclick="hst()">Close</button>
+</body>
+</html>

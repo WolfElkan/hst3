@@ -110,6 +110,8 @@ urlpatterns = [
 	url(r'^reports/summary/generate/$', reports.generate_summary),
 	url(r'^reports/summary/\d{4}/generate/$', reports.generate_summary),
 
+	url(r'^reports/overview/$', reports.overview),
+
 	url(r'^admin/dashboard/$', radmin.dashboard),
 
 	url(r'^admin/auditions/$', program.audition_menu),
