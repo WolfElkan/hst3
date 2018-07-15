@@ -2,6 +2,9 @@
 <html>
 <head>
 	<title>HST | Students {{year}}</title>
+	{% load staticfiles %}
+	<script src="{% static 'main/js/script.js' %}" charset="utf-8"></script>
+	<link rel="stylesheet" type="text/css" href="{% static 'main/css/style.css' %}">
 	<style type="text/css">
 		table {
 			border-collapse: collapse;
@@ -19,7 +22,8 @@
 		}
 	</style>
 </head>
-<body>
+<body id="enrollment_matrix_edit" class="admin">
+	<img id="logo" src="//www.hstonline.org/wp-content/uploads/2017/05/cropped-cropped-HST-LOGO-10.png">
 	<h1>HST {{year|add:-1}}-{{year}} Enrollment Matrix</h1>
 	<form method="POST" action="mass_enroll/">{% csrf_token %}
 		<button>Mass Enroll</button>
@@ -76,5 +80,6 @@
 		{% endfor %}
 	</table>
 	</form>
+	<button class="close" onclick="hst()">Close</button>
 </body>
 </html>

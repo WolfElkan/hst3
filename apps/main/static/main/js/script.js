@@ -74,3 +74,9 @@ function DateET() {
 		][a.length]
 	}
 }
+
+function hst() {
+	window.close()
+	window.location.href = '//www.hstonline.org'
+}
+

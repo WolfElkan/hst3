@@ -2,6 +2,9 @@
 <html>
 <head>
 	<title>HST | {{course.title}} Class List {{course.year}}</title>
+	{% load staticfiles %}
+	<script src="{% static 'main/js/script.js' %}" charset="utf-8"></script>
+	<link rel="stylesheet" type="text/css" href="{% static 'main/css/style.css' %}">
 	<style type="text/css">
 		* {
 			font-family: sans-serif;
@@ -32,7 +35,8 @@
 		}
 	</style>
 </head>
-<body>
+<body id="roster" class="roster">
+	<img id="logo" src="//www.hstonline.org/wp-content/uploads/2017/05/cropped-cropped-HST-LOGO-10.png">
 	<center>
 		<h1>HST {{course.tradition}} CLASS LIST</h1>
 		<h1>{{course.year|add:-1}} - {{course.year}}</h1>
@@ -64,6 +68,6 @@
 	{% endfor %}
 	</table>
 	</center>
-
+<button class="close" onclick="hst()">Close</button>
 </body>
 </html>

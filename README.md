@@ -60,6 +60,20 @@
   1. To reduce required volunteer time and allow HST to take full advantage of the digital age by streamlining data management processes wherever helpful,
   1. To be a blessing and an expression of God's love and providence to HST's staff, students and families as they have been to the developer.
 
+## CSS
+
+  Each HTML page loads the stylesheet `main/style.css`, this enables the style of all pages to be controlled from a single file.  (Some pages also load additional stylesheets for specific functions.)  
+
+  Each page's `<body>` tag is given a (mostly) unique `id` by which it can be referenced, and its specific elements targeted.  Each page is also given a class: `public`, `admin`, `invoice`, `roster` or `error`.  (Some of the `admin` pages also have the class `rest`)  These tags divide the pages into groups based on who is supposed to see them.  This allows for separate styles for pages that HST families are supposed to see, vs pages for administrative use.
+
+### Logo
+
+  The HST [logo](https://www.hstonline.org/wp-content/uploads/2017/05/cropped-cropped-HST-LOGO-10.png) appears at the top of every page.  It has the CSS class `logo` and can be targeted, styled or hidden on certain pages.
+
+### Close Button
+
+  A Close button has been added to the bottom of every page which will close the window.  Note that this button *only works* if the window was opened with the JavaScript command `window.open("families.hstonline.org")`.  If the window was opened some other way, the button will act as a hyperlink and redirect the user to [`hstonline.org`](hstonline.org).  This button has the CSS class `close` and can be targeted, styled or hidden on certain pages.
+
 ## Apps
 
   This website contains 7 apps (located in the [apps](apps) folder) which handle different functionalities of the site.  They are alphabetically:

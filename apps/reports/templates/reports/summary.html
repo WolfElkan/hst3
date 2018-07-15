@@ -2,6 +2,9 @@
 <html>
 <head>
 	<title>HST | Registration Summary</title>
+	{% load staticfiles %}
+	<script src="{% static 'main/js/script.js' %}" charset="utf-8"></script>
+	<link rel="stylesheet" type="text/css" href="{% static 'main/css/style.css' %}">
 	<style type="text/css">
 		th {
 			font-size: 16pt;
@@ -27,7 +30,8 @@
 
 	</style>
 </head>
-<body>
+<body id="summary" class="admin">
+<img id="logo" src="//www.hstonline.org/wp-content/uploads/2017/05/cropped-cropped-HST-LOGO-10.png">
 <h1>Registration Summary Report</h1>
 <b>Today's Date: {{date}}</b>
 <table>
@@ -136,6 +140,7 @@
 <button onclick="mo('refresh')">Refresh</button>
 <img src="https://zippy.gfycat.com/SkinnySeveralAsianlion.gif">
 <br>(This takes about a minute)
+<button class="close" onclick="hst()">Close</button>
 </body>
 <script type="text/javascript">
 	function mo(url) {

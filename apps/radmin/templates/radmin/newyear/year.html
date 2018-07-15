@@ -2,6 +2,9 @@
 <html>
 <head>
 	<title>HST | Admin</title>
+	{% load staticfiles %}
+	<script src="{% static 'main/js/script.js' %}" charset="utf-8"></script>
+	<link rel="stylesheet" type="text/css" href="{% static 'main/css/style.css' %}">
 	<style type="text/css">
 		.already {
 			color: #585;
@@ -9,7 +12,7 @@
 		}
 	</style>
 </head>
-<body>
+<body id="new_year" class="admin">
 <a href="/admin/dashboard/">&larr; Return to Admin Dashboard</a>
 <center>
 	<h1>Create Courses</h1>
@@ -39,5 +42,6 @@
 		{% if courses %}<button>Create Courses</button>{% endif %}
 	</form>
 </center>
+<button class="close" onclick="hst()">Close</button>
 </body>
 </html>

@@ -2,8 +2,12 @@
 <html>
 <head>
 	<title>HST | REST Home</title>
+	{% load staticfiles %}
+	<script src="{% static 'main/js/script.js' %}" charset="utf-8"></script>
+	<link rel="stylesheet" type="text/css" href="{% static 'main/css/style.css' %}">
 </head>
-<body>
+<body id="rest_home" class="admin rest">
+	<img id="logo" src="//www.hstonline.org/wp-content/uploads/2017/05/cropped-cropped-HST-LOGO-10.png">
 	<h1><a href="/">HST Website</a> Backend REST Framework</h1>
 	<h3>People:</h3>
 	<a href="index/address">Addresses</a>
@@ -18,5 +22,6 @@
 	<h3>Payment:</h3>
 	<a href="index/invoice/">Invoices</a>
 	<h3><a href="/reports/">Reports</a></h3>
+	<button class="close" onclick="window.close()">Close</button>
 </body>
 </html>

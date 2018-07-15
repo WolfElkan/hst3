@@ -3,7 +3,8 @@
 <head>
 	<title>HST | {{year}} Enrollment Matrix</title>
 	{% load staticfiles %}
-	<link rel="stylesheet" type="text/css" href="{% static 'main/css/status.css' %}">
+	<script src="{% static 'main/js/script.js' %}" charset="utf-8"></script>
+	<link rel="stylesheet" type="text/css" href="{% static 'main/css/style.css' %}">
 	<style type="text/css">
 		table {
 			border-collapse: collapse;
@@ -67,7 +68,8 @@
 		// })
 	</script>
 </head>
-<body>
+<body id="enrollment_matrix" class="admin">
+	<img id="logo" src="//www.hstonline.org/wp-content/uploads/2017/05/cropped-cropped-HST-LOGO-10.png">
 	<center>
 	<h1>HST {{year|add:-1}}-{{year}} Summary Report</h1>
 	<!-- <form method="POST" action="mass_enroll/">{% csrf_token %} -->
@@ -145,5 +147,6 @@
 	</table>
 	<!-- </form> -->
 	</center>
+	<button class="close" onclick="hst()">Close</button>
 </body>
 </html>

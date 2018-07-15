@@ -2,8 +2,11 @@
 <html>
 <head>
 	<title>HST | Mass Enroll</title>
+	{% load staticfiles %}
+	<script src="{% static 'main/js/script.js' %}" charset="utf-8"></script>
+	<link rel="stylesheet" type="text/css" href="{% static 'main/css/style.css' %}">
 </head>
-<body>
+<body id="mass_enroll" class="admin">
 <h1>Mass Enrollment Interface</h1>
 <form method="POST" action="register/" >{% csrf_token %}
 <select name="status">
@@ -41,5 +44,6 @@ in
 </table>
 <input type="submit">
 </form>
+<button class="close" onclick="hst()">Close</button>
 </body>
 </html>

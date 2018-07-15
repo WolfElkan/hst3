@@ -3,14 +3,17 @@
 <head>
 	<title>HST | {{policy.year}} Policy</title>
 	{% load staticfiles %}
+	<script src="{% static 'main/js/script.js' %}" charset="utf-8"></script>
+	<link rel="stylesheet" type="text/css" href="{% static 'main/css/style.css' %}">
 	<link rel="stylesheet" type="text/css" href="{% static 'main/css/policy.css' %}">
 </head>
-<body>
+<body id="policy_show" class="admin">
 <a href="/admin/policy/edit/{{policy.year}}">Edit</a>
 HST's {{policy.year}} Policy Agreement (Last Edited: {{policy.updated_at}})
 <a href="/admin/dashboard/">Return to Admin Dashboard</a>
 <a href="/admin/policy/index/">View Historical</a>
 <hr>
 {{policy.html|safe}}
+<button class="close" onclick="hst()">Close</button>
 </body>
 </html>

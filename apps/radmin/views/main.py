@@ -18,7 +18,7 @@ def dashboard(request, **kwargs):
 	bad = restricted(request,4)
 	if bad:
 		return bad
-	context = {}
+	context = {'year':getyear()}
 	return render(request, 'radmin/dashboard.html', context)
 
 K = {

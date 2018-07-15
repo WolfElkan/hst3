@@ -1,2 +1,15 @@
-<h1>403 Forbidden</h1>
-<p>You are logged in with a {{me.get_permission_display}}-level account.  You must have a {{need}}-level account to access this content.</p>
+<!DOCTYPE html>
+<html>
+<head>
+	<title>HST | 403 Forbidden</title>
+	{% load staticfiles %}
+	<script src="{% static 'main/js/script.js' %}" charset="utf-8"></script>
+	<link rel="stylesheet" type="text/css" href="{% static 'main/css/style.css' %}">
+</head>
+<body id="cdiii" class="error">
+	<img id="logo" src="//www.hstonline.org/wp-content/uploads/2017/05/cropped-cropped-HST-LOGO-10.png">
+	<h1>403 Forbidden</h1>
+	<p>You are logged in with a {{me.get_permission_display}}-level account.  You must have a {{need}}-level account to access this content.</p>
+	<button class="close" onclick="hst()">Close</button>
+</body>
+</html>
