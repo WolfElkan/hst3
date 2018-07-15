@@ -2,13 +2,16 @@
 <html>
 <head>
 	<title>HST | Policy Index</title>
+	{% load staticfiles %}
+	<script src="{% static 'main/js/script.js' %}" charset="utf-8"></script>
+	<link rel="stylesheet" type="text/css" href="{% static 'main/css/style.css' %}">
 	<style type="text/css">
 		.clean {
 			font-style: italic;
 		}
 	</style>
 </head>
-<body>
+<body id="policy_index" class="admin">
 <a href="/admin/dashboard/">&larr; Return to Admin Dashboard</a>
 <h1>Previous Policy Agreements</h1>
 <ul>
@@ -16,5 +19,6 @@
 	<li {% if policy.clean %} class="clean" {% endif %} ><a href="/admin/policy/show/{{policy.year}}/">{{policy.year}}</a></li>
 	{% endfor %}
 </ul>
+<button class="close" onclick="hst()">Close</button>
 </body>
 </html>

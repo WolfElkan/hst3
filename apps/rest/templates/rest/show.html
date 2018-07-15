@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
+	{% load staticfiles %}
+	<script src="{% static 'main/js/script.js' %}" charset="utf-8"></script>
+	<link rel="stylesheet" type="text/css" href="{% static 'main/css/style.css' %}">
 	<style type="text/css">
 		ul {
 			display: inline-block;
@@ -15,7 +18,8 @@
 	</style>
 	<title>HST | {{thing}}</title>
 </head>
-<body>
+<body id="rest_show" class="admin rest">
+	<img id="logo" src="//www.hstonline.org/wp-content/uploads/2017/05/cropped-cropped-HST-LOGO-10.png">
 	<a href="/rest/">REST</a>
 	<a href="/rest/index/{{model}}/">{{model|title}} Index</a>
 	<h1>{{thing}}</h1>
@@ -36,5 +40,6 @@
 		{% endfor %}
 	</table>
 	<a href="/rest/edit/{{model}}/{{thing.id}}/">Edit</a><br>
+	<button class="close" onclick="hst()">Close</button>
 </body>
 </html>

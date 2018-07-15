@@ -8,10 +8,11 @@
 		<link rel="stylesheet" type="text/css" href="{% static 'main/css/style.css' %}">
 		<link rel="icon" type="image/png" href="{% static 'main/images/favicon.ico/favicon.ico' %}">
 	</head>
-	<body id="index">
+	<img id="logo" src="//www.hstonline.org/wp-content/uploads/2017/05/cropped-cropped-HST-LOGO-10.png">
+	<body id="index" class="public">
 		<h1>Registration</h1>
 		{% if name %}
-		<p>Hello {{name}}!</p>
+		<p>Hello {{name}}</p>
 		<a href="/logout/">Log Out</a>
 		<a href="/myaccount/">My Account</a>
 		{% else %}
@@ -21,5 +22,6 @@
 		{% if incomplete_registration %}
 		<a href="/register/redirect/">Continue Registration</a>
 		{% endif %}
+		<button class="close" onclick="hst()">Close</button>
 	</body>
 </html>

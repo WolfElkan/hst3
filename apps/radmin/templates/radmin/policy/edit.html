@@ -2,6 +2,9 @@
 <html>
 <head>
 	<title>HST | Edit Policies</title>
+	{% load staticfiles %}
+	<script src="{% static 'main/js/script.js' %}" charset="utf-8"></script>
+	<link rel="stylesheet" type="text/css" href="{% static 'main/css/style.css' %}">
 	<style type="text/css">
 		textarea {
 			width: 100%;
@@ -9,12 +12,13 @@
 		}
 	</style>
 </head>
-<body>
+<body id="policy_edit" class="admin">
 	<form method="post">{% csrf_token %}
 		Year: <input type="number" name="year" value="{{year}}"><br>
 		Text: (Markdown supported)<br>
 		<textarea rows="20" name="markdown">{{current}}</textarea>
 		<button>Save</button>
 	</form>
+	<button class="close" onclick="hst()">Close</button>
 </body>
 </html>

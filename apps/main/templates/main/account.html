@@ -2,13 +2,17 @@
 <html>
 <head>
 	<title>HST | My Account</title>
+	{% load staticfiles %}
+	<script src="{% static 'main/js/script.js' %}" charset="utf-8"></script>
+	<link rel="stylesheet" type="text/css" href="{% static 'main/css/style.css' %}">
 	<style type="text/css">
 		.mono {
 			font-family: monospace;
 		}
 	</style>
 </head>
-<body>
+<body id="myaccount" class="public">
+	<img id="logo" src="//www.hstonline.org/wp-content/uploads/2017/05/cropped-cropped-HST-LOGO-10.png">
 	<a href="/">Home</a>
 	<h1>User Account Info</h1>
 	<table>
@@ -65,5 +69,6 @@
 <a href="students/{{me.owner.children.first.id}}/">Student Info</a>
 <a href="classes/">Registration Info</a>
 {% if me.permission >= 4 %}<a href="/admin/dashboard/">Admin Dashboard</a>{% endif %}
+<button class="close" onclick="window.close()">Close</button>
 </body>
 </html>

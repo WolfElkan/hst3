@@ -2,8 +2,12 @@
 <html>
 <head>
 	<title>HST | JSON Input</title>
+	{% load staticfiles %}
+	<script src="{% static 'main/js/script.js' %}" charset="utf-8"></script>
+	<link rel="stylesheet" type="text/css" href="{% static 'main/css/style.css' %}">
 </head>
-<body>
+<body id="seed" class="admin">
+<img id="logo" src="//www.hstonline.org/wp-content/uploads/2017/05/cropped-cropped-HST-LOGO-10.png">
 <a href="/admin/dashboard/">&larr; Return to Admin Dashboard</a><br>
 JSON:
 <form method="post">
@@ -14,5 +18,6 @@ JSON:
 <a href="/seed/nuke/">Nuke Database</a>
 <a href="/seed/dump/">JSON Dump</a>
 <a href="/seed/old/">Transfer Old</a>
+
 </body>
 </html>

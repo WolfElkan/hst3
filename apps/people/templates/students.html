@@ -16,7 +16,8 @@
 	<link rel="stylesheet" type="text/css" href="{% static 'main/css/style.css' %}">
 	<link rel="stylesheet" type="text/css" href="{% static 'people/css/style.css' %}">
 </head>
-<body id="register_students">
+<body id="students" class="public">
+	<img id="logo" src="//www.hstonline.org/wp-content/uploads/2017/05/cropped-cropped-HST-LOGO-10.png">
 	<a href="/">Home</a>
 	<h1>New Family Registration</h1>
 	<h2>Step 3: Students Information</h2>
@@ -180,5 +181,6 @@
 		<input id="data" type="hidden" name="students" value="">
 	</form>
 	<button style="display: none;" id="submit">Save &amp; Continue</button>
+	<button class="close" onclick="hst()">Close</button>
 </body>
 </html>

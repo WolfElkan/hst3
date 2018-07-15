@@ -2,11 +2,15 @@
 <html>
 <head>
 	<title>Admin | Dashboard</title>
+	{% load staticfiles %}
+	<script src="{% static 'main/js/script.js' %}" charset="utf-8"></script>
+	<link rel="stylesheet" type="text/css" href="{% static 'main/css/style.css' %}">
 </head>
-<body>
+<body id="admin_dashboard" class="admin">
 <a href="/myaccount/">&larr; Return to My Account</a>
 <h1>HST Admin Dashboard</h1>
 <ul>
+	<li><a href="/reports/summary/{{year}}">{{year|add:-1}}-{{year}} Summary Report</a></li>
 	<li><a href="/admin/auditions/">Audition Results Interface</a></li>
 	<li><a href="/admin/year/">Create New Year's Courses</a></li>
 	<li><a href="/admin/policy/index/">HST Policy Agreements</a></li>
@@ -14,5 +18,6 @@
 	<li><a href="/rest/">REST Framework</a></li>
 	<li><a href="/seed/load/">JSON Bulk Data Interface</a></li>
 </ul>
+<button class="close" onclick="hst()">Close</button>
 </body>
 </html>

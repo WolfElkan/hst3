@@ -2,6 +2,9 @@
 <html>
 <head>
 	<title>HST | Reports Home</title>
+	{% load staticfiles %}
+	<script src="{% static 'main/js/script.js' %}" charset="utf-8"></script>
+	<link rel="stylesheet" type="text/css" href="{% static 'main/css/style.css' %}">
 	<style type="text/css">
 		a {
 			display: block;
@@ -11,7 +14,8 @@
 		}
 	</style>
 </head>
-<body>
+<body id="rosters_index" class="admin">
+<img id="logo" src="//www.hstonline.org/wp-content/uploads/2017/05/cropped-cropped-HST-LOGO-10.png">
 <h1>Reports</h1>
 <h2><a href="/reports/students/{{year}}/">{{year}} Master Enrollment Matrix</a></h2>
 <h2>{{year}} Class Rosters</h2>
@@ -19,5 +23,6 @@
 <a {% if course.tradition.e %} class="e" {% endif %} href="/reports/roster/{{course.id}}/">{{course.title}}</a>
 {% endfor %}
 <br><a href="/reports/historical/">Historical</a>
+<button class="close" onclick="hst()">Close</button>
 </body>
 </html>

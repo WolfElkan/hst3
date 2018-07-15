@@ -2,6 +2,9 @@
 <html>
 <head>
 	<title>Invoice {{invoice.id}}</title>
+	{% load staticfiles %}
+	<script src="{% static 'main/js/script.js' %}" charset="utf-8"></script>
+	<link rel="stylesheet" type="text/css" href="{% static 'main/css/style.css' %}">
 	<style type="text/css">
 		input:disabled {
 			text-align: right;
@@ -14,7 +17,8 @@
 		}
 	</style>
 </head>
-<body>
+<body id="static_invoice" class="invoice">
+<img id="logo" src="//www.hstonline.org/wp-content/uploads/2017/05/cropped-cropped-HST-LOGO-10.png">
 <a href="/admin/dashboard/">Return to Dashboard</a>
 <center>
 	<h1>Invoice #{{invoice.id}}</h1>
@@ -93,5 +97,6 @@
 	</form>
 	<a href="/register/invoice/{{invoice.id}}/" target="_blank">View Invoice</a>
 </center>
+<button class="close" onclick="hst()">Close</button>
 </body>
 </html>

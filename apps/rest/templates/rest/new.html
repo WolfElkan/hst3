@@ -2,8 +2,11 @@
 <html>
 <head>
 	<title>HST | New {{Model}}</title>
+	{% load staticfiles %}
+	<script src="{% static 'main/js/script.js' %}" charset="utf-8"></script>
+	<link rel="stylesheet" type="text/css" href="{% static 'main/css/style.css' %}">
 </head>
-<body>
+<body id="rest_new" class="admin rest">
 	<h1>New {{Model}}</h1>
 	<form action="create/" method="POST"> {% csrf_token %}
 		<table>
@@ -17,5 +20,6 @@
 		<button type="submit">Create</button>
 		<a href="/rest/index/{{neutral}}/">Cancel</a>
 	</form>
+	<button class="close" onclick="hst()">Close</button>
 </body>
 </html>

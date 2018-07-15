@@ -2,6 +2,9 @@
 <html>
 <head>
 	<title>HST | Deferred Items</title>
+	{% load staticfiles %}
+	<script src="{% static 'main/js/script.js' %}" charset="utf-8"></script>
+	<link rel="stylesheet" type="text/css" href="{% static 'main/css/style.css' %}">
 	<style type="text/css">
 		tr td:first-child, thead th:first-child {
 			text-align: left;
@@ -17,7 +20,7 @@
 		}
 	</style>
 </head>
-<body>
+<body id="deferred" class="admin">
 <a href="/admin/dashboard/">&larr; Return to Admin Dashboard</a>
 <h1>Prepaid Tickets</h1>
 <table>
@@ -75,5 +78,6 @@
 <form action="rescind">
 Click the button below to rescind the ability to defer purchasing prepaid tickets from all families who have already enrolled.  Families who enroll in the future will still be able to defer paying for their tickets.  The action of this button cannot be undone.
 <button>Rescind</button>
+<button class="close" onclick="hst()">Close</button>
 </form>
 </html>

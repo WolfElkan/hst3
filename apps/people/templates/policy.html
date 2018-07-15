@@ -3,6 +3,8 @@
 <head>
 	<title>HST | Policy Agreement | Page {{page}}</title>
 	{% load staticfiles %}
+	<script src="{% static 'main/js/script.js' %}" charset="utf-8"></script>
+	<link rel="stylesheet" type="text/css" href="{% static 'main/css/style.css' %}">
 	<link rel="stylesheet" type="text/css" href="{% static 'main/css/policy.css' %}">
 	<style type="text/css">
 		form {
@@ -10,19 +12,21 @@
 		}
 	</style>
 </head>
-<body>
-<div class="content">{{content|safe}}</div>
-<form method="POST">{% csrf_token %}
-	<input type="hidden" name="year" value="{{full.year}}">
-	<input type="hidden" name="page" value="{{page}}">
-	<button>Decline</button>
-</form>
-<form method="POST">{% csrf_token %}
-	<input type="hidden" name="accept" value="True">
-	<input type="hidden" name="year" value="{{full.year}}">
-	<input type="hidden" name="page" value="{{page}}">
-	<button>Accept</button>
-</form>
-<form></form>
+<body id="policy" class="public">
+	<img id="logo" src="//www.hstonline.org/wp-content/uploads/2017/05/cropped-cropped-HST-LOGO-10.png">
+	<div class="content">{{content|safe}}</div>
+	<form method="POST">{% csrf_token %}
+		<input type="hidden" name="year" value="{{full.year}}">
+		<input type="hidden" name="page" value="{{page}}">
+		<button>Decline</button>
+	</form>
+	<form method="POST">{% csrf_token %}
+		<input type="hidden" name="accept" value="True">
+		<input type="hidden" name="year" value="{{full.year}}">
+		<input type="hidden" name="page" value="{{page}}">
+		<button>Accept</button>
+	</form>
+	<form></form>
+	<button class="close" onclick="hst()">Close</button>
 </body>
 </html>

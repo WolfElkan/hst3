@@ -2,6 +2,9 @@
 <html>
 <head>
 	<style type="text/css">
+	{% load staticfiles %}
+	<script src="{% static 'main/js/script.js' %}" charset="utf-8"></script>
+	<link rel="stylesheet" type="text/css" href="{% static 'main/css/style.css' %}">
 		ul {
 			display: inline-block;
 			list-style: none;
@@ -20,7 +23,8 @@
 	</style>
 	<title>HST | {{thing}}</title>
 </head>
-<body>
+<body id="rest_edit" class="admin rest">
+	<img id="logo" src="//www.hstonline.org/wp-content/uploads/2017/05/cropped-cropped-HST-LOGO-10.png">
 	<h1>{{thing}}</h1>
 	<h2>{{Model}}</h2>
 	<form action="/rest/update/{{model}}/{{thing.id}}/" method="POST"> {% csrf_token %}
@@ -40,5 +44,6 @@
 		<a href="/rest/show/{{model}}/{{thing.id}}/">Cancel</a>
 	</form>
 	<a href="/rest/delete/{{model}}/{{thing.id}}">Delete</a>
+	<button class="close" onclick="hst()">Close</button>
 </body>
 </html>

@@ -16,11 +16,12 @@
 			})
 		</script>
 	</head>
-	<body id="register_familyinfo">
-			<a href="/">Home</a>
-			<h1>New Family Registration</h1>
-			<h2>Step 1: Family Information</h2>
-			<span class="instructions">Enter the family surname, as used by the children, as well as basic contact information.  Create a username and password for the Family.  All fields on this page are required.  (If you refresh the page, data may not be saved.)</span>
+	<body id="family" class="public">
+		<img id="logo" src="//www.hstonline.org/wp-content/uploads/2017/05/cropped-cropped-HST-LOGO-10.png">
+		<a href="/">Home</a>
+		<h1>New Family Registration</h1>
+		<h2>Step 1: Family Information</h2>
+		<span class="instructions">Enter the family surname, as used by the children, as well as basic contact information.  Create a username and password for the Family.  All fields on this page are required.  (If you refresh the page, data may not be saved.)</span>
 		<center>
 			<form method="post">{% csrf_token %}
 				<table>
@@ -70,5 +71,6 @@
 			<button>Next >></button>
 			</form>
 		</center>
+		<button class="close" onclick="hst()">Close</button>
 	</body>
 </html>
