@@ -6,6 +6,9 @@
 	<script src="{% static 'main/js/script.js' %}" charset="utf-8"></script>
 	<link rel="stylesheet" type="text/css" href="{% static 'main/css/style.css' %}">
 	<style type="text/css">
+		* {
+			vertical-align: middle;
+		}
 		.mono {
 			font-family: monospace;
 		}
@@ -40,7 +43,7 @@
 				{% elif me.owner.policyPage != policy.nPages %}
 					You have accepted {{me.owner.policyPage}} out of {{policy.nPages}} page{% if policy.nPages != 1 %}s{% endif %} of HST's {{year}} Policy Agreement.  <a href="policy/{{me.owner.policyPage|add:1}}">Please continue</a> before enrolling in classes.
 				{% else %}
-					You accepted all pages of HST's current Policy Agreement on {{me.owner.policyDate}}  You are now eligible to <a href="courses">enroll</a> in classes.  <a href="policy">Review Policies</a>
+					You accepted all pages of HST's current Policy Agreement on {{me.owner.policyDate}}  You are now eligible to enroll in classes.  
 				{% endif %}
 				{% if me.owner.policyYear == year and me.owner.policyDate < policy.updated_at %}
 					({{year}} Policies may have been updated since you last accepted them)
@@ -50,7 +53,7 @@
 		{% endif %}
 		<tr>
 			<td>Password:</td>
-			<td>{{password|safe}} <a href="changepassword">Change</a></td>
+			<td><a href="changepassword">{{password|safe}} Change</a></td>
 		</tr>
 		<tr>
 			<td>Account Type:</td>
@@ -68,6 +71,7 @@
 <a href="parents/">Parent Info</a>
 <a href="students/{{me.owner.children.first.id}}/">Student Info</a>
 <a href="classes/">Registration Info</a>
+<a href="policy">Review Policies</a>
 {% if me.permission >= 4 %}<a href="/admin/dashboard/">Admin Dashboard</a>{% endif %}
 <button class="close" onclick="window.close()">Close</button>
 </body>

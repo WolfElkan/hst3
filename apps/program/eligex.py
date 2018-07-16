@@ -199,8 +199,10 @@ def check_word(trad, student, word, **kwargs):
 			if str(type(kwargs['debug'])) == "<class 'django.core.handlers.wsgi.WSGIRequest'>":
 				request = kwargs['debug']
 				log(request,query)
+				log(request,query_result)
 			else:
 				print query
+				print query_result
 			# print 'Quota:',word.count('+')
 		if '+' in word:
 			# return True
