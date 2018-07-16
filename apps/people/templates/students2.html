@@ -60,7 +60,7 @@
 
 </style>
 <body id="students" class="public">
-	<img id="logo" src="//www.hstonline.org/wp-content/uploads/2017/05/cropped-cropped-HST-LOGO-10.png">
+	<div><img id="logo" src="//www.hstonline.org/wp-content/uploads/2017/05/cropped-cropped-HST-LOGO-10.png"></div>
 	<div class="tabs">
 		{% for student in students %}
 		<div onclick="go('{{student.id}}')" class="tab{% if student.id|add:0 == current_student.id|add:0 %} selected_tab {% endif %}">

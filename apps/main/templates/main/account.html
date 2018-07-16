@@ -37,11 +37,11 @@
 			<td>{% if not policy %}
 					You have not accepted HST's {{year}} Policy Agreement as it is not yet available.
 				{% elif not me.owner.policyYear %}
-					You have not yet accepted HST's Policy Agreement.  <a href="policy">Please do so</a> before enrolling in classes.
+					You have not yet accepted HST's Policy Agreement.  Please review the policies before enrolling in classes.
 				{% elif me.owner.policyYear != year %}
-					You have not yet accepted HST's {{year}} Policy Agreement.  <a href="policy">Please do so</a> before enrolling in classes.
+					You have not yet accepted HST's {{year}} Policy Agreement.  Please review the policies before enrolling in classes.
 				{% elif me.owner.policyPage != policy.nPages %}
-					You have accepted {{me.owner.policyPage}} out of {{policy.nPages}} page{% if policy.nPages != 1 %}s{% endif %} of HST's {{year}} Policy Agreement.  <a href="policy/{{me.owner.policyPage|add:1}}">Please continue</a> before enrolling in classes.
+					You have accepted {{me.owner.policyPage}} out of {{policy.nPages}} page{% if policy.nPages != 1 %}s{% endif %} of HST's {{year}} Policy Agreement.  Please review the policies before enrolling in classes.
 				{% else %}
 					You accepted all pages of HST's current Policy Agreement on {{me.owner.policyDate}}  You are now eligible to enroll in classes.  
 				{% endif %}
