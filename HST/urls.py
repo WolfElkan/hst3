@@ -80,7 +80,7 @@ urlpatterns = [
 	url(r'^hot/$', dev.hot),
 	url(r'^run/$', dev.run),
 	url(r'^clear/$', dev.clear),
-	url(r'^nuke/$', seed.nuke),
+	# url(r'^nuke/$', seed.nuke),
 
 	url(r'^rest/$', rest.home),
 	url(r'^rest/edit/(?P<model>[a-zA-Z]+)/(?P<id>\d+|(\d\d)?\w\w|\w{3})/$', rest.edit),
@@ -133,7 +133,7 @@ urlpatterns = [
 	url(r'^rest/delete/(?P<model>[a-zA-Z]+)/(?P<id>\d+|(\d\d)?\w\w)/$', rest.delete),
 	url(r'^seed/load/$', seed.load),
 	url(r'^seed/dump/$', seed.dump),
-	url(r'^seed/nuke/$', seed.nuke),
+	# url(r'^seed/nuke/$', seed.nuke),
 	url(r'^seed/old/$', old.old),
 
 #	url(r'.*', main.dciv),
