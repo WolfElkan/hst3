@@ -145,6 +145,12 @@ class Family(models.Model):
 
 	def children(self):
 		return Students.filter(family_id=self.id).order_by('birthday')
+	def children_eligible_in(self,year):
+		ids = []
+		for child in self.children:
+			if set(Each(list(child.course_menu())).status) - set(['not_elig']):
+				ids.append(child.id)
+		return Students.filter(id__in=ids)
 	def children_enrolled_in(self,year):
 		return self.children.filter(enrollment__course__year=year).distinct()
 

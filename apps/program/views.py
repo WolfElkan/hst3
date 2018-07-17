@@ -9,13 +9,13 @@ from Utils.security import getme, getyear, restricted
 
 def oldest_student(request, ref):
 	me = getme(request)
-	if me.owner.children:
-		return redirect('/{}/classes/{}/'.format(ref,me.owner.children[0].id))
+	if me.owner.children_eligible_in(getyear()):
+		return redirect('/{}/classes/{}/'.format(ref,me.owner.children_eligible_in(getyear())[0].id))
 
 
 def courses(request, **kwargs):
 	me = getme(request)
-	if not me or not me.owner or not me.owner.children:
+	if not me or not me.owner or not me.owner.children_eligible_in(getyear()):
 		return redirect('/register')
 	if request.GET.get('action') == u'add':
 		return add(request, **kwargs)
@@ -28,7 +28,7 @@ def courses(request, **kwargs):
 		if not current_student:
 			return redirect('/')
 	else:
-		current_student = me.owner.children[0]
+		current_student = me.owner.children_eligible_in(getyear())[0]
 	reg_year = getyear()
 	cart = me.owner.enrollments_in(reg_year).filter(course__tradition__e=True)
 	cart = cart.filter(status__in=['aud_pass','aud_pend','invoiced','deferred','maydefer','enrolled','need_pay','pend_pub','aud_lock'])
@@ -42,7 +42,7 @@ def courses(request, **kwargs):
 		'invoiceable' : bool(cart_unpaid), # TODO: This is simple enough now to be calculated in the HTML page
 		'reg_year': reg_year,
 		'family'  : me.owner,
-		'students': equip(me.owner.children, lambda student: student.hst_age_in(reg_year), attr='age'),
+		'students': equip(me.owner.children_eligible_in(getyear()), lambda student: student.hst_age_in(reg_year), attr='age'),
 		'current_student' : current_student,
 		'menu'    : current_student.course_menu(year=reg_year),
 		'cart'    : cart,
