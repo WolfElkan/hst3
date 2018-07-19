@@ -105,9 +105,35 @@ def generate_summary(request, **kwargs):
 def overview(request, **kwargs):
 	GET = request.GET.copy()
 	year = GET.setdefault('year',getyear())
+	courses = Courses.filter(year=year).order_by('tradition__order')
 	context = {
-		'year':year,
-		'courses':Courses.filter(tradition__e=True,tradition__m=True,year=year).order_by('tradition__order'),
+		'year':Year(year),
+		'real':courses.filter(tradition__e=True, tradition__m=True),
+		'auto':courses.filter(tradition__e=True, tradition__m=False),
+		'stat':courses.filter(tradition__e=False,tradition__m=False),
+		'rf'  :Courses.fetch(tradition__id='RF',year=year),
+		'total':{
+			'SG': sum([
+				len(Courses.fetch(tradition__id='KG',year=year).students) * 10,
+				len(Courses.fetch(tradition__id='KS',year=year).students) * 15,
+				len(Courses.fetch(tradition__id='KW',year=year).students) * 20
+			]),
+			'SJ': sum([
+				len(Courses.fetch(tradition__id='KJ',year=year).students) * 10,
+				len(Courses.fetch(tradition__id='KT',year=year).students) * 15,
+				len(Courses.fetch(tradition__id='KX',year=year).students) * 20
+			]),
+			'SH': sum([
+				len(Courses.fetch(tradition__id='KH',year=year).students) * 10,
+				len(Courses.fetch(tradition__id='KU',year=year).students) * 15,
+				len(Courses.fetch(tradition__id='KY',year=year).students) * 20
+			]),
+			'SR': sum([
+				len(Courses.fetch(tradition__id='KR',year=year).students) * 10,
+				len(Courses.fetch(tradition__id='KV',year=year).students) * 15,
+				len(Courses.fetch(tradition__id='KZ',year=year).students) * 20
+			]),
+		},
 	}
 	return render(request, 'reports/overview.html', context)
 

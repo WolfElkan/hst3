@@ -1,30 +1,123 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>HST | {{year}} Overview Report</title>
+	<title>HST | {{year.year}} Overview Report</title>
 	{% load staticfiles %}
 	<script src="{% static 'main/js/script.js' %}" charset="utf-8"></script>
 	<link rel="stylesheet" type="text/css" href="{% static 'main/css/style.css' %}">
+	<style type="text/css">
+		.right {
+			text-align: right;
+		}
+		.center {
+			text-align: center;
+		}
+	</style>
 </head>
 <body id="overview" class="admin">
 	<img id="logo" src="//www.hstonline.org/wp-content/uploads/2017/05/cropped-cropped-HST-LOGO-10.png">
+	<h1>{{year.year}} Classes</h1>
 	<table>
 		<thead>
 			<th>ID</th>
-			<th>Course</th>
+			<th>Course (Roster)</th>
 			<th>Slots</th>
 			<th>Filled</th>
-			<th>Roster</th>
+			<th colspan="2">Tuition</th>
+			<th>Revenue</th>
 		</thead>
-		{% for course in courses %}
+		{% for course in real %}
 		<tr>
 			<td>{{course.tradition.id}}</td>
-			<td>{{course.title}}</td>
-			<td>{{course.nSlots}}</td>
-			<td>{{course.students|length}}</td>
-			<td><a href="/reports/roster/{{course.id}}">{{course}}</a></td>
+			<td><a href="/reports/roster/{{course.id}}">{{course.title}}</a></td>
+			<td class="right">{% if course.nSlots %}{{course.nSlots}}{% else %}&infin;{% endif %}</td>
+			<td class="right">{{course.students|length}}</td>
+			  {% if course.early_tuit == course.after_tuit %}
+				<td class="right" colspan="2">${{course.early_tuit}}</td>
+			  {% else %}
+				<td class="right">${{course.early_tuit}}</td>
+				<td class="right">${{course.after_tuit}}</td>
+			  {% endif %}
+			<td class="right">${{course.revenue}}</td>
 		</tr>
 		{% endfor %}
+	</table>
+	<h1>Autos</h1>
+	<h2>Prepaid Tickets</h2>
+		<table>
+			<thead>
+				<th>Show</th>
+				<th>x10</th>
+				<th>x15</th>
+				<th>x20</th>
+				<th>Total</th>
+			</thead>
+			<tr>
+				<td>Coffee House</td>
+				<td class="right">{{year.KB.students|length}}</td>
+				<td></td>
+				<td></td>
+				<td class="right">{% widthratio year.KB.students|length 1 10 %}</td>
+			</tr>
+			<tr>
+				<td>Showcase</td>
+				<td class="right">{{year.KC.students|length}}</td>
+				<td></td>
+				<td></td>
+				<td class="right">{% widthratio year.KC.students|length 1 10 %}</td>
+			</tr>
+			<tr>
+				<td>Gaithersburg Troupe</td>
+				<td class="right">{{year.KG.students|length}}</td>
+				<td class="right">{{year.KS.students|length}}</td>
+				<td class="right">{{year.KW.students|length}}</td>
+				<td class="right">{{total.SG}}</td>
+			</tr>
+			<tr>
+				<td>Junior Troupe</td>
+				<td class="right">{{year.KJ.students|length}}</td>
+				<td class="right">{{year.KT.students|length}}</td>
+				<td class="right">{{year.KX.students|length}}</td>
+				<td class="right">{{total.SJ}}</td>
+			</tr>
+			<tr>
+				<td>Shakespeare Troupe</td>
+				<td class="right">{{year.KH.students|length}}</td>
+				<td class="right">{{year.KU.students|length}}</td>
+				<td class="right">{{year.KY.students|length}}</td>
+				<td class="right">{{total.SH}}</td>
+			</tr>
+			<tr>
+				<td>Senior Troupe</td>
+				<td class="right">{{year.KR.students|length}}</td>
+				<td class="right">{{year.KV.students|length}}</td>
+				<td class="right">{{year.KZ.students|length}}</td>
+				<td class="right">{{total.SR}}</td>
+			</tr>
+		</table>
+	<h2>Registration Fee</h2>
+	<table>
+		<tr>
+			<td>Amount</td>
+			<td class="right">${{rf.after_tuit}}</td>
+		</tr>
+		<tr>
+			<td>Quantity</td>
+			<td class="right">{{rf.students|length}}</td>
+		</tr>
+		<tr>
+			<td>Revenue</td>
+			<td class="right">${{rf.revenue}}</td>
+		</tr>
+	</table>
+	<h1>Statistics</h1>
+	<table>
+	{% for course in stat %}
+	<tr>
+		<td><a href="/reports/roster/{{course.id}}">{{course.title}}</a></td>
+		<td>{{course.students|length}}</td>
+	</tr>
+	{% endfor %}
 	</table>
 	<button class="close" onclick="hst()">Close</button>
 </body>

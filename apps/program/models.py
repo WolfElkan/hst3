@@ -206,6 +206,8 @@ class Course(models.Model):
 
 	def enrollments(self):
 		return Enrollments.filter(course_id=self.id,status='enrolled')
+	def all_students(self):
+		return Students.filter(enrollment__course=self).order_by('family__last','birthday').distinct()
 	def students(self):
 		return Students.filter(enrollment__course=self,enrollment__status='enrolled').order_by('family__last','birthday').distinct()
 	def boys(self):
@@ -242,6 +244,9 @@ class Course(models.Model):
 		for enrollment in self.enrollments:
 			result.append({'widget':enrollment,'static':Students.get(id=enrollment.student_id)})
 		return result
+
+	def revenue(self):
+		return sum(Each(Enrollments.filter(course=self)).tuition)
 
 	def conflicts_with(self, other):
 		if self.id == other.id:
@@ -307,7 +312,7 @@ class Course(models.Model):
 		return len(self.students)
 
 	def __getattribute__(self, field):
-		if field in ['students_toggle_enrollments','students','enrollments','prepaid','slots_open']:
+		if field in ['students_toggle_enrollments','students','all_students','enrollments','prepaid','slots_open']:
 			call = super(Course, self).__getattribute__(field)
 			return call()
 		elif '_' not in field and field not in ['audible','clean','delete','eligible','enroll','id','objects','pk','save','title','tradition'] and hasattr(CourseTrad, field):
