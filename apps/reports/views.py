@@ -107,6 +107,7 @@ def overview(request, **kwargs):
 	year = GET.setdefault('year',getyear())
 	courses = Courses.filter(year=year).order_by('tradition__order')
 	context = {
+		'date':datetime.datetime.now(),
 		'year':Year(year),
 		'real':courses.filter(tradition__e=True, tradition__m=True),
 		'auto':courses.filter(tradition__e=True, tradition__m=False),
