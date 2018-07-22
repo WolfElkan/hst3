@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>HST | Search Results</title>
+	{% load staticfiles %}
+	<script src="{% static 'main/js/script.js' %}" charset="utf-8"></script>
+	<link rel="stylesheet" type="text/css" href="{% static 'main/css/style.css' %}">
+	<style type="text/css">
+		a {
+			display: block;
+		}
+	</style>
+</head>
+<body class="admin rest">
+	<img id="logo" src="//www.hstonline.org/wp-content/uploads/2017/05/cropped-cropped-HST-LOGO-10.png">
+	<form>
+		<input type="text" name="query" value="{{query}}">
+		<button>Search</button>
+	</form>
+	{% for result in results %}
+	<a href="/rest/show/{{result.rest_model}}/{{result.id}}">{{result}}</a>
+	{% empty %}
+	<div>No results</div>
+	{% endfor %}
+	<button class="close" onclick="hst()">Close</button>
+</body>
+</html>

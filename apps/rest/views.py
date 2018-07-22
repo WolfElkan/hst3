@@ -1,4 +1,6 @@
 from django.shortcuts import render, redirect, HttpResponse
+from apps.program.managers import Enrollments
+from .search import search_query
 
 from Utils.data import collect, sub
 from Utils.security import restricted
@@ -168,3 +170,19 @@ def delete(request, model, id):
 	thing = manager.get(id=id)
 	thing.delete()
 	return redirect('/rest/index/{}/'.format(model))
+
+def search(request, **kwargs):
+	query = request.GET.get('query')
+	if ' in ' in query:
+		match = re.match(r'(?P<student>.*?) in (?P<course>.*)',query).groupdict()
+		students = search_query(match['student'], all_tables=False, student=True)
+		courses  = search_query(match['course'],  all_tables=False, course=True)
+		results  = Enrollments.filter(student__in=students,course__in=courses)
+	else:
+		results = search_query(query)
+	context = {
+		'results':results,
+		'query':query,
+	}
+	return render(request, 'rest/search_results.html', context)
+

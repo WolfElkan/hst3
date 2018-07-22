@@ -83,6 +83,7 @@ urlpatterns = [
 	# url(r'^nuke/$', seed.nuke),
 
 	url(r'^rest/$', rest.home),
+	url(r'^rest/search/$', rest.search),
 	url(r'^rest/edit/(?P<model>[a-zA-Z]+)/(?P<id>\d+|(\d\d)?\w\w|\w{3})/$', rest.edit),
 	url(r'^rest/show/(?P<model>[a-zA-Z]+)/(?P<id>\d+|(\d\d)?\w\w|\w{3})/$', rest.show),
 	url(r'^rest/update/(?P<model>[a-zA-Z]+)/(?P<id>\d+|(\d\d)?\w\w)/$', rest.update),

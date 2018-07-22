@@ -416,6 +416,12 @@ The relationship between the `Student` table and the `Course` table is [many-to-
 
 ## `rest` app
 
+A search bar has been added to the REST framework.  This search bar *is* case-sensitive.  A future commit will change this.
+
+Also, if the search query contains the word "in", with a space on both sides, a search will be performed for Students matching the string to the left of "in" and another for Courses matching the string to the right of "in".  Finally, a list of enrollments for any of these students in any of these courses will be returned.
+
+For example, searching for `Elkan in Troupe` will return any enrollments by students matching `Elkan` in courses matching `Troupe`.
+
 ## Development Features
 
 ### Hot Code
