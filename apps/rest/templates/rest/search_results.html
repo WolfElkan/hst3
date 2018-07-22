@@ -17,7 +17,7 @@
 		<input type="text" name="query" value="{{query}}">
 		<button>Search</button>
 	</form>
-	{{results|length}} results
+	{{results|length}} result{% if results|length != 1 %}s{% endif %}
 	{% for result in results %}
 	<a href="/rest/show/{{result.rest_model}}/{{result.id}}">{{result}}</a>
 	{% endfor %}
