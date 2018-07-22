@@ -17,10 +17,9 @@
 		<input type="text" name="query" value="{{query}}">
 		<button>Search</button>
 	</form>
+	{{results|length}} results
 	{% for result in results %}
 	<a href="/rest/show/{{result.rest_model}}/{{result.id}}">{{result}}</a>
-	{% empty %}
-	<div>No results</div>
 	{% endfor %}
 	<button class="close" onclick="hst()">Close</button>
 </body>

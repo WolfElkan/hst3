@@ -1,7 +1,7 @@
 from django.db.models import Q
 
 from apps.people.managers  import Families, Addresses, Parents, Users, Students, Teachers
-from apps.program.managers import CourseTrads, Courses, Venues
+from apps.program.managers import CourseTrads, Courses, Venues, Enrollments
 from apps.payment.managers import Invoices, PayPals
 
 def search_word(word, all_tables=True, **kwargs):
@@ -60,6 +60,8 @@ def search_word(word, all_tables=True, **kwargs):
 			Q(zipcode__contains=word))))
 	if all_tables or kwargs.get('venue'):
 		results |= set(Venues.filter(name__contains=word))
+	if all_tables or kwargs.get('enrollment'):
+		results |= set(Enrollments.filter(role__contains=word))
 	if all_tables or kwargs.get('user'):
 		results |= set(Users.filter(username__contains=word))
 	if all_tables or kwargs.get('teacher'):
