@@ -6,7 +6,7 @@ from apps.program.eligex   import check_eligex, check_word, calc_status, eligibl
 from apps.payment.managers import Invoices, PayPals
 from apps.radmin.managers  import Policies
 from apps.program.models   import Year
-from apps.rest.search import search_query, search_number, search_word
+from apps.rest.search import search_query, search_number, search_word, fetch
 
 from Utils.custom_fields import Bcrypt, PhoneNumber, DayOfWeek
 from Utils.data  import collect, copy, copyatts, Each, equip, find, find_all, sub, cleandate

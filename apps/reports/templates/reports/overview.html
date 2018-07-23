@@ -12,6 +12,9 @@
 		.center {
 			text-align: center;
 		}
+		tfoot td {
+			font-weight: bold;
+		}
 	</style>
 </head>
 <body id="overview" class="admin">
@@ -42,6 +45,14 @@
 			<td class="right">${{course.revenue}}</td>
 		</tr>
 		{% endfor %}
+		<tfoot>
+			<td colspan="2">Total Program:</td>
+			<td class="right">{{tSlots}}</td>
+			<td class="right">{{tFilled}}</td>
+			<td></td>
+			<td></td>
+			<td class="right">${{tRev}}</td>
+		</tfoot>
 	</table>
 	<h1>Autos</h1>
 	<h2>Prepaid Tickets</h2>
@@ -95,6 +106,13 @@
 				<td class="right">{{year.KZ.students|length}}</td>
 				<td class="right">{{total.SR}}</td>
 			</tr>
+			<tfoot>
+				<td>Total:</td>
+				<td class="right">{{total.10}}</td>
+				<td class="right">{{total.15}}</td>
+				<td class="right">{{total.20}}</td>
+				<td class="right">{{total.tt}}</td>
+			</tfoot>
 		</table>
 	<h2>Registration Fee</h2>
 	<table>
@@ -116,7 +134,7 @@
 	{% for course in stat %}
 	<tr>
 		<td><a href="/reports/roster/{{course.id}}">{{course.title}}</a></td>
-		<td>{{course.students|length}}</td>
+		<td class="right">{{course.students|length}}</td>
 	</tr>
 	{% endfor %}
 	</table>

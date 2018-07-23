@@ -5,7 +5,7 @@ from apps.program.managers import Courses, CourseTrads, Enrollments
 from apps.program.eligex   import status_choices
 from apps.program.models   import Year
 
-from Utils.data import sub
+from Utils.data import sub, Each
 from Utils.security import getyear, gethist, restricted
 
 import re, datetime
@@ -106,6 +106,37 @@ def overview(request, **kwargs):
 	GET = request.GET.copy()
 	year = GET.setdefault('year',getyear())
 	courses = Courses.filter(year=year).order_by('tradition__order')
+	nTickets = {
+		'SB': [len(Courses.fetch(tradition__id='KB',year=year).students),0,0],
+		'SC': [len(Courses.fetch(tradition__id='KC',year=year).students),0,0],
+		'SG': [
+			len(Courses.fetch(tradition__id='KG',year=year).students),
+			len(Courses.fetch(tradition__id='KS',year=year).students),
+			len(Courses.fetch(tradition__id='KW',year=year).students),
+		],
+		'SJ': [
+			len(Courses.fetch(tradition__id='KJ',year=year).students),
+			len(Courses.fetch(tradition__id='KT',year=year).students),
+			len(Courses.fetch(tradition__id='KX',year=year).students),
+		],
+		'SH': [
+			len(Courses.fetch(tradition__id='KH',year=year).students),
+			len(Courses.fetch(tradition__id='KU',year=year).students),
+			len(Courses.fetch(tradition__id='KY',year=year).students),
+		],
+		'SR': [
+			len(Courses.fetch(tradition__id='KR',year=year).students),
+			len(Courses.fetch(tradition__id='KV',year=year).students),
+			len(Courses.fetch(tradition__id='KZ',year=year).students),
+		],
+	}
+	tSlots  = 0
+	tFilled = 0
+	tRev    = 0
+	for course in courses.filter(tradition__e=True, tradition__m=True):
+		tSlots  += course.tradition.nSlots
+		tFilled += len(course.students)
+		tRev    += course.revenue
 	context = {
 		'date':datetime.datetime.now(),
 		'year':Year(year),
@@ -113,27 +144,22 @@ def overview(request, **kwargs):
 		'auto':courses.filter(tradition__e=True, tradition__m=False),
 		'stat':courses.filter(tradition__e=False,tradition__m=False),
 		'rf'  :Courses.fetch(tradition__id='RF',year=year),
+		'tSlots':tSlots,
+		'tFilled':tFilled,
+		'tRev':tRev,
 		'total':{
-			'SG': sum([
-				len(Courses.fetch(tradition__id='KG',year=year).students) * 10,
-				len(Courses.fetch(tradition__id='KS',year=year).students) * 15,
-				len(Courses.fetch(tradition__id='KW',year=year).students) * 20
-			]),
-			'SJ': sum([
-				len(Courses.fetch(tradition__id='KJ',year=year).students) * 10,
-				len(Courses.fetch(tradition__id='KT',year=year).students) * 15,
-				len(Courses.fetch(tradition__id='KX',year=year).students) * 20
-			]),
-			'SH': sum([
-				len(Courses.fetch(tradition__id='KH',year=year).students) * 10,
-				len(Courses.fetch(tradition__id='KU',year=year).students) * 15,
-				len(Courses.fetch(tradition__id='KY',year=year).students) * 20
-			]),
-			'SR': sum([
-				len(Courses.fetch(tradition__id='KR',year=year).students) * 10,
-				len(Courses.fetch(tradition__id='KV',year=year).students) * 15,
-				len(Courses.fetch(tradition__id='KZ',year=year).students) * 20
-			]),
+			'SB': nTickets['SB'][0] * 10,
+			'SC': nTickets['SC'][0] * 10,
+			'SG': nTickets['SG'][0] * 10 + nTickets['SG'][1] * 15 + nTickets['SG'][2] * 20,
+			'SH': nTickets['SH'][0] * 10 + nTickets['SH'][1] * 15 + nTickets['SH'][2] * 20,
+			'SJ': nTickets['SJ'][0] * 10 + nTickets['SJ'][1] * 15 + nTickets['SJ'][2] * 20,
+			'SR': nTickets['SR'][0] * 10 + nTickets['SR'][1] * 15 + nTickets['SR'][2] * 20,
+			'10': sum(Each(nTickets.values()).__getitem__(0)),
+			'15': sum(Each(nTickets.values()).__getitem__(1)),
+			'20': sum(Each(nTickets.values()).__getitem__(2)),
+			'tt': sum(Each(nTickets.values()).__getitem__(0)) * 10
+				+ sum(Each(nTickets.values()).__getitem__(1)) * 15
+				+ sum(Each(nTickets.values()).__getitem__(2)) * 20,
 		},
 	}
 	return render(request, 'reports/overview.html', context)

@@ -312,7 +312,7 @@ class Course(models.Model):
 		return len(self.students)
 
 	def __getattribute__(self, field):
-		if field in ['students_toggle_enrollments','students','all_students','enrollments','prepaid','slots_open']:
+		if field in ['students_toggle_enrollments','students','all_students','enrollments','prepaid','slots_open','revenue']:
 			call = super(Course, self).__getattribute__(field)
 			return call()
 		elif '_' not in field and field not in ['audible','clean','delete','eligible','enroll','id','objects','pk','save','title','tradition'] and hasattr(CourseTrad, field):

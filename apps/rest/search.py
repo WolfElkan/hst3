@@ -109,3 +109,7 @@ def search_query(query, **kwargs):
 			results = search_word(word, **kwargs)
 	return results
 
+def fetch(query):
+	result = list(search_query(query))
+	if result:
+		return result[0]
