@@ -72,7 +72,7 @@ urlpatterns = [
 	# url(r'^register/student/(?P<id>\d+)/$', program.courses),
 
 	url(r'^(?P<ref>register|myaccount)/process/$',payment.invoice_create),
-	url(r'^(?P<ref>register|myaccount)/invoice/(?P<id>\d{6})/$',payment.invoice_show),
+	url(r'^(?P<ref>register|myaccount|rest/show)/invoice/(?P<id>\d{6})/$',payment.invoice_show),
 	url(r'^ipn/$', payment.paypal_ipn),
 
 	url(r'^family/(?P<family_id>\d+)/invoices/$',payment.invoice_index),

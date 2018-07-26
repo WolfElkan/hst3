@@ -42,7 +42,7 @@
 				<td class="right">${{course.early_tuit}}</td>
 				<td class="right">${{course.after_tuit}}</td>
 			  {% endif %}
-			<td class="right">${{course.revenue}}</td>
+			<td class="right"><a href="/rest/index/enrollment/?course_id={{course.id}}">${{course.revenue}}</a></td>
 		</tr>
 		{% endfor %}
 		<tfoot>
@@ -126,7 +126,7 @@
 		</tr>
 		<tr>
 			<td>Revenue</td>
-			<td class="right">${{rf.revenue}}</td>
+			<td class="right"><a href="/rest/index/enrollment/?course_id={{ar}}RF">${{rf.revenue}}</a></td>
 		</tr>
 	</table>
 	<h1>Statistics</h1>
