@@ -9,35 +9,35 @@ def search_word(word, all_tables=True, **kwargs):
 	if all_tables or kwargs.get('family'):
 		results |= set(Families.filter(Q(
 			Q(hid=word)|
-			Q(last__contains=word)|
-			Q(phone__contains=word)|
+			Q(last__icontains=word)|
+			Q(phone__icontains=word)|
 			Q(phone_type=word)|
-			Q(email__contains=word))))
+			Q(email__icontains=word))))
 	if all_tables or kwargs.get('parent'):
 		results |= set(Parents.filter(Q(
 			Q(hid=word)|
-			Q(first__contains=word)|
-			Q(alt_last__contains=word)|
-			Q(alt_phone__contains=word)|
+			Q(first__icontains=word)|
+			Q(alt_last__icontains=word)|
+			Q(alt_phone__icontains=word)|
 			Q(phone_type=word)|
-			Q(alt_email__contains=word))))
+			Q(alt_email__icontains=word))))
 	if all_tables or kwargs.get('student'):
 		results |= set(Students.filter(Q(
 			Q(hid=word)|
-			Q(first__contains=word)|
-			Q(alt_first__contains=word)|
-			Q(family__last__contains=word)|
-			Q(alt_last__contains=word)|
-			Q(alt_phone__contains=word)|
-			Q(alt_email__contains=word)|
-			Q(needs__contains=word))))
+			Q(first__icontains=word)|
+			Q(alt_first__icontains=word)|
+			Q(family__last__icontains=word)|
+			Q(alt_last__icontains=word)|
+			Q(alt_phone__icontains=word)|
+			Q(alt_email__icontains=word)|
+			Q(needs__icontains=word))))
 	if all_tables or kwargs.get('coursetrad'):
 		results |= set(CourseTrads.filter(Q(
 			Q(id=word)|
 			Q(oid=word)|
-			Q(title__contains=word)|
+			Q(title__icontains=word)|
 			Q(alias_id=word)|
-			Q(eligex__contains=word)|
+			Q(eligex__icontains=word)|
 			Q(default=word)|
 			Q(action=word))))
 	if all_tables or kwargs.get('course'):
@@ -45,31 +45,31 @@ def search_word(word, all_tables=True, **kwargs):
 			Q(id=word)|
 			Q(tradition__id=word)|
 			Q(tradition__oid=word)|
-			Q(title__contains=word)|
-			Q(tradition__title__contains=word)|
+			Q(title__icontains=word)|
+			Q(tradition__title__icontains=word)|
 			Q(tradition__alias_id=word)|
-			Q(tradition__eligex__contains=word)|
+			Q(tradition__eligex__icontains=word)|
 			Q(tradition__default=word)|
-			Q(tradition__action__contains=word))))
+			Q(tradition__action__icontains=word))))
 	if all_tables or kwargs.get('address'):
 		results |= set(Addresses.filter(Q(
-			Q(line1__contains=word)|
-			Q(line2__contains=word)|
-			Q(city__contains=word)|
-			Q(state__contains=word)|
-			Q(zipcode__contains=word))))
+			Q(line1__icontains=word)|
+			Q(line2__icontains=word)|
+			Q(city__icontains=word)|
+			Q(state__icontains=word)|
+			Q(zipcode__icontains=word))))
 	if all_tables or kwargs.get('venue'):
-		results |= set(Venues.filter(name__contains=word))
+		results |= set(Venues.filter(name__icontains=word))
 	if all_tables or kwargs.get('enrollment'):
-		results |= set(Enrollments.filter(role__contains=word))
+		results |= set(Enrollments.filter(role__icontains=word))
 	if all_tables or kwargs.get('user'):
-		results |= set(Users.filter(username__contains=word))
+		results |= set(Users.filter(username__icontains=word))
 	if all_tables or kwargs.get('teacher'):
 		results |= set(Teachers.filter(Q(
-			Q(first__contains=word)|
-			Q(last__contains=word)|
-			Q(phone__contains=word)|
-			Q(email__contains=word))))
+			Q(first__icontains=word)|
+			Q(last__icontains=word)|
+			Q(phone__icontains=word)|
+			Q(email__icontains=word))))
 	return results
 
 def search_number(number, all_tables=True, **kwargs):
@@ -94,8 +94,6 @@ def search_number(number, all_tables=True, **kwargs):
 		results |= set(Courses.filter(year=word))
 	if all_tables or kwargs.get('address'):
 		results |= set(Addresses.filter(id=word))
-	if all_tables or kwargs.get('user'):
-		results |= set(Users.filter(username__contains=word))
 	return results
 
 def search_query(query, **kwargs):
