@@ -57,7 +57,7 @@ FIELDS = {
 		{'field':'password'  , 'template': Bcrypt()},
 		{'field':'permission', 'template': Enum(items=User.perm_levels)},
 		{'field':'owner_id'  , 'template': Static()},
-		{'field':'owner'     , 'template': ForeignKey()}
+		{'field':'owner'     , 'template': ForeignKey(model='family')}
 	],
 	'coursetrad': [
 		{'field':'id'        , 'template': VarChar(maxlength=2)},
