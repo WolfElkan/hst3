@@ -232,6 +232,8 @@ class ForeignKey(object):
 		self.field = field
 		if value:
 			return rest_link(value)
+		elif self.xstatic:
+			return '-'
 		else:
 			return '<a href="add/{}/">add</a>'.format(field)
 	def set(self, thing, field, post, isAttr):

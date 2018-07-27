@@ -30,7 +30,22 @@ def index(request, model):
 	order_by = query.get('order_by')
 	if order_by:
 		query.pop('order_by')
-	qset = MODELS[model].filter(**query)
+	limit = query.get('limit')
+	offset = query.get('offset')
+	limit = int(limit) if limit else None
+	offset = int(offset) if offset else None
+	if limit and offset:
+		query.pop('limit')
+		query.pop('offset')
+		qset = MODELS[model].filter(**query)[offset:offset+limit]
+	elif limit:
+		query.pop('limit')
+		qset = MODELS[model].filter(**query)[:limit]
+	elif offset:
+		query.pop('offset')
+		qset = MODELS[model].filter(**query)[offset:]
+	else:
+		qset = MODELS[model].filter(**query)
 	if order_by:
 		qset = qset.order_by(order_by)
 	display = []
