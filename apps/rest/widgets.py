@@ -26,16 +26,12 @@ MODELS = {
 
 
 def rest_link(foreign):
-	if TRACE:
-		print '# rest.widgets.rest_link'
 	if foreign:
 		return '<a href="/rest/show/{}/{}/">{}</a>'.format(foreign.rest_model,foreign.id,str(foreign))
 	else:
 		return ''
 
 def rest_list(qset):
-	if TRACE:
-		print '# rest.widgets.rest_list'
 	if qset:
 		html = '<span>({})</span><ul>'.format(len(qset))
 		for foreign in qset:
@@ -48,22 +44,14 @@ def rest_list(qset):
 
 class VarChar(object):
 	def __init__(self, **kwargs):
-		if TRACE:
-			print '* rest.widgets.VarChar'
 		self.field = kwargs.setdefault('field', None)
 		self.default = kwargs.setdefault('default', '')
 		self.maxlength = kwargs.setdefault('maxlength', None)
 	def widget(self, field, value, **kwargs):
-		if TRACE:
-			print '# rest.widgets.VarChar:widget'
 		return '<input type="text" maxlength="{}" name="{}" value="{}">'.format(self.maxlength, field, value)
 	def static(self, field, value):
-		if TRACE:
-			print '# rest.widgets.VarChar:static'
 		return value
 	def set(self, thing, field, post, isAttr):
-		if TRACE:
-			print '# rest.widgets.VarChar:set'
 		if field in post:
 			value = post[field]
 		else:
@@ -76,24 +64,16 @@ class VarChar(object):
 
 class Integer(object):
 	def __init__(self, **kwargs):
-		if TRACE:
-			print '* rest.widgets.Integer'
 		self.field = kwargs.setdefault('field', None)
 		self.suffix = kwargs.setdefault('suffix', '')
 		self.default = kwargs.setdefault('default', 0)
 	def widget(self, field, value, **kwargs):
-		if TRACE:
-			print '# rest.widgets.Integer:widget'
 		if value:
 			value = int(value)
 		return '<input type="number" name="{}" value="{}"> {}'.format(field, value, self.suffix)
 	def static(self, field, value):
-		if TRACE:
-			print '# rest.widgets.Integer:static'
 		return '<div>{} {}</div>'.format(value, self.suffix) if value else '<div>0</div>'
 	def set(self, thing, field, post, isAttr):
-		if TRACE:
-			print '# rest.widgets.Integer:set'
 		if field in post:
 			value = post[field]
 		else:
@@ -106,8 +86,6 @@ class Integer(object):
 
 class Enum(object):
 	def __init__(self, **kwargs):
-		if TRACE:
-			print '* rest.widgets.Enum'
 		self.field = kwargs.setdefault('field', None)
 		self.items = kwargs.setdefault('items', [])
 		if hasattr(self.items, 'items'):
@@ -115,8 +93,6 @@ class Enum(object):
 		self.options = kwargs.setdefault('options', [])
 		self.default = kwargs.setdefault('default', self.items[0][0] if self.items else self.options[0])
 	def widget(self, field, value, **kwargs):
-		if TRACE:
-			print '# rest.widgets.Enum:widget'
 		html = '<select name="{}">'.format(field)
 		if self.items:
 			for db, full in self.items:
@@ -127,15 +103,11 @@ class Enum(object):
 		html += '</select>'
 		return html
 	def static(self, field, value):
-		if TRACE:
-			print '# rest.widgets.Enum:static'
 		if self.items:
 			return dict(self.items).get(value)
 		else:
 			return value
 	def set(self, thing, field, post, isAttr):
-		if TRACE:
-			print '# rest.widgets.Enum:set'
 		if field in post:
 			value = post[field]
 		else:
@@ -148,27 +120,19 @@ class Enum(object):
 		
 class Radio(object):
 	def __init__(self, **kwargs):
-		if TRACE:
-			print '* rest.widgets.Radio'
 		self.field = kwargs.setdefault('field', None)
 		self.options = kwargs.setdefault('options', [])
 		self.default = kwargs.setdefault('default', 0)
 	def widget(self, field, value, **kwargs):
-		if TRACE:
-			print '# rest.widgets.Radio:widget'
 		value = value if value else 0
 		html = ''
 		for o in range(len(self.options)):
 			html += '<input type="radio" name="{}" value="{}" {}>{}<br>'.format(field, o,' checked' if value == o else '',self.options[o])
 		return html
 	def static(self, field, value):
-		if TRACE:
-			print '# rest.widgets.Radio:static'
 		value = value if value else 0
 		return self.options[value]
 	def set(self, thing, field, post, isAttr):
-		if TRACE:
-			print '# rest.widgets.Radio:set'
 		if field in post:
 			value = post[field]
 		else:
@@ -181,22 +145,14 @@ class Radio(object):
 
 class Checkbox(object):
 	def __init__(self, **kwargs):
-		if TRACE:
-			print '* rest.widgets.Checkbox'
 		self.field = kwargs.setdefault('field', None)
 		self.suffix = kwargs.setdefault('suffix', '')
 		self.default = kwargs.setdefault('default', False)
 	def widget(self, field, value, **kwargs):
-		if TRACE:
-			print '# rest.widgets.Checkbox:widget'
 		return '<input type="checkbox" name="{}" {}> {}'.format(field, ' checked' if value else '',self.suffix)
 	def static(self, field, value):
-		if TRACE:
-			print '# rest.widgets.Checkbox:static'
 		return 'Yes' if value else 'No'
 	def set(self, thing, field, post, isAttr):
-		if TRACE:
-			print '# rest.widgets.Checkbox:set'
 		if field in post:
 			value = str(post[field]) == 'on'
 		else:
@@ -214,23 +170,15 @@ class NullBoolean(Enum):
 
 class Date(object):
 	def __init__(self, **kwargs):
-		if TRACE:
-			print '* rest.widgets.Date'
 		self.field = kwargs.setdefault('field', None)
 		self.default = kwargs.setdefault('default', None)
 	def widget(self, field, value, **kwargs):
-		if TRACE:
-			print '# rest.widgets.Date:widget'
 		return '<input type="date" name="{}" value="{}">'.format(field, value)
 	def static(self, field, value):
-		if TRACE:
-			print '# rest.widgets.Date:static'
 		if value:
 			return value.strftime('%B %-d, %Y')
 	def set(self, thing, field, post, isAttr):
 		# return thing
-		if TRACE:
-			print '# rest.widgets.Date:set'
 		if field in post:
 			value = post[field]
 		if value:
@@ -242,22 +190,14 @@ class Date(object):
 
 class Time(object):
 	def __init__(self, **kwargs):
-		if TRACE:
-			print '* rest.widgets.Time'
 		self.field = kwargs.setdefault('field', None)
 		self.default = kwargs.setdefault('default', None)
 	def widget(self, field, value, **kwargs):
-		if TRACE:
-			print '# rest.widgets.Time:widget'
 		return '<input type="time" name="{}" value="{}">'.format(field, value)
 	def static(self, field, value):
-		if TRACE:
-			print '# rest.widgets.Time:static'
 		if value:
 			return value.strftime('<div>%-I:%M %p</div>')
 	def set(self, thing, field, post, isAttr):
-		if TRACE:
-			print '# rest.widgets.Time:set'
 		if field in post:
 			value = post[field]
 		else:
@@ -270,15 +210,14 @@ class Time(object):
 
 class ForeignKey(object):
 	def __init__(self, **kwargs):
-		if TRACE:
-			print '* rest.widgets.ForeignKey'
-		self.field = kwargs.setdefault('field', None)
-		self.model = kwargs.setdefault('model', None)
-		self.null  = kwargs.setdefault('null', False)
+		self.field   = kwargs.setdefault('field'  , None)
+		self.model   = kwargs.setdefault('model'  , None)
+		self.null    = kwargs.setdefault('null'   , False)
 		self.default = kwargs.setdefault('default', None)
+		self.xstatic = kwargs.setdefault('static' , False)
 	def widget(self, field, value, **kwargs):
-		if TRACE:
-			print '# rest.widgets.ForeignKey:widget'
+		if self.xstatic:
+			return self.static(field, value, **kwargs)
 		self.field = field
 		html = '<select name="{}_id">'.format(field)
 		if not self.model:
@@ -290,16 +229,12 @@ class ForeignKey(object):
 		html += '</select>'
 		return html
 	def static(self, field, value):
-		if TRACE:
-			print '# rest.widgets.ForeignKey:static'
 		self.field = field
 		if value:
 			return rest_link(value)
 		else:
 			return '<a href="add/{}/">add</a>'.format(field)
 	def set(self, thing, field, post, isAttr):
-		if TRACE:
-			print '# rest.widgets.ForeignKey:set'
 		field += '_id'
 		if field in post:
 			value = post[field]
@@ -327,24 +262,16 @@ class Static(object):
 
 class ForeignSet(object):
 	def __init__(self, **kwargs):
-		if TRACE:
-			print '* rest.widgets.ForeignSet'
 		self.field = kwargs.setdefault('field', None)
 		self.model = kwargs.setdefault('model', None)
 		self.default = kwargs.setdefault('default', None)
 	def widget(self, field, qset, **kwargs):
-		if TRACE:
-			print '# rest.widgets.ForeignSet:widget'
 		html = rest_list(qset)
 		html += '<a class="plus" href="add/{}/">+</a>'.format(self.model)
 		return html
 	def static(self, field, qset):
-		if TRACE:
-			print '# rest.widgets.ForeignSet:static'
 		return rest_list(qset)
 	def set(self, thing, field, post, isAttr):
-		if TRACE:
-			print '# rest.widgets.ForeignSet:set'
 		if field in post:
 			value = post[field]
 		else:
@@ -353,14 +280,10 @@ class ForeignSet(object):
 
 class ToggleSet(object):
 	def __init__(self, **kwargs):
-		if TRACE:
-			print '* rest.widgets.ToggleSet'
 		self.field = kwargs.setdefault('field', None)
 		self.model = kwargs.setdefault('model', None)
 		self.default = kwargs.setdefault('default', None)
 	def widget(self, field, qset, **kwargs):
-		if TRACE:
-			print '# rest.widgets.ToggleSet:widget'
 		html = ''
 		if qset:
 			display = []
@@ -370,19 +293,26 @@ class ToggleSet(object):
 		html += '<a class="plus" href="add/{}/">+</a>'.format(self.model)
 		return html
 	def static(self, field, qset):
-		if TRACE:
-			print '# rest.widgets.ToggleSet:static'
 		if qset:
 			display = []
 			for foreign in qset:
 				display.append(foreign['static'])
 			return rest_list(display)
 	def set(self, thing, field, post, isAttr):
-		if TRACE:
-			print '# rest.widgets.ToggleSet:set'
 		if field in post:
 			value = post[field]
 		else:
 			value = self.default
 		return thing
 	
+# class Method(object):
+# 	def __init__(self, **kwargs):
+# 		self.params = kwargs.setdefault('params', [])
+# 	def widget(self, **kwargs):
+# 		return self.static()
+# 	def static(self, field, **kwargs):
+# 		return '<a class="button" href="method/{}/">{}</a>'.format(field, field)
+# 	def set(self, thing, field, post, isAttr):
+# 		return thing
+
+# 		

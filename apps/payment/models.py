@@ -22,6 +22,7 @@ class PayPal(models.Model):
 	txn_id     = models.CharField(max_length= 20)
 	created_at = models.DateTimeField(auto_now_add=True)
 	payment_date = models.DateTimeField(null=True)
+	rest_model = 'paypal'
 	objects = PayPals
 	def invoice(self):
 		return Invoices.fetch(id=self.get('invoice'))
@@ -62,6 +63,7 @@ class Invoice(models.Model):
 	paypal = models.OneToOneField(PayPal, null=True)
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
+	rest_model = 'invoice'
 	objects = Invoices
 	def __str__(self):
 		return "Invoice #{}".format(self.id)
