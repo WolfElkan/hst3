@@ -143,6 +143,9 @@ class Family(models.Model):
 		else:
 			return self.last
 
+	def accounts(self):
+		return Users.filter(owner_type='Family',owner_id=self.id)
+
 	def children(self):
 		return Students.filter(family_id=self.id).order_by('birthday')
 	def children_eligible_in(self,year):
@@ -224,7 +227,7 @@ class Family(models.Model):
 		# return ('{} Family #{}' if self.name_num else '{} Family').format(self.last,self.name_num)
 		return '{} Family'.format(self.last)
 	def __getattribute__(self, field):
-		if field in ['unique_last','children','enrollments','hours_worked']:
+		if field in ['unique_last','children','enrollments','hours_worked','accounts']:
 			call = super(Family, self).__getattribute__(field)
 			return call()
 		else:
