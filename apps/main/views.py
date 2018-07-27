@@ -1,9 +1,10 @@
 from django.shortcuts import render, redirect, HttpResponse
 
 
-from apps.people.managers  import Families, Addresses, Parents, Users, Students
-from apps.program.managers import CourseTrads, Courses, Enrollments
-from apps.radmin.managers  import Policies
+from apps.people.managers   import Families, Addresses, Parents, Users, Students
+from apps.program.managers  import CourseTrads, Courses, Enrollments
+from apps.radmin.managers   import Policies
+from apps.radmin.views.main import sudochangepassword
 
 from Utils.data  import collect, copy, copyatts, Each, equip, find, find_all, sub
 from Utils.debug import pretty, pdir, divs
@@ -94,10 +95,13 @@ def changepassword_get(request, **kwargs):
 	context = copy(request.session,'pe')
 	return render(request, 'main/changepassword.html', context)
 
-def changepassword_post(request, ref, **kwargs):
+def changepassword_post(request, **kwargs):
+	ref = kwargs.setdefault('ref',None)
 	me = getme(request)
 	if not me:
 		return redirect('/')
+	if 'them_id' in kwargs:
+		return sudochangepassword(request, **kwargs)
 	user = copy(request.POST,['password','pw_confm'])
 	valid = Users.isValid(user, partial=True)
 	if not valid:

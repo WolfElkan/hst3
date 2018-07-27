@@ -45,6 +45,7 @@ urlpatterns = [
 	url(r'^myaccount/$', main.account),
 	
 	url(r'^(?P<ref>register|myaccount)/changepassword/$',main.changepassword),
+	url(r'^rest/edit/user/(?P<them_id>\d+)/sudochangepassword/$',main.changepassword),
 	# url(r'^myaccount/changepassword/$', main.changepassword),
 	# url(r'^register/changepassword/$', main.changepassword),
 	

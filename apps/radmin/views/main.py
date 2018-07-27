@@ -63,3 +63,26 @@ def rescind(request, **kwargs):
 		enrollment.save()
 	return redirect('/admin/deferred/')
 
+
+def sudochangepassword(request, them_id, **kwargs):
+	me = getme(request)
+	if not me:
+		return redirect('/')
+	bad = restricted(request,6)
+	if bad:
+		return bad
+	user = copy(request.POST,['password','pw_confm'])
+	valid = Users.isValid(user, partial=True)
+	if not valid:
+		request.session['e'] = Users.errors(user, partial=True)
+	correct = me.password(request.POST['current_pw'])
+	if not correct:
+		request.session['e']['current_pw'] = "Your password is incorrect"
+	if correct and valid:
+		them = Users.get(id=them_id)
+		request.session['e'] = {}
+		them.password = request.POST['password']
+		them.save()
+	# 	return redirect('/{}/'.format(ref))
+	# else:
+		return redirect(request.META['HTTP_REFERER'])

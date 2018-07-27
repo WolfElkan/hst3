@@ -69,8 +69,8 @@ class Bcrypt(object):
 	def hash(self):
 		return dict(self)['hash']
 	def widget(self, field, value, **kwargs):
-		user_id = kwargs['id'] if 'id' in kwargs else 0
-		return '{} <a href="/user/{}/sudochangepassword/">Change</a>'.format(self.html, user_id)
+		self.__init__(value)
+		return '{} <a href="sudochangepassword/">Change</a>'.format(self.html)
 	def static(self, field, value):
 		self.__init__(value)
 		self.field = field
