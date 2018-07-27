@@ -140,7 +140,7 @@ def overview(request, **kwargs):
 	context = {
 		'date':datetime.datetime.now(),
 		'year':Year(year),
-		'ar'  :'07',#'{:02}'.format(year%100),
+		'ar'  :'{:02}'.format(int(year)%100),
 		'real':courses.filter(tradition__e=True, tradition__m=True),
 		'auto':courses.filter(tradition__e=True, tradition__m=False),
 		'stat':courses.filter(tradition__e=False,tradition__m=False),
