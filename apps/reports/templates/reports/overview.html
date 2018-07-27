@@ -52,11 +52,10 @@
 			<td class="right">{{tFilled}}</td>
 			<td></td>
 			<td></td>
-			<td class="right">${{tRev|intcomma}}</td>
+			<td class="right">${{tuitionRev|intcomma}}</td>
 		</tfoot>
 	</table>
-	<h1>Autos</h1>
-	<h2>Prepaid Tickets</h2>
+	<h1>Prepaid Tickets</h1>
 		<table>
 			<thead>
 				<th>Show</th>
@@ -115,7 +114,7 @@
 				<td class="right">{{total.tt}}</td>
 			</tfoot>
 		</table>
-	<h2>Registration Fee</h2>
+	<h1>Registration Fee</h1>
 	<table>
 		<tr>
 			<td>Amount</td>
@@ -138,6 +137,25 @@
 		<td class="right">{{course.students|length}}</td>
 	</tr>
 	{% endfor %}
+	</table>
+	<h1>Financial</h1>
+	<table>
+		<tr>
+			<td>Tuition:</td>
+			<td class="right">${{tuitionRev|intcomma}}</td>
+		</tr>
+		<tr>
+			<td>Registration Fee:</td>
+			<td class="right">${{rf.revenue|intcomma}}</td>
+		</tr>
+		<tr>
+			<td>Prepaid Tickets:</td>
+			<td class="right">${{prepaidRev|intcomma}}.00</td>
+		</tr>
+		<tfoot>
+			<td>Total Revenue:</td>
+			<td class="right">${{totalRev|intcomma}}</td>
+		</tfoot>
 	</table>
 	<button class="close" onclick="hst()">Close</button>
 </body>

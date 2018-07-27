@@ -7,6 +7,7 @@ from apps.program.models   import Year
 
 from Utils.data import sub, Each
 from Utils.security import getyear, gethist, restricted
+from decimal import Decimal
 
 import re, datetime
 
@@ -132,11 +133,11 @@ def overview(request, **kwargs):
 	}
 	tSlots  = 0
 	tFilled = 0
-	tRev    = 0
+	tuitionRev = 0
 	for course in courses.filter(tradition__e=True, tradition__m=True):
 		tSlots  += course.tradition.nSlots
 		tFilled += len(course.students)
-		tRev    += course.revenue
+		tuitionRev += course.revenue
 	context = {
 		'date':datetime.datetime.now(),
 		'year':Year(year),
@@ -147,7 +148,7 @@ def overview(request, **kwargs):
 		'rf'  :Courses.fetch(tradition__id='RF',year=year),
 		'tSlots':tSlots,
 		'tFilled':tFilled,
-		'tRev':tRev,
+		'tuitionRev':tuitionRev,
 		'total':{
 			'SB': nTickets['SB'][0] * 10,
 			'SC': nTickets['SC'][0] * 10,
@@ -163,6 +164,8 @@ def overview(request, **kwargs):
 				+ sum(Each(nTickets.values()).__getitem__(2)) * 20,
 		},
 	}
+	prepaidRev = context['prepaidRev'] = context['total']['tt'] * 10
+	context['totalRev'] = prepaidRev + context['tuitionRev'] + context['rf'].revenue
 	return render(request, 'reports/overview.html', context)
 
 def mass_enroll(request, **kwargs):
