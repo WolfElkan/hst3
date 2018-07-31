@@ -195,7 +195,7 @@ class Course(models.Model):
 			return bool(self.students.filter(id=me.owner.id))
 
 	def tuition(self, asof=datetime.now()):
-		cutoff = datetime(year=self.year-1,month=8,day=1)
+		cutoff = datetime(year=self.year-1,month=8,day=4)
 		return self.early_tuit if asof < cutoff else self.after_tuit
 
 	def slots_open(self):

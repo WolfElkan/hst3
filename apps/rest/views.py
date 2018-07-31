@@ -30,9 +30,9 @@ def index(request, model):
 	order_by = query.get('order_by')
 	if order_by:
 		query.pop('order_by')
-	limit = query.get('limit')
+	limit  = query.get('limit')
 	offset = query.get('offset')
-	limit = int(limit) if limit else None
+	limit  = int(limit)  if limit  else None
 	offset = int(offset) if offset else None
 	if limit and offset:
 		query.pop('limit')
