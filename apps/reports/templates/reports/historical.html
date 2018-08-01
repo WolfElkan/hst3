@@ -20,7 +20,7 @@
 <h1>HST Historical Class Rosters</h1>
 {% for year in history %}
 <h2>{{year.year}}</h2>
-	<a href="/reports/students/{{year.year}}/">{{year.year}} Summary Report</a>
+	<a href="/reports/students/{{year.year}}/">{{year.year}} Enrollment Matrix</a>
 	{% for course in year.courses %}
 	<a {% if course.tradition.e %} class="e" {% endif %} href="/reports/roster/{{course.id}}/">{{course.title}}</a>
 	{% endfor %}
