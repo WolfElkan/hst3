@@ -26,7 +26,8 @@ FIELDS = {
 		{'field':'father'    , 'template': ForeignKey(model='parent', null=True)},
 		{'field':'address'   , 'template': ForeignKey(model='address', null=True)},
 		{'field':'children'  , 'template': ForeignSet(model='student')},
-		{'field':'accounts'  , 'template': ForeignSet(model='user')}
+		{'field':'accounts'  , 'template': ForeignSet(model='user')},
+		{'field':'invoices'  , 'template': ForeignSet(model='invoice')},
 	],
 	'parent'    : [
 		{'field':'first'     , 'template': VarChar(maxlength=20)},

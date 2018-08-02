@@ -310,8 +310,9 @@ class Dollar(object):
 	def __init__(self, **kwargs):
 		if TRACE:
 			print '* rest.widgets.Dollar'
-		self.field = kwargs['field'] if 'field' in kwargs else None
-		self.default = kwargs['default'] if 'default' in kwargs else 0.00
+		self.field = kwargs.setdefault('field',None)
+		self.default = kwargs.setdefault('default',0.00)
+		# if thing in kwargs and kwargs['thing'].:
 	def widget(self, field, value, **kwargs):
 		if TRACE:
 			print '# rest.widgets.Dollar:widget'

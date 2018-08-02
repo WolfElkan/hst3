@@ -308,7 +308,13 @@ class ToggleSet(object):
 		else:
 			value = self.default
 		return thing
-	
+
+# class YearAndCourse(object):
+# 	def __init__(self, **kwargs):
+# 		self.field = kwargs.setdefault('field', None)
+# 		self.model = 'course'
+		
+
 # class Method(object):
 # 	def __init__(self, **kwargs):
 # 		self.params = kwargs.setdefault('params', [])
