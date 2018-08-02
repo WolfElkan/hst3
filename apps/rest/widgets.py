@@ -242,7 +242,9 @@ class ForeignKey(object):
 			value = post[field]
 		else:
 			value = self.default
-		if str(value) == '0':
+		# if value == 'None':
+		# 	value = None
+		if str(value) in ['0','None']:
 			return thing
 		if isAttr:
 			thing.__setattr__(field, str(value))
