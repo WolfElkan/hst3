@@ -184,7 +184,7 @@ def delete(request, model, id):
 	manager = MODELS[model]
 	thing = manager.get(id=id)
 	thing.delete()
-	return redirect('/rest/index/{}/'.format(model))
+	return redirect('/rest/')
 
 def search(request, **kwargs):
 	query = request.GET.get('query')
