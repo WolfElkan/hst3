@@ -162,8 +162,13 @@ def check_word(trad, student, word, **kwargs):
 					print query
 			return bool(Enrollments.filter(**query).exclude(student=student,course__tradition=trad,course__year=year))
 
+		if 'e' in word:
+			query['course__tradition__e'] = True
+		if 'u' in word:
+			query['course__tradition__m'] = True
+
 		# If the word is '**', then you don't care what course it is, as long as it's this year.
-		if word == '**':
+		if word.count('*') == 2:
 			if kwargs['cur']:
 				return True
 			query['course__year'] = year

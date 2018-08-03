@@ -404,6 +404,7 @@ class Enrollment(models.Model):
 			self.student.trigger(self.course.year)
 
 	def fate(self):
+		print self
 		self.status = calc_status(self)
 		self.save()
 		if self.status in ["not_elig","aud_need","conflict","need_cur","needboth"]:
@@ -413,7 +414,7 @@ class Enrollment(models.Model):
 		if self.status == "aud_pass" and self.course.tradition.droppable:
 			self.status = "aud_drop"
 			self.save()
-			self.student.family.fate(self.course.year)
+			# self.student.family.fate(self.course.year)
 		elif self.status == "need_pay":
 			self.delete()
 		elif self.status == "aud_pend":
@@ -423,8 +424,8 @@ class Enrollment(models.Model):
 			invoice = self.invoice
 			self.delete()
 			invoice.update_amount()
-		if self.course.tradition.action == 'trig':
-			self.fate()
+		# if self.course.tradition.action == 'trig':
+		self.student.family.fate(self.course.year)
 
 	def defer(self):
 		if self.status == "maydefer":

@@ -330,6 +330,8 @@ Methods which serve only to call methods on other objects should be used rarely.
   :---: | ---
   `y` | Younger: may be appended to `a` or `g` to relax the *minimum* age or grade requirement by one year for each appended glyph (E. g., If a class is for ages 9-12, `ayy` will return True for 7-12 year olds and False otherwise)
   `o` | Older: just like `y` but relaxes the *maximum* age or grade requirement
+  `e` | Limits query to only courses whose tradition's `e` variable is true, meaning the course will appear in Shopping Cart
+  `u` | Limits query to only courses whose tradition's `m` variable is true, meaning the course will appear on Course Menu.  
 
 #### Enrollment Search
 
