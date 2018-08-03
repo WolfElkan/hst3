@@ -414,11 +414,11 @@ class Enrollment(models.Model):
 			self.status = "aud_drop"
 			self.save()
 			self.student.family.fate(self.course.year)
-		elif self.status in ["aud_pend","need_pay"]:
-			print 410
+		elif self.status == "need_pay":
 			self.delete()
-			self.student.family.fate(self.course.year)
-			print self.status
+		elif self.status == "aud_pend":
+			self.status = "aud_need"
+			self.save()
 		elif self.status == "invoiced":
 			invoice = self.invoice
 			self.delete()

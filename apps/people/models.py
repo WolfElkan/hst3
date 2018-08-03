@@ -309,12 +309,15 @@ class Student(models.Model):
 	def grade(self):
 		return self.grade_in(getyear())
 
+	def all_enrollments(self):
+		return Enrollments.filter(student=self).order_by('course__year')
 	def enrollments(self):
-		return Enrollments.filter(student=self).order_by('course__year').exclude(status__in=['nonexist','aud_fail','aud_drop'])
+		return self.all_enrollments.exclude(status__in=['nonexist','aud_fail','aud_drop','aud_need','eligible'])
 	def enrollments_in(self, year):
 		return self.enrollments.filter(course__year=year)
 	def enrollments_before(self, year):
 		return self.enrollments.filter(course__year__lt=year)
+
 	def trigger(self, year):
 		for course in Courses.filter(year=year,tradition__action='auto'):
 			course.enroll(self)
@@ -379,6 +382,7 @@ class Student(models.Model):
 		auto_methods = [
 			'hst_age',
 			'grade',
+			'all_enrollments',
 			'enrollments',
 			'courses',
 			'courses_toggle_enrollments',

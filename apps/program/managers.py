@@ -73,6 +73,7 @@ class EnrollmentManager(sm.SuperManager):
 	def __init__(self):
 		super(EnrollmentManager, self).__init__('program_enrollment')
 	def create(self, **kwargs):
+		print kwargs
 		already = kwargs.copy()
 		if 'course' in kwargs:
 			course = kwargs['course']
