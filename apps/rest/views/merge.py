@@ -36,7 +36,7 @@ def records(request, model, old_id, new_id):
 			'field':template.field if template.field else field, 
 			'old':old_value,
 			'new':new_value,
-			'merge':template.merge(old,new) if hasattr(template,'merge') else ''
+			'merge':template.merge if hasattr(template,'merge') else ''
 		})
 	context = {
 		'old'     : old,
@@ -62,4 +62,33 @@ def swap(request, model, old_id, new_id):
 	old.save()
 	new.save()
 	return redirect('/rest/merge/{}/{}/{}/'.format(model,old_id,new_id))
+
+def copy(request, model, old_id, new_id):
+	bad = restricted(request,5)
+	if bad:
+		return bad
+	field = request.GET.get('field')
+	manager = MODELS[model]
+	old = manager.get(id=old_id)
+	new = manager.get(id=new_id)
+
+	new.__setattr__(field, old.__getattribute__(field))
+	new.save()
+	return redirect('/rest/merge/{}/{}/{}/'.format(model,old_id,new_id))
 	
+def transfer(request, model, old_id, new_id):
+	bad = restricted(request,5)
+	if bad:
+		return bad
+	field = request.GET.get('field')
+	blank = request.GET.get('blank')
+	manager = MODELS[model]
+	old = manager.get(id=old_id)
+	new = manager.get(id=new_id)
+
+	mid = old.__getattribute__(field)
+	old.__setattr__(field, blank)
+	old.save()
+	new.__setattr__(field, mid)
+	new.save()
+	return redirect('/rest/merge/{}/{}/{}/'.format(model,old_id,new_id))

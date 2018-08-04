@@ -53,8 +53,22 @@ class VarChar(object):
 	def static(self, field, value):
 		self.field = field
 		return value
-	def merge(self, old, new):
-		return '''<form action="swap/"><input type="hidden" name="field" value="{field}"><button>Swap</button></form>'''.format(field=self.field)
+	def merge(self):
+		return '''
+		<form action="swap/">
+			<input type="hidden" name="field" value="{field}">
+			<button>&larr;Swap&rarr;</button>
+		</form>
+		<form action="copy/">
+			<input type="hidden" name="field" value="{field}">
+			<button>Copy&rarr;</button>
+		</form>
+		<form action="transfer/">
+			<input type="hidden" name="field" value="{field}">
+			<input type="hidden" name="blank" value="">
+			<button>Transfer&rarr;</button>
+		</form>
+		'''.format(field=self.field)
 	def set(self, thing, field, post, isAttr):
 		if field in post:
 			value = post[field]
@@ -76,7 +90,24 @@ class Integer(object):
 			value = int(value)
 		return '<input type="number" name="{}" value="{}"> {}'.format(field, value, self.suffix)
 	def static(self, field, value):
+		self.field = field
 		return '<div>{} {}</div>'.format(value, self.suffix) if value else '<div>0</div>'
+	def merge(self):
+		return '''
+		<form action="swap/">
+			<input type="hidden" name="field" value="{field}">
+			<button>&larr;Swap&rarr;</button>
+		</form>
+		<form action="copy/">
+			<input type="hidden" name="field" value="{field}">
+			<button>Copy&rarr;</button>
+		</form>
+		<form action="transfer/">
+			<input type="hidden" name="field" value="{field}">
+			<input type="hidden" name="blank" value="{default}">
+			<button>Transfer&rarr;</button>
+		</form>
+		'''.format(field=self.field,default=self.default)
 	def set(self, thing, field, post, isAttr):
 		if field in post:
 			value = post[field]
