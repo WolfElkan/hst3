@@ -52,7 +52,8 @@ FIELDS = {
 		{'field':'alt_email' , 'template': VarChar(maxlength=254)},
 		{'field':'tshirt'    , 'template': Enum(items=Student.t_shirt_sizes)},
 		{'field':'needs'     , 'template': VarChar()},
-		{'field':'courses_toggle_enrollments', 'template': ToggleSet(field='courses',model='enrollment')},
+		{'field':'enrollments','template': ForeignSet(model='enrollment')}
+		# {'field':'courses_toggle_enrollments', 'template': ToggleSet(field='courses',model='enrollment')},
 	],
 	'user'      : [
 		{'field':'username'  , 'template': Static()},
@@ -101,7 +102,9 @@ FIELDS = {
 		{'field':'teacher'   , 'template': ForeignKey(model='teacher')},
 		{'field':'tradition' , 'template': ForeignKey(model='coursetrad')},
 		{'field':'aud_date'  , 'template': Date()},
-		{'field':'students_toggle_enrollments','template': ToggleSet(field='students')},
+		{'field':'enrollments','template': ForeignSet(model='enrollment')}
+		# {'field':'students'  , 'template': ForeignSet(model='student')}
+		# {'field':'students_toggle_enrollments','template': ToggleSet(field='students')},
 	],
 	'enrollment': [
 		{'field':'student'   , 'template': ForeignKey(model='student')},

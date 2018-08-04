@@ -33,10 +33,10 @@
 	<h2>Merge {{Model}} Records</h2>
 	<table>
 		<tr>
-			<td>id:</td>
-			<td><a href="/rest/show/{{model}}/{{old.id}}">{{old.id}}</a></td>
+			<td>Record:</td>
+			<td><a href="/rest/show/{{model}}/{{old.id}}">{{old}} (#{{old.id}})</a></td>
 			<td class="center"><button onclick="window.location='/rest/merge/{{model}}/{{new.id}}/{{old.id}}/'">Swap Sides</button></td>
-			<td><a href="/rest/show/{{model}}/{{new.id}}">{{new.id}}</a></td>
+			<td><a href="/rest/show/{{model}}/{{new.id}}">{{new}} (#{{new.id}})</a></td>
 		</tr>
 		{% for kvp in display %}
 		<tr>
