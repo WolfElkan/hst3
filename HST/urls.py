@@ -28,9 +28,13 @@ import apps.old.views     as old
 import apps.payment.views as payment
 import apps.people.views  as people
 import apps.program.views as program
-import apps.rest.views    as rest
 import apps.reports.views as reports
-import apps.rest.seed     as seed
+
+import apps.rest.views.main     as rest
+import apps.rest.views.seed     as seed
+import apps.rest.views.merge    as merge
+import apps.rest.views.search   as search
+
 import apps.radmin.views.main   as radmin
 import apps.radmin.views.policy as policy
 import apps.radmin.views.year   as year
@@ -46,8 +50,6 @@ urlpatterns = [
 	
 	url(r'^(?P<ref>register|myaccount)/changepassword/$',main.changepassword),
 	url(r'^rest/edit/user/(?P<them_id>\d+)/sudochangepassword/$',main.changepassword),
-	# url(r'^myaccount/changepassword/$', main.changepassword),
-	# url(r'^register/changepassword/$', main.changepassword),
 	
 	url(r'^(?P<ref>register|myaccount)/(?P<step>redirect|family|parents|students|policy)/(?P<id>[^/]*)/$',people.reg),
 	url(r'^(?P<ref>register|myaccount)/(?P<step>redirect|family|parents|students|policy)/$',people.reg),
@@ -58,19 +60,6 @@ urlpatterns = [
 	# url(r'^(?P<ref>register|myaccount)/classes/(?P<id>\d+)/audition/$', program.courses_audition),
 	url(r'^(?P<ref>register|myaccount)/classes/(?P<id>\d+)/drop/$', program.courses_drop),
 	url(r'^(?P<ref>register|myaccount)/classes/(?P<id>\d+)/cancel/$', program.courses_cancel),
-
-	# url(r'^register/$', people.reg),
-	# url(r'^register/family/$', people.family),
-	# url(r'^myaccount/parents/$', people.parents),
-	# url(r'^register/parents/$', people.parents),
-	# url(r'^myaccount/students/$', people.students),
-	# url(r'^register/students/$', people.students),
-	# url(r'^register/policy/(?P<page>\d+)/$', people.policy),
-	# url(r'^myaccount/policy/(?P<page>\d+)/$', people.policy),
-	# url(r'^myaccount/policy/$', people.policy),
-
-	# url(r'^myaccount/courses/$', program.from_myaccount),
-	# url(r'^register/student/(?P<id>\d+)/$', program.courses),
 
 	url(r'^(?P<ref>register|myaccount)/process/$',payment.invoice_create),
 	url(r'^(?P<ref>register|myaccount|rest/show)/invoice/(?P<id>\d{6})/$',payment.invoice_show),
@@ -92,6 +81,9 @@ urlpatterns = [
 	url(r'^rest/new/(?P<model>[a-zA-Z]+)/$', rest.new),
 	url(r'^rest/new/(?P<model>[a-zA-Z]+)/create/$', rest.create),
 	url(r'^rest/create/(?P<model>[a-zA-Z]+)/$', rest.create),
+
+	url(r'^rest/merge/(?P<model>[a-zA-Z]+)/(?P<old_id>\d+|(\d\d)?\w\w|\w{3})/(?P<new_id>\d+|(\d\d)?\w\w|\w{3})/$', merge.records),
+	url(r'^rest/merge/(?P<model>[a-zA-Z]+)/(?P<old_id>\d+|(\d\d)?\w\w|\w{3})/(?P<new_id>\d+|(\d\d)?\w\w|\w{3})/swap/$', merge.swap),
 
 	url(r'^reports/$', reports.index),
 	url(r'^reports/historical/$', reports.historical),

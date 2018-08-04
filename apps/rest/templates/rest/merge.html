@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+	{% load staticfiles %}
+	<script src="{% static 'main/js/script.js' %}" charset="utf-8"></script>
+	<link rel="stylesheet" type="text/css" href="{% static 'main/css/style.css' %}">
+	<style type="text/css">
+		ul {
+			display: inline-block;
+			list-style: none;
+			padding-left: 5px;
+			margin: 0;
+			vertical-align: middle;
+		}
+		span {
+			display: inline-block;
+		}
+		.center {
+			text-align: center;
+		}
+	</style>
+	<title>HST | Merge {{Model}}</title>
+</head>
+<body id="rest_show" class="admin rest">
+	<img id="logo" src="//www.hstonline.org/wp-content/uploads/2017/05/cropped-cropped-HST-LOGO-10.png">
+	<a href="/rest/">REST</a>
+	<a href="/rest/index/{{model}}/">{{model|title}} Index</a>
+	<h1>{{thing}}</h1>
+	{% if model == "course" %}<a href="/reports/roster/{{thing.id}}/">Roster</a>{% endif %}
+	<h2>Merge {{Model}} Records</h2>
+	<table>
+		<tr>
+			<td>id:</td>
+			<td><a href="/rest/show/{{model}}/{{old.id}}">{{old.id}}</a></td>
+			<td class="center"><button onclick="window.location='/rest/merge/{{model}}/{{new.id}}/{{old.id}}/'">Swap Places</button></td>
+			<td><a href="/rest/show/{{model}}/{{new.id}}">{{new.id}}</a></td>
+		</tr>
+		{% for kvp in display %}
+		<tr>
+			<td>{{kvp.field}}:</td>
+			<td>{{kvp.old|safe}}</td>
+			<td class="center">{{kvp.merge|safe}}</td>
+			<td>{{kvp.new|safe}}</td>
+		</tr>
+		{% endfor %}
+	</table>
+	<button class="close" onclick="hst()">Close</button>
+</body>
+</html>

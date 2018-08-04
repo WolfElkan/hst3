@@ -27,7 +27,8 @@ MODELS = {
 
 def rest_link(foreign):
 	if foreign:
-		return '<a href="/rest/show/{}/{}/">{}</a>'.format(foreign.rest_model,foreign.id,str(foreign))
+		extra = ' (#{})'.format(foreign.id) if foreign.rest_model in ['family','student','parent'] else ''
+		return '<a href="/rest/show/{}/{}/">{}{}</a>'.format(foreign.rest_model,foreign.id,str(foreign),extra)
 	else:
 		return ''
 
@@ -50,7 +51,10 @@ class VarChar(object):
 	def widget(self, field, value, **kwargs):
 		return '<input type="text" maxlength="{}" name="{}" value="{}">'.format(self.maxlength, field, value)
 	def static(self, field, value):
+		self.field = field
 		return value
+	def merge(self, old, new):
+		return '''<form action="swap/"><input type="hidden" name="field" value="{field}"><button>Swap</button></form>'''.format(field=self.field)
 	def set(self, thing, field, post, isAttr):
 		if field in post:
 			value = post[field]

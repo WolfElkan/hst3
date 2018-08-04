@@ -8,8 +8,8 @@ from Utils.security import restricted
 from datetime import datetime
 import re
 
-from .fields import FIELDS
-from .widgets import MODELS
+from ..fields import FIELDS
+from ..widgets import MODELS
 
 def home(request):
 	bad = restricted(request)
