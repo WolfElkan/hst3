@@ -18,6 +18,9 @@
 		.center {
 			text-align: center;
 		}
+		tr:nth-child(odd) {
+			background-color: #ddd;
+		}
 	</style>
 	<title>HST | Merge {{Model}}</title>
 </head>
@@ -32,7 +35,7 @@
 		<tr>
 			<td>id:</td>
 			<td><a href="/rest/show/{{model}}/{{old.id}}">{{old.id}}</a></td>
-			<td class="center"><button onclick="window.location='/rest/merge/{{model}}/{{new.id}}/{{old.id}}/'">Swap Places</button></td>
+			<td class="center"><button onclick="window.location='/rest/merge/{{model}}/{{new.id}}/{{old.id}}/'">Swap Sides</button></td>
 			<td><a href="/rest/show/{{model}}/{{new.id}}">{{new.id}}</a></td>
 		</tr>
 		{% for kvp in display %}

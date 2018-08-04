@@ -54,11 +54,10 @@ class VarChar(object):
 		self.field = field
 		return value
 	def merge(self):
-		return '''
-		<form action="swap/">
-			<input type="hidden" name="field" value="{field}">
-			<button>&larr;Swap&rarr;</button>
-		</form>
+		if self.field == 'id':
+			return ''
+		else:
+			return '''
 		<form action="copy/">
 			<input type="hidden" name="field" value="{field}">
 			<button>Copy&rarr;</button>
@@ -94,10 +93,6 @@ class Integer(object):
 		return '<div>{} {}</div>'.format(value, self.suffix) if value else '<div>0</div>'
 	def merge(self):
 		return '''
-		<form action="swap/">
-			<input type="hidden" name="field" value="{field}">
-			<button>&larr;Swap&rarr;</button>
-		</form>
 		<form action="copy/">
 			<input type="hidden" name="field" value="{field}">
 			<button>Copy&rarr;</button>
@@ -138,10 +133,22 @@ class Enum(object):
 		html += '</select>'
 		return html
 	def static(self, field, value):
+		self.field = field
 		if self.items:
 			return dict(self.items).get(value)
 		else:
 			return value
+	def merge(self):
+		return '''
+		<form action="copy/">
+			<input type="hidden" name="field" value="{field}">
+			<button>Copy&rarr;</button>
+		</form>
+		<form action="swap/">
+			<input type="hidden" name="field" value="{field}">
+			<button>&larr;Swap&rarr;</button>
+		</form>
+		'''.format(field=self.field,default=self.default)
 	def set(self, thing, field, post, isAttr):
 		if field in post:
 			value = post[field]
@@ -165,6 +172,7 @@ class Radio(object):
 			html += '<input type="radio" name="{}" value="{}" {}>{}<br>'.format(field, o,' checked' if value == o else '',self.options[o])
 		return html
 	def static(self, field, value):
+		self.field = field
 		value = value if value else 0
 		return self.options[value]
 	def set(self, thing, field, post, isAttr):
@@ -186,7 +194,19 @@ class Checkbox(object):
 	def widget(self, field, value, **kwargs):
 		return '<input type="checkbox" name="{}" {}> {}'.format(field, ' checked' if value else '',self.suffix)
 	def static(self, field, value):
+		self.field = field
 		return 'Yes' if value else 'No'
+	def merge(self):
+		return '''
+		<form action="copy/">
+			<input type="hidden" name="field" value="{field}">
+			<button>Copy&rarr;</button>
+		</form>
+		<form action="swap/">
+			<input type="hidden" name="field" value="{field}">
+			<button>&larr;Swap&rarr;</button>
+		</form>
+		'''.format(field=self.field,default=self.default)
 	def set(self, thing, field, post, isAttr):
 		if field in post:
 			value = str(post[field]) == 'on'
@@ -201,6 +221,18 @@ class Checkbox(object):
 class NullBoolean(Enum):
 	def __init__(self):
 		super(NullBoolean, self).__init__(options=['-','No','Yes'])
+	def merge(self):
+		return '''
+		<form action="copy/">
+			<input type="hidden" name="field" value="{field}">
+			<button>Copy&rarr;</button>
+		</form>
+		<form action="transfer/">
+			<input type="hidden" name="field" value="{field}">
+			<input type="hidden" name="blank" value="-">
+			<button>Transfer&rarr;</button>
+		</form>
+		'''.format(field=self.field)
 		
 
 class Date(object):
@@ -210,8 +242,25 @@ class Date(object):
 	def widget(self, field, value, **kwargs):
 		return '<input type="date" name="{}" value="{}">'.format(field, value)
 	def static(self, field, value):
+		self.field = field
 		if value:
 			return value.strftime('%B %-d, %Y')
+	def merge(self):
+		return '''
+		<form action="copy/">
+			<input type="hidden" name="field" value="{field}">
+			<button>Copy&rarr;</button>
+		</form>
+		<form action="transfer/">
+			<input type="hidden" name="field" value="{field}">
+			<input type="hidden" name="blank" value="2020-12-31">
+			<button>Transfer&rarr;</button>
+		</form>
+		<form action="swap/">
+			<input type="hidden" name="field" value="{field}">
+			<button>&larr;Swap&rarr;</button>
+		</form>
+		'''.format(field=self.field)
 	def set(self, thing, field, post, isAttr):
 		# return thing
 		if field in post:
@@ -230,8 +279,25 @@ class Time(object):
 	def widget(self, field, value, **kwargs):
 		return '<input type="time" name="{}" value="{}">'.format(field, value)
 	def static(self, field, value):
+		self.field = field
 		if value:
 			return value.strftime('<div>%-I:%M %p</div>')
+	def merge(self):
+		return '''
+		<form action="copy/">
+			<input type="hidden" name="field" value="{field}">
+			<button>Copy&rarr;</button>
+		</form>
+		<form action="transfer/">
+			<input type="hidden" name="field" value="{field}">
+			<input type="hidden" name="blank" value="00:00:00">
+			<button>Transfer&rarr;</button>
+		</form>
+		<form action="swap/">
+			<input type="hidden" name="field" value="{field}">
+			<button>&larr;Swap&rarr;</button>
+		</form>
+		'''.format(field=self.field)
 	def set(self, thing, field, post, isAttr):
 		if field in post:
 			value = post[field]
@@ -271,6 +337,18 @@ class ForeignKey(object):
 			return '-'
 		else:
 			return '<a href="add/{}/">add</a>'.format(field)
+	def merge(self):
+		options = '' if self.field in ['mother','father'] else '''
+		<form action="copy/">
+			<input type="hidden" name="field" value="{field}">
+			<button>Copy&rarr;</button>
+		</form>'''
+		options += '''
+		<form action="transfer/">
+			<input type="hidden" name="field" value="{field}">
+			<button>Transfer&rarr;</button>
+		</form>'''
+		return options.format(field=self.field,default=self.default)
 	def set(self, thing, field, post, isAttr):
 		field += '_id'
 		if field in post:
@@ -295,7 +373,10 @@ class Static(object):
 	def widget(self, field, value, **kwargs):
 		return value
 	def static(self, field, value):
+		self.field = field
 		return value
+	def merge(self):
+		return ''
 	def set(self, thing, field, post, isAttr):
 		return thing
 

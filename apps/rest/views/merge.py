@@ -56,9 +56,10 @@ def swap(request, model, old_id, new_id):
 	old = manager.get(id=old_id)
 	new = manager.get(id=new_id)
 
-	mid = old.__getattribute__(field)
-	old.__setattr__(field, new.__getattribute__(field))
-	new.__setattr__(field, mid)
+	right = old.__getattribute__(field)
+	left  = new.__getattribute__(field)
+	old.__setattr__(field, left)
+	new.__setattr__(field, right)
 	old.save()
 	new.save()
 	return redirect('/rest/merge/{}/{}/{}/'.format(model,old_id,new_id))
@@ -89,6 +90,9 @@ def transfer(request, model, old_id, new_id):
 	mid = old.__getattribute__(field)
 	old.__setattr__(field, blank)
 	old.save()
+	if hasattr(mid,'rest_model') and mid.rest_model == 'parent' and old.rest_model == 'family':
+		mid.family_id = new.id
+		mid.save()
 	new.__setattr__(field, mid)
 	new.save()
 	return redirect('/rest/merge/{}/{}/{}/'.format(model,old_id,new_id))
