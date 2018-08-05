@@ -86,6 +86,7 @@ urlpatterns = [
 	url(r'^rest/merge/(?P<model>[a-zA-Z]+)/(?P<old_id>\d+|(\d\d)?\w\w|\w{3})/(?P<new_id>\d+|(\d\d)?\w\w|\w{3})/swap/$', merge.swap),
 	url(r'^rest/merge/(?P<model>[a-zA-Z]+)/(?P<old_id>\d+|(\d\d)?\w\w|\w{3})/(?P<new_id>\d+|(\d\d)?\w\w|\w{3})/copy/$', merge.copy),
 	url(r'^rest/merge/(?P<model>[a-zA-Z]+)/(?P<old_id>\d+|(\d\d)?\w\w|\w{3})/(?P<new_id>\d+|(\d\d)?\w\w|\w{3})/transfer/$', merge.transfer),
+	url(r'^rest/merge/(?P<model>[a-zA-Z]+)/(?P<old_id>\d+|(\d\d)?\w\w|\w{3})/(?P<new_id>\d+|(\d\d)?\w\w|\w{3})/delete/$', merge.delete),
 
 	url(r'^reports/$', reports.index),
 	url(r'^reports/historical/$', reports.historical),

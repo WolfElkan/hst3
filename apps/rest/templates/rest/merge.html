@@ -21,6 +21,10 @@
 		tr:nth-child(odd) {
 			background-color: #ddd;
 		}
+		.column {
+			display: inline;
+			background-color: red;
+		}
 	</style>
 	<title>HST | Merge {{Model}}</title>
 </head>
@@ -46,6 +50,12 @@
 			<td>{{kvp.new|safe}}</td>
 		</tr>
 		{% endfor %}
+		<tr>
+			<td></td>
+			<td class="center"><button onclick="window.location='delete'">Delete</button></td>
+			<td></td>
+			<td></td>
+		</tr>
 	</table>
 	<button class="close" onclick="hst()">Close</button>
 </body>

@@ -53,7 +53,7 @@ class VarChar(object):
 	def static(self, field, value):
 		self.field = field
 		return value
-	def merge(self):
+	def merge(self, old, new):
 		if self.field == 'id':
 			return ''
 		else:
@@ -91,7 +91,7 @@ class Integer(object):
 	def static(self, field, value):
 		self.field = field
 		return '<div>{} {}</div>'.format(value, self.suffix) if value else '<div>0</div>'
-	def merge(self):
+	def merge(self, old, new):
 		return '''
 		<form action="copy/">
 			<input type="hidden" name="field" value="{field}">
@@ -138,7 +138,7 @@ class Enum(object):
 			return dict(self.items).get(value)
 		else:
 			return value
-	def merge(self):
+	def merge(self, old, new):
 		return '''
 		<form action="copy/">
 			<input type="hidden" name="field" value="{field}">
@@ -196,7 +196,7 @@ class Checkbox(object):
 	def static(self, field, value):
 		self.field = field
 		return 'Yes' if value else 'No'
-	def merge(self):
+	def merge(self, old, new):
 		return '''
 		<form action="copy/">
 			<input type="hidden" name="field" value="{field}">
@@ -221,7 +221,7 @@ class Checkbox(object):
 class NullBoolean(Enum):
 	def __init__(self):
 		super(NullBoolean, self).__init__(options=['-','No','Yes'])
-	def merge(self):
+	def merge(self, old, new):
 		return '''
 		<form action="copy/">
 			<input type="hidden" name="field" value="{field}">
@@ -245,7 +245,7 @@ class Date(object):
 		self.field = field
 		if value:
 			return value.strftime('%B %-d, %Y')
-	def merge(self):
+	def merge(self, old, new):
 		return '''
 		<form action="copy/">
 			<input type="hidden" name="field" value="{field}">
@@ -282,7 +282,7 @@ class Time(object):
 		self.field = field
 		if value:
 			return value.strftime('<div>%-I:%M %p</div>')
-	def merge(self):
+	def merge(self, old, new):
 		return '''
 		<form action="copy/">
 			<input type="hidden" name="field" value="{field}">
@@ -337,18 +337,33 @@ class ForeignKey(object):
 			return '-'
 		else:
 			return '<a href="add/{}/">add</a>'.format(field)
-	def merge(self):
-		options = '' if self.field in ['mother','father'] else '''
+	def merge(self, old, new):
+		html = '' if self.field in ['mother','father'] else '''
 		<form action="copy/">
 			<input type="hidden" name="field" value="{field}">
 			<button>Copy&rarr;</button>
 		</form>'''
-		options += '''
+		html += '''
 		<form action="transfer/">
 			<input type="hidden" name="field" value="{field}">
 			<button>Transfer&rarr;</button>
-		</form>'''
-		return options.format(field=self.field,default=self.default)
+		</form>
+		'''
+		fargs = {
+			'field':self.field,
+			'default':self.default,
+		}
+		old_sub = old.__getattribute__(self.field)
+		if old_sub:
+			fargs['old_id'] = old_sub.id
+		new_sub = new.__getattribute__(self.field)
+		if new_sub:
+			fargs['new_id'] = new_sub.id
+		if old_sub and new_sub:
+			fargs['model'] = old_sub.rest_model
+			# JavaScript within HTML within Python.  What is this world coming to?
+			html += '''<button onclick="window.location='/rest/merge/{model}/{old_id}/{new_id}/'">Sub Merge</button>'''
+		return html.format(**fargs)
 	def set(self, thing, field, post, isAttr):
 		field += '_id'
 		if field in post:
@@ -375,7 +390,7 @@ class Static(object):
 	def static(self, field, value):
 		self.field = field
 		return value
-	def merge(self):
+	def merge(self, old, new):
 		return ''
 	def set(self, thing, field, post, isAttr):
 		return thing
@@ -390,7 +405,19 @@ class ForeignSet(object):
 		html += '<a class="plus" href="add/{}/">+</a>'.format(self.model)
 		return html
 	def static(self, field, qset):
+		self.field = field
 		return rest_list(qset)
+	def merge(self, old, new):
+		return '''
+		<div class="column">d</div>
+		<div class="column">
+			<form action="move_all/">
+				<input type="hidden" name="field" value="{field}">
+				<button>All&rarr;</button>
+			</form>
+		</div>
+		<div class="column"></div>
+		'''.format(field=self.field)
 	def set(self, thing, field, post, isAttr):
 		if field in post:
 			value = post[field]

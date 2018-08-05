@@ -36,7 +36,7 @@ def records(request, model, old_id, new_id):
 			'field':template.field if template.field else field, 
 			'old':old_value,
 			'new':new_value,
-			'merge':template.merge if hasattr(template,'merge') else ''
+			'merge':template.merge(old,new) if hasattr(template,'merge') else ''
 		})
 	context = {
 		'old'     : old,
@@ -96,3 +96,13 @@ def transfer(request, model, old_id, new_id):
 	new.__setattr__(field, mid)
 	new.save()
 	return redirect('/rest/merge/{}/{}/{}/'.format(model,old_id,new_id))
+
+def delete(request, model, old_id, new_id):
+	bad = restricted(request,6)
+	if bad:
+		return bad
+	else:
+		manager = MODELS[model]
+		old = manager.get(id=old_id)
+		old.delete()
+		return redirect('/rest/show/{}/{}/'.format(model,new_id))
