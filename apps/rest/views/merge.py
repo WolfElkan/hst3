@@ -103,11 +103,18 @@ def transfer(request, model, old_id, new_id):
 def move_all(request, model, old_id, new_id):
 	field = request.GET.get('field')
 	manager = MODELS[model]
+	reflex = request.GET.get('reflex')
+	field = request.GET.get('field')
 	old = manager.get(id=old_id)
-	new = manager.get(id=new_id)
-	for sub in old.__getattribute__(request.GET.get('field')):
-		sub.__setattr__(request.GET.get('reflex'),new)
-		sub.save()
+	if reflex[-3:] == '_id':
+		for sub in old.__getattribute__(field):
+			sub.__setattr__(reflex,new_id)
+			sub.save()
+	else:
+		new = manager.get(id=new_id)
+		for sub in old.__getattribute__(field):
+			sub.__setattr__(reflex,new)
+			sub.save()
 	return redirect('/rest/merge/{}/{}/{}/'.format(model,old_id,new_id))
 
 def sub_merge(request, model, old_id, new_id):
@@ -139,8 +146,10 @@ def sub_transfer(request, model, old_id, new_id):
 	fargs = collect(request.GET,str)
 	manager = MODELS[fargs['model']]
 	thing = manager.get(id=fargs['sub_id'])
-	dest_manager = MODELS[model]
-	dest = dest_manager.get(id=fargs['dest'])
+	dest = fargs['dest']
+	if fargs['reflex'][-3:] != '_id':
+		dest_manager = MODELS[model]
+		dest = dest_manager.get(id=fargs['dest'])
 	thing.__setattr__(fargs['reflex'],dest)
 	thing.save()
 	return redirect('/rest/merge/{}/{}/{}/sub_move/?field={field}&reflex={reflex}'.format(model,old_id,new_id,**fargs))

@@ -410,8 +410,8 @@ class ForeignSet(object):
 		self.field = field
 		return rest_list(qset)
 	def merge(self, old, new):
-		if self.field == 'accounts':
-			return ''
+		# if self.field == 'accounts':
+		# 	return ''
 		reflex = self.reflex if self.reflex else old.rest_model
 		html ='''
 		<form action="move_all/">
