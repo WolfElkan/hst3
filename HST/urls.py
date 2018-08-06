@@ -87,6 +87,15 @@ urlpatterns = [
 	url(r'^rest/merge/(?P<model>[a-zA-Z]+)/(?P<old_id>\d+|(\d\d)?\w\w|\w{3})/(?P<new_id>\d+|(\d\d)?\w\w|\w{3})/copy/$', merge.copy),
 	url(r'^rest/merge/(?P<model>[a-zA-Z]+)/(?P<old_id>\d+|(\d\d)?\w\w|\w{3})/(?P<new_id>\d+|(\d\d)?\w\w|\w{3})/transfer/$', merge.transfer),
 	url(r'^rest/merge/(?P<model>[a-zA-Z]+)/(?P<old_id>\d+|(\d\d)?\w\w|\w{3})/(?P<new_id>\d+|(\d\d)?\w\w|\w{3})/delete/$', merge.delete),
+	url(r'^rest/merge/(?P<model>[a-zA-Z]+)/(?P<old_id>\d+|(\d\d)?\w\w|\w{3})/(?P<new_id>\d+|(\d\d)?\w\w|\w{3})/move_all/$', merge.move_all),
+	url(r'^rest/merge/(?P<model>[a-zA-Z]+)/(?P<old_id>\d+|(\d\d)?\w\w|\w{3})/(?P<new_id>\d+|(\d\d)?\w\w|\w{3})/sub_move/$', merge.sub_move),
+	url(r'^rest/merge/(?P<model>[a-zA-Z]+)/(?P<old_id>\d+|(\d\d)?\w\w|\w{3})/(?P<new_id>\d+|(\d\d)?\w\w|\w{3})/sub_move/transfer/$', merge.sub_transfer),
+	url(r'^rest/merge/(?P<model>[a-zA-Z]+)/(?P<old_id>\d+|(\d\d)?\w\w|\w{3})/(?P<new_id>\d+|(\d\d)?\w\w|\w{3})/sub_move/delete/$', merge.sub_delete),
+	url(r'^rest/merge/(?P<model>[a-zA-Z]+)/(?P<old_id>\d+|(\d\d)?\w\w|\w{3})/(?P<new_id>\d+|(\d\d)?\w\w|\w{3})/sub_merge/$', merge.sub_merge),
+
+	url(r'^rest/merge/$', merge.new_merge),
+
+	url(r'^rest/merge/(?P<model>[a-zA-Z]+)/(?P<old_id>\d+|(\d\d)?\w\w|\w{3})/(?P<new_id>\d+|(\d\d)?\w\w|\w{3})/sub_m(ove|erge)/exit/$', merge.sub_exit),
 
 	url(r'^reports/$', reports.index),
 	url(r'^reports/historical/$', reports.historical),

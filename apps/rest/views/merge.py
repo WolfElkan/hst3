@@ -1,7 +1,8 @@
 from django.shortcuts import render, redirect, HttpResponse
 
 from Utils.security import restricted
-from Utils.data import sub
+from Utils.data import sub as substitute
+from Utils.data import collect
 
 from ..fields import FIELDS
 from ..widgets import MODELS
@@ -43,7 +44,7 @@ def records(request, model, old_id, new_id):
 		'new'     : new,
 		'display' : display,
 		'model'   : model,
-		'Model'   : sub(model,{'coursetrad':'Course Tradition'}).title()
+		'Model'   : substitute(model,{'coursetrad':'Course Tradition'}).title()
 	}
 	return render(request, 'rest/merge.html', context)
 
@@ -95,6 +96,65 @@ def transfer(request, model, old_id, new_id):
 		mid.save()
 	new.__setattr__(field, mid)
 	new.save()
+	return redirect('/rest/merge/{}/{}/{}/'.format(model,old_id,new_id))
+
+def move_all(request, model, old_id, new_id):
+	field = request.GET.get('field')
+	manager = MODELS[model]
+	old = manager.get(id=old_id)
+	new = manager.get(id=new_id)
+	for sub in old.__getattribute__(request.GET.get('field')):
+		sub.__setattr__(request.GET.get('reflex'),new)
+		sub.save()
+	return redirect('/rest/merge/{}/{}/{}/'.format(model,old_id,new_id))
+
+def sub_merge(request, model, old_id, new_id):
+	return sub(request, model, old_id, new_id, 'rest/sub_merge.html')
+
+def sub_move(request, model, old_id, new_id):
+	return sub(request, model, old_id, new_id, 'rest/sub_move.html')
+
+def sub(request, model, old_id, new_id, template):
+	field = request.GET.get('field')
+	reflex = request.GET.get('reflex')
+	manager = MODELS[model]
+	old = manager.get(id=old_id)
+	new = manager.get(id=new_id)
+	old_subs = old.__getattribute__(field)
+	new_subs = new.__getattribute__(field)
+	context = {
+		'old':old,
+		'new':new,
+		'old_subs':old_subs,
+		'new_subs':new_subs,
+		'field':field,
+		'reflex':reflex,
+	}
+	return render(request, template, context)
+	# return redirect('/rest/merge/{}/{}/{}/'.format(model,old_id,new_id))
+
+def sub_transfer(request, model, old_id, new_id):
+	fargs = collect(request.GET,str)
+	manager = MODELS[fargs['model']]
+	thing = manager.get(id=fargs['sub_id'])
+	dest_manager = MODELS[model]
+	dest = dest_manager.get(id=fargs['dest'])
+	thing.__setattr__(fargs['reflex'],dest)
+	thing.save()
+	return redirect('/rest/merge/{}/{}/{}/sub_move/?field={field}&reflex={reflex}'.format(model,old_id,new_id,**fargs))
+
+def sub_delete(request, model, old_id, new_id):
+	fargs = collect(request.GET,str)
+	manager = MODELS[fargs['model']]
+	thing = manager.get(id=fargs['sub_id'])
+	thing.delete()
+	return redirect('/rest/merge/{}/{}/{}/sub_move/?field={field}&reflex={reflex}'.format(model,old_id,new_id,**fargs))
+
+def new_merge(request):
+	fargs = collect(request.GET,str)
+	return redirect('/rest/merge/{model}/{old_id}/{new_id}/'.format(**fargs))
+
+def sub_exit(request, model, old_id, new_id):
 	return redirect('/rest/merge/{}/{}/{}/'.format(model,old_id,new_id))
 
 def delete(request, model, old_id, new_id):

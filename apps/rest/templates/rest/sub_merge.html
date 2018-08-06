@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>HST | Sub Merge</title>
+	<style type="text/css">
+		a, input {
+			display: inline;
+		}
+	</style>
+</head>
+<body>
+	<h1>Choose Records to Merge</h1>
+	<form action="/rest/merge/">
+	<h2>Old</h2>
+	<input type="hidden" name="model" value="{{old_subs.first.rest_model}}">
+	{% for sub in old_subs %}
+	<div>
+		<input type="radio" name="old_id" value="{{sub.id}}">
+		<a href="/rest/show/{{sub.rest_model}}/{{sub.id}}">{{sub}} (#{{sub.id}})</a>
+	</div>
+	{% endfor %}
+	<h2>New</h2>
+	{% for sub in new_subs %}
+	<div>
+		<input type="radio" name="new_id" value="{{sub.id}}">
+		<a href="/rest/show/{{sub.rest_model}}/{{sub.id}}">{{sub}} (#{{sub.id}})</a>
+	</div>
+	{% endfor %}
+	<h1></h1>
+	<button>Merge</button>
+	</form>
+	<h1></h1>
+	<a href="exit/">Return</a>
+</body>
+</html>

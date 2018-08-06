@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>HST | Sub Move</title>
+	<style type="text/css">
+		a, form {
+			display: inline;
+		}
+	</style>
+</head>
+<body>
+	<h1>Old</h1>
+	{% for sub in old_subs %}
+	<div>
+		<a href="/rest/show/{{sub.rest_model}}/{{sub.id}}">{{sub}} (#{{sub.id}})</a>
+		<form action="transfer/">
+			<input type="hidden" name="model" value="{{sub.rest_model}}">
+			<input type="hidden" name="sub_id" value="{{sub.id}}">
+			<input type="hidden" name="dest" value="{{new.id}}">
+			<input type="hidden" name="field" value="{{field}}">
+			<input type="hidden" name="reflex" value="{{reflex}}">
+			<button>Transfer&darr;</button>
+		</form>
+		<form action="delete/">
+			<input type="hidden" name="model" value="{{sub.rest_model}}">
+			<input type="hidden" name="sub_id" value="{{sub.id}}">
+			<input type="hidden" name="field" value="{{field}}">
+			<input type="hidden" name="reflex" value="{{reflex}}">
+			<button>Delete</button>
+		</form>
+	</div>
+	{% endfor %}
+	<h1>New</h1>
+	{% for sub in new_subs %}
+	<div>
+		<a href="/rest/show/{{sub.rest_model}}/{{sub.id}}">{{sub}} (#{{sub.id}})</a>
+		<form action="transfer/">
+			<input type="hidden" name="model" value="{{sub.rest_model}}">
+			<input type="hidden" name="sub_id" value="{{sub.id}}">
+			<input type="hidden" name="dest" value="{{old.id}}">
+			<input type="hidden" name="field" value="{{field}}">
+			<input type="hidden" name="reflex" value="{{reflex}}">
+			<button>Transfer&uarr;</button>
+		</form>
+		<form action="delete/">
+			<input type="hidden" name="model" value="{{sub.rest_model}}">
+			<input type="hidden" name="sub_id" value="{{sub.id}}">
+			<input type="hidden" name="field" value="{{field}}">
+			<input type="hidden" name="reflex" value="{{reflex}}">
+			<button>Delete</button>
+		</form>
+	</div>
+	{% endfor %}
+	<h1></h1>
+	<a href="exit/">Return</a>
+</body>
+</html>

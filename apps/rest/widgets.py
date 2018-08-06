@@ -339,15 +339,15 @@ class ForeignKey(object):
 			return '<a href="add/{}/">add</a>'.format(field)
 	def merge(self, old, new):
 		html = '' if self.field in ['mother','father'] else '''
-		<form action="copy/">
-			<input type="hidden" name="field" value="{field}">
-			<button>Copy&rarr;</button>
-		</form>'''
+			<form action="copy/">
+				<input type="hidden" name="field" value="{field}">
+				<button>Copy&rarr;</button>
+			</form>'''
 		html += '''
-		<form action="transfer/">
-			<input type="hidden" name="field" value="{field}">
-			<button>Transfer&rarr;</button>
-		</form>
+			<form action="transfer/">
+				<input type="hidden" name="field" value="{field}">
+				<button>Transfer&rarr;</button>
+			</form>
 		'''
 		fargs = {
 			'field':self.field,
@@ -363,6 +363,7 @@ class ForeignKey(object):
 			fargs['model'] = old_sub.rest_model
 			# JavaScript within HTML within Python.  What is this world coming to?
 			html += '''<button onclick="window.location='/rest/merge/{model}/{old_id}/{new_id}/'">Sub Merge</button>'''
+		html += ''
 		return html.format(**fargs)
 	def set(self, thing, field, post, isAttr):
 		field += '_id'
@@ -400,6 +401,7 @@ class ForeignSet(object):
 		self.field = kwargs.setdefault('field', None)
 		self.model = kwargs.setdefault('model', None)
 		self.default = kwargs.setdefault('default', None)
+		self.reflex = kwargs.setdefault('reflex', None)
 	def widget(self, field, qset, **kwargs):
 		html = rest_list(qset)
 		html += '<a class="plus" href="add/{}/">+</a>'.format(self.model)
@@ -408,16 +410,27 @@ class ForeignSet(object):
 		self.field = field
 		return rest_list(qset)
 	def merge(self, old, new):
-		return '''
-		<div class="column">d</div>
-		<div class="column">
-			<form action="move_all/">
-				<input type="hidden" name="field" value="{field}">
-				<button>All&rarr;</button>
-			</form>
-		</div>
-		<div class="column"></div>
-		'''.format(field=self.field)
+		if self.field == 'accounts':
+			return ''
+		reflex = self.reflex if self.reflex else old.rest_model
+		html ='''
+		<form action="move_all/">
+			<input type="hidden" name="field" value="{field}">
+			<input type="hidden" name="reflex" value="{reflex}">
+			<button>Move All&rarr;</button>
+		</form>
+		<form action="sub_move/">
+			<input type="hidden" name="field" value="{field}">
+			<input type="hidden" name="reflex" value="{reflex}">
+			<button>Sub Move</button>
+		</form>
+		<form action="sub_merge/">
+			<input type="hidden" name="field" value="{field}">
+			<input type="hidden" name="reflex" value="{reflex}">
+			<button>Sub Merge</button>
+		</form>
+		'''
+		return html.format(field=self.field,reflex=reflex)
 	def set(self, thing, field, post, isAttr):
 		if field in post:
 			value = post[field]
