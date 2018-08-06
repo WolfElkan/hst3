@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>HST | Merge {{Model}}</title>
+	<style type="text/css">
+		.pane {
+			display: inline-block;
+		}
+	</style>
+</head>
+<body>
+	<a href="/rest/">REST</a>
+	<a href="/rest/index/{{model}}/">{{model|title}} Index</a>
+	<h2>Merge {{Model}} Records</h2>
+	<form>
+		<input type="hidden" name="model" value="{{model}}">
+		<div class="pane">
+			<h3>Old</h3>
+			{% for record in results %}
+			<div>
+				<input type="radio" name="old_id" value="{{record.id}}">
+				<a href="/rest/show/{{model}}/{{record.id}}">{{record}} (#{{record.id}})</a>
+			</div>
+			{% endfor %}
+		</div>
+		<div class="pane">
+			<h3>New</h3>
+			{% for record in results %}
+			<div>
+				<input type="radio" name="new_id" value="{{record.id}}">
+				<a href="/rest/show/{{model}}/{{record.id}}">{{record}} (#{{record.id}})</a>
+			</div>
+			{% endfor %}
+		</div>
+		<h2></h2>
+		<button>Merge</button>
+	</form>
+</body>
+</html>

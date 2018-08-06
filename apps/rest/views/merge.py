@@ -7,6 +7,8 @@ from Utils.data import collect
 from ..fields import FIELDS
 from ..widgets import MODELS
 
+from .search import search_query
+
 def records(request, model, old_id, new_id):
 	bad = restricted(request,5)
 	if bad:
@@ -151,8 +153,22 @@ def sub_delete(request, model, old_id, new_id):
 	return redirect('/rest/merge/{}/{}/{}/sub_move/?field={field}&reflex={reflex}'.format(model,old_id,new_id,**fargs))
 
 def new_merge(request):
+	if 'query' in request.GET:
+		return merge_search(request)
+	elif 'model' not in request.GET:
+		return render(request, 'rest/merge_search.html')
 	fargs = collect(request.GET,str)
 	return redirect('/rest/merge/{model}/{old_id}/{new_id}/'.format(**fargs))
+
+def merge_search(request):
+	model = request.GET.get('model')
+	kwargs = {model:True}
+	context = {
+		'model'   : model,
+		'Model'   : substitute(model,{'coursetrad':'Course Tradition'}).title(),
+		'results' : search_query(request.GET['query'], all_tables=False, **kwargs),
+	}
+	return render(request, 'rest/merge_results.html', context)
 
 def sub_exit(request, model, old_id, new_id):
 	return redirect('/rest/merge/{}/{}/{}/'.format(model,old_id,new_id))
