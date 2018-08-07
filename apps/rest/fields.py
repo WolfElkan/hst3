@@ -121,7 +121,7 @@ FIELDS = {
 		{'field':'method'    , 'template': Enum(options=['','Cash','Check','PayPal'])},
 		{'field':'status'    , 'template': Enum(items=Invoices.model.status_choices)},
 		{'field':'items'     , 'template': ForeignSet(model='enrollment')},
-		{'field':'update_amount','template': Method()},
+		# {'field':'update_amount','template': Method()},
 	],
 	'venue': [
 		{'field':'id'        , 'template': VarChar(maxlength=3)},
