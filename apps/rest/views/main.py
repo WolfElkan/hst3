@@ -137,6 +137,12 @@ def show_or_edit(request, model, id, isEdit):
 	bad = restricted(request,5) if isEdit else restricted(request,4,thing,1)
 	if bad:
 		return bad
+	method = request.GET.get('method')
+	if method:
+		call = thing.__getattribute__(method)
+		if hasattr(call,'__call__'):
+			call()
+		return redirect('/rest/{}/{}/{}/'.format('edit' if isEdit else 'show', model, id))
 	tempset = FIELDS[model]
 	display = []
 	for ftp in tempset:
@@ -151,7 +157,7 @@ def show_or_edit(request, model, id, isEdit):
 		if value == None:
 			value = ''
 		display.append({
-			'field':template.field if template.field else field, 
+			'field':template.field if hasattr(template,'field') and template.field else field, 
 			'input':value
 		})
 	context = {

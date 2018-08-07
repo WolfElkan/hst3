@@ -477,14 +477,19 @@ class ToggleSet(object):
 # 		self.model = 'course'
 		
 
-# class Method(object):
-# 	def __init__(self, **kwargs):
-# 		self.params = kwargs.setdefault('params', [])
-# 	def widget(self, **kwargs):
-# 		return self.static()
-# 	def static(self, field, **kwargs):
-# 		return '<a class="button" href="method/{}/">{}</a>'.format(field, field)
-# 	def set(self, thing, field, post, isAttr):
-# 		return thing
+class Method(object):
+	def __init__(self, **kwargs):
+		self.params = kwargs.setdefault('params', [])
+	def widget(self, field, value, **kwargs):
+		return self.static(field,value,**kwargs)
+	def static(self, field, value, **kwargs):
+		return '''
+		<form>
+			<input type="hidden" name="method" value="{field}">
+			<button>{field}</button>
+		</form>
+		'''.format(field=field)
+	def set(self, thing, field, post, isAttr):
+		return thing
 
 # 		

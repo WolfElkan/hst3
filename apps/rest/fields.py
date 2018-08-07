@@ -1,4 +1,4 @@
-from .widgets import VarChar, Integer, Enum, Radio, Checkbox, Date, Time, ForeignKey, ForeignSet, ToggleSet, NullBoolean, Static
+from .widgets import VarChar, Integer, Enum, Radio, Checkbox, Date, Time, ForeignKey, ForeignSet, ToggleSet, NullBoolean, Static, Method
 from Utils.custom_fields import Bcrypt, PhoneNumber, ZipCode, DayOfWeek, Dollar
 from Utils.data import collect
 from apps.program.managers import CourseTrads, Enrollments
@@ -121,6 +121,7 @@ FIELDS = {
 		{'field':'method'    , 'template': Enum(options=['','Cash','Check','PayPal'])},
 		{'field':'status'    , 'template': Enum(items=Invoices.model.status_choices)},
 		{'field':'items'     , 'template': ForeignSet(model='enrollment')},
+		{'field':'update_amount','template': Method()},
 	],
 	'venue': [
 		{'field':'id'        , 'template': VarChar(maxlength=3)},
