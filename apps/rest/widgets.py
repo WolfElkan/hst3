@@ -313,6 +313,7 @@ class ForeignKey(object):
 	def __init__(self, **kwargs):
 		self.field   = kwargs.setdefault('field'  , None)
 		self.model   = kwargs.setdefault('model'  , None)
+		self.reflex  = kwargs.setdefault('reflex' , self.model)
 		self.null    = kwargs.setdefault('null'   , False)
 		self.default = kwargs.setdefault('default', None)
 		self.xstatic = kwargs.setdefault('static' , False)
@@ -324,7 +325,7 @@ class ForeignKey(object):
 		if not self.model:
 			self.model = field
 		if self.null:
-			html += '<option value="0"{}>- select -</option>'.format(' selected' if not value else '')
+			html += '<option value="NULL"{}>- none -</option>'.format(' selected' if not value else '')
 		for foreign in MODELS[self.model].all():
 			html += '<option value="{}"{}>{}</option>'.format(foreign.id,' selected' if value == foreign else '',foreign)
 		html += '</select>'
@@ -335,8 +336,8 @@ class ForeignKey(object):
 			return rest_link(value)
 		elif self.xstatic:
 			return '-'
-		else:
-			return '<a href="add/{}/">add</a>'.format(field)
+		# else:
+		# 	return '<a href="add/{}/">add</a>'.format(field)
 	def merge(self, old, new):
 		html = '' if self.field in ['mother','father'] else '''
 			<form action="copy/">
@@ -371,8 +372,13 @@ class ForeignKey(object):
 			value = post[field]
 		else:
 			value = self.default
-		# if value == 'None':
-		# 	value = None
+		if value == 'NULL':
+			field = field[:-3]
+			if isAttr:
+				thing.__setattr__(field, None)
+			else:
+				thing.__setitem__(field, None)
+			return thing
 		if str(value) in ['0','None']:
 			return thing
 		if isAttr:

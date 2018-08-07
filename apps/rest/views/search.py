@@ -70,6 +70,11 @@ def search_word(word, all_tables=True, **kwargs):
 			Q(last__icontains=word)|
 			Q(phone__icontains=word)|
 			Q(email__icontains=word))))
+	if all_tables or kwargs.get('invoice'):
+		results |= set(Invoices.filter(Q(
+			Q(family__last__icontains=word)|
+			Q(enrollment__course__title__icontains=word)|
+			Q(paypal__txn_id__icontains=word))))
 	return results
 
 def search_number(number, all_tables=True, **kwargs):

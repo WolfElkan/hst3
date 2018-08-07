@@ -111,7 +111,7 @@ FIELDS = {
 		{'field':'course'    , 'template': ForeignKey(model='course')},
 		{'field':'status'    , 'template': Enum(options=dict(status_choices).keys())},
 		{'field':'tuition'   , 'template': Dollar()},
-		{'field':'invoice'   , 'template': ForeignKey(model='invoice',static=True)},
+		{'field':'invoice'   , 'template': ForeignKey(model='invoice',null=True)},
 		{'field':'role'      , 'template': VarChar()},
 		{'field':'role_type' , 'template': Enum(options=['','Chorus','Support','Lead'])},
 	],
