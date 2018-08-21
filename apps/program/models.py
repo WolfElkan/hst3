@@ -41,8 +41,9 @@ class CourseTrad(models.Model):
 	title      = models.CharField(max_length=50)
 	alias      = models.ForeignKey('self', null=True)
 	order      = models.FloatField(null=True)
-	e          = models.BooleanField(default=True)
-	m          = models.BooleanField(default=True)
+	e          = models.BooleanField(default=True) # Whether course appears in Shopping Cart
+	m          = models.BooleanField(default=True) # Whether course appears in Course Menu
+	r          = models.BooleanField(default=True) # Whether Courses can inherit from this CourseTrad
 	# Commitment:
 	day        = custom.DayOfWeekField(default='')
 	start      = models.TimeField(default="00:00:00")

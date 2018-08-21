@@ -65,6 +65,7 @@ FIELDS = {
 	'coursetrad': [
 		{'field':'id'        , 'template': VarChar(maxlength=2)},
 		{'field':'oid'       , 'template': Static()},
+		{'field':'r'         , 'template': Checkbox(suffix='This course is real, and not an aggregator.')},
 		{'field':'m'         , 'template': Checkbox(suffix='This course will be visible on course menu.')},
 		{'field':'e'         , 'template': Checkbox(suffix='This course will be visible in family enrollment shopping cart.')},
 		{'field':'action'    , 'template': Enum(options=CourseTrads.model.action_choices,default='none')},
