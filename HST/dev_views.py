@@ -27,6 +27,13 @@ edit = 3
 
 from .hotlog import log
 
+# def expel(course):
+# 	for enrollment in Enrollments.filter(course=course):
+# 		student = enrollment.student
+# 		if not eligible(course,student):
+# 			enrollment.delete()
+# 			yield student
+
 def lookup_student(obj):
 	first = namecase(obj['first'])
 	last = namecase(obj['last'])

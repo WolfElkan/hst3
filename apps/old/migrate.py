@@ -252,11 +252,11 @@ def find_existing_family(family):
 	# 	return already[0]
 	# elif len(already) > 1:
 		old_children = OldStudents.filter(familyid=family.accessid)
-		old_children = set(Each(Each(old_children).first).lower())
+		old_children = set(Each(old_children).first.lower())
 		nMatches = []
 		for fam in already:
-			new_children = set(Each(Each(fam.children).first).lower())
-			new_children |= set(Each(Each(fam.children).alt_first).lower())
+			new_children = set(Each(fam.children).first.lower())
+			new_children |= set(Each(fam.children).alt_first.lower())
 			nMatches.append(len(old_children & new_children))
 		nMatches.append(0)
 		best = max(nMatches)

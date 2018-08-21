@@ -1,41 +1,41 @@
 from django.db.models.query import QuerySet
 from inspect import getargspec # Update getargspec -> signature in Python3
 
-class Caller(object):
-	def __init__(self, arr, fx):
-		self.arr = arr
-		self.fx = fx
-	def __str__(self):
-		new = []
-		for x in self.arr:
-			new.append(x.__getattribute__(self.fx))
-		return str(new)
-	def __repr__(self):
-		return '<Caller: {} @{}>'.format(self.arr,self.fx)
-	def __iter__(self):
-		for x in self.arr:
-			yield x.__getattribute__(self.fx)
-	def __call__(self, *args, **kwargs):
-		new = []
-		for x in self.arr:
-			if hasattr(x, self.fx):
-				new.append(x.__getattribute__(self.fx).__call__(*args, **kwargs))
-			else:
-				new.append(x)
-		return Each(new)
-	def __getattr__(self, attr):
-		new = []
-		for x in self.arr:
-			new.append(x.__getattribute__(attr))
-		return Caller(new, None)
-	def setattr(self, attr, value):
-		new = []
-		for x in self.arr:
-			x.__setattr__(attr, value)
-			if type(x) is QuerySet:
-				x.save()
-			new.append(x)
-		return Each(new)
+# class Caller(object):
+# 	def __init__(self, arr, fx):
+# 		self.arr = arr
+# 		self.fx = fx
+# 	def __str__(self):
+# 		new = []
+# 		for x in self.arr:
+# 			new.append(x.__getattribute__(self.fx))
+# 		return str(new)
+# 	def __repr__(self):
+# 		return '<Caller: {} @{}>'.format(self.arr,self.fx)
+# 	def __iter__(self):
+# 		for x in self.arr:
+# 			yield x.__getattribute__(self.fx)
+# 	def __call__(self, *args, **kwargs):
+# 		new = []
+# 		for x in self.arr:
+# 			if hasattr(x, self.fx):
+# 				new.append(x.__getattribute__(self.fx).__call__(*args, **kwargs))
+# 			else:
+# 				new.append(x)
+# 		return Each(new)
+# 	def __getattr__(self, attr):
+# 		new = []
+# 		for x in self.arr:
+# 			new.append(x.__getattribute__(attr))
+# 		return Caller(new, None)
+# 	def setattr(self, attr, value):
+# 		new = []
+# 		for x in self.arr:
+# 			x.__setattr__(attr, value)
+# 			if type(x) is QuerySet:
+# 				x.save()
+# 			new.append(x)
+# 		return Each(new)
 
 def collect(thing, lam):
 	if type(thing) in [list, tuple, QuerySet]:
@@ -94,22 +94,57 @@ def cleandate(string):
 	return datetime.replace(naive,tzinfo=tz)
 
 class Each(object):
-	def __init__(self, arr):
-		self.arr = arr
-	def __getattribute__(self, attr):
-		if attr == '_':
-			return super(Each,self).__getattribute__('arr')
-		else:
-			return Caller(super(Each,self).__getattribute__('arr'), attr)
+	def __init__(self, content):
+		self._content = content._content if type(content) is Each else content
 	def __iter__(self):
-		for x in super(Each,self).__getattribute__('arr'):
-			yield x
-	def __str__(self):
-		return '<'+str(super(Each,self).__getattribute__('arr'))+'>'
-	def __repr__(self):
-		return '<Each: {}>'.format(str(super(Each,self).__getattribute__('arr')))
+		for item in self._content:
+			yield item
 	def __len__(self):
-		return len(super(Each,self).__getattribute__('arr'))
+		return len(self._content)
+	def __repr__(self):
+		return 'Each({})'.format(self._content)
+	def __setattr__(self, attr, value):
+		if attr == '_content':
+			super(Each, self).__setattr__(attr, value)
+		else:
+			for item in self._content:
+				item.__setattr__(attr, value)
+	def __getattribute__(self, attr):
+		if attr == '_content':
+			return super(Each, self).__getattribute__(attr)
+		else:
+			new_content = []
+			for item in self._content:
+				result = item.__getattribute__(attr)
+				new_content.append(result)
+			return Each(new_content)
+	def __call__(self, *args, **kwargs):
+		new_content = []
+		for item in self._content:
+			if callable(item):
+				new_content.append(item(*args, **kwargs))
+			else:
+				new_content.append(item)
+		return Each(new_content)
+
+# class Each(object):
+# 	def __init__(self, arr):
+# 		print arr
+# 		self.arr = arr
+# 	def __getattribute__(self, attr):
+# 		if attr == '_':
+# 			return super(Each,self).__getattribute__('arr')
+# 		else:
+# 			return Caller(super(Each,self).__getattribute__('arr'), attr)
+# 	def __iter__(self):
+# 		for x in super(Each,self).__getattribute__('arr'):
+# 			yield x
+# 	def __str__(self):
+# 		return '<'+str(super(Each,self).__getattribute__('arr'))+'>'
+# 	def __repr__(self):
+# 		return '<Each: {}>'.format(str(super(Each,self).__getattribute__('arr')))
+# 	def __len__(self):
+# 		return len(super(Each,self).__getattribute__('arr'))
 	# def __setattr__(self, attr, value):
 	# 	for x in super(Each,self).__getattribute__('arr'):
 	# 		x.__setattr__(attr, value)

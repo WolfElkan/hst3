@@ -208,16 +208,7 @@ def check_word(trad, student, word, **kwargs):
 			else:
 				print query
 				print query_result
-			# print 'Quota:',word.count('+')
 		if '+' in word:
-			# return True
-			# print word.count('+')
-			# print len(set(Each(Each(query_result).student).id))
-			# return len(set(Each(Each(query_result).student).id))
-			# return len(set(Each(Each(query_result).student).id)) >= word.count('+')
-			# print ids
-			# return False
-			# return len(Students.filter(enrollment__id__in=ids).distinct())
 			return len(Students.filter(enrollment__in=query_result).distinct()) >= word.count('+')
 		else:
 			return bool(query_result)
