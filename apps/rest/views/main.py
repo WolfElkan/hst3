@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, HttpResponse
 from apps.program.managers import Enrollments
-from .search import search_query
+from ..search import search_query
 
 from Utils.data import collect, sub
 from Utils.security import restricted

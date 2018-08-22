@@ -33,7 +33,6 @@ import apps.reports.views as reports
 import apps.rest.views.main     as rest
 import apps.rest.views.seed     as seed
 import apps.rest.views.merge    as merge
-import apps.rest.views.search   as search
 
 import apps.radmin.views.main   as radmin
 import apps.radmin.views.policy as policy

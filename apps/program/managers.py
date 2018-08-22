@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 from django.db import models
 from Utils import custom_fields as custom
 from Utils import supermodel as sm
+from Utils.security import getyear
 from django_mysql import models as sqlmod
 
 class CourseTradManager(sm.SuperManager):
@@ -33,14 +34,25 @@ class CourseManager(sm.SuperManager):
 		else:
 			return super(CourseManager, self).create(**data)
 	def fetch(self, **kwargs):
+		print 0, kwargs
 		qset = self.filter(**kwargs)
 		if qset and not qset[0].tradition.alias:
+			print 1
 			return qset[0]
 		elif 'id' in kwargs:
+			print 2
 			split = self.split_id(kwargs.pop('id'))
 			if split:
 				kwargs.update(split)
 				return self.fetch(**kwargs)
+		elif 'tradition' in kwargs:
+			print 3
+			year = kwargs.setdefault('year',getyear())
+			tradition = kwargs['tradition']
+			if tradition.r:
+				pass
+			else:
+				return self.simulate(tradition, year)
 	def create_by_id(self, course_id, **kwargs):
 		course = self.fetch(id=course_id)
 		if course:

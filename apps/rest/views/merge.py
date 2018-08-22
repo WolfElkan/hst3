@@ -7,7 +7,7 @@ from Utils.data import collect
 from ..fields import FIELDS
 from ..widgets import MODELS
 
-from .search import search_query
+from ..search import search_query
 
 def records(request, model, old_id, new_id):
 	bad = restricted(request,5)

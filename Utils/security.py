@@ -1,3 +1,7 @@
+def getyear():
+	now = datetime.now()
+	return now.year + (0 if now.month < 5 else 1)
+
 from django.shortcuts import render, redirect
 
 def restricted(request, level=0, standing=None, standing_level=0):
@@ -19,23 +23,13 @@ def cleandate(date):
 	print date
 	return datetime.now()
 
-# Find User object for current logged-in user, without causing errors.
-# me is always a User, never a Family, Student, or Teacher
-
-from apps.program.managers import Courses
+# from apps.program.managers import Courses
 
 def gethist(ago=1):
-	years = []
-	for year in range(getyear()-ago,1994,-1):
-		if Courses.filter(year=year):
-			years.append(year)
-	return years
-def getyear():
-	# if DEV:
-	# 	return 2017
-	now = datetime.now()
-	return now.year + (0 if now.month < 5 else 1)
+	return range(getyear()-ago,1994,-1)
 
+# Find User object for current logged-in user, without causing errors.
+# me is always a User, never a Family, Student, or Teacher
 from apps.people.managers import Users
 def getme(request):
 	if 'meid' in request.session:

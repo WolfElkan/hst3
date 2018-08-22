@@ -4,17 +4,41 @@
 	<title>HST | Invoices</title>
 	{% load staticfiles %}
 	<script src="{% static 'main/js/script.js' %}" charset="utf-8"></script>
+	<style type="text/css">
+		* {
+			float: none!important;
+		}
+		h2 {
+			text-decoration: underline;
+			margin: 20px 1px 5px 5px;
+		}
+		div {
+			padding: 10px;
+		}
+		.nav {
+			padding: 20px;
+		}
+		.invoice {
+			display: block;
+		}
+	</style>
 	<link rel="stylesheet" type="text/css" href="{% static 'main/css/style.css' %}">
 </head>
 <body id="invoice_index" class="public">
-	<img id="logo" src="//www.hstonline.org/wp-content/uploads/2017/05/cropped-cropped-HST-LOGO-10.png">
-	<a href="/myaccount/classes/">&larr; Back to Course Selection</a>
-	{% for year in hist %}
-	<h2>{{year.year}}</h2>
-		{% for invoice in year.invoices %}
-		<a href="/register/invoice/{{invoice.id}}">{{invoice}}</a><br>
-		{% endfor %}
-	{% endfor %}
+	<div id="top">
+		<img id="logo" src="//www.hstonline.org/wp-content/uploads/2017/05/cropped-cropped-HST-LOGO-10.png">
+		<a class="nav" href="/myaccount/classes/">&larr; Back to Course Selection</a>
+	</div>
+	<div id="list">
+		  {% for year in hist %}
+		   {% if year.invoices %}
+			<h2>{{year.year}}</h2>
+			  {% for invoice in year.invoices %}
+				<a class="invoice" href="/register/invoice/{{invoice.id}}">{{invoice}}</a>
+			  {% endfor %}
+		   {% endif %}
+		  {% endfor %}
+	</div>
 	<button class="close" onclick="hst()">Close</button>
 </body>
 </html>
