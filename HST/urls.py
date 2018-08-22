@@ -133,6 +133,9 @@ urlpatterns = [
 
 	url(r'^admin/year/$', year.bib),
 
+	url(r'^sudo/$', radmin.sudo),
+	url(r'^sudo/exit/$', radmin.sudo_exit),	
+
 	url(r'^rest/(show|edit)/(?P<model>[a-zA-Z]+)/(?P<id>\d+|(\d\d)?\w\w)/add/(?P<foreign_model>[a-zA-Z]+)/$', rest.new),
 	url(r'^rest/(show|edit)/(?P<model>[a-zA-Z]+)/(?P<id>\d+|(\d\d)?\w\w)/add/(?P<foreign_model>[a-zA-Z]+)/create/$', rest.create),
 	url(r'^rest/delete/(?P<model>[a-zA-Z]+)/(?P<id>\d+|(\d\d)?\w\w)/$', rest.delete),

@@ -34,19 +34,19 @@ class CourseManager(sm.SuperManager):
 		else:
 			return super(CourseManager, self).create(**data)
 	def fetch(self, **kwargs):
-		print 0, kwargs
+		# print 0, kwargs
 		qset = self.filter(**kwargs)
 		if qset and not qset[0].tradition.alias:
-			print 1
+			# print 1
 			return qset[0]
 		elif 'id' in kwargs:
-			print 2
+			# print 2
 			split = self.split_id(kwargs.pop('id'))
 			if split:
 				kwargs.update(split)
 				return self.fetch(**kwargs)
 		elif 'tradition' in kwargs:
-			print 3
+			# print 3
 			year = kwargs.setdefault('year',getyear())
 			tradition = kwargs['tradition']
 			if tradition.r:

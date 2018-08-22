@@ -21,7 +21,8 @@ def index(request):
 	me = getme(request)
 	context = {
 		'name':me.owner if me else None,
-		'incomplete_registration': me and me.owner and not me.owner.children
+		'incomplete_registration': me and me.owner and not me.owner.children,
+		'sudo':Users.fetch(id=request.session.get('sudo')),
 	}
 	return render(request, 'main/index.html', context)
 

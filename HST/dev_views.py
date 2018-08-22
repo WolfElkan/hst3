@@ -105,7 +105,7 @@ def hot(request):
 	return render(request, 'main/hot.html', context)
 
 def run(request):
-	bad = restricted(request,7)
+	bad = restricted(request,7,allow_sudo=True)
 	if bad:
 		return bad
 	me = getme(request)

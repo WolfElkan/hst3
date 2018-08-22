@@ -86,3 +86,20 @@ def sudochangepassword(request, them_id, **kwargs):
 	# 	return redirect('/{}/'.format(ref))
 	# else:
 		return redirect(request.META['HTTP_REFERER'])
+
+def sudo(request):
+	sudo_id = request.GET.get('sudo')
+	if sudo_id:
+		request.session['sudo'] = int(sudo_id)
+		return redirect('/sudo/')
+	else:
+		context = {
+			'users':Users.all(),
+			'current_sudo':Users.fetch(id=request.session.get('sudo')),
+			'current_me':Users.fetch(id=request.session.get('meid')),
+		}
+		return render(request, 'radmin/sudo.html', context)
+
+def sudo_exit(request):
+	request.session.pop('sudo')
+	return redirect('/sudo/')

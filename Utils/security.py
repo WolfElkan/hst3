@@ -4,8 +4,11 @@ def getyear():
 
 from django.shortcuts import render, redirect
 
-def restricted(request, level=0, standing=None, standing_level=0):
-	me = getme(request)
+def restricted(request, level=0, standing=None, standing_level=0, allow_sudo=False):
+	if allow_sudo:
+		me = Users.fetch(id=request.session.get('meid'))
+	else:
+		me = getme(request)
 	if not me:
 		return redirect('/login{}'.format(request.path))
 	if me.permission < (standing_level if standing and standing.stand(me) else level):
@@ -35,6 +38,15 @@ def getme(request):
 	if 'meid' in request.session:
 		me = Users.fetch(id=request.session['meid'])
 		if me:
+			if me.permission >= 6 and 'sudo' in request.session:
+				sudo = Users.fetch(id=request.session['sudo'])
+				if sudo and sudo.permission < me.permission:
+					return sudo
+				else:
+					request.session.pop('sudo')
+					return me
 			return me
 		else:
 			request.session.pop('meid')
+
+

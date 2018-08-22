@@ -5,6 +5,14 @@
 		<title>HST | Registration</title>
 		{% load staticfiles %}
 		<script src="{% static 'main/js/script.js' %}" charset="utf-8"></script>
+		<style type="text/css">
+			.exit-sudo {
+				background-color: #f4a!important;
+			}
+			.exit-sudo:hover {
+				background-color: #a29!important;
+			}
+		</style>
 		<link rel="stylesheet" type="text/css" href="{% static 'main/css/style.css' %}">
 		<link rel="icon" type="image/png" href="{% static 'main/images/favicon.ico/favicon.ico' %}">
 	</head>
@@ -21,6 +29,9 @@
 		{% endif %}
 		{% if incomplete_registration %}
 		<a href="/register/redirect/">Continue Registration</a>
+		{% endif %}
+		{% if sudo %}
+		<a class="exit-sudo" href="/sudo/exit/">Exit SUDO</a>
 		{% endif %}
 		<button class="close" onclick="hst()">Close</button>
 	</body>
