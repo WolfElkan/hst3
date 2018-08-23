@@ -20,6 +20,14 @@
 .public a:hover {
          background-color: CornflowerBlue;
 }
+
+.public a.sudo {
+         background-color: #880000!important;
+}
+.public a.sudo:hover {
+         background-color: #ED6495!important;
+}
+
 .public h1 {
          margin-top: 30px;
          font-size: 24px;
