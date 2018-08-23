@@ -5,7 +5,25 @@
 	<style type="text/css">
 		form, div {
 			display: block;
+		}
+		form, div, table {
 			margin-bottom: 20px;
+		}
+		table, td, th {
+			border-collapse: collapse;
+			border: solid black 1px;
+		}
+		td {
+			text-align: center;
+			vertical-align: middle;
+		}
+		.na {
+			font-weight: bold;
+			overflow-wrap: all;
+		}
+		td:first-child {
+			font-weight: bold;
+			text-align: left;
 		}
 	</style>
 </head>
@@ -15,20 +33,63 @@
 		<a href="/">My Profile</a>
 		{% if me.permission >= 6 %}<a href="/admin/dashboard/">Admin Dashboard</a>{% endif %}
 	</div>
-	<div>
-	  {% if current_me %}
-		You are logged in as #{{current_me.id}} <code>{{current_me}}</code> (#{{current_me.owner.id}} {{current_me.owner}}).
-	  {% else %}
-		You are not logged in.
-	  {% endif %}
-	</div>
-	<div>
-	  {% if current_sudo %}
-		You are currently SUDOing as #{{current_sudo.id}} <code>{{current_sudo}}</code> (#{{current_sudo.owner.id}} {{current_sudo.owner}}).
-	  {% else %}
-		You are not currently SUDOing.
-	  {% endif %}
-	</div>
+	<table>
+		<thead>
+			<th></th>
+			<th>Login</th>
+			<th>SUDO</th>
+		</thead>
+		<tr>
+			<td>User ID</td>
+		  {% if current_me %}
+		  	<td>#{{current_me.id}}</td>
+		  {% else %}
+			<td class="na" rowspan="5">You are not logged in.</td>
+		  {% endif %}
+		  {% if current_sudo %}
+		  	<td>#{{current_sudo.id}}</td>
+		  {% else %}
+			<td class="na" rowspan="5">You are not currently SUDOing.</td>
+		  {% endif %}
+		</tr>
+		<tr>
+			<td>Username</td>
+		  {% if current_me %}
+		  	<td>{{current_me.username}}</td>
+		  {% endif %}			
+		  {% if current_sudo %}
+		  	<td>{{current_sudo.username}}</td>
+		  {% endif %}			
+		</tr>
+		<tr>
+			<td>Family ID</td>
+		  {% if current_me %}
+		  	<td>#{{current_me.owner.id}}</td>
+		  {% endif %}			
+		  {% if current_sudo %}
+		  	<td>#{{current_sudo.owner.id}}</td>
+		  {% endif %}			
+		</tr>		
+		<tr>
+			<td>Family</td>
+		  {% if current_me %}
+		  	<td>{{current_me.owner.unique_last}}</td>
+		  {% endif %}			
+		  {% if current_sudo %}
+		  	<td>{{current_sudo.owner.unique_last}}</td>
+		  {% endif %}			
+		</tr>
+		<tr>
+			<td>Permission</td>
+		  {% if current_me %}
+		  	<td>{{current_me.permission}}: {{current_me.get_permission_display}}</td>
+		  {% endif %}			
+		  {% if current_sudo %}
+		  	<td>{{current_sudo.permission}}: {{current_sudo.get_permission_display}}</td>
+		  {% endif %}			
+		</tr>
+	</table>
+
 	<select name="sudo">
 	  {% for user in users %}
 		<option value="{{user.id}}">#{{user.id}} {{user}} (#{{user.owner.id}} {{user.owner}})</option>
