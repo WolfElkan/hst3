@@ -13,25 +13,25 @@
 <form>
 	<div>
 		<a href="/">My Profile</a>
-		{% if not current_sudo %}<a href="/admin/dashboard/">Admin Dashboard</a>{% endif %}
+		{% if me.permission >= 6 %}<a href="/admin/dashboard/">Admin Dashboard</a>{% endif %}
 	</div>
 	<div>
 	  {% if current_me %}
-		You are logged in as #{{current_me.id}} <code>{{current_me}}</code> / #{{current_me.owner.id}} {{current_me.owner}}.
+		You are logged in as #{{current_me.id}} <code>{{current_me}}</code> (#{{current_me.owner.id}} {{current_me.owner}}).
 	  {% else %}
 		You are not logged in.
 	  {% endif %}
 	</div>
 	<div>
 	  {% if current_sudo %}
-		You are currently SUDOing as #{{current_sudo.id}} <code>{{current_sudo}}</code> / #{{current_sudo.owner.id}} {{current_sudo.owner}}.
+		You are currently SUDOing as #{{current_sudo.id}} <code>{{current_sudo}}</code> (#{{current_sudo.owner.id}} {{current_sudo.owner}}).
 	  {% else %}
 		You are not currently SUDOing.
 	  {% endif %}
 	</div>
 	<select name="sudo">
 	  {% for user in users %}
-		<option value="{{user.id}}">#{{user.id}} {{user}} / #{{user.owner.id}} {{user.owner}}</option>
+		<option value="{{user.id}}">#{{user.id}} {{user}} (#{{user.owner.id}} {{user.owner}})</option>
 	  {% endfor %}
 	</select>
 	<button>SUDO</button>

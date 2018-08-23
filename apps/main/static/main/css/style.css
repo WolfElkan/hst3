@@ -1,36 +1,38 @@
 .public * {
 	vertical-align: top;
-        font-family: Verdana, Arial, sans-serif;
+	font-family: Verdana, Arial, sans-serif;
 }
 .public a {
-       
-         background-color: Navy;
-         border:1px solid #660000;
-         border-radius:5px;
-         color:#fff;
-         margin-right:10px;
-         text-decoration:none;
-         color: white;
-         padding:5px 5px 5px 5px;
-         float: left;
-         margin: 20px 1px 5px 5px;
-         width: 150px;
-         text-align: center;
+	background-color: Navy;
+	float: left;
+	border:1px solid #660000;
+}
+.public a, a.sudo{
+	border-radius:5px;
+	padding:5px 5px 5px 5px;
+	margin: 20px 1px 5px 5px;
+	width: 150px;
+	text-align: center;
+	color:#fff;
+	color: white;
+	text-decoration:none;
 }
 .public a:hover {
-         background-color: CornflowerBlue;
+	background-color: CornflowerBlue;
 }
 
-.public a.sudo {
-         background-color: #880000!important;
+a.sudo {
+	background-color: #880000!important;
+	font-family: serif;
+	border: solid black 1px;
 }
-.public a.sudo:hover {
-         background-color: #ED6495!important;
+a.sudo:hover {
+	background-color: #ed6495!important;
 }
 
 .public h1 {
-         margin-top: 30px;
-         font-size: 24px;
+	margin-top: 30px;
+	font-size: 24px;
 }
 
 .public .error {
@@ -46,34 +48,33 @@
 	margin: 0 auto;
 }
 .public img{
-        width: 150px;
-        float: left;
-        margin-left: 20px
+	width: 150px;
+	float: left;
+	margin-left: 20px
 
 }
 
 .public .close {
-       position: absolute;
-       right: 10%;
-       bottom: 2%;
-       color: rgba(88, 88, 90, 0.7);
+	position: absolute;
+	right: 10%;
+	bottom: 2%;
+	color: rgba(88, 88, 90, 0.7);
 }
 .public center {
-       clear: both;
+	clear: both;
 }
 
 .public .instructions {
-       display: block;
-       width: 100%;
-       clear: both;
-       margin: 10px 5px;
+	display: block;
+	width: 100%;
+	clear: both;
+	margin: 10px 5px;
 }
 
-
 .public table {
-       font-size: 14px;
+	font-size: 14px;
 }
 
 .admin #logo {
-  display: none;
+	display: none;
 }

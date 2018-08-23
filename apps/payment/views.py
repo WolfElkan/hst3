@@ -36,6 +36,7 @@ def invoice_show(request, ref, id):
 		'email'  : PAYPAL_BUSINESS_EMAIL,
 		'host'   : 'https://{}'.format(CURRENT_HOST),
 		'waiting': invoice.status == 'N' and request.GET.get('ref') == 'paypal',
+		'sudo'   : bool(request.session.get('sudo')),
 	}
 	return render(request, 'invoice.html', context)
 

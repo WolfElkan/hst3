@@ -6,7 +6,7 @@ from apps.payment.managers import Invoices
 from ..managers import Policies
 
 from Utils.custom_fields import Bcrypt, PhoneNumber
-from Utils.data  import collect, copy, copyatts, equip
+from Utils.data  import collect, copy, copyatts, equip, Each
 from Utils.fjson import FriendlyEncoder, json
 from Utils.misc  import namecase, cleanhex
 from Utils.security import getme, getyear, restricted
@@ -97,9 +97,26 @@ def sudo(request):
 			'users':Users.all(),
 			'current_sudo':Users.fetch(id=request.session.get('sudo')),
 			'current_me':Users.fetch(id=request.session.get('meid')),
+			'me':getme(request),
 		}
 		return render(request, 'radmin/sudo.html', context)
 
 def sudo_exit(request):
 	request.session.pop('sudo')
 	return redirect('/sudo/')
+
+def sudo_invoice(request, **kwargs):
+	invoice = Invoices.fetch(id=kwargs.get('id'))
+	bad = restricted(request,8,standing=invoice)
+	if bad:
+		return bad
+	action = request.GET.get('action')
+	method = request.GET.get('method')
+	if invoice and action == 'pay' and method in Each(Invoices.model.method_choices).lower():
+		invoice.status = 'P'
+		invoice.method = method
+		invoice.save()
+	print Each(Invoices.model.method_choices).lower()
+	return redirect('/{ref}/invoice/{id}/'.format(**kwargs))
+
+

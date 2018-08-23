@@ -25,6 +25,7 @@
 	<h1>{{thing}}</h1>
 	{% if model == "course" %}<a href="/reports/roster/{{thing.id}}/">Roster</a>{% endif %}
 	{% if model == "invoice" %}<a href="/rest/invoice/{{thing.id}}/">View Invoice</a>{% endif %}
+	{% if model == "user" %}<a href="/sudo/?sudo={{thing.id}}">SUDO</a>{% endif %}
 	<h2><a href="/rest/index/{{model}}/">{{Model}}</a></h2>
 	<!-- <a href="prev/">&lt;Prev</a>
 	<a href="next/">Next&gt;</a> -->

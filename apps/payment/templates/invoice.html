@@ -34,6 +34,7 @@
 			font-weight: bold;
 			padding: 3px 20px;
 			border-radius: 10px;
+			margin-bottom: 20px;
 			/*font-style: italic;*/
 		}
 	</style>
@@ -63,7 +64,11 @@
 			</tr>
 			<tr>
 				<td>Status:</td>
-				<td>{{invoice.get_status_display}}{% if waiting %}*{% endif %}</td>
+				<td>
+					{{invoice.get_status_display}}
+					{% if waiting %}*{% endif %}
+					{% if invoice.status == 'P' %}({{invoice.method}}){% endif %}
+				</td>
 			</tr>
 		</table>
 		<h2>Items</h2>
@@ -73,13 +78,13 @@
 				<th>Class</th>
 				<th>Amount</th>
 			</thead>
-			{% for item in invoice.items %}
+		  {% for item in invoice.items %}
 			<tr class="{{item.status}}" onclick="">
 				<td>{% if item.course.tradition.byFamily %} n/a {% else %} {{item.student.prefer}} {% endif %} </td>
 				<td>{{item.course}}</td>
 				<td class="money">${{item.price}}</td>
 			</tr>
-			{% endfor %}
+		  {% endfor %}
 			<thead class="sum">
 				<th>Total:</th>
 				<th><!-- {{invoice.items|length}} items --></th>
@@ -88,22 +93,28 @@
 		</table>
 		<div>
 	{% if invoice.status == 'N' %}
- 	<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
-        <input type="hidden" name="business" value="{{email}}">
-        <input type="hidden" name="cmd" value="_xclick">
-        <input type="hidden" name="item_name" value="HST Tuition Invoice #{{invoice.id}}"> 
-        <input type="hidden" name="amount" value="{{invoice.amount}}"> 
-        <input type="hidden" name="currency_code" value="USD"> 
-        <input type="hidden" name="invoice" value="{{invoice.id}}" id="invoice"> 
-        <input type="hidden" name="notify_url" value='{{host}}/ipn/' /> 
-        <input type='hidden' name='cancel_return' value="{{host}}/{{ref}}/invoice/{{invoice.id}}/" /> 
-        <input type='hidden' name='return' value="{{host}}/{{ref}}/invoice/{{invoice.id}}/?ref=paypal" /> 
-        <button id="paypal" title="PayPal - The safer, easier way to pay online">Pay with PayPal</button>
-    </form>
+	<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+		<input type="hidden" name="business" value="{{email}}">
+		<input type="hidden" name="cmd" value="_xclick">
+		<input type="hidden" name="item_name" value="HST Tuition Invoice #{{invoice.id}}"> 
+		<input type="hidden" name="amount" value="{{invoice.amount}}"> 
+		<input type="hidden" name="currency_code" value="USD"> 
+		<input type="hidden" name="invoice" value="{{invoice.id}}" id="invoice"> 
+		<input type="hidden" name="notify_url" value='{{host}}/ipn/' /> 
+		<input type='hidden' name='cancel_return' value="{{host}}/{{ref}}/invoice/{{invoice.id}}/" /> 
+		<input type='hidden' name='return' value="{{host}}/{{ref}}/invoice/{{invoice.id}}/?ref=paypal" /> 
+		<button id="paypal" title="PayPal - The safer, easier way to pay online">Pay with PayPal</button>
+	</form>
 	{% endif %}
-    {% if waiting %}
-    <p>* Still waiting for verification from PayPal.  Try refreshing the page.</p>
-    {% endif %}
+	{% if waiting %}
+	<p>* Still waiting for verification from PayPal.  Try refreshing the page.</p>
+	{% endif %}
+	{% if sudo %}
+	<a class="sudo" href="/rest/edit/invoice/{{invoice.id}}/">Edit</a>
+	  {% if invoice.status == 'N' %}
+		<a class="sudo" href="sudo/?action=pay&method=check">Mark as Paid by Check</a>
+	  {% endif %}
+	{% endif %}
 </div>
 </center>
 <button class="close" onclick="hst()">Close</button>

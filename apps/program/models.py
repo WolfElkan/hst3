@@ -405,7 +405,6 @@ class Enrollment(models.Model):
 			self.student.trigger(self.course.year)
 
 	def fate(self):
-		print self
 		self.status = calc_status(self)
 		self.save()
 		if self.status in ["not_elig","aud_need","conflict","need_cur","needboth"]:

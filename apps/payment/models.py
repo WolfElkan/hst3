@@ -52,7 +52,8 @@ class PayPal(models.Model):
 class Invoice(models.Model):
 	family = models.ForeignKey('people.Family')
 	amount = models.DecimalField(max_digits=6, decimal_places=2, default=0)
-	method = custfd.EnumField(choices=['','Cash','Check','PayPal'], default='')
+	method_choices = ['','Cash','Check','PayPal']
+	method = custfd.EnumField(choices=method_choices, default='')
 	status_choices = [
 		('N','Not Paid'),
 		('P','Paid'),
