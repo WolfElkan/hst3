@@ -17,7 +17,7 @@ def index(request, **kwargs):
 		return bad
 	context = {
 		'courses':Courses.filter(year=getyear()).order_by('tradition__order'),
-		'year':getyear()
+		'year':getyear(),
 	}
 	return render(request, 'reports/index.html', context)
 
@@ -83,12 +83,20 @@ def enrollment_matrix(request, **kwargs):
 	}
 	return render(request, 'reports/enrollment_matrix_edit.html', context)
 
+def address(request, **kwargs):
+	year = getyear()
+	context = {
+		'families':Families.filter(student__enrollment__course__year=year).order_by('last').distinct(),
+		'year':year,
+	}
+	return render(request, 'reports/addresses.html', context)
+
 def summary(request, **kwargs):
 	kwargs.setdefault('year',getyear())
 	context = {
 		'year':Year(int(kwargs['year'])),
 		'prev':Year(int(kwargs['year'])-1),
-		'date':datetime.datetime.now()
+		'date':datetime.datetime.now(),
 	}
 	return render(request, 'reports/summary.html', context)
 

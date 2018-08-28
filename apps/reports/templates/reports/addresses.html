@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>HST | {{course.title}} Class List {{course.year}}</title>
+	{% load staticfiles %}
+	<script src="{% static 'main/js/script.js' %}" charset="utf-8"></script>
+	<link rel="stylesheet" type="text/css" href="{% static 'main/css/style.css' %}">
+	<link rel="stylesheet" type="text/css" href="{% static 'main/css/roster.css' %}">
+</head>
+<body id="roster" class="roster">
+	<center>
+		<h1>HST {{year|add:-1}} - {{year}} ADDRESS LIST</h1>
+	<table>
+		<thead>
+			<th>Family</th>
+			<th>Street</th>
+			<th>Line 2</th>
+			<th>City</th>
+			<th>State</th>
+			<th>Zip</th>
+		</thead>
+	{% for family in families %}
+	<tr>
+		<td>{{family.last}}</td>
+		<td>{{family.address.line1}}</td>
+		<td>{{family.address.line2}}</td>
+		<td>{{family.address.city}}</td>
+		<td>{{family.address.state}}</td>
+		<td>{{family.address.zipcode}}</td>
+	</tr>
+	{% endfor %}
+	</table>
+	</center>
+<button class="close" onclick="window.close()">Close</button>
+</body>
+</html>
