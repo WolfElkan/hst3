@@ -10,21 +10,27 @@
 	</head>
 	<img id="logo" src="//www.hstonline.org/wp-content/uploads/2017/05/cropped-cropped-HST-LOGO-10.png">
 	<body id="index" class="public">
-		<h1>Registration</h1>
-		{% if name %}
+	  {% if name %}
+		<h1>My Profile</h1>
 		<p>Hello {{name}}</p>
+		<a href="/myaccount/">Account Info</a>
+		<a href="/myaccount/parents/">Parent Info</a>
+		<a href="/myaccount/students/{{me.owner.children.first.id}}/">Student Info</a>
+		<a href="/myaccount/classes/">Registration Info</a>
+		<a href="/myaccount/policy/">Review Policies</a>
 		<a href="/logout/">Log Out</a>
-		<a href="/myaccount/">My Account</a>
-		{% else %}
+	  {% if me.permission >= 4 %}<a href="/admin/dashboard/">Admin Dashboard</a>{% endif %}
+	  {% else %}
+		<h1>HST Registration Portal</h1>
 		<a href="/login">Login (Returning Families)</a>
 		<a href="/register/family/">Registration (New Families)</a>
-		{% endif %}
-		{% if incomplete_registration %}
+	  {% endif %}
+	  {% if incomplete_registration %}
 		<a href="/register/redirect/">Continue Registration</a>
-		{% endif %}
-		{% if sudo %}
+	  {% endif %}
+	  {% if sudo %}
 		<a class="sudo" href="/sudo/exit/">Exit SUDO</a>
-		{% endif %}
+	  {% endif %}
 		<button class="close" onclick="hst()">Close</button>
 	</body>
 </html>

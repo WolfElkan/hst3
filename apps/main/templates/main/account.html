@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>HST | My Account</title>
+	<title>HST | Account Info</title>
 	{% load staticfiles %}
 	<script src="{% static 'main/js/script.js' %}" charset="utf-8"></script>
 	<link rel="stylesheet" type="text/css" href="{% static 'main/css/style.css' %}">
@@ -68,11 +68,6 @@
 			<td>{{me.owner}}</td>
 		</tr>
 	</table>
-<a href="parents/">Parent Info</a>
-<a href="students/{{me.owner.children.first.id}}/">Student Info</a>
-<a href="classes/">Registration Info</a>
-<a href="policy">Review Policies</a>
-{% if me.permission >= 4 %}<a href="/admin/dashboard/">Admin Dashboard</a>{% endif %}
 <button class="close" onclick="window.close()">Close</button>
 </body>
 </html>
