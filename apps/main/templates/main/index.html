@@ -18,8 +18,10 @@
 		<a href="/myaccount/students/{{me.owner.children.first.id}}/">Student Info</a>
 		<a href="/myaccount/classes/">Registration Info</a>
 		<a href="/myaccount/policy/">Review Policies</a>
+		  {% if me.permission >= 4 %}
+			<a href="/admin/dashboard/">Admin Dashboard</a>
+		  {% endif %}
 		<a href="/logout/">Log Out</a>
-	  {% if me.permission >= 4 %}<a href="/admin/dashboard/">Admin Dashboard</a>{% endif %}
 	  {% else %}
 		<h1>HST Registration Portal</h1>
 		<a href="/login">Login (Returning Families)</a>
