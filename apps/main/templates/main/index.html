@@ -11,7 +11,7 @@
 	<img id="logo" src="//www.hstonline.org/wp-content/uploads/2017/05/cropped-cropped-HST-LOGO-10.png">
 	<body id="index" class="public">
 	  {% if name %}
-		<h1>My Profile</h1>
+		<h1>Home</h1>
 		<p>Hello {{name}}</p>
 		<a href="/myaccount/">Account Info</a>
 		<a href="/myaccount/parents/">Parent Info</a>
@@ -20,6 +20,17 @@
 		<a href="/myaccount/policy/">Review Policies</a>
 		  {% if me.permission >= 4 %}
 			<a href="/admin/dashboard/">Admin Dashboard</a>
+		  {% endif %}
+		  {% if me.permission >= 1 %}
+			<form>
+				<select name="course">
+					<option value="">{{year|add:-1}}-{{year}} Courses</option>
+				  {% for course in courses %}
+					<option value="{{course.id}}">{{course.title}}</option>
+				  {% endfor %}
+				</select>
+				<button>View Roster</button>
+			</form>
 		  {% endif %}
 		<a href="/logout/">Log Out</a>
 	  {% else %}

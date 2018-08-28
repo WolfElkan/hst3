@@ -18,12 +18,20 @@ from Utils.seshinit import seshinit, forminit
 import re
 
 def index(request):
+	if 'course' in request.GET:
+		course = request.GET['course']
+		if course:
+			return redirect('/reports/roster/{}'.format(course))
+		else:
+			return redirect('/')
 	me = getme(request)
 	context = {
+		'year':getyear(),
 		'me':me,
 		'name':me.owner if me else None,
 		'incomplete_registration': me and me.owner and not me.owner.children,
 		'sudo':Users.fetch(id=request.session.get('sudo')),
+		'courses':Courses.filter(year=getyear(),tradition__m=True).order_by('tradition__order')
 	}
 	return render(request, 'main/index.html', context)
 
