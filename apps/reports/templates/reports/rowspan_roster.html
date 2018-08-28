@@ -37,7 +37,6 @@
 	</style>
 </head>
 <body id="roster" class="roster">
-	<img id="logo" src="//www.hstonline.org/wp-content/uploads/2017/05/cropped-cropped-HST-LOGO-10.png">
 	<center>
 		<h1>HST {{course.tradition}} CLASS LIST</h1>
 		<h1>{{course.year|add:-1}} - {{course.year}}</h1>
@@ -71,6 +70,7 @@
 	</tr>
 	{% endfor %}
 	</table>
+	<h2>{{course.nMeets}} {{course.day}}s, {{course.start}} to {{course.end}} {{course.venue.name}}</h2>
 	</center>
 <button class="close" onclick="window.close()">Close</button>
 </body>
