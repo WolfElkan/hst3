@@ -51,8 +51,9 @@ class Address(models.Model):
 		else:
 			return super(Address, self).__getattribute__(field)	
 	def __str__(self):
-		title = self.line1 + ('\n'+self.line2 if self.line2 else '') + '\n' + self.city + ', ' + self.state + '\n' + str(self.zipcode)
-		return title
+		return self.line1 + ('\n'+self.line2 if self.line2 else '') + '\n' + self.city + ', ' + self.state + '\n' + str(self.zipcode)
+	def __repr__(self):
+		return '<Address: ' + self.line1 + (' '+self.line2 if self.line2 else '') + ' ' + self.city + ', ' + self.state + ' ' + str(self.zipcode) + '>'
 
 
 class Parent(models.Model):

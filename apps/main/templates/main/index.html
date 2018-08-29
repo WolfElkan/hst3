@@ -20,8 +20,9 @@
 		<a href="/myaccount/policy/">Review Policies</a>
 		  {% if me.permission >= 4 %}
 			<a href="/admin/dashboard/">Admin Dashboard</a>
+			<a href="/reports/registration/">Family Registration</a>
 		  {% endif %}
-		  {% if me.permission >= 1 %}
+		  {% if me.permission >= 4 %}
 			<form>
 				<select name="course">
 					<option value="">{{year|add:-1}}-{{year}} Courses</option>
