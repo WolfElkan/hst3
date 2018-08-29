@@ -52,7 +52,7 @@ def enrollment_matrix(request, **kwargs):
 	siblings |= everyone
 	families = Families.all()
 	if not everyone:
-		families = families.filter(student__enrollment__course__year=year).distinct()
+		families = families.filter(children__enrollment__course__year=year).distinct()
 	families = families.order_by('last','name_num')
 	table = []
 	blank = {'content':'','rowspan':1,'class':'enr'}
@@ -89,7 +89,7 @@ def address(request, **kwargs):
 		return bad
 	year = getyear()
 	context = {
-		'families':Families.filter(student__enrollment__course__year=year).order_by('last').distinct(),
+		'families':Families.filter(children__enrollment__course__year=year).order_by('last').distinct(),
 		'year':year,
 	}
 	return render(request, 'reports/addresses.html', context)

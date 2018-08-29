@@ -216,7 +216,7 @@ class Course(models.Model):
 	def girls(self):
 		return self.students.filter(sex='F')
 	def families(self):
-		return Families.filter(student__enrollment__course=self).distinct()
+		return Families.filter(children__enrollment__course=self).distinct()
 
 	def equipped_students(self):
 		result = []

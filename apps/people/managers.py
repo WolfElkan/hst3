@@ -37,7 +37,7 @@ class FamilyManager(sm.SuperManager):
 		result = []
 		ids = []
 		for year in gethist(0)[::-1]:
-			for family in self.filter(student__enrollment__course__year=year).order_by('last'):
+			for family in self.filter(children__enrollment__course__year=year).order_by('last'):
 				if family.id not in ids:
 					ids.append(family.id)
 					result.append(family)
@@ -102,7 +102,7 @@ class NameClashManager(sm.SuperManager):
 			last = family
 		clashes = Families.filter(last=last)
 		if year:
-			clashes = clashes.filter(student__enrollment__course__year=year).distinct()
+			clashes = clashes.filter(children__enrollment__course__year=year).distinct()
 		if len(clashes) <= 1:
 			return 0
 		else:

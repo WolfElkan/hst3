@@ -145,7 +145,7 @@ class Family(models.Model):
 	def unique_last(self):
 		return '{} #{}'.format(self.last,self.name_num) if self.name_num else self.last
 	def unique_last_in(self, year):
-		clashes = Families.filter(last=self.last,student__enrollment__course__year=year).exclude(id=self.id)
+		clashes = Families.filter(last=self.last,children__enrollment__course__year=year).exclude(id=self.id)
 		if clashes:
 			return self.unique_last
 		else:
