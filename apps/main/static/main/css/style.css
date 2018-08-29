@@ -78,3 +78,8 @@ a.sudo:hover {
 .admin #logo {
 	display: none;
 }
+
+.center {
+	text-align: center;
+	vertical-align: middle;
+}

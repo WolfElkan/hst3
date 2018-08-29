@@ -74,8 +74,15 @@ class Parent(models.Model):
 		return self.alt_last  if self.alt_last  else self.family.last 
 	def phone(self):
 		return self.alt_phone if self.alt_phone > 0 else self.family.phone
+	def unique_phone(self):
+		if self.alt_phone.value != self.family.phone.value:
+			return self.alt_phone
 	def email(self):
 		return self.alt_email if self.alt_email else self.family.email
+	def unique_email(self):
+		if self.alt_email != self.family.email:
+			if self.sex == 'M' or (self.family.father and self.alt_email != self.family.father.alt_email):
+				return self.alt_email
 	def family(self):
 		return Families.fetch(id=self.family_id)
 

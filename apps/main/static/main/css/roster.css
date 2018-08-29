@@ -27,3 +27,6 @@ table {
 	/*display: block;*/
 	margin: 10px;
 }
+strong {
+	display: block;
+}

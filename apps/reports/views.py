@@ -5,7 +5,7 @@ from apps.program.managers import Courses, CourseTrads, Enrollments
 from apps.program.eligex   import status_choices
 from apps.program.models   import Year
 
-from Utils.data import sub, Each
+from Utils.data import sub, Each, equip
 from Utils.security import getyear, gethist, restricted
 from decimal import Decimal
 
@@ -84,12 +84,28 @@ def enrollment_matrix(request, **kwargs):
 	return render(request, 'reports/enrollment_matrix_edit.html', context)
 
 def address(request, **kwargs):
+	bad = restricted(request,1)
+	if bad:
+		return bad
 	year = getyear()
 	context = {
 		'families':Families.filter(student__enrollment__course__year=year).order_by('last').distinct(),
 		'year':year,
 	}
 	return render(request, 'reports/addresses.html', context)
+
+def directory(request, **kwargs):
+	bad = restricted(request,1)
+	if bad:
+		return bad
+	year = getyear()
+	families = Families.filter(student__enrollment__course__year=year).order_by('last').distinct()
+
+	context = {
+		'families':families,
+		'year':year,
+	}
+	return render(request, 'reports/directory.html', context)
 
 def summary(request, **kwargs):
 	kwargs.setdefault('year',getyear())

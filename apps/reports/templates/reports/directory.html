@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>HST | {{course.title}} Class List {{course.year}}</title>
+	{% load staticfiles %}
+	<script src="{% static 'main/js/script.js' %}" charset="utf-8"></script>
+	<link rel="stylesheet" type="text/css" href="{% static 'main/css/style.css' %}">
+	<link rel="stylesheet" type="text/css" href="{% static 'main/css/roster.css' %}">
+</head>
+<body id="roster" class="roster">
+	<center>
+		<h1>HST {{year|add:-1}}-{{year}} Family Directory</h1>
+	<table>
+		<thead>
+			<th>Family</th>
+			<th>Parents</th>
+ 			<th>Phone</th>
+			<th>Email</th>
+			<th>Students</th>
+			<th>Address</th>
+		</thead>
+	  {% for family in families %}
+		<tr>
+			<td>{{family.last}}</td>
+			<td>
+				{{family.mother.first}}
+				{% if family.mother and family.father %}<br>{% endif %}
+				{{family.father.first}}
+			</td>
+			<td>
+				{% if family.mother.unique_phone %}{{family.mother.unique_phone}}{% endif %}
+				<strong>{{family.phone}}</strong>
+				{% if family.father.unique_phone %}{{family.father.unique_phone}}{% endif %}
+			</td>
+			<td>
+				{% if family.mother.unique_email %}{{family.mother.unique_email}}{% endif %}
+				<strong>{{family.email}}</strong>
+				{% if family.father.unique_email %}{{family.father.unique_email}}{% endif %}
+			</td>
+			<td>
+			  {% for student in family.children %}
+				<div>
+					{{student.prefer}}, {{student.hst_age}}
+				</div>
+			  {% endfor %}
+			</td>
+			<td>
+				{{family.address.line1}}<br>
+				{% if family.address.line2 %}{{family.address.line2}}<br>{% endif %}
+				{% if family.address %}{{family.address.city}}, {{family.address.state}}<br>{% endif %}
+				{{family.address.zipcode}}
+			</td>
+		</tr>
+	  {% endfor %}
+	</table>
+	</center>
+<button class="close" onclick="window.close()">Close</button>
+</body>
+</html>
