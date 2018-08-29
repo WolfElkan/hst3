@@ -59,7 +59,7 @@ def enrollment_matrix(request, **kwargs):
 	ctids = {'SB':'TT','SG':'GB','SJ':'JR'}
 	for family in families:
 		oldest = True
-		children = family.children if siblings else family.children_enrolled_in(year)
+		children = family.children.all() if siblings else family.children_enrolled_in(year)
 		for student in children:
 			row = {
 				'family' : family,
@@ -99,7 +99,7 @@ def directory(request, **kwargs):
 	if bad:
 		return bad
 	year = getyear()
-	families = Families.filter(student__enrollment__course__year=year).order_by('last').distinct()
+	families = Families.filter(children__enrollment__course__year=year).order_by('last').distinct()
 
 	context = {
 		'families':families,

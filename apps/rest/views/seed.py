@@ -266,7 +266,7 @@ def dump(request):
 			if family.address.line2:
 				family_obj['address']['line2' ] = family.address.line2
 		family_obj['students'] = []
-		for student in family.children:
+		for student in family.children.all():
 				student_obj = student.__json__()
 				student_obj.pop('id')
 				enrollments = student.enrollments

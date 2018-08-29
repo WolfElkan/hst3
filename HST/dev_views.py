@@ -69,7 +69,7 @@ def add_hids(**kwargs):
 			family.father.hid = '{}{:0>2}'.format(las,'FA')
 		if family.mother and not family.mother.hid:
 			family.mother.hid = '{}{:0>2}'.format(las,'MO')
-		for student in family.children:
+		for student in family.children.all():
 			if student.hid:
 				continue
 			num = student.birthday.year

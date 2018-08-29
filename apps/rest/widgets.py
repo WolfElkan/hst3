@@ -34,6 +34,8 @@ def rest_link(foreign):
 
 def rest_list(qset):
 	if qset:
+		if hasattr(qset,'all'):
+			qset = qset.all()
 		html = '<span>({})</span><ul>'.format(len(qset))
 		for foreign in qset:
 			html += '<li>{}</li>'.format(rest_link(foreign))

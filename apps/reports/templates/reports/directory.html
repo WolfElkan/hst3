@@ -38,7 +38,7 @@
 				{% if family.father.unique_email %}{{family.father.unique_email}}{% endif %}
 			</td>
 			<td>
-			  {% for student in family.children %}
+			  {% for student in family.children.all %}
 				<div>
 					{{student.prefer}}, {{student.hst_age}}
 				</div>

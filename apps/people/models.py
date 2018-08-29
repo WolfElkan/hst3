@@ -156,8 +156,8 @@ class Family(models.Model):
 	def invoices(self):
 		return Invoices.filter(family=self)
 
-	def children(self):
-		return Students.filter(family_id=self.id).order_by('birthday')
+	# def children(self):
+	# 	return Students.filter(family_id=self.id).order_by('birthday')
 	def children_eligible_in(self,year):
 		ids = []
 		for child in self.children:
@@ -237,7 +237,7 @@ class Family(models.Model):
 		# return ('{} Family #{}' if self.name_num else '{} Family').format(self.last,self.name_num)
 		return '{} Family'.format(self.last)
 	def __getattribute__(self, field):
-		if field in ['unique_last','children','enrollments','hours_worked','accounts','invoices']:
+		if field in ['unique_last','enrollments','hours_worked','accounts','invoices']:
 			call = super(Family, self).__getattribute__(field)
 			return call()
 		else:
@@ -251,7 +251,7 @@ class Student(models.Model):
 	first     = models.CharField(max_length=20)
 	alt_first = models.CharField(max_length=20, default='')
 	alt_last  = models.CharField(max_length=30, default='')
-	family    = models.ForeignKey(Family)
+	family    = models.ForeignKey(Family, related_name='children')
 	sex_choices = sex_choices
 	sex       = models.CharField(max_length=1, choices=sex_choices)
 	current   = models.BooleanField(default=True)
