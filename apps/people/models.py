@@ -161,7 +161,7 @@ class Family(models.Model):
 	# 	return Students.filter(family_id=self.id).order_by('birthday')
 	def children_eligible_in(self,year):
 		ids = []
-		for child in self.children:
+		for child in self.children.all():
 			if set(Each(list(child.course_menu())).status) - set(['not_elig']):
 				ids.append(child.id)
 		return Students.filter(id__in=ids)

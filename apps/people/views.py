@@ -257,7 +257,7 @@ def students_edit(request, ref, id):
 		'reg_year': getyear(),
 		'family'  : me.owner,
 		't_shirt_sizes': collect(Students.model.t_shirt_sizes, lambda obj: dict(collect(obj,lambda val, index: ['no'+str(index),val]))),
-		'students': me.owner.children,
+		'students': me.owner.children.all(),
 		'ref':ref,
 		'current_student':student,
 		'e':request.session['e'],

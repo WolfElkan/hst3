@@ -24,7 +24,7 @@ def courses(request, **kwargs):
 	current_id = kwargs.setdefault('id',0)
 	if 'id' in kwargs:
 		current_id = kwargs['id']
-		current_student = me.owner.student_set.fetch(id=current_id)
+		current_student = me.owner.children.fetch(id=current_id)
 		if not current_student:
 			return redirect('/')
 	else:
