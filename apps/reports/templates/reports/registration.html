@@ -17,6 +17,12 @@
 			border-top: none;
 			border-bottom: none;
 		}
+		span.enrolled {
+			font-style: normal;
+		}
+		span.invoiced, span.need_pay, span.aud_pass {
+			font-style: italic;
+		}
 	</style>
 </head>
 <body id="roster" class="roster">
@@ -46,7 +52,7 @@
 			</td>
 			<td>
 			  {% for enrollment in student.current_enrollments %}
-				{{enrollment.course.abbr}},
+				<span class="enrollment {{enrollment.status}}">{{enrollment.course.abbr}}</span>,
 			  {% endfor %}
 			</td>
 		</tr>

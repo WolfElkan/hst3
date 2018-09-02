@@ -111,7 +111,7 @@ def registration(request, **kwargs):
 	if bad:
 		return bad
 	year = getyear()
-	qset = Students.filter(enrollment__course__year=year,enrollment__course__tradition__m=True).select_related('family').distinct().order_by('family__last','family__id','birthday')
+	qset = Students.filter(enrollment__course__year=year,enrollment__course__tradition__m=True,enrollment__status__in=['enrolled','invoiced','need_pay','aud_pass']).select_related('family').distinct().order_by('family__last','family__id','birthday')
 	families = []
 	students = []
 	nchild = 0
@@ -127,7 +127,6 @@ def registration(request, **kwargs):
 				'current_enrollments':student.enrollment.filter(course__year=year, course__tradition__m=True),
 				'famspan':0,
 			}
-		# 	fam['students'].append(stu)
 		else:
 			stu = {
 				'o':student,
@@ -135,15 +134,9 @@ def registration(request, **kwargs):
 				'age':student.hst_age_in(year),
 				'current_enrollments':student.enrollment.filter(course__year=year, course__tradition__m=True),
 			}
-		# 	fam = {
-		# 		'o':student.family,
-		# 		'students':[stu],
-		# 	}
 			nchild += 1
-		# 	families.append(fam.copy())
 		students.append(stu.copy())
 		students[s-nchild]['famspan'] += 1
-		# stu = {}
 	context = {
 		'families':families,
 		'students':students,
