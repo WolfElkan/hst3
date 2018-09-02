@@ -319,8 +319,8 @@ class Student(models.Model):
 
 	def all_enrollments(self):
 		return Enrollments.filter(student=self).order_by('course__year')
-	def enrollments(self):
-		return self.all_enrollments.exclude(status__in=['nonexist','aud_fail','aud_drop','aud_need','eligible'])
+	# def enrollments(self):
+	# 	return self.all_enrollments.exclude(status__in=['nonexist','aud_fail','aud_drop','aud_need','eligible'])
 	def enrollments_in(self, year):
 		return self.enrollments.filter(course__year=year)
 	def enrollments_before(self, year):
@@ -391,7 +391,7 @@ class Student(models.Model):
 			'hst_age',
 			'grade',
 			'all_enrollments',
-			'enrollments',
+			# 'enrollments',
 			'courses',
 			'courses_toggle_enrollments',
 			'auditions',

@@ -109,6 +109,7 @@ urlpatterns = [
 
 	url(r'^reports/addresse?s?/$', reports.address),
 	url(r'^reports/directory/$', reports.directory),
+	url(r'^reports/registration/$', reports.registration),
 
 	url(r'^reports/students/mass_enroll/register/$', reports.register),
 	url(r'^reports/students/(?P<year>\d{4})/mass_enroll/register/$', reports.register),

@@ -97,6 +97,7 @@ def hot(request):
 	context = {
 		'log':request.session['log'],
 		'command': request.session['command'],
+		'runtime': request.session['runtime'],
 		'session': divs(request.session.__dict__['_session_cache']),
 		'request': divs(request.__dict__.copy()),
 		'get': divs(request.GET.__dict__.copy()),
@@ -113,7 +114,9 @@ def run(request):
 	modified_command = command.replace('log(','log(request,')
 	request.session['command'] = command
 	request.session['log'] = []
+	start = datetime.datetime.now()
 	exec(modified_command)
+	request.session['runtime'] = str(datetime.datetime.now()-start)
 	return redirect('/hot/')
 
 def clear(request):

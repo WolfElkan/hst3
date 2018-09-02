@@ -103,6 +103,8 @@ class Each(object):
 		return len(self._content)
 	def __repr__(self):
 		return 'Each({})'.format(self._content)
+	def __str__(self):
+		return 'Each({})'.format(self._content)
 	def __setattr__(self, attr, value):
 		if attr == '_content':
 			super(Each, self).__setattr__(attr, value)

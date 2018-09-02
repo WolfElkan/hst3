@@ -101,6 +101,7 @@ Python Hot Code:
 	{% csrf_token %}
 	<textarea name="command" rows="20" cols="100" style="font-family: monospace;">{{ command }}</textarea>
 	<input type="submit" value="RUN">
+	<code>{{runtime}}</code>
 </form>
 <button class="show_req">Show Request</button>
 <button style="display: none;" class="hide_req">Hide Request</button>

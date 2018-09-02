@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>HST | {{course.title}} Class List {{course.year}}</title>
+	{% load staticfiles %}
+	<script src="{% static 'main/js/script.js' %}" charset="utf-8"></script>
+	<link rel="stylesheet" type="text/css" href="{% static 'main/css/style.css' %}">
+	<link rel="stylesheet" type="text/css" href="{% static 'main/css/roster.css' %}">
+	<style type="text/css">
+		.first {
+			border-top: solid black 1px;
+		}
+		table {
+			border-bottom: solid black 1px;
+		}
+		td {
+			border-top: none;
+			border-bottom: none;
+		}
+	</style>
+</head>
+<body id="roster" class="roster">
+	<center>
+		<h1>HST {{year|add:-1}}-{{year}} Registration Report</h1>
+	<table>
+		<thead>
+			<th>Family</th>
+			<th>Parents</th>
+			<th>Students</th>
+			<th>Classes in HST</th>
+		</thead>
+	  {% for student in students %}
+		<tr {% if student.first %}class="first"{% endif %}>
+		  {% if student.first %}
+			<td rowspan="{{student.famspan}}">
+				{{student.o.family.last}}
+			</td>
+			<td rowspan="{{student.famspan}}">
+				{{student.o.family.mother.first}}
+				{% if student.o.family.mother and student.o.family.father %}&amp;{% endif %}
+				{{student.o.family.father.first}}
+			</td>
+		  {% endif %}
+			<td>
+				{{student.o.prefer}}, {{student.age}} ({{student.o.birthday|date:'n/j/y'}})
+			</td>
+			<td>
+			  {% for enrollment in student.current_enrollments %}
+				{{enrollment.course.abbr}},
+			  {% endfor %}
+			</td>
+		</tr>
+	  {% endfor %}
+	</table>
+	</center>
+<button class="close" onclick="window.close()">Close</button>
+</body>
+</html>

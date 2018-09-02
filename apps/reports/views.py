@@ -100,12 +100,58 @@ def directory(request, **kwargs):
 		return bad
 	year = getyear()
 	families = Families.filter(children__enrollment__course__year=year).order_by('last').distinct()
-
 	context = {
 		'families':families,
 		'year':year,
 	}
 	return render(request, 'reports/directory.html', context)
+
+def registration(request, **kwargs):
+	bad = restricted(request,1)
+	if bad:
+		return bad
+	year = getyear()
+	qset = Students.filter(enrollment__course__year=year,enrollment__course__tradition__m=True).select_related('family').distinct().order_by('family__last','family__id','birthday')
+	families = []
+	students = []
+	nchild = 0
+	for s in xrange(len(qset)):
+		student = qset[s]
+		prevstu = qset[s-1] if s else None
+		if not (prevstu and student.family.id == prevstu.family.id):
+			nchild = 0
+			stu = {
+				'o':student,
+				'first':True,
+				'age':student.hst_age_in(year),
+				'current_enrollments':student.enrollment.filter(course__year=year, course__tradition__m=True),
+				'famspan':0,
+			}
+		# 	fam['students'].append(stu)
+		else:
+			stu = {
+				'o':student,
+				'first':False,
+				'age':student.hst_age_in(year),
+				'current_enrollments':student.enrollment.filter(course__year=year, course__tradition__m=True),
+			}
+		# 	fam = {
+		# 		'o':student.family,
+		# 		'students':[stu],
+		# 	}
+			nchild += 1
+		# 	families.append(fam.copy())
+		students.append(stu.copy())
+		students[s-nchild]['famspan'] += 1
+		# stu = {}
+	context = {
+		'families':families,
+		'students':students,
+		'year':year,
+		'now':datetime.datetime.now()
+	}
+	return render(request, 'reports/registration.html', context)
+
 
 def summary(request, **kwargs):
 	kwargs.setdefault('year',getyear())

@@ -39,6 +39,7 @@ class CourseTrad(models.Model):
 	id         = models.CharField(max_length=2, primary_key=True)
 	oid        = models.CharField(max_length=10,default='')
 	title      = models.CharField(max_length=50)
+	abbr       = models.CharField(max_length=13)
 	alias      = models.ForeignKey('self', null=True)
 	order      = models.FloatField(null=True)
 	e          = models.BooleanField(default=True) # Whether course appears in Shopping Cart
@@ -176,6 +177,7 @@ class Course(models.Model):
 	tradition  = models.ForeignKey(CourseTrad, unique_for_year=True, db_column='trad_id')
 	nSlots     = models.PositiveIntegerField(default=0)
 	title      = models.CharField(max_length=50)
+	abbr       = models.CharField(max_length=13)
 	last_date  = models.DateField(null=True)
 	aud_date   = models.DateField(null=True)
 	teacher    = models.ForeignKey('people.Teacher', null=True)
@@ -323,8 +325,8 @@ class Course(models.Model):
 
 
 class Enrollment(models.Model):
-	student    = models.ForeignKey('people.Student')
-	course     = models.ForeignKey(Course)
+	student    = models.ForeignKey('people.Student', related_name='enrollment')
+	course     = models.ForeignKey(Course, related_name='enrollment')
 	invoice    = models.ForeignKey('payment.Invoice', null=True)
 	tuition    = models.DecimalField(max_digits=6, decimal_places=2, default=0)
 	role       = models.TextField(null=True)

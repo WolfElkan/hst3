@@ -70,6 +70,7 @@ FIELDS = {
 		{'field':'e'         , 'template': Checkbox(suffix='This course will be visible in family enrollment shopping cart.')},
 		{'field':'action'    , 'template': Enum(options=CourseTrads.model.action_choices,default='none')},
 		{'field':'title'     , 'template': VarChar(maxlength=50)},
+		{'field':'abbr'      , 'template': VarChar(maxlength=13)},
 		{'field':'eligex'    , 'template': VarChar(default='a')},
 		{'field':'default'   , 'template': Enum(options=dict(status_choices).keys())},
 		{'field':'day'       , 'template': DayOfWeek()},
@@ -93,6 +94,7 @@ FIELDS = {
 	],
 	'course'    : [
 		{'field':'title'     , 'template': VarChar(maxlength=50)},
+		{'field':'abbr'      , 'template': VarChar(maxlength=13)},
 		{'field':'year'      , 'template': Integer()},
 		{'field':'nSlots'    , 'template': Integer()},
 		{'field':'last_date' , 'template': Date()},
