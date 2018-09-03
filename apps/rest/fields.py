@@ -52,7 +52,7 @@ FIELDS = {
 		{'field':'alt_email' , 'template': VarChar(maxlength=254)},
 		{'field':'tshirt'    , 'template': Enum(items=Student.t_shirt_sizes)},
 		{'field':'needs'     , 'template': VarChar()},
-		{'field':'enrollments','template': ForeignSet(model='enrollment')}
+		{'field':'enrollment', 'template': ForeignSet(model='enrollment')}
 		# {'field':'courses_toggle_enrollments', 'template': ToggleSet(field='courses',model='enrollment')},
 	],
 	'user'      : [

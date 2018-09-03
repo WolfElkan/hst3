@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, HttpResponse
 
 from Utils.security import restricted
 from Utils.data import sub as substitute
-from Utils.data import collect
+from Utils.data import collect, allify
 
 from ..fields import FIELDS
 from ..widgets import MODELS
@@ -107,12 +107,12 @@ def move_all(request, model, old_id, new_id):
 	field = request.GET.get('field')
 	old = manager.get(id=old_id)
 	if reflex[-3:] == '_id':
-		for sub in old.__getattribute__(field):
+		for sub in allify(old.__getattribute__(field)):
 			sub.__setattr__(reflex,new_id)
 			sub.save()
 	else:
 		new = manager.get(id=new_id)
-		for sub in old.__getattribute__(field):
+		for sub in allify(old.__getattribute__(field)):
 			sub.__setattr__(reflex,new)
 			sub.save()
 	return redirect('/rest/merge/{}/{}/{}/'.format(model,old_id,new_id))
@@ -125,22 +125,18 @@ def sub_move(request, model, old_id, new_id):
 
 def sub(request, model, old_id, new_id, template):
 	field = request.GET.get('field')
-	reflex = request.GET.get('reflex')
 	manager = MODELS[model]
 	old = manager.get(id=old_id)
 	new = manager.get(id=new_id)
-	old_subs = old.__getattribute__(field)
-	new_subs = new.__getattribute__(field)
 	context = {
 		'old':old,
 		'new':new,
-		'old_subs':old_subs,
-		'new_subs':new_subs,
+		'old_subs':allify(old.__getattribute__(field)),
+		'new_subs':allify(new.__getattribute__(field)),
 		'field':field,
-		'reflex':reflex,
+		'reflex':request.GET.get('reflex'),
 	}
 	return render(request, template, context)
-	# return redirect('/rest/merge/{}/{}/{}/'.format(model,old_id,new_id))
 
 def sub_transfer(request, model, old_id, new_id):
 	fargs = collect(request.GET,str)

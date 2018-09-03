@@ -285,8 +285,9 @@ def students_new(request, ref):
 	me = getme(request)
 	if not me or not me.owner or not (me.owner.mother or me.owner.father):
 		return redirect('/register/redirect/')
-	students = list(me.owner.children)
+	students = list(me.owner.children.all())
 	students.append(new_student)
+	print students
 	context = {
 		'new':True,
 		'reg_year': getyear(),

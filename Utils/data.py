@@ -1,41 +1,11 @@
 from django.db.models.query import QuerySet
 from inspect import getargspec # Update getargspec -> signature in Python3
 
-# class Caller(object):
-# 	def __init__(self, arr, fx):
-# 		self.arr = arr
-# 		self.fx = fx
-# 	def __str__(self):
-# 		new = []
-# 		for x in self.arr:
-# 			new.append(x.__getattribute__(self.fx))
-# 		return str(new)
-# 	def __repr__(self):
-# 		return '<Caller: {} @{}>'.format(self.arr,self.fx)
-# 	def __iter__(self):
-# 		for x in self.arr:
-# 			yield x.__getattribute__(self.fx)
-# 	def __call__(self, *args, **kwargs):
-# 		new = []
-# 		for x in self.arr:
-# 			if hasattr(x, self.fx):
-# 				new.append(x.__getattribute__(self.fx).__call__(*args, **kwargs))
-# 			else:
-# 				new.append(x)
-# 		return Each(new)
-# 	def __getattr__(self, attr):
-# 		new = []
-# 		for x in self.arr:
-# 			new.append(x.__getattribute__(attr))
-# 		return Caller(new, None)
-# 	def setattr(self, attr, value):
-# 		new = []
-# 		for x in self.arr:
-# 			x.__setattr__(attr, value)
-# 			if type(x) is QuerySet:
-# 				x.save()
-# 			new.append(x)
-# 		return Each(new)
+def allify(obj):
+	if hasattr(obj,'all'):
+		return obj.all()
+	else:
+		return obj
 
 def collect(thing, lam):
 	if type(thing) in [list, tuple, QuerySet]:

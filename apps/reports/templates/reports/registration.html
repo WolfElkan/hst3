@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>HST | {{course.title}} Class List {{course.year}}</title>
+	<title>HST | Registration Report</title>
 	{% load staticfiles %}
 	<script src="{% static 'main/js/script.js' %}" charset="utf-8"></script>
 	<link rel="stylesheet" type="text/css" href="{% static 'main/css/style.css' %}">
@@ -20,41 +20,56 @@
 		span.enrolled {
 			font-style: normal;
 		}
+		span.aud_pend {
+			color: blue;
+		}
 		span.invoiced, span.need_pay, span.aud_pass {
 			font-style: italic;
+		}
+		td.even {
+			background-color: #ddd;
 		}
 	</style>
 </head>
 <body id="roster" class="roster">
 	<center>
 		<h1>HST {{year|add:-1}}-{{year}} Registration Report</h1>
+		<h2>Total Students: {{students|length}}</h2>
+		<h2>Total Families: {{families|length}}</h2>
+		<h2>Students in Showcase: {{sc.students|length}}</h2>
 	<table>
 		<thead>
 			<th>Family</th>
 			<th>Parents</th>
 			<th>Students</th>
 			<th>Classes in HST</th>
+			<!-- <th>Student Email</th> -->
 		</thead>
 	  {% for student in students %}
 		<tr {% if student.first %}class="first"{% endif %}>
 		  {% if student.first %}
-			<td rowspan="{{student.famspan}}">
+			<td class="family" rowspan="{{student.famspan}}">
 				{{student.o.family.last}}
 			</td>
-			<td rowspan="{{student.famspan}}">
+			<td class="family" rowspan="{{student.famspan}}">
 				{{student.o.family.mother.first}}
 				{% if student.o.family.mother and student.o.family.father %}&amp;{% endif %}
 				{{student.o.family.father.first}}
 			</td>
 		  {% endif %}
-			<td>
+			<td class="student{% if student.serial|divisibleby:'2' %} even{% endif %}">
 				{{student.o.prefer}}, {{student.age}} ({{student.o.birthday|date:'n/j/y'}})
 			</td>
-			<td>
+			<td class="student{% if student.serial|divisibleby:'2' %} even{% endif %}">
 			  {% for enrollment in student.current_enrollments %}
-				<span class="enrollment {{enrollment.status}}">{{enrollment.course.abbr}}</span>,
+				<span class="enrollment {{enrollment.status}}">{{enrollment.course.abbr}}</span>{% if not forloop.last %},{% endif %}
 			  {% endfor %}
 			</td>
+<!--
+ 			<td class="student{% if student.serial|divisibleby:'2' %} even{% endif %}">
+ 				{{student.o.unique_email|default:''}}
+			</td>
+ -->
 		</tr>
 	  {% endfor %}
 	</table>

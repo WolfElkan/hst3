@@ -209,7 +209,7 @@ class Family(models.Model):
 	def fate(self, year=None):
 		if not year:
 			year = getyear()
-		Each(self.children).fate(year)
+		Each(self.children.all()).fate(year)
 	def delete(self):
 		# Manual cascading for Parents and Users
 		safe_delete(self.mother)
@@ -287,6 +287,9 @@ class Student(models.Model):
 		return self.alt_phone if self.alt_phone else self.family.phone
 	def email(self):
 		return self.alt_email if self.alt_email else self.family.email
+	def unique_email(self):
+		if self.alt_email != self.family.email:
+			return self.alt_email
 	def full_name(self):
 		return ' '.join([self.first,self.last])
 	def mother(self):
@@ -308,12 +311,12 @@ class Student(models.Model):
 	# 	return course.audition(self)
 
 	def hst_age_in(self, year):
-		return year - self.birthday.year - 1
+		return int(year) - self.birthday.year - 1
 	def hst_age(self):
 		return self.hst_age_in(getyear())
 	def grade_in(self, year):
 		if self.grad_year:
-			return year - self.grad_year + 12
+			return int(year) - self.grad_year + 12
 	def grade(self):
 		return self.grade_in(getyear())
 
@@ -322,9 +325,9 @@ class Student(models.Model):
 	# def enrollments(self):
 	# 	return self.all_enrollments.exclude(status__in=['nonexist','aud_fail','aud_drop','aud_need','eligible'])
 	def enrollments_in(self, year):
-		return self.enrollments.filter(course__year=year)
+		return self.enrollment.all().filter(course__year=year)
 	def enrollments_before(self, year):
-		return self.enrollments.filter(course__year__lt=year)
+		return self.enrollment.all().filter(course__year__lt=year)
 
 	def trigger(self, year):
 		for course in Courses.filter(year=year,tradition__action='auto'):
@@ -334,13 +337,13 @@ class Student(models.Model):
 		return Enrollments.filter(student=self, status__startswith="aud")
 	def auditions_in(self, year):
 		return Enrollments.filter(student=self, status__startswith="aud", course__year=year)
-	def courses(self): 
-		return Courses.filter(enrollment__in=self.enrollments)
+	def courses(self):
+		return Courses.filter(enrollment__in=self.enrollment.all())
 	def courses_in(self, year):
 		return self.courses.filter(year=year)
 	def courses_toggle_enrollments(self):
 		qset = []
-		for enrollment in self.enrollments:
+		for enrollment in self.enrollment.all():
 			qset.append({'widget':enrollment,'static':Courses.fetch(id=enrollment.course_id)})
 		return qset
 	def course_menu(self, year=getyear()):
