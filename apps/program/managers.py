@@ -62,6 +62,9 @@ class CourseManager(sm.SuperManager):
 		r = kwargs.get('r')
 		if 'r' in kwargs:
 			kwargs.pop('r')
+		all_students = kwargs.get('all_students')
+		if 'all_students' in kwargs:
+			kwargs.pop('all_students')
 		qset = self.filter(**kwargs)
 		if qset and type(qset[0]) is self.model and not qset[0].tradition.alias:
 			# print 1
@@ -77,7 +80,7 @@ class CourseManager(sm.SuperManager):
 			kwargs.setdefault('year',getyear())
 			tradition = kwargs['tradition']
 			if not tradition.r:
-				return StudentList(**kwargs)
+				return StudentList(all_students=all_students, **kwargs)
 	def create_by_id(self, course_id, **kwargs):
 		course = self.fetch(id=course_id)
 		if course and type(course) is self.model:

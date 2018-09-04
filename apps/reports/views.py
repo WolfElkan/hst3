@@ -211,13 +211,14 @@ def overview(request, **kwargs):
 		tSlots  += course.tradition.nSlots
 		tFilled += len(course.students)
 		tuitionRev += course.revenue
+	all_students=Students.all()
 	context = {
 		'date':datetime.datetime.now(),
 		'year':Year(year),
 		'ar'  :'{:02}'.format(int(year)%100),
 		'real':courses.filter(tradition__e=True, tradition__m=True),
 		'auto':courses.filter(tradition__e=True, tradition__m=False),
-		'stat':courses.filter(tradition__e=False,tradition__m=False),
+		# 'stat':Each(CourseTrads.filter(r=False)).find(year, r=False, all_students=all_students),
 		'rf'  :Courses.fetch(tradition__id='RF',year=year),
 		'tSlots':tSlots,
 		'tFilled':tFilled,

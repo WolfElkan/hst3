@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>HST | Admin {{course}} </title>
+	{% load staticfiles %}
+	{% load humanize %}
+	<script src="{% static 'main/js/jquery.js' %}" charset="utf-8"></script>
+	<script src="{% static 'main/js/script.js' %}" charset="utf-8"></script>
+	<script type="text/javascript">
+		function drop(enrollment_id, student) {
+			var course = "{{course.title}}"
+			if (confirm(`Are you sure you want to drop ${student} from ${course}?`)) {
+				window.location.href = `?drop=${enrollment_id}`
+			}
+		}
+		$(document).ready(function() {
+			$('.status').on('change',function() {
+				this.parentElement.submit()
+				// window.location.href = `?enrollment=${}&status=${this.value}`
+			})
+		})
+	</script>
+	<link rel="stylesheet" type="text/css" href="{% static 'main/css/style.css' %}">
+	<link rel="stylesheet" type="text/css" href="{% static 'main/css/status.css' %}">
+	<link rel="stylesheet" type="text/css" href="{% static 'main/css/roster.css' %}">
+</head>
+<body class="admin">
+	<h1>{{course}}</h1>
+	<table>
+		<thead>
+			<th>Student</th>
+			<!-- <th>DOB</th> -->
+			<th>Status</th>
+			<th>Last Updated</th>
+			<th>Paid</th>
+			<th>Drop</th>
+			<th>Move</th>
+		</thead>
+	  {% for enrollment in course.enrollment.all %}
+		<tr>
+			<td><a href="/rest/show/student/{{enrollment.student.id}}">{{enrollment.student}}</a></td>
+			<!-- <td>{{enrollment.student.birthday|date:'n/j/y'}}</td> -->
+			<td class="{{enrollment.status}}">
+				<form>
+					<input type="hidden" name="enrollment" value="{{enrollment.id}}">
+					<select class="status" name="status">
+					  {% for status in status_choices %}
+						<option {% if status == enrollment.status %}selected{% endif %}>{{status}}</option>
+					  {% endfor %}
+					</select>
+				</form>
+			</td>
+			<td><a href="/rest/show/enrollment/{{enrollment.id}}">{{enrollment.updated_at}}</a></td>
+			<td>
+			  {% if enrollment.invoice %}
+				<a href="/rest/invoice/{{enrollment.invoice.id}}">${{enrollment.tuition}}</a>
+			  {% else %}
+				${{enrollment.tuition}}
+			  {% endif %}
+			</td>
+			<td><button onclick="drop('{{enrollment.id}}','{{enrollment.student}}')">Drop</button></td>
+			<td>
+				<form>
+					<input type="hidden" name="enrollment" value="{{enrollment.id}}">
+					<select name="move">
+						<option value="">Select Course...</option>
+					  {% for other in courses %}
+						<option {% if other.id == course.id %}disabled{% endif %} value="{{other.id}}">
+							{{other.title}}
+						  	{% if other.start == course.start and other.end == course.end %}&#x23f0;{% endif %}
+						  	{% if other.tuition == course.tuition %}&#x1f4b5;{% endif %}
+						</option>
+					  {% endfor %}
+					</select>
+					<button>Move</button>
+				</form>
+			</td>
+		</tr>
+	  {% endfor %}
+	</table>
+	<div>
+		<form>
+			Student Search:
+			<input type="text" name="query">
+			<button>Search</button>
+		</form>
+	  {% for student in results %}
+		<div>
+			<form>
+				<input type="hidden" name="add" value="{{student.id}}">
+				<button>Add</button>
+				<a href="/rest/show/student/{{student.id}}">{{student}}</a>
+			</form>
+		</div>
+	  {% endfor %}
+	</div>
+	<a href="/reports/overview/?year={{course.year}}">Return</a>
+</body>

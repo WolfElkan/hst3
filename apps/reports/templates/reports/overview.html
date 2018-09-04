@@ -30,6 +30,7 @@
 			<th>Filled</th>
 			<th colspan="2">Tuition</th>
 			<th>Revenue</th>
+			<th>Admin</th>
 		</thead>
 		{% for course in real %}
 		<tr>
@@ -44,6 +45,7 @@
 				<td class="right">${{course.after_tuit|intcomma}}</td>
 			  {% endif %}
 			<td class="right"><a href="/rest/index/enrollment/?course_id={{course.id}}">${{course.revenue|intcomma}}</a></td>
+			<td><a href="/rest/admin/course/{{course.id}}">Add/Drop</a></td>
 		</tr>
 		{% endfor %}
 		<tfoot>
@@ -130,6 +132,8 @@
 		</tr>
 	</table>
 	<h1>Statistics</h1>
+	&#x26a0;&#xfe0f; Under Construction &#x26a0;&#xfe0f;
+<!--
 	<table>
 	{% for course in stat %}
 	<tr>
@@ -137,6 +141,7 @@
 		<td class="right">{{course.students|length}}</td>
 	</tr>
 	{% endfor %}
+  -->
 	</table>
 	<h1>Financial</h1>
 	<table>

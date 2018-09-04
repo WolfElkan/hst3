@@ -1,8 +1,10 @@
 from django.shortcuts import render, redirect, HttpResponse
-from apps.program.managers import Enrollments
+from apps.program.eligex   import status_choices
+from apps.program.managers import Enrollments, Courses
+from apps.people.managers  import Students
 from ..search import search_query
 
-from Utils.data import collect, sub
+from Utils.data import collect, sub, Each
 from Utils.security import restricted
 
 from datetime import datetime
@@ -206,4 +208,39 @@ def search(request, **kwargs):
 		'query':query,
 	}
 	return render(request, 'rest/search_results.html', context)
+
+def admin(request, **kwargs):
+	bad = restricted(request,6)
+	if bad:
+		return bad
+	course = Courses.fetch(id=kwargs['id'])
+	results = []
+	if request.GET.get('enrollment'):
+		enrollment = Enrollments.fetch(id=request.GET['enrollment'])
+		if request.GET.get('move'):
+			new_course = Courses.fetch(id=request.GET['move'])
+			enrollment.course = new_course
+		if request.GET.get('status'):
+			enrollment.status = request.GET['status']
+		enrollment.save()
+	elif request.GET.get('drop'):
+		enrollment = Enrollments.fetch(id=request.GET['drop'])
+		enrollment.delete()
+	elif request.GET.get('query'):
+		results = search_query(request.GET['query'], all_tables=False, student=True)
+	elif request.GET.get('add'):
+		student = Students.fetch(id=request.GET['add'])
+		Enrollments.create(student=student,course=course)
+	# if request.GET and not request.GET.get('query'):
+	# 	return redirect('/rest/admin/{model}/{id}'.format(**kwargs))
+	context = {
+		'course':course,
+		'courses':Courses.filter(year=course.year,tradition__e=True,tradition__m=True).order_by('tradition__order'),
+		'results':results,
+		'status_choices':Each(status_choices).__getitem__(0),
+	}
+	return render(request, 'rest/admin.html', context)
+
+
+
 

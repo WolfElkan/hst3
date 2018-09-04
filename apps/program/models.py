@@ -151,8 +151,8 @@ class CourseTrad(models.Model):
 		else:
 			return Courses.create(tradition=self, year=year)
 
-	def find(self, year, r=False):
-		course = Courses.fetch(tradition=self, year=year, r=r)
+	def find(self, year, r=False, all_students=None):
+		course = Courses.fetch(tradition=self, year=year, r=r, all_students=all_students)
 
 	def __str__(self):
 		return self.title.upper()

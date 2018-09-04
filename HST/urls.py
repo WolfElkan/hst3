@@ -83,6 +83,8 @@ urlpatterns = [
 	url(r'^rest/new/(?P<model>[a-zA-Z]+)/create/$', rest.create),
 	url(r'^rest/create/(?P<model>[a-zA-Z]+)/$', rest.create),
 
+	url(r'^rest/admin/(?P<model>[a-zA-Z]+)/(?P<id>\d+|(\d\d)?\w\w|\w{3})/$', rest.admin),
+
 	url(r'^rest/merge/(?P<model>[a-zA-Z]+)/(?P<old_id>\d+|(\d\d)?\w\w|\w{3})/(?P<new_id>\d+|(\d\d)?\w\w|\w{3})/$', merge.records),
 	url(r'^rest/merge/(?P<model>[a-zA-Z]+)/(?P<old_id>\d+|(\d\d)?\w\w|\w{3})/(?P<new_id>\d+|(\d\d)?\w\w|\w{3})/swap/$', merge.swap),
 	url(r'^rest/merge/(?P<model>[a-zA-Z]+)/(?P<old_id>\d+|(\d\d)?\w\w|\w{3})/(?P<new_id>\d+|(\d\d)?\w\w|\w{3})/copy/$', merge.copy),
