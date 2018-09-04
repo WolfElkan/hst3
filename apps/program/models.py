@@ -11,7 +11,7 @@ Q = models.Q
 from apps.people.managers import Students, Families
 #from trace import DEV
 import trace
-from datetime import datetime
+from datetime import datetime, date
 import pytz, re
 
 class Venue(models.Model):
@@ -150,6 +150,9 @@ class CourseTrad(models.Model):
 			return course
 		else:
 			return Courses.create(tradition=self, year=year)
+
+	def find(self, year, r=False):
+		course = Courses.fetch(tradition=self, year=year, r=r)
 
 	def __str__(self):
 		return self.title.upper()

@@ -1,4 +1,4 @@
-from .managers import Courses, Enrollments
+from .managers import Enrollments
 from apps.people.managers import Students
 from Utils.data import Each
 from Utils.debug import kwargle
@@ -9,8 +9,7 @@ TRACE = False
 
 def check_eligex(course, student, **kwargs):
 	# Set defaults for omitted keyword arguments
-	eligex = kwargs.setdefault('eligex', None)
-	year   = kwargs.setdefault('year'  , None)
+	eligex = kwargs.get('eligex')
 	aud    = kwargs.setdefault('aud'   , False)
 	cur    = kwargs.setdefault('cur'   , False)
 	conj   = kwargs.setdefault('conj'  , True)
@@ -27,9 +26,13 @@ def check_eligex(course, student, **kwargs):
 	if course.rest_model == 'course':
 		trad = course.tradition
 		kwargs['year'] = year = course.year
-	elif course.rest_model == 'coursetrad':
+		aud_date = course.aud_date
+	elif course.rest_model == 'coursetrad' and 'year' in kwargs:
 		trad = course
-		course = Courses.fetch(year=year, tradition=trad)
+		year = kwargs['year']
+		course = course.find(year, r=True)
+		aud_date = course.aud_date if course else None
+
 	else:
 		raise Exception('course argument must be Course or CourseTrad object')
 
@@ -38,7 +41,7 @@ def check_eligex(course, student, **kwargs):
 		eligex = trad.eligex
 
 	# If this course's audition date has already passed, don't check for audition eligibility
-	if course.aud_date and datetime.datetime.now().date() > course.aud_date:
+	if aud_date and datetime.datetime.now().date() > aud_date:
 		kwargs['aud'] = False
 
 	# Checks to make sure Eligex is valid

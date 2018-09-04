@@ -151,7 +151,7 @@ def registration(request, **kwargs):
 		'students':students,
 		'year':year,
 		'now':datetime.datetime.now(),
-		# 'sc':Courses.fetch(year=year,tradition=CourseTrads.fetch(id='SC')),
+		'sc':Courses.fetch(year=year,tradition=CourseTrads.fetch(id='SC')),
 	}
 	return render(request, 'reports/registration.html', context)
 
