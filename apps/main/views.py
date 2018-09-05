@@ -61,6 +61,12 @@ def login_post(request, path):
 	me = Users.fetch(username=request.POST['username'])
 	persist = copy(request.POST, ['username','password'])
 	if not me:
+		me = Families.fetch(email=request.POST['username'])
+		if me:
+			me = me.accounts
+			if me:
+				me = me[0]
+	if not me:
 		request.session['e'] = {'login':{'username': "You do not have an account.  Please register."}}
 		request.session['p'] = {'login':persist}
 		return redirect('/login{}'.format(path))

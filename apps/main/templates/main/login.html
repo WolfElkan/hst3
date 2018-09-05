@@ -15,7 +15,7 @@
 		<form method="post">{% csrf_token %}
 			<table>
 				<tr>
-					<td>Username:</td>
+					<td>Username or Email:</td>
 					<td><input type="text" name="username" value="{{p.login.username}}"></td>
 					<td class="error">{{e.login.username}}</td>
 				</tr>
