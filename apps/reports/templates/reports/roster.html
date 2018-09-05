@@ -5,35 +5,7 @@
 	{% load staticfiles %}
 	<script src="{% static 'main/js/script.js' %}" charset="utf-8"></script>
 	<link rel="stylesheet" type="text/css" href="{% static 'main/css/style.css' %}">
-	<style type="text/css">
-		* {
-			font-family: sans-serif;
-		}
-		.stats {
-			display: inline-block;
-			margin: 0 auto;
-		}
-		h1 {
-			font-size: 18px;
-			margin: 7px;
-		}
-		h2 {
-			font-size: 16px;
-			font-weight: normal;
-			font-style: italic;
-			display: inline;
-			margin: 0 30px;
-		}
-		th, td {
-			border: solid black 1px;
-			padding: 2px 5px;
-		}
-		table {
-			border-collapse: collapse;
-			/*display: block;*/
-			margin: 10px;
-		}
-	</style>
+	<link rel="stylesheet" type="text/css" href="{% static 'main/css/roster.css' %}">
 </head>
 <body id="roster" class="roster">
 	<img id="logo" src="//www.hstonline.org/wp-content/uploads/2017/05/cropped-cropped-HST-LOGO-10.png">
@@ -67,6 +39,7 @@
 	</tr>
 	{% endfor %}
 	</table>
+	<h2>{{course.day}}s, {{course.start}} to {{course.end}} {{course.venue.name}}</h2>
 	</center>
 <button class="close" onclick="hst()">Close</button>
 </body>
