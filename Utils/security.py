@@ -12,7 +12,7 @@ def restricted(request, level=0, standing=None, standing_level=0, allow_sudo=Fal
 	if not me:
 		return redirect('/login{}'.format(request.path))
 	if me.permission < (standing_level if standing and standing.stand(me) else level):
-		me.perm_levels.append((8,'Eight'))
+		me.perm_levels.append((8,"So-high-it-doesn't-exist"))
 		context = {
 			'me':me,
 			'need':dict(me.perm_levels)[level]
@@ -34,19 +34,19 @@ def gethist(ago=1):
 # Find User object for current logged-in user, without causing errors.
 # me is always a User, never a Family, Student, or Teacher
 from apps.people.managers import Users
-def getme(request):
+def getme(request, both=False):
 	if 'meid' in request.session:
 		me = Users.fetch(id=request.session['meid'])
 		if me:
 			if me.permission >= 6 and 'sudo' in request.session:
 				sudo = Users.fetch(id=request.session['sudo'])
 				if sudo and sudo.permission < me.permission:
-					return sudo
+					return {'login':me,'sudo':sudo} if both else sudo
 				else:
 					request.session.pop('sudo')
-					return me
-			return me
+					return {'login':me,'sudo':None} if both else me
+			return {'login':me,'sudo':None} if both else me
 		else:
 			request.session.pop('meid')
-
+			return {'login':None,'sudo':None} if both else None
 

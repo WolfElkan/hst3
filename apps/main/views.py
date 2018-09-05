@@ -109,6 +109,13 @@ def changepassword(request, **kwargs):
 
 def changepassword_get(request, **kwargs):
 	context = copy(request.session,'pe')
+	if 'them_id' in kwargs:
+		context.update({'me':{
+			'login': getme(request, both=True)['login'],
+			'sudo' : Users.fetch(id=kwargs['them_id']),
+		}})
+	else:
+		context.update({'me':getme(request, both=True)})
 	return render(request, 'main/changepassword.html', context)
 
 def changepassword_post(request, **kwargs):

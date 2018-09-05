@@ -65,7 +65,7 @@ def rescind(request, **kwargs):
 
 
 def sudochangepassword(request, them_id, **kwargs):
-	me = getme(request)
+	me = getme(request, both=True)['login']
 	if not me:
 		return redirect('/')
 	bad = restricted(request,6)
@@ -79,7 +79,9 @@ def sudochangepassword(request, them_id, **kwargs):
 	if not correct:
 		request.session['e']['current_pw'] = "Your password is incorrect"
 	if correct and valid:
-		them = Users.get(id=them_id)
+		them = Users.fetch(id=them_id)
+		if not them:
+			return HttpResponse('User not found.', status=404)
 		request.session['e'] = {}
 		them.password = request.POST['password']
 		them.save()

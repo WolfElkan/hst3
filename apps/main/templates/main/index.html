@@ -18,11 +18,13 @@
 		<a href="/myaccount/students/{{me.owner.children.first.id}}/">Student Info</a>
 		<a href="/myaccount/policy/">Review Policies</a>
 		<a href="/myaccount/classes/">Registration Info</a>
+		<a href="/reports/directory/">Family Directory</a>
 		  {% if me.permission >= 4 %}
 			<a href="/admin/dashboard/">Admin Dashboard</a>
 			<a href="/reports/registration/">Family Report</a>
+			<a href="/reports/addresses/">Family Addresses</a>
 		  {% endif %}
-		  {% if me.permission >= 4 %}
+		<a href="/logout/">Log Out</a>
 			<form>
 				<select name="course">
 					<option value="">{{year|add:-1}}-{{year}} Courses</option>
@@ -32,10 +34,6 @@
 				</select>
 				<button>View Roster</button>
 			</form>
-			<a href="/reports/directory/">Family Directory</a>
-			<a href="/reports/addresses/">Family Addresses</a>
-		  {% endif %}
-		<a href="/logout/">Log Out</a>
 	  {% else %}
 		<h1>HST Registration Portal</h1>
 		<a href="/login">Login (Returning Families)</a>
