@@ -23,7 +23,7 @@ def index(request, **kwargs):
 
 def roster(request, id):
 	course = Courses.fetch(id=id)
-	bad = restricted(request,5,course)
+	bad = restricted(request,1)
 	if bad:
 		return bad
 	context = {
@@ -32,6 +32,9 @@ def roster(request, id):
 	return render(request, 'reports/rowspan_roster.html', context)
 
 def historical(request, **kwargs):
+	bad = restricted(request,1)
+	if bad:
+		return bad
 	history = []
 	for year in gethist():
 		history.append({
@@ -107,6 +110,9 @@ def directory(request, **kwargs):
 	return render(request, 'reports/directory.html', context)
 
 def registration(request, **kwargs):
+	return general(request, **kwargs)
+
+def general(request, **kwargs):
 	bad = restricted(request,1)
 	if bad:
 		return bad
@@ -157,6 +163,9 @@ def registration(request, **kwargs):
 
 
 def summary(request, **kwargs):
+	bad = restricted(request,5)
+	if bad:
+		return bad
 	kwargs.setdefault('year',getyear())
 	context = {
 		'year':Year(int(kwargs['year'])),
@@ -166,6 +175,9 @@ def summary(request, **kwargs):
 	return render(request, 'reports/summary.html', context)
 
 def refresh_summary(request, **kwargs):
+	bad = restricted(request,5)
+	if bad:
+		return bad
 	kwargs.setdefault('year',getyear())
 	for course in Courses.filter(year__in=[kwargs['year'],kwargs['year']-1],tradition__action='trig'):
 		for student in Students.filter(enrollment__course=course):
@@ -173,10 +185,16 @@ def refresh_summary(request, **kwargs):
 	return redirect('/reports/summary/')
 
 def generate_summary(request, **kwargs):
+	bad = restricted(request,5)
+	if bad:
+		return bad
 	Courses.create_by_id(request.GET['course_id'])
 	return redirect('/reports/summary/')
 
 def overview(request, **kwargs):
+	bad = restricted(request,5)
+	if bad:
+		return bad
 	GET = request.GET.copy()
 	year = GET.setdefault('year',getyear())
 	courses = Courses.filter(year=year).order_by('tradition__order')

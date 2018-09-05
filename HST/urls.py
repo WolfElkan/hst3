@@ -40,6 +40,7 @@ import apps.radmin.views.year   as year
 
 urlpatterns = [
 
+	url(r'^reports/(?P<template>.+\.html)$', reports.general),
 	url(r'^.*[^/]$', main.slash),
 
 	url(r'^$', main.index),
