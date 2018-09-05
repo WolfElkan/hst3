@@ -102,22 +102,25 @@ def directory(request, **kwargs):
 	if bad:
 		return bad
 	year = getyear()
-	families = Families.filter(children__enrollment__course__year=year).order_by('last').distinct()
+	# families = Families.filter(children__enrollment__course__year=year).order_by('last').distinct()
+	families = layered_students_and_families(year)['families']
 	context = {
 		'families':families,
 		'year':year,
 	}
 	return render(request, 'reports/directory.html', context)
 
-def registration(request, **kwargs):
-	return general(request, **kwargs)
+def layered_queryset(year):
+	qset = Students.select_related('family').filter(
+		enrollment__course__year=year,
+		enrollment__course__tradition__m=True,
+		enrollment__status__in=['enrolled','invoiced','need_pay','aud_pass','aud_pend']).distinct()
+	return qset.order_by('family__last','family__id','birthday')
+	
 
-def general(request, **kwargs):
-	bad = restricted(request,1)
-	if bad:
-		return bad
-	year = int(request.GET.copy().setdefault('year',getyear()))
-	qset = Students.filter(enrollment__course__year=year,enrollment__course__tradition__m=True,enrollment__status__in=['enrolled','invoiced','need_pay','aud_pass','aud_pend']).select_related('family').distinct().order_by('family__last','family__id','birthday')
+def layered_students_and_families(year, qset=None, enrollments=False):
+	if not qset:
+		qset = layered_queryset(year)
 	families = []
 	students = []
 	nchild = 0
@@ -132,10 +135,11 @@ def general(request, **kwargs):
 				'o':student,
 				'first':True,
 				'age':student.hst_age_in(year),
-				'current_enrollments':student.enrollment.filter(course__year=year, course__tradition__m=True),
 				'famspan':0,
 				'serial':s,
 			}
+			if enrollments:
+				stu.update({'current_enrollments':student.enrollment.filter(course__year=year, course__tradition__m=True),})
 			family = {
 				'o':student.family,
 				'children':[stu]
@@ -145,20 +149,31 @@ def general(request, **kwargs):
 				'o':student,
 				'first':False,
 				'age':student.hst_age_in(year),
-				'current_enrollments':student.enrollment.filter(course__year=year, course__tradition__m=True),
 				'serial':s,
 			}
+			if enrollments:
+				stu.update({'current_enrollments':student.enrollment.filter(course__year=year, course__tradition__m=True),})
 			family['children'].append(stu)
 			nchild += 1
 		students.append(stu.copy())
 		students[s-nchild]['famspan'] += 1
-	context = {
-		'families':families,
+	return {
 		'students':students,
+		'families':families,
+	}
+
+
+def registration(request, **kwargs):
+	bad = restricted(request,1)
+	if bad:
+		return bad
+	year = int(request.GET.copy().setdefault('year',getyear()))
+	context = {
 		'year':year,
 		'now':datetime.datetime.now(),
-		'sc':Courses.fetch(year=year,tradition=CourseTrads.fetch(id='SC')),
+		'sc':Courses.fetch(year=year, tradition=CourseTrads.fetch(id='SC')),
 	}
+	context.update(layered_students_and_families(year, enrollments=True))
 	return render(request, 'reports/registration.html', context)
 
 

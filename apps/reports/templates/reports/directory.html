@@ -10,7 +10,6 @@
 <body id="roster" class="roster">
 	<center>
 		<h1>HST {{year|add:-1}}-{{year}} Family Directory</h1>
-		<h2>(Some HST Alumni Included)</h2>
 	<table>
 		<thead>
 			<th>Family</th>
@@ -22,34 +21,34 @@
 		</thead>
 	  {% for family in families %}
 		<tr>
-			<td>{{family.last}}</td>
+			<td>{{family.o.last}}</td>
 			<td>
-				{{family.mother.first}}
-				{% if family.mother and family.father %}<br>{% endif %}
-				{{family.father.first}}
+				{{family.o.mother.first}}
+				{% if family.o.mother and family.o.father %}<br>{% endif %}
+				{{family.o.father.first}}
 			</td>
 			<td>
-				{% if family.mother.unique_phone %}{{family.mother.unique_phone}}{% endif %}
-				<strong>{{family.phone}}</strong>
-				{% if family.father.unique_phone %}{{family.father.unique_phone}}{% endif %}
+				{% if family.o.mother.unique_phone %}{{family.o.mother.unique_phone}}{% endif %}
+				<strong>{{family.o.phone}}</strong>
+				{% if family.o.father.unique_phone %}{{family.o.father.unique_phone}}{% endif %}
 			</td>
 			<td>
-				{% if family.mother.unique_email %}{{family.mother.unique_email}}{% endif %}
-				<strong>{{family.email}}</strong>
-				{% if family.father.unique_email %}{{family.father.unique_email}}{% endif %}
+				{% if family.o.mother.unique_email %}{{family.o.mother.unique_email}}{% endif %}
+				<strong>{{family.o.email}}</strong>
+				{% if family.o.father.unique_email %}{{family.o.father.unique_email}}{% endif %}
 			</td>
 			<td>
-			  {% for student in family.children.all %}
+			  {% for student in family.children %}
 				<div>
-					{{student.prefer}}, {{student.hst_age}}
+					{{student.o.prefer}}, {{student.age}}
 				</div>
 			  {% endfor %}
 			</td>
 			<td>
-				{{family.address.line1}}<br>
-				{% if family.address.line2 %}{{family.address.line2}}<br>{% endif %}
-				{% if family.address %}{{family.address.city}}, {{family.address.state}}<br>{% endif %}
-				{{family.address.zipcode}}
+				{{family.o.address.line1}}<br>
+				{% if family.o.address.line2 %}{{family.o.address.line2}}<br>{% endif %}
+				{% if family.o.address %}{{family.o.address.city}}, {{family.o.address.state}}<br>{% endif %}
+				{{family.o.address.zipcode}}
 			</td>
 		</tr>
 	  {% endfor %}

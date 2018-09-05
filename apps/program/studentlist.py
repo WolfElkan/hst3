@@ -11,7 +11,7 @@ class StudentList(object):
 		self.id = str(int(self.year)%100).zfill(2)+self.tradition.id
 		self.rest_model = 'course'
 		self.aud_date = None
-		self.all_students = kwargs.setdefault('all_students',Students.all())
+		self.all_students = kwargs.get('all_students') or Students.all()
 		# Inherit these fields from Tradition, unless overridden.
 		for field in ['vol_hours','the_hours','early_tuit','after_tuit','title','abbr','nSlots']:
 			if field in kwargs:
