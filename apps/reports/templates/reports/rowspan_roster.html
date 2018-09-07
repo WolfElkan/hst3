@@ -31,11 +31,11 @@
 	<tr>
 		<td>{{student.last}}</td>
 		<td>{{student.first}}</td>
-		<td>{{student.whole.sex}}</td>
-		<td>{{student.age}}</td>
+		<td class="center">{{student.whole.sex}}</td>
+		<td class="center">{{student.age}}</td>
 		{% if student.oldest %}
 		<td rowspan="{{student.rows}}">{{student.whole.family.mother.first}}{% if student.whole.family.mother and student.whole.family.father %} &amp; {% endif %}{{student.whole.family.father.first}}</td>
-		<td rowspan="{{student.rows}}">{{student.whole.family.phone}}</td>
+		<td rowspan="{{student.rows}}" class="phone">{{student.whole.family.phone}}</td>
 		<td rowspan="{{student.rows}}">{{student.whole.family.email}}</td>
 		{% endif %}
 	</tr>

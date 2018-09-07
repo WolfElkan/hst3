@@ -1,9 +1,17 @@
 * {
 	font-family: sans-serif;
 }
+@media print {
+	@page {
+		size: landscape
+	}
+}
 .stats {
 	display: inline-block;
 	margin: 0 auto;
+}
+.phone {
+	min-width: 110px;
 }
 h1 {
 	font-size: 18px;

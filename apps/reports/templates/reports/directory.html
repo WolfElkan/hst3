@@ -27,7 +27,7 @@
 				{% if family.o.mother and family.o.father %}<br>{% endif %}
 				{{family.o.father.first}}
 			</td>
-			<td>
+			<td class="phone">
 				{% if family.o.mother.unique_phone %}{{family.o.mother.unique_phone}}{% endif %}
 				<strong>{{family.o.phone}}</strong>
 				{% if family.o.father.unique_phone %}{{family.o.father.unique_phone}}{% endif %}

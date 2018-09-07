@@ -213,7 +213,7 @@ class PhoneNumber(object):
 	def __int__(self):
 		return self.value
 	def __str__(self):
-		return '('+self.cod+') '+self.mid+'-'+self.last if self.value else ''
+		return '({}) {}-{}'.format(self.cod,self.mid,self.last) if self.value else ''
 	def __repr__(self):
 		return str(self.value)
 	def __get__(self):
