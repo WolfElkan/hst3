@@ -119,15 +119,18 @@ def changepassword_get(request, **kwargs):
 	return render(request, 'main/changepassword.html', context)
 
 def changepassword_post(request, **kwargs):
+	print "*"*100
 	ref = kwargs.setdefault('ref',None)
-	me = getme(request)
+	both = getme(request, both=True)
+	me = both['login']
 	if not me:
 		return redirect('/')
-	if 'them_id' in kwargs:
+	if 'them_id' in kwargs or both['sudo']:
 		return sudochangepassword(request, **kwargs)
 	user = copy(request.POST,['password','pw_confm'])
 	valid = Users.isValid(user, partial=True)
 	if not valid:
+		request.session['e'] = {}
 		request.session['e'] = Users.errors(user, partial=True)
 	correct = me.password(request.POST['current_pw'])
 	if not correct:
@@ -137,8 +140,7 @@ def changepassword_post(request, **kwargs):
 		me.password = request.POST['password']
 		me.save()
 		return redirect('/{}/'.format(ref))
-	else:
-		return redirect(request.META['HTTP_REFERER'])
+	return redirect(request.META['HTTP_REFERER'])
 
 
 def dciv(request):

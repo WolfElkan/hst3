@@ -64,13 +64,19 @@ def rescind(request, **kwargs):
 	return redirect('/admin/deferred/')
 
 
-def sudochangepassword(request, them_id, **kwargs):
-	me = getme(request, both=True)['login']
+def sudochangepassword(request, **kwargs):
+	both = getme(request, both=True)
+	if 'them_id' in kwargs:
+		them = Users.fetch(id=kwargs['them_id'])
+	else:
+		them = both['sudo']
+	me = both['login']
 	if not me:
 		return redirect('/')
-	bad = restricted(request,6)
+	bad = restricted(request,6,them,allow_sudo=True)
 	if bad:
 		return bad
+	print them
 	user = copy(request.POST,['password','pw_confm'])
 	valid = Users.isValid(user, partial=True)
 	if not valid:
@@ -79,15 +85,12 @@ def sudochangepassword(request, them_id, **kwargs):
 	if not correct:
 		request.session['e']['current_pw'] = "Your password is incorrect"
 	if correct and valid:
-		them = Users.fetch(id=them_id)
 		if not them:
 			return HttpResponse('User not found.', status=404)
 		request.session['e'] = {}
-		them.password = request.POST['password']
+		them.password = str(request.POST['password'])
 		them.save()
-	# 	return redirect('/{}/'.format(ref))
-	# else:
-		return redirect(request.META['HTTP_REFERER'])
+	return redirect(request.META['HTTP_REFERER'])
 
 def sudo(request):
 	sudo_id = request.GET.get('sudo')
