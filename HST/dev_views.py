@@ -94,6 +94,7 @@ def hot(request):
 		return bad
 	me = getme(request)
 	seshinit(request,'command')
+	seshinit(request,'runtime', '0:00:00.000000')
 	seshinit(request, 'log', [])
 	context = {
 		'log':request.session['log'],
