@@ -25,7 +25,7 @@ def invoice_create(request, ref):
 	return redirect('/{}/invoice/{}'.format(ref,invoice.id))
 
 def invoice_show(request, ref, id):
-	# me = getme(request)
+	me = getme(request, both=True)['login']
 	invoice = Invoices.fetch(id=id)
 	bad = restricted(request,5,invoice)
 	if bad:
@@ -36,7 +36,7 @@ def invoice_show(request, ref, id):
 		'email'  : PAYPAL_BUSINESS_EMAIL,
 		'host'   : 'https://{}'.format(CURRENT_HOST),
 		'waiting': invoice.status == 'N' and request.GET.get('ref') == 'paypal',
-		'sudo'   : bool(request.session.get('sudo')),
+		'sudo'   : me.owner.id != invoice.family.id,
 	}
 	return render(request, 'invoice.html', context)
 

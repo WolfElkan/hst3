@@ -109,7 +109,7 @@ def sudo_exit(request):
 
 def sudo_invoice(request, **kwargs):
 	invoice = Invoices.fetch(id=kwargs.get('id'))
-	bad = restricted(request,8,standing=invoice)
+	bad = restricted(request,5,standing=invoice)
 	if bad:
 		return bad
 	action = request.GET.get('action')
@@ -117,6 +117,8 @@ def sudo_invoice(request, **kwargs):
 	if invoice and action == 'pay' and method in Each(Invoices.model.method_choices).lower():
 		invoice.status = 'P'
 		invoice.method = method
+		for item in invoice.items:
+			item.pay()
 		invoice.save()
 	print Each(Invoices.model.method_choices).lower()
 	return redirect('/{ref}/invoice/{id}/'.format(**kwargs))
