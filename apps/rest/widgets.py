@@ -5,6 +5,7 @@ Teachers = Teacher.objects
 from apps.program.managers import Courses, CourseTrads, Enrollments, Venues
 from apps.payment.managers import Invoices
 #from trace import TRACE
+from datetime import datetime
 TRACE = False
 
 MODELS = {
@@ -81,6 +82,7 @@ class VarChar(object):
 			thing.__setitem__(field, str(value))
 		return thing
 
+
 class Integer(object):
 	def __init__(self, **kwargs):
 		self.field = kwargs.setdefault('field', None)
@@ -115,6 +117,7 @@ class Integer(object):
 		else:
 			thing.__setitem__(field, value if value else 0)
 		return thing
+
 
 class Enum(object):
 	def __init__(self, **kwargs):
@@ -161,6 +164,7 @@ class Enum(object):
 		else:
 			thing.__setitem__(field, str(value))
 		return thing
+
 		
 class Radio(object):
 	def __init__(self, **kwargs):
@@ -187,6 +191,7 @@ class Radio(object):
 		else:
 			thing.__setitem__(field, value)
 		return thing
+
 
 class Checkbox(object):
 	def __init__(self, **kwargs):
@@ -220,6 +225,7 @@ class Checkbox(object):
 			thing.__setitem__(field, value)
 		return thing
 
+
 class NullBoolean(Enum):
 	def __init__(self):
 		super(NullBoolean, self).__init__(options=['-','No','Yes'])
@@ -241,12 +247,15 @@ class Date(object):
 	def __init__(self, **kwargs):
 		self.field = kwargs.setdefault('field', None)
 		self.default = kwargs.setdefault('default', None)
+		self.cake = kwargs.setdefault('cake', 0)
 	def widget(self, field, value, **kwargs):
 		return '<input type="date" name="{}" value="{}">'.format(field, value)
 	def static(self, field, value):
 		self.field = field
 		if value:
-			return value.strftime('%B %-d, %Y')
+			today = datetime.today()
+			birthday = bool(self.cake) and today.month == value.month and today.day == value.day
+			return ("{0:%B %-d, %Y} &#{1};" if birthday else "{0:%B %-d, %Y}").format(value, self.cake)
 	def merge(self, old, new):
 		return '''
 		<form action="copy/">
@@ -273,6 +282,7 @@ class Date(object):
 			else:
 				thing.__setitem__(field, str(value))
 		return thing
+
 
 class Time(object):
 	def __init__(self, **kwargs):
@@ -310,6 +320,7 @@ class Time(object):
 		else:
 			thing.__setitem__(field, str(value) if value else '00:00')
 		return thing
+
 
 class ForeignKey(object):
 	def __init__(self, **kwargs):
@@ -389,6 +400,7 @@ class ForeignKey(object):
 			thing.__setitem__(field, str(value))
 		return thing
 
+
 class Static(object):
 	def __init__(self, **kwargs):
 		self.default = kwargs.setdefault('default',None)
@@ -403,6 +415,7 @@ class Static(object):
 		return ''
 	def set(self, thing, field, post, isAttr):
 		return thing
+
 
 class ForeignSet(object):
 	def __init__(self, **kwargs):
@@ -445,6 +458,7 @@ class ForeignSet(object):
 		else:
 			value = self.default
 		return thing
+
 
 class ToggleSet(object):
 	def __init__(self, **kwargs):
