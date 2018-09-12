@@ -119,7 +119,6 @@ def changepassword_get(request, **kwargs):
 	return render(request, 'main/changepassword.html', context)
 
 def changepassword_post(request, **kwargs):
-	print "*"*100
 	ref = kwargs.setdefault('ref',None)
 	both = getme(request, both=True)
 	me = both['login']

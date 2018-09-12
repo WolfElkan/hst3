@@ -75,8 +75,7 @@ def sudochangepassword(request, **kwargs):
 		return redirect('/')
 	bad = restricted(request,6,them,allow_sudo=True)
 	if bad:
-		return bad
-	print them
+		return bad 
 	user = copy(request.POST,['password','pw_confm'])
 	valid = Users.isValid(user, partial=True)
 	if not valid:
