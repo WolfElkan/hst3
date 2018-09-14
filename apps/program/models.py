@@ -21,6 +21,7 @@ class Venue(models.Model):
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
 	rest_model = "venue"
+	emoji = "&#x26ea;"
 	objects = Venues
 	def stand(self, me):
 		return False
@@ -82,6 +83,7 @@ class CourseTrad(models.Model):
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
 	rest_model = "coursetrad"
+	emoji = "&#x1f3a9;"
 	objects = CourseTrads
 
 	def stand(self, me):
@@ -192,6 +194,7 @@ class Course(models.Model):
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
 	rest_model = "course"
+	emoji = "&#x1f393;"
 	objects = Courses
 
 	def stand(self, me):
@@ -339,6 +342,7 @@ class Enrollment(models.Model):
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
 	rest_model = "enrollment"
+	emoji = "&#x1f517;"
 	objects = Enrollments
 
 	def title(self):

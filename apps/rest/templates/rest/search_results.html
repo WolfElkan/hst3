@@ -6,9 +6,6 @@
 	<script src="{% static 'main/js/script.js' %}" charset="utf-8"></script>
 	<link rel="stylesheet" type="text/css" href="{% static 'main/css/style.css' %}">
 	<style type="text/css">
-		a {
-			display: block;
-		}
 	</style>
 </head>
 <body class="admin rest">
@@ -19,7 +16,10 @@
 	</form>
 	{{results|length}} result{% if results|length != 1 %}s{% endif %}
 	{% for result in results %}
-	<a href="/rest/show/{{result.rest_model}}/{{result.id}}">{{result}}</a>
+	<div>
+		{{result.emoji|safe}}
+		<a href="/rest/show/{{result.rest_model}}/{{result.id}}">{{result}}</a>
+	</div>
 	{% endfor %}
 	<button class="close" onclick="hst()">Close</button>
 </body>

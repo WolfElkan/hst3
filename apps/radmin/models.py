@@ -18,6 +18,8 @@ class Policy(models.Model):
 	markdown   = models.TextField(default='# HST Policy Agreement')
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
+	rest_model = 'policy'
+	emoji      = emoji = "&#x1f4c3;"
 	objects    = Policies
 	ff = r'^\s*# |\n\s*# '
 	def md(self, page=0):

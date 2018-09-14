@@ -33,6 +33,7 @@ class Address(models.Model):
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
 	rest_model = "address"
+	emoji = "&#x1f3e0;"
 	objects = Addresses
 	def stand(self, me):
 		if me.owner_type == 'Family':
@@ -86,6 +87,8 @@ class Parent(models.Model):
 				return self.alt_email
 	def family(self):
 		return Families.fetch(id=self.family_id)
+	def emoji(self):
+		return "&#x1f468;" if self.sex == 'M' else "&#x1f469;"
 
 	def stand(self, me):
 		if me.owner_type == 'Family':
@@ -96,7 +99,7 @@ class Parent(models.Model):
 			family = None
 		return self.family.id == family.id
 	def __getattribute__(self, field):
-		if field in ['last','phone','email','family']:
+		if field in ['last','phone','email','family','emoji']:
 			call = super(Parent, self).__getattribute__(field)
 			return call()
 		else:
@@ -150,6 +153,26 @@ class Family(models.Model):
 			return self.unique_last
 		else:
 			return self.last
+
+	def emoji(self):
+		people = []
+		if self.father:
+			people.append("&#x1f468;")
+		if self.mother:
+			people.append("&#x1f469;")
+		if not people:
+			people = ["&#x1f468;","&#x1f469;"]
+		nGirls = len(self.children.filter(sex='F'))
+		nBoys  = len(self.children.filter(sex='M'))
+		if nGirls:
+			people.append("&#x1f467;")
+		if nBoys:
+			people.append("&#x1f466;")
+		if nGirls > 1 and nBoys == 0:
+			people.append("&#x1f467;")
+		if nBoys > 1 and nGirls == 0:
+			people.append("&#x1f466;")
+		return "&#x200d;".join(people)
 
 	def accounts(self):
 		return Users.filter(owner_type='Family',owner_id=self.id)
@@ -238,7 +261,7 @@ class Family(models.Model):
 		# return ('{} Family #{}' if self.name_num else '{} Family').format(self.last,self.name_num)
 		return '{} Family'.format(self.last)
 	def __getattribute__(self, field):
-		if field in ['unique_last','enrollments','hours_worked','accounts','invoices']:
+		if field in ['unique_last','enrollments','hours_worked','accounts','invoices','emoji']:
 			call = super(Family, self).__getattribute__(field)
 			return call()
 		else:
@@ -296,6 +319,8 @@ class Student(models.Model):
 		return self.family.mother
 	def father(self):
 		return self.family.father
+	def emoji(self):
+		return "&#x1f466;" if self.sex == 'M' else "&#x1f467;"
 
 	def infolock(self):
 		return getyear() != 2019 and self.family.policyDate > self.created_at
@@ -404,7 +429,8 @@ class Student(models.Model):
 			'email',
 			'full_name',
 			'mother',
-			'father'
+			'father',
+			'emoji',
 		]
 		if field in auto_methods:
 			call = super(Student, self).__getattribute__(field)
@@ -432,8 +458,10 @@ class Teacher(models.Model):
 			return bool(Enrollments.filter(student_id=me.owner.id,course__teacher=self))
 	def courses(self):
 		pass
+	def emoji(self):
+		return ("&#x1f468;" if self.sex == 'M' else "&#x1f469;")+"&#x200d;&#x1f3eb;"
 	def __getattribute__(self, field):
-		if field in ['courses']:
+		if field in ['courses','emoji']:
 			call = super(Teacher, self).__getattribute__(field)
 			return call()
 		else:
@@ -459,6 +487,7 @@ class User(models.Model):
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
 	rest_model = "user"
+	emoji = "&#x1f5a5;&#xfe0f;"
 	objects = Users
 	def stand(self, me):
 		return self.id == me.id

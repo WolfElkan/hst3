@@ -46,7 +46,7 @@ FIELDS = {
 		{'field':'alt_last'  , 'template': VarChar(maxlength=30)},
 		{'field':'sex'       , 'template': Enum(items=Student.sex_choices)},
 		{'field':'current'   , 'template': Checkbox(suffix='Student is currently in HST')},
-		{'field':'birthday'  , 'template': Date(cake=0x1f382)},
+		{'field':'birthday'  , 'template': Date(cake=0x1f388)},
 		{'field':'grad_year' , 'template': Integer()},
 		{'field':'alt_phone' , 'template': PhoneNumber()},
 		{'field':'alt_email' , 'template': VarChar(maxlength=254)},

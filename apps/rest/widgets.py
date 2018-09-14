@@ -45,7 +45,6 @@ def rest_list(qset):
 	else:
 		return '(0)'
 
-
 class VarChar(object):
 	def __init__(self, **kwargs):
 		self.field = kwargs.setdefault('field', None)

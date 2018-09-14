@@ -23,6 +23,7 @@ class PayPal(models.Model):
 	created_at = models.DateTimeField(auto_now_add=True)
 	payment_date = models.DateTimeField(null=True)
 	rest_model = 'paypal'
+	emoji = "&#x1f4b8;"
 	objects = PayPals
 	def invoice(self):
 		return Invoices.fetch(id=self.get('invoice'))
@@ -65,6 +66,7 @@ class Invoice(models.Model):
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
 	rest_model = 'invoice'
+	emoji = "&#x1f4b0;"
 	objects = Invoices
 	def __str__(self):
 		return "Invoice #{}".format(self.id)
