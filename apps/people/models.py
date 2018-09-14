@@ -72,14 +72,14 @@ class Parent(models.Model):
 	objects = Parents
 
 	def last(self):
-		return self.alt_last  if self.alt_last  else self.family.last 
+		return self.alt_last  if self.alt_last else self.family.last if self.family else "_____"
 	def phone(self):
-		return self.alt_phone if self.alt_phone > 0 else self.family.phone
+		return self.alt_phone if self.alt_phone > 0 else self.family.phone if self.family else 0
 	def unique_phone(self):
 		if self.alt_phone.value != self.family.phone.value:
 			return self.alt_phone
 	def email(self):
-		return self.alt_email if self.alt_email else self.family.email
+		return self.alt_email if self.alt_email else self.family.email if self.family else "_____"
 	def unique_email(self):
 		if self.alt_email != self.family.email:
 			if self.sex == 'M' or (self.family.father and self.alt_email != self.family.father.alt_email):
@@ -282,11 +282,11 @@ class Student(models.Model):
 	def prefer(self):
 		return self.alt_first if self.alt_first else self.first
 	def last(self):
-		return self.alt_last  if self.alt_last  else self.family.last
+		return self.alt_last  if self.alt_last  else self.family.last  if self.family else "_____"
 	def phone(self):
-		return self.alt_phone if self.alt_phone else self.family.phone
+		return self.alt_phone if self.alt_phone else self.family.phone if self.family else 0
 	def email(self):
-		return self.alt_email if self.alt_email else self.family.email
+		return self.alt_email if self.alt_email else self.family.email if self.family else "_____"
 	def unique_email(self):
 		if self.alt_email != self.family.email:
 			return self.alt_email
