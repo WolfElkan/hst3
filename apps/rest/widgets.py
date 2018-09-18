@@ -323,12 +323,13 @@ class Time(object):
 
 class ForeignKey(object):
 	def __init__(self, **kwargs):
-		self.field   = kwargs.setdefault('field'  , None)
-		self.model   = kwargs.setdefault('model'  , None)
-		self.reflex  = kwargs.setdefault('reflex' , self.model)
-		self.null    = kwargs.setdefault('null'   , False)
-		self.default = kwargs.setdefault('default', None)
-		self.xstatic = kwargs.setdefault('static' , False)
+		self.field    = kwargs.setdefault('field'   , None)
+		self.model    = kwargs.setdefault('model'   , None)
+		self.reflex   = kwargs.setdefault('reflex'  , self.model)
+		self.null     = kwargs.setdefault('null'    , False)
+		self.order_by = kwargs.setdefault('order_by', None)
+		self.default  = kwargs.setdefault('default' , None)
+		self.xstatic  = kwargs.setdefault('static'  , False)
 	def widget(self, field, value, **kwargs):
 		if self.xstatic:
 			return self.static(field, value, **kwargs)
@@ -338,7 +339,13 @@ class ForeignKey(object):
 			self.model = field
 		if self.null:
 			html += '<option value="NULL"{}>- none -</option>'.format(' selected' if not value else '')
-		for foreign in MODELS[self.model].all():
+		options = MODELS[self.model].all()
+		if self.order_by:
+			if type(self.order_by) in [list, tuple]:
+				options = options.order_by(*self.order_by)
+			else:
+				options = options.order_by(self.order_by)
+		for foreign in options:
 			html += '<option value="{}"{}>{}</option>'.format(foreign.id,' selected' if value == foreign else '',foreign)
 		html += '</select>'
 		return html

@@ -22,16 +22,16 @@ FIELDS = {
 		{'field':'phone'     , 'template': PhoneNumber()},
 		{'field':'phone_type', 'template': Enum(options=['','Home','Cell','Work'])},
 		{'field':'email'     , 'template': VarChar(maxlength=254)},
-		{'field':'mother'    , 'template': ForeignKey(model='parent', null=True)},
-		{'field':'father'    , 'template': ForeignKey(model='parent', null=True)},
-		{'field':'address'   , 'template': ForeignKey(model='address', null=True)},
+		{'field':'mother'    , 'template': ForeignKey(model='parent', null=True, order_by='sex')},
+		{'field':'father'    , 'template': ForeignKey(model='parent', null=True, order_by='sex')},
+		{'field':'address'   , 'template': ForeignKey(model='address', null=True, order_by='zipcode')},
 		{'field':'children'  , 'template': ForeignSet(model='student')},
 		{'field':'accounts'  , 'template': ForeignSet(model='user',reflex='owner_id')},
 		{'field':'invoices'  , 'template': ForeignSet(model='invoice')},
 	],
 	'parent'    : [
 		{'field':'first'     , 'template': VarChar(maxlength=20)},
-		{'field':'family'    , 'template': ForeignKey(model='family')},
+		{'field':'family'    , 'template': ForeignKey(model='family',order_by=['last','name_num'])},
 		{'field':'alt_last'  , 'template': VarChar(maxlength=30)},
 		{'field':'sex'       , 'template': Enum(items=Parent.sex_choices)},
 		{'field':'alt_phone' , 'template': PhoneNumber()},
@@ -42,7 +42,7 @@ FIELDS = {
 		{'field':'hid'       , 'template': Static()},
 		{'field':'first'     , 'template': VarChar(maxlength=20)},
 		{'field':'alt_first' , 'template': VarChar(maxlength=20)},
-		{'field':'family'    , 'template': ForeignKey(model='family')},
+		{'field':'family'    , 'template': ForeignKey(model='family',order_by=['last','name_num'])},
 		{'field':'alt_last'  , 'template': VarChar(maxlength=30)},
 		{'field':'sex'       , 'template': Enum(items=Student.sex_choices)},
 		{'field':'current'   , 'template': Checkbox(suffix='Student is currently in HST')},
@@ -60,11 +60,12 @@ FIELDS = {
 		{'field':'password'  , 'template': Bcrypt()},
 		{'field':'permission', 'template': Enum(items=User.perm_levels)},
 		{'field':'owner_id'  , 'template': Static()},
-		{'field':'owner'     , 'template': ForeignKey(model='family')}
+		{'field':'owner'     , 'template': ForeignKey(model='family',order_by=['last','name_num'])}
 	],
 	'coursetrad': [
 		{'field':'id'        , 'template': VarChar(maxlength=2)},
 		{'field':'oid'       , 'template': Static()},
+		{'field':'order'     , 'template': Integer()},
 		{'field':'r'         , 'template': Checkbox(suffix='This course is real, and not an aggregator.')},
 		{'field':'m'         , 'template': Checkbox(suffix='This course will be visible on course menu.')},
 		{'field':'e'         , 'template': Checkbox(suffix='This course will be visible in family enrollment shopping cart.')},
@@ -76,7 +77,7 @@ FIELDS = {
 		{'field':'day'       , 'template': DayOfWeek()},
 		{'field':'start'     , 'template': Time()},
 		{'field':'end'       , 'template': Time()},
-		{'field':'place'     , 'template': ForeignKey(model='venue',null=True)},
+		{'field':'place'     , 'template': ForeignKey(model='venue',null=True,order_by='name')},
 		{'field':'min_age'   , 'template': Integer(default= 9)},
 		{'field':'max_age'   , 'template': Integer(default=18)},
 		{'field':'nSlots'    , 'template': Integer()},
@@ -102,16 +103,16 @@ FIELDS = {
 		{'field':'after_tuit', 'template': Dollar()},
 		{'field':'vol_hours' , 'template': Integer()},
 		{'field':'the_hours' , 'template': Integer()},
-		{'field':'teacher'   , 'template': ForeignKey(model='teacher')},
-		{'field':'tradition' , 'template': ForeignKey(model='coursetrad')},
+		{'field':'teacher'   , 'template': ForeignKey(model='teacher',order_by=['last','first'])},
+		{'field':'tradition' , 'template': ForeignKey(model='coursetrad',order_by='order')},
 		{'field':'aud_date'  , 'template': Date()},
 		{'field':'enrollments','template': ForeignSet(model='enrollment')}
 		# {'field':'students'  , 'template': ForeignSet(model='student')}
 		# {'field':'students_toggle_enrollments','template': ToggleSet(field='students')},
 	],
 	'enrollment': [
-		{'field':'student'   , 'template': ForeignKey(model='student')},
-		{'field':'course'    , 'template': ForeignKey(model='course')},
+		{'field':'student'   , 'template': ForeignKey(model='student',order_by=['family__last','family__name_num','birthday'])},
+		{'field':'course'    , 'template': ForeignKey(model='course',order_by=['year','tradition__order'])},
 		{'field':'status'    , 'template': Enum(options=dict(status_choices).keys())},
 		{'field':'tuition'   , 'template': Dollar()},
 		{'field':'invoice'   , 'template': ForeignKey(model='invoice',null=True)},
@@ -119,7 +120,7 @@ FIELDS = {
 		{'field':'role_type' , 'template': Enum(options=['','Chorus','Support','Lead'])},
 	],
 	'invoice': [
-		{'field':'family'    , 'template': ForeignKey(model='family')},
+		{'field':'family'    , 'template': ForeignKey(model='family',order_by=['last','name_num'])},
 		{'field':'amount'    , 'template': Dollar()},
 		{'field':'method'    , 'template': Enum(options=['','Cash','Check','PayPal'])},
 		{'field':'status'    , 'template': Enum(items=Invoices.model.status_choices)},
@@ -129,6 +130,6 @@ FIELDS = {
 	'venue': [
 		{'field':'id'        , 'template': VarChar(maxlength=3)},
 		{'field':'name'      , 'template': VarChar(maxlength=30)},
-		{'field':'address'   , 'template': ForeignKey(model='address', null=True)},		
+		{'field':'address'   , 'template': ForeignKey(model='address', null=True, order_by='zipcode')},		
 	]
 }

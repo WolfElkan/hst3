@@ -183,6 +183,10 @@ class DayOfWeekField(EnumField):
 class PayPalDateTimeField(models.CharField):
 	def __init__(self):
 		super(PayPalDateTimeField, self).__init__(max_length=28, default='')
+
+class TimeDeltaField(models.FloatField):
+	def __init__(self, **kwargs):
+		super(TimeDeltaField, self).__init__(**kwargs)
 		
 class PhoneNumber(object):
 	def __init__(self, *value):
