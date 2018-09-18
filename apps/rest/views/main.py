@@ -109,7 +109,7 @@ def create(request, model, **kwargs):
 		return bad
 	if 'foreign_model' in kwargs:
 		old_model = model
-		model = kwargs['foreign_model']
+		model = str(kwargs['foreign_model'])
 	else:
 		old_model = None
 	manager = MODELS[model]

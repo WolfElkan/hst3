@@ -355,8 +355,8 @@ class ForeignKey(object):
 			return rest_link(value)
 		elif self.xstatic:
 			return '-'
-		# else:
-		# 	return '<a href="add/{}/">add</a>'.format(field)
+		else:
+			return '<a href="add/{}/">add</a>'.format(field)
 	def merge(self, old, new):
 		html = '' if self.field in ['mother','father'] else '''
 			<form action="copy/">

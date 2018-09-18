@@ -1,12 +1,12 @@
 from .widgets import VarChar, Integer, Enum, Radio, Checkbox, Date, Time, ForeignKey, ForeignSet, ToggleSet, NullBoolean, Static, Method
 from Utils.custom_fields import Bcrypt, PhoneNumber, ZipCode, DayOfWeek, Dollar
-from Utils.data import collect
+from Utils.data import collect, sub
 from apps.program.managers import CourseTrads, Enrollments
 from apps.program.eligex   import status_choices
 from apps.payment.managers import Invoices
 from apps.people.models    import Address, Family, Student, Parent, User
 
-FIELDS = {
+fields = {
 	'address'   : [
 		{'field':'owner'     , 'template': Static()},
 		{'field':'line1'     , 'template': VarChar(maxlength=50)},
@@ -133,3 +133,19 @@ FIELDS = {
 		{'field':'address'   , 'template': ForeignKey(model='address', null=True, order_by='zipcode')},		
 	]
 }
+
+class FieldIndex(object):
+	def __init__(self, fields, subs):
+		super(FieldIndex, self).__init__()
+		self.fields = fields
+		self.subs = subs
+	def __getitem__(self, key):
+		key = str(key)
+		key = sub(key, self.subs)
+		return self.fields[key]
+
+FIELDS = FieldIndex(fields, {
+	'mother':'parent',
+	'father':'parent',
+})		
+
