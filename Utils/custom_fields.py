@@ -386,7 +386,7 @@ class PolymorphicField(poly.MultiColumnField):
 		_id = _(thing , self.attname + '_id')
 		model_index = self.relatable_names.index(_type)
 		model = self.relatables[model_index]
-		return model.objects.get(id=_id)
+		return model.objects.fetch(id=_id)
 	
 # https://djangosnippets.org/snippets/2513/
 class TinyIntegerField(models.SmallIntegerField):
