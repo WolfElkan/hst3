@@ -44,7 +44,7 @@ def deferred(request, **kwargs):
 			tix = 0
 			for qty in K[show]:
 				# print qty, K[show][qty]
-				tix += sum(Each(family.children).enrollment.filter(course__tradition__id=K[show][qty]).count()) * int(qty)
+				tix += sum(Each(family.children).enrollment.filter(status='deferred',course__tradition__id=K[show][qty]).count()) * int(qty)
 			row[show] = tix
 		row['amount'] = sum(row.values()) * 10.00
 		row['o'] = family
