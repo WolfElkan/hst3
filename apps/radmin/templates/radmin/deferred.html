@@ -5,6 +5,7 @@
 	{% load staticfiles %}
 	<script src="{% static 'main/js/script.js' %}" charset="utf-8"></script>
 	<link rel="stylesheet" type="text/css" href="{% static 'main/css/style.css' %}">
+	<link rel="stylesheet" type="text/css" href="{% static 'main/css/roster.css' %}">
 	<style type="text/css">
 		tr td:first-child, thead th:first-child {
 			text-align: left;
@@ -18,11 +19,17 @@
 		tr.total td {
 			font-weight: bold;
 		}
+		a {
+			text-decoration: none;
+		}
+		.v0 {
+			color: lightgray;
+		}
 	</style>
 </head>
 <body id="deferred" class="admin">
 <a href="/admin/dashboard/">&larr; Return to Admin Dashboard</a>
-<h1>Prepaid Tickets</h1>
+<h1>Prepaid Ticket Totals</h1>
 <table>
 	<thead>
 		<th>Show:</th>
@@ -78,6 +85,31 @@
 <form action="rescind">
 Click the button below to rescind the ability to defer purchasing prepaid tickets from all families who have already enrolled.  Families who enroll in the future will still be able to defer paying for their tickets.  The action of this button cannot be undone.
 <button>Rescind</button>
+<h1>Deferred Tickets by Family</h1>
+<table>
+	<thead>
+		<th>Family</th>
+		<th>TT</th>
+		<th>SC</th>
+		<th>GB</th>
+		<th>JR</th>
+		<th>SH</th>
+		<th>SR</th>
+		<th>Owed</th>
+	</thead>
+	{% for family in families %}
+	<tr>
+		<td><a href="/rest/show/{{family.o.rest_model}}/{{family.o.id}}">{{family.o.unique_last}}</a></td>
+		<td class="v{{family.SB}}">{{family.SB}}</td>
+		<td class="v{{family.SC}}">{{family.SC}}</td>
+		<td class="v{{family.SG}}">{{family.SG}}</td>
+		<td class="v{{family.SJ}}">{{family.SJ}}</td>
+		<td class="v{{family.SH}}">{{family.SH}}</td>
+		<td class="v{{family.SR}}">{{family.SR}}</td>
+		<td>${{family.amount|floatformat:2}}</td>
+	</tr>
+	{% endfor %}
+</table>
 <button class="close" onclick="hst()">Close</button>
 </form>
 </html>

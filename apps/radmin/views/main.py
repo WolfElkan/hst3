@@ -31,7 +31,28 @@ K = {
 }
 
 def deferred(request, **kwargs):
-	context = {}
+	families = Families.filter(
+		children__enrollment__course__year=getyear(),
+		children__enrollment__course__tradition__id__startswith='K',
+		children__enrollment__status='deferred'
+	).distinct().order_by('last','name_num').prefetch_related('children__enrollment')
+	agg = []
+	for family in families:
+		row = {}
+		for show in K:
+			# print show
+			tix = 0
+			for qty in K[show]:
+				# print qty, K[show][qty]
+				tix += sum(Each(family.children).enrollment.filter(course__tradition__id=K[show][qty]).count()) * int(qty)
+			row[show] = tix
+		row['amount'] = sum(row.values()) * 10.00
+		row['o'] = family
+		print row
+		agg.append(row)
+	context = {
+		'families':agg
+	}
 	for show_id in K:
 		total = 0
 		context[show_id] = {}

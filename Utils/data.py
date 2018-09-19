@@ -65,7 +65,7 @@ def cleandate(string):
 
 class Each(object):
 	def __init__(self, content):
-		self._content = content._content if type(content) is Each else content
+		self._content = allify(content._content if type(content) is Each else content)
 	def __iter__(self):
 		for item in self._content:
 			yield item
