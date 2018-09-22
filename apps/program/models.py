@@ -153,8 +153,8 @@ class CourseTrad(models.Model):
 		else:
 			return Courses.create(tradition=self, year=year)
 
-	def find(self, year, r=False, all_students=None):
-		course = Courses.fetch(tradition=self, year=year, r=r, all_students=all_students)
+	def find(self, year, all_students=None):
+		course = Courses.fetch(tradition=self, year=year)
 
 	def __str__(self):
 		return self.title.upper()
@@ -196,6 +196,18 @@ class Course(models.Model):
 	rest_model = "course"
 	emoji = "&#x1f393;"
 	objects = Courses
+
+	def can_repop(self):
+		return not self.tradition.r
+
+	def repop(self, all_students=None, **kwargs):
+		if self.can_repop():
+			for enrollment in self.enrollments:
+				enrollment.delete()
+			for student in all_students or Students.all().order_by('family__last','family__name_num','birthday'):
+				if check_eligex(self, student, **kwargs):
+					Enrollments.create(course=self, student=student)
+			return self.enrollments.count()
 
 	def stand(self, me):
 		if me.owner_type == 'Family':

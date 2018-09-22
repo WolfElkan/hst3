@@ -37,7 +37,7 @@ def new(request, method=None):
 		context.update({
 			'year'   : year,
 			'year2'  : year[-2:],
-			'courses': equip(CourseTrads.filter(alias=None, r=True).order_by('order'), lambda trad: bool(Courses.filter(year=year,tradition=trad)), attr='already'),
+			'courses': equip(CourseTrads.filter(alias=None).order_by('order'), lambda trad: bool(Courses.filter(year=year,tradition=trad)), attr='already'),
 		})
 	elif request.GET:
 		for key in request.GET:

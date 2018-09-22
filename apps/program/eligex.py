@@ -30,7 +30,7 @@ def check_eligex(course, student, **kwargs):
 	elif course.rest_model == 'coursetrad' and 'year' in kwargs:
 		trad = course
 		year = kwargs['year']
-		course = course.find(year, r=True)
+		course = course.find(year)
 		aud_date = course.aud_date if course else None
 
 	else:

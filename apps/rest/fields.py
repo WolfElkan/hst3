@@ -106,6 +106,7 @@ fields = {
 		{'field':'teacher'   , 'template': ForeignKey(model='teacher',order_by=['last','first'])},
 		{'field':'tradition' , 'template': ForeignKey(model='coursetrad',order_by='order')},
 		{'field':'aud_date'  , 'template': Date()},
+		{'field':'repop'     , 'template': Method()},
 		{'field':'enrollments','template': ForeignSet(model='enrollment')}
 		# {'field':'students'  , 'template': ForeignSet(model='student')}
 		# {'field':'students_toggle_enrollments','template': ToggleSet(field='students')},

@@ -5,27 +5,6 @@ from Utils import supermodel as sm
 from Utils.security import getyear
 from django_mysql import models as sqlmod
 
-class EnrollmentManager(sm.SuperManager):
-	def __init__(self):
-		super(EnrollmentManager, self).__init__('program_enrollment')
-	def create(self, **kwargs):
-		# print kwargs
-		already = kwargs.copy()
-		if 'course' in kwargs:
-			course = kwargs['course']
-			kwargs.setdefault('status',course.tradition.default)
-			if course.tradition.byFamily():
-				student = already.pop('student')
-				already['student__family'] = student.family
-		already = self.fetch(**already)
-		if already:
-			return already
-		else:
-			return super(EnrollmentManager, self).create(**kwargs)
-Enrollments = EnrollmentManager()
-
-from studentlist import StudentList
-
 class CourseTradManager(sm.SuperManager):
 	def __init__(self):
 		super(CourseTradManager, self).__init__('program_coursetrad')
@@ -43,30 +22,21 @@ CourseTrads = CourseTradManager()
 class CourseManager(sm.SuperManager):
 	def __init__(self):
 		super(CourseManager, self).__init__('program_course')
-	def create_data(self, data):
+	def create(self, **data):
 		# Inherit these fields from Tradition, unless overridden.
 		for field in ['vol_hours','the_hours','early_tuit','after_tuit','title','abbr','nSlots']:
 			if field not in data:
 				data[field] = data['tradition'].__getattribute__(field)
 		data['id'] = str(int(data['year'])%100).zfill(2)+data['tradition'].id
-		return data
-	def create(self, **data):
-		data = self.create_data(data)
 		already = self.fetch(id=data.get('id'))
-		if already and type(already) is self.model:
+		if already:
 			return already
 		else:
 			return super(CourseManager, self).create(**data)
 	def fetch(self, **kwargs):
 		# print 0, kwargs
-		r = kwargs.get('r')
-		if 'r' in kwargs:
-			kwargs.pop('r')
-		all_students = kwargs.get('all_students')
-		if 'all_students' in kwargs:
-			kwargs.pop('all_students')
 		qset = self.filter(**kwargs)
-		if qset and type(qset[0]) is self.model and not qset[0].tradition.alias:
+		if qset and not qset[0].tradition.alias:
 			# print 1
 			return qset[0]
 		elif 'id' in kwargs:
@@ -75,15 +45,17 @@ class CourseManager(sm.SuperManager):
 			if split:
 				kwargs.update(split)
 				return self.fetch(**kwargs)
-		elif 'tradition' in kwargs and 'year' in kwargs and not r:
-			# print 3
-			kwargs.setdefault('year',getyear())
-			tradition = kwargs['tradition']
-			if not tradition.r:
-				return StudentList(all_students=all_students, **kwargs)
+		# elif 'tradition' in kwargs:
+		# 	# print 3
+		# 	year = kwargs.setdefault('year',getyear())
+		# 	tradition = kwargs['tradition']
+		# 	if tradition.r:
+		# 		pass
+		# 	else:
+		# 		return self.simulate(tradition, year)
 	def create_by_id(self, course_id, **kwargs):
 		course = self.fetch(id=course_id)
-		if course and type(course) is self.model:
+		if course:
 			return course
 		if 'tradition' in kwargs and 'year' in kwargs:
 			split = kwargs.copy()
@@ -108,6 +80,25 @@ class CourseManager(sm.SuperManager):
 					'tradition':tradition
 				}
 Courses = CourseManager()
+
+class EnrollmentManager(sm.SuperManager):
+	def __init__(self):
+		super(EnrollmentManager, self).__init__('program_enrollment')
+	def create(self, **kwargs):
+		# print kwargs
+		already = kwargs.copy()
+		if 'course' in kwargs:
+			course = kwargs['course']
+			kwargs.setdefault('status',course.tradition.default)
+			if course.tradition.byFamily():
+				student = already.pop('student')
+				already['student__family'] = student.family
+		already = self.fetch(**already)
+		if already:
+			return already
+		else:
+			return super(EnrollmentManager, self).create(**kwargs)
+Enrollments = EnrollmentManager()
 
 class VenueManager(sm.SuperManager):
 	def __init__(self):
