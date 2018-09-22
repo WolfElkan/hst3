@@ -21,6 +21,25 @@
 <body id="overview" class="admin">
 	<img id="logo" src="//www.hstonline.org/wp-content/uploads/2017/05/cropped-cropped-HST-LOGO-10.png">
 	<b>Today's Date: {{date}}</b>
+	<h1>Statistics</h1>
+<!--
+	&#x26a0;&#xfe0f; Under Construction &#x26a0;&#xfe0f;
+  -->
+	<table>
+	{% for course in stat %}
+	<tr>
+		<td><a href="/reports/roster/{{course.id}}">{{course.title}}</a></td>
+		<td class="right">{{course.students|length}}</td>
+		<td>
+			<form>
+				<input type="hidden" name="year"  value="{{year.year}}">
+				<input type="hidden" name="repop" value="{{course.id}}">
+				<button>Refresh</button>
+			</form>
+		</td>
+	</tr>
+	{% endfor %}
+	</table>
 	<h1>{{year.year}} Classes</h1>
 	<table>
 		<thead>
@@ -131,18 +150,6 @@
 			<td>Revenue</td>
 			<td class="right"><a href="/rest/index/enrollment/?course_id={{ar}}RF">${{rf.revenue|intcomma}}</a></td>
 		</tr>
-	</table>
-	<h1>Statistics</h1>
-	&#x26a0;&#xfe0f; Under Construction &#x26a0;&#xfe0f;
-<!--
-	<table>
-	{% for course in stat %}
-	<tr>
-		<td><a href="/reports/roster/{{course.id}}">{{course.title}}</a></td>
-		<td class="right">{{course.students|length}}</td>
-	</tr>
-	{% endfor %}
-  -->
 	</table>
 	<h1>Financial</h1>
 	<table>

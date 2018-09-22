@@ -14,6 +14,8 @@ fields = {
 		{'field':'city'      , 'template': VarChar(maxlength=25)},
 		{'field':'state'     , 'template': VarChar(maxlength=2)},
 		{'field':'zipcode'   , 'template': ZipCode()},
+		{'field':'created_at', 'template': Static()},
+		{'field':'updated_at', 'template': Static()},
 	],
 	'family'    : [
 		{'field':'oid'       , 'template': Static()},
@@ -28,6 +30,8 @@ fields = {
 		{'field':'children'  , 'template': ForeignSet(model='student')},
 		{'field':'accounts'  , 'template': ForeignSet(model='user',reflex='owner_id')},
 		{'field':'invoices'  , 'template': ForeignSet(model='invoice')},
+		{'field':'created_at', 'template': Static()},
+		{'field':'updated_at', 'template': Static()},
 	],
 	'parent'    : [
 		{'field':'first'     , 'template': VarChar(maxlength=20)},
@@ -37,6 +41,8 @@ fields = {
 		{'field':'alt_phone' , 'template': PhoneNumber()},
 		{'field':'phone_type', 'template': Enum(options=['','Home','Cell','Work'])},
 		{'field':'alt_email' , 'template': VarChar(maxlength=254)},
+		{'field':'created_at', 'template': Static()},
+		{'field':'updated_at', 'template': Static()},
 	],
 	'student'   : [
 		{'field':'hid'       , 'template': Static()},
@@ -52,15 +58,19 @@ fields = {
 		{'field':'alt_email' , 'template': VarChar(maxlength=254)},
 		{'field':'tshirt'    , 'template': Enum(items=Student.t_shirt_sizes)},
 		{'field':'needs'     , 'template': VarChar()},
-		{'field':'enrollment', 'template': ForeignSet(model='enrollment')}
+		{'field':'enrollment', 'template': ForeignSet(model='enrollment')},
 		# {'field':'courses_toggle_enrollments', 'template': ToggleSet(field='courses',model='enrollment')},
+		{'field':'created_at', 'template': Static()},
+		{'field':'updated_at', 'template': Static()},
 	],
 	'user'      : [
 		{'field':'username'  , 'template': Static()},
 		{'field':'password'  , 'template': Bcrypt()},
 		{'field':'permission', 'template': Enum(items=User.perm_levels)},
 		{'field':'owner_id'  , 'template': Static()},
-		{'field':'owner'     , 'template': ForeignKey(model='family',order_by=['last','name_num'])}
+		{'field':'owner'     , 'template': ForeignKey(model='family',order_by=['last','name_num'])},
+		{'field':'created_at', 'template': Static()},
+		{'field':'updated_at', 'template': Static()},
 	],
 	'coursetrad': [
 		{'field':'id'        , 'template': VarChar(maxlength=2)},
@@ -92,6 +102,8 @@ fields = {
 		{'field':'max_grd'   , 'template': Integer(default=12)},
 		{'field':'the_hours' , 'template': Integer()},
 		# {'field':'courses'   , 'template': ForeignSet(model='course')},
+		{'field':'created_at', 'template': Static()},
+		{'field':'updated_at', 'template': Static()},
 	],
 	'course'    : [
 		{'field':'title'     , 'template': VarChar(maxlength=50)},
@@ -107,9 +119,11 @@ fields = {
 		{'field':'tradition' , 'template': ForeignKey(model='coursetrad',order_by='order')},
 		{'field':'aud_date'  , 'template': Date()},
 		{'field':'repop'     , 'template': Method()},
-		{'field':'enrollments','template': ForeignSet(model='enrollment')}
-		# {'field':'students'  , 'template': ForeignSet(model='student')}
+		{'field':'enrollments','template': ForeignSet(model='enrollment')},
+		# {'field':'students'  , 'template': ForeignSet(model='student')},
 		# {'field':'students_toggle_enrollments','template': ToggleSet(field='students')},
+		{'field':'created_at', 'template': Static()},
+		{'field':'updated_at', 'template': Static()},
 	],
 	'enrollment': [
 		{'field':'student'   , 'template': ForeignKey(model='student',order_by=['family__last','family__name_num','birthday'])},
@@ -119,6 +133,8 @@ fields = {
 		{'field':'invoice'   , 'template': ForeignKey(model='invoice',null=True)},
 		{'field':'role'      , 'template': VarChar()},
 		{'field':'role_type' , 'template': Enum(options=['','Chorus','Support','Lead'])},
+		{'field':'created_at', 'template': Static()},
+		{'field':'updated_at', 'template': Static()},
 	],
 	'invoice': [
 		{'field':'family'    , 'template': ForeignKey(model='family',order_by=['last','name_num'])},
@@ -127,11 +143,15 @@ fields = {
 		{'field':'status'    , 'template': Enum(items=Invoices.model.status_choices)},
 		{'field':'items'     , 'template': ForeignSet(model='enrollment')},
 		# {'field':'update_amount','template': Method()},
+		{'field':'created_at', 'template': Static()},
+		{'field':'updated_at', 'template': Static()},
 	],
 	'venue': [
 		{'field':'id'        , 'template': VarChar(maxlength=3)},
 		{'field':'name'      , 'template': VarChar(maxlength=30)},
 		{'field':'address'   , 'template': ForeignKey(model='address', null=True, order_by='zipcode')},		
+		{'field':'created_at', 'template': Static()},
+		{'field':'updated_at', 'template': Static()},
 	]
 }
 

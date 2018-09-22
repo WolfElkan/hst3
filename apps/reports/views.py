@@ -212,6 +212,12 @@ def overview(request, **kwargs):
 		return bad
 	GET = request.GET.copy()
 	year = GET.setdefault('year',getyear())
+	if 'repop' in GET:
+		all_students=Students.all()
+		course = Courses.fetch(id=GET['repop'])
+		if course:
+			course.repop(all_students=all_students)
+			return redirect('/reports/overview/?year='+year)
 	courses = Courses.filter(year=year).order_by('tradition__order')
 	nTickets = {
 		'SB': [len(Courses.fetch(tradition__id='KB',year=year).students),0,0],
@@ -244,14 +250,13 @@ def overview(request, **kwargs):
 		tSlots  += course.tradition.nSlots
 		tFilled += len(course.students)
 		tuitionRev += course.revenue
-	all_students=Students.all()
 	context = {
 		'date':datetime.datetime.now(),
 		'year':Year(year),
 		'ar'  :'{:02}'.format(int(year)%100),
 		'real':courses.filter(tradition__e=True, tradition__m=True),
 		'auto':courses.filter(tradition__e=True, tradition__m=False),
-		# 'stat':Each(CourseTrads.filter(r=False)).find(year, r=False, all_students=all_students),
+		'stat':Courses.filter(tradition__r=False, year=year).order_by('tradition__order'),
 		'rf'  :Courses.fetch(tradition__id='RF',year=year),
 		'tSlots':tSlots,
 		'tFilled':tFilled,
@@ -270,6 +275,7 @@ def overview(request, **kwargs):
 				+ sum(Each(nTickets.values()).__getitem__(1)) * 15
 				+ sum(Each(nTickets.values()).__getitem__(2)) * 20,
 		},
+		'latest_enrollment':Enrollments.all().order_by('-updated_at')[0]
 	}
 	prepaidRev = context['prepaidRev'] = context['total']['tt'] * 10
 	context['totalRev'] = prepaidRev + context['tuitionRev'] + context['rf'].revenue

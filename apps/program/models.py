@@ -207,6 +207,7 @@ class Course(models.Model):
 			for student in all_students or Students.all().order_by('family__last','family__name_num','birthday'):
 				if check_eligex(self, student, **kwargs):
 					Enrollments.create(course=self, student=student)
+			self.save()
 			return self.enrollments.count()
 
 	def stand(self, me):
