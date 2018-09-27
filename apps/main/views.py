@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, HttpResponse
-
+from django.core.mail import send_mail
+from HST.ignored import NGROK_URL
 
 from apps.people.managers   import Families, Addresses, Parents, Users, Students
 from apps.program.managers  import CourseTrads, Courses, Enrollments
@@ -10,6 +11,7 @@ from Utils.data  import collect, copy, copyatts, Each, equip, find, find_all, su
 from Utils.debug import pretty, pdir, divs
 from Utils.fjson import FriendlyEncoder
 from Utils.misc  import namecase, safe_delete
+from Utils.password import generate
 from Utils.security import getme, getyear
 from Utils.seshinit import seshinit, forminit
 
@@ -55,17 +57,25 @@ def login_get(request, **kwargs):
 	context = copy(request.session, ['p','e'])
 	return render(request, 'main/login.html', context)
 
+def find_user(username):
+	user = Users.fetch(username=username)
+	if not user:
+		family = Families.fetch(email=username)
+		if not family:
+			parent = Parents.fetch(alt_email=username)
+			if parent:
+				family = parent.family
+		if family:
+			accounts = family.accounts
+			if accounts:
+				user = accounts[0]
+	return user
+
 def login_post(request, path):
 	if not path:
 		path = '/'
-	me = Users.fetch(username=request.POST['username'])
 	persist = copy(request.POST, ['username','password'])
-	if not me:
-		me = Families.fetch(email=request.POST['username'])
-		if me:
-			me = me.accounts
-			if me:
-				me = me[0]
+	me = find_user(request.POST['username'])
 	if not me:
 		request.session['e'] = {'login':{'username': "You do not have an account.  Please register."}}
 		request.session['p'] = {'login':persist}
@@ -105,7 +115,7 @@ def changepassword(request, **kwargs):
 	elif request.method == 'POST':
 		return changepassword_post(request, **kwargs)
 	else:
-		return HttpResponse("Unrecognized HTTP Verb")
+		return HttpResponse("Unrecognized HTTP Verb", status=405)
 
 def changepassword_get(request, **kwargs):
 	context = copy(request.session,'pe')
@@ -141,6 +151,42 @@ def changepassword_post(request, **kwargs):
 		return redirect('/{}/'.format(ref))
 	return redirect(request.META['HTTP_REFERER'])
 
+def forgot(request, path, item):
+	if item == 'username':
+		return forgot_username(request, path)
+	elif item == 'password':
+		return forgot_password(request, path)
+	else:
+		return HttpResponse("Unrecognized HTTP Verb", status=405)
+
+def forgot_username(request, path):
+	return HttpResponse('Username Recovery not yet supported')
+
+def forgot_password(request, path):
+	if request.method == 'GET':
+		return render(request, 'main/forgot_password.html')
+	elif request.method == 'POST':
+		user = find_user(request.POST['username'])
+		context = {
+			'user':user
+		}
+		return render(request, 'main/send_password.html', context)
+	else:
+		return HttpResponse("Unrecognized HTTP Verb", status=405)
+
+def send(request, **kwargs):
+	user = Users.fetch(id=request.POST['user_id'])
+	email = request.POST['email']
+	new_password = generate(20,30)
+	if email in user.all_emails:
+		print send_mail(
+			subject='HST Website Password Reset',
+			message='Your password is '+new_password,
+			recipient_list=[email],
+			from_email='no-reply@'+NGROK_URL,
+			fail_silently=False,
+		)
+	return HttpResponse('Email has been sent')
 
 def dciv(request):
 	return render(request, 'main/404.html', status=404)

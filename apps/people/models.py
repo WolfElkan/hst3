@@ -491,10 +491,25 @@ class User(models.Model):
 	objects = Users
 	def stand(self, me):
 		return self.id == me.id
+	def all_emails(self):
+		emails = []
+		if '@' in self.username:
+			emails.append(self.username)
+		if self.owner:
+			if self.owner.email:
+				emails.append(self.owner.email)
+			if self.owner.mother and self.owner.mother.alt_email:
+				emails.append(self.owner.mother.alt_email)
+			if self.owner.father and self.owner.father.alt_email:
+				emails.append(self.owner.father.alt_email)
+			for child in self.owner.children.all():
+				if child.alt_email:
+					emails.append(child.alt_email)
+		return set(emails)
 	def __str__(self):
 		return self.username
 	def __getattribute__(self, field):
-		if field in ['get_permission_display']:
+		if field in ['get_permission_display','all_emails']:
 			call = super(User, self).__getattribute__(field)
 			return call()
 		else:

@@ -44,7 +44,9 @@ urlpatterns = [
 	url(r'^.*[^/]$', main.slash),
 
 	url(r'^$', main.index),
-	url(r'^login(?P<path>.*)/$', main.login),
+	url(r'^login(?P<path>.*?)/forgot/(?P<item>username|password)/$', main.forgot),
+	url(r'^login(?P<path>.*?)/forgot/(?P<item>username|password)/send/$', main.send),
+	url(r'^login(?P<path>.*?)/$', main.login),
 	url(r'^logout/$', main.logout),
 	url(r'^myaccount/$', main.account),
 	

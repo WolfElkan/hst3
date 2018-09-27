@@ -138,6 +138,7 @@ class UserManager(sm.SuperManager):
 		self.validations = [
 			sm.Present('username','Please enter a username.'),
 			sm.Unique(self,'username','This username is taken. Please select another.'),
+			# sm.Regular('username', r'^[^@]*$', 'Username may not contain the @ symbol.'),
 			sm.Present('password','Please enter a password'),
 			sm.Regular('password', r'^$|^.{8,}$','Password is too short. It should be at least 8 characters.'),
 			sm.Regular('password', r'^$|^[^$].*$','Password may not begin with a dollar sign ($).'),
