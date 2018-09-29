@@ -5,7 +5,7 @@ from apps.program.managers import Courses, CourseTrads, Enrollments
 from apps.program.eligex   import status_choices
 from apps.program.models   import Year
 
-from Utils.data import sub, Each, equip
+from Utils.data import sub, Each, equip, cleandate
 from Utils.security import getyear, gethist, restricted
 from decimal import Decimal
 
@@ -324,3 +324,45 @@ def register(request, **kwargs):
 		Enrollments.create(student=student, course=course, role=new_enrollments[x]['role'], role_type=new_enrollments[x]['role_type'], status=request.POST['status'])
 	return redirect('/reports/students/2016/')
 	
+def signin(request):
+	day = request.GET.get('day')
+	if not day:
+		context = {
+			'today':datetime.datetime.today(),
+		}
+		return render(request, 'reports/signin_home.html', context)
+	else:
+		start = cleandate(request.GET.get('start'))
+		qset = Enrollments.filter(
+			course__tradition__m=True,
+			course__tradition__day=day,course__year=getyear(start),
+		).order_by(
+			'student__family__last',
+			'student__family__name_num',
+			'student__birthday',
+			'course__tradition__start',
+		).distinct()
+		weeks = request.GET.get('weeks')
+
+		starts = list(set(Each(qset).course.tradition.start))
+		starts.sort()
+		context = {
+			'qset':starts,
+		}
+		return render(request, 'reports/signin.html', context)
+		# day_specs = {
+		# 	'sun':None,
+		# 	'mon':None,
+		# 	'tue':{'start':datetime.date(2018,10, 9)},
+		# 	'wed':{'start':datetime.date(2018,10,10)},
+		# 	'thu':None,
+		# 	'fri':{'start':datetime.date(2018, 9,28)},
+		# 	'sat':None,
+		# }[day]
+		# print day_specs
+
+
+
+
+
+

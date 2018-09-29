@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>HST | {{day}} Signin Sheet </title>
+	{% load staticfiles %}
+	<script src="{% static 'main/js/script.js' %}" charset="utf-8"></script>
+	<link rel="stylesheet" type="text/css" href="{% static 'main/css/style.css' %}">
+</head>
+<body id="signin{{day}}" class="admin roster">
+	<img id="logo" src="//www.hstonline.org/wp-content/uploads/2017/05/cropped-cropped-HST-LOGO-10.png">
+		{% for q in qset %}
+			{{q}}<br>
+		{% endfor %}
+	<button class="close" onclick="hst()">Close</button>
+</body>
+</html>
