@@ -8,8 +8,7 @@ def allify(obj):
 		return obj
 
 def collect(thing, lam):
-	print type(thing)
-	if type(thing) in [list, tuple, set, QuerySet]:
+	if type(thing) in [list, tuple, QuerySet]:
 		new = []
 		nargs = len(getargspec(lam).args)
 		if nargs == 1:
@@ -24,6 +23,7 @@ def collect(thing, lam):
 			new[key] = lam(thing[key])
 	else:
 		new = thing.copy()
+		raise Warning("collect() does not recognized '{}'.  Returned copy.".format(type(thing)))
 	return new
 
 # https://stackoverflow.com/questions/3420122/filter-dict-to-contain-only-certain-keys

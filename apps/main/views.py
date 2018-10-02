@@ -167,11 +167,12 @@ def forgot_password(request, path):
 		return render(request, 'main/forgot_password.html')
 	elif request.method == 'POST':
 		user = find_user(request.POST['username'])
-		ae = collect(user.all_emails, lambda e: '{}*****{}'.format(*(re.match(r'^(.{3}).*(@\w+\.\w+)$',e).groups())))
-		print ae
 		context = {
 			'user':user,
-			'all_emails':ae
+			'all_emails':collect(user.all_emails, lambda e, n: {
+				'email':'{}*****{}'.format(*(re.match(r'^(.{3}).*(@\w+\.\w+)$',e).groups())),
+				'num':n,
+			}),
 		}
 		return render(request, 'main/send_password.html', context)
 	else:
@@ -179,16 +180,15 @@ def forgot_password(request, path):
 
 def send(request, **kwargs):
 	user = Users.fetch(id=request.POST['user_id'])
-	email = request.POST['email']
+	email = user.all_emails[int(request.POST['email'])]
 	new_password = generate(20,30)
-	if email in user.all_emails:
-		print send_mail(
-			subject='HST Website Password Reset',
-			message='Your password is '+new_password,
-			recipient_list=[email],
-			from_email='password.reset@'+NGROK_URL,
-			fail_silently=False,
-		)
+	print send_mail(
+		subject='HST Website Password Reset',
+		message='Your password is '+new_password,
+		recipient_list=[email],
+		from_email='password.reset@'+NGROK_URL,
+		fail_silently=False,
+	)
 	return HttpResponse('Email has been sent')
 
 def dciv(request):

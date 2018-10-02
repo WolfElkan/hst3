@@ -505,7 +505,9 @@ class User(models.Model):
 			for child in self.owner.children.all():
 				if child.alt_email:
 					emails.append(child.alt_email)
-		return set(emails)
+		emails = list(set(emails))
+		emails.sort()
+		return emails
 	def __str__(self):
 		return self.username
 	def __getattribute__(self, field):
