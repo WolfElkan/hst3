@@ -12,6 +12,9 @@
 		.mono {
 			font-family: monospace;
 		}
+		a {
+			float: none;
+		}
 	</style>
 </head>
 <body id="myaccount" class="public">
@@ -21,7 +24,11 @@
 	<table>
 		<tr>
 			<td>Username:</td>
-			<td class="mono">{{me.username}}</td>
+			<td class="mono">{{me.username}}<a href="change/email">Change</a></td>
+		</tr>
+		<tr>
+			<td>Password:</td>
+			<td>{{password|safe}}<a href="change/password">Change</a></td>
 		</tr>
 		<tr>
 			<td>User ID:</td>
@@ -51,10 +58,6 @@
 			</td>
 		</tr>		
 		{% endif %}
-		<tr>
-			<td>Password:</td>
-			<td><a href="changepassword">{{password|safe}} Change</a></td>
-		</tr>
 		<tr>
 			<td>Account Type:</td>
 			<td>{{me.owner.rest_model|title}}</td>

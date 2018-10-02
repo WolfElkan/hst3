@@ -129,13 +129,13 @@ class DayOfWeek(object):
 			elif type(value) in [str,unicode]:
 				if re.match(r'^\d+$', value):
 					return int(value)
-				elif value in short_days:
-					return short_days.index(value)
-				elif value in long_days:
-					return long_days.index(value)
+				elif value.title() in short_days:
+					return short_days.index(value.title())
+				elif value.title() in long_days:
+					return long_days.index(value.title())
 		return 0
 	def __str__(self):
-		return self.long
+		return self.short
 	def __int__(self):
 		return self.value
 	def __eq__(self, other):
@@ -163,6 +163,10 @@ class DayOfWeek(object):
 		else:
 			thing.__setitem__(field, value)
 		return thing
+	def __getattribute__(self, field):
+		result = super(DayOfWeek, self).__getattribute__(field)
+		# print field, result
+		return result
 
 class DayOfWeekField(EnumField):
 	def __init__(self, **kwargs):

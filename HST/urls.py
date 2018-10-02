@@ -50,7 +50,7 @@ urlpatterns = [
 	url(r'^logout/$', main.logout),
 	url(r'^myaccount/$', main.account),
 	
-	url(r'^(?P<ref>register|myaccount)/changepassword/$',main.changepassword),
+	url(r'^(?P<ref>register|myaccount)/change/password/$',main.changepassword),
 	url(r'^rest/edit/user/(?P<them_id>\d+)/sudochangepassword/$',main.changepassword),
 	
 	url(r'^(?P<ref>register|myaccount)/(?P<step>redirect|family|parents|students|policy)/(?P<id>[^/]*)/$',people.reg),
@@ -127,6 +127,9 @@ urlpatterns = [
 	url(r'^reports/summary/\d{4}/generate/$', reports.generate_summary),
 
 	url(r'^reports/overview/$', reports.overview),
+
+	url(r'^reports/signin/$', reports.signin),
+	# url(r'^reports/signin/(sun|mon|tue|wed|thu|fri|sat)/$', reports.signin),
 
 	url(r'^admin/dashboard/$', radmin.dashboard),
 

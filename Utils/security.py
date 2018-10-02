@@ -1,5 +1,11 @@
-def getyear():
-	now = datetime.now()
+from datetime import datetime
+from Utils.data import cleandate
+
+def getyear(now=None):
+	if now:
+		now = cleandate(now)
+	else:
+		now = datetime.now()
 	return now.year + (0 if now.month < 5 else 1)
 
 from django.shortcuts import render, redirect
@@ -20,11 +26,10 @@ def restricted(request, level=0, standing=None, standing_level=0, allow_sudo=Fal
 		return render(request, 'main/403.html', context, status=403)
 
 
-from datetime import datetime
 
-def cleandate(date):
-	print date
-	return datetime.now()
+# def cleandate(date):
+# 	print date
+# 	return datetime.now()
 
 # from apps.program.managers import Courses
 

@@ -160,15 +160,18 @@ def forgot(request, path, item):
 		return HttpResponse("Unrecognized HTTP Verb", status=405)
 
 def forgot_username(request, path):
-	return HttpResponse('Username Recovery not yet supported')
+	return HttpResponse('Your Username is the email address at which you recieve messages from HST')
 
 def forgot_password(request, path):
 	if request.method == 'GET':
 		return render(request, 'main/forgot_password.html')
 	elif request.method == 'POST':
 		user = find_user(request.POST['username'])
+		ae = collect(user.all_emails, lambda e: '{}*****{}'.format(*(re.match(r'^(.{3}).*(@\w+\.\w+)$',e).groups())))
+		print ae
 		context = {
-			'user':user
+			'user':user,
+			'all_emails':ae
 		}
 		return render(request, 'main/send_password.html', context)
 	else:
@@ -183,7 +186,7 @@ def send(request, **kwargs):
 			subject='HST Website Password Reset',
 			message='Your password is '+new_password,
 			recipient_list=[email],
-			from_email='no-reply@'+NGROK_URL,
+			from_email='password.reset@'+NGROK_URL,
 			fail_silently=False,
 		)
 	return HttpResponse('Email has been sent')
