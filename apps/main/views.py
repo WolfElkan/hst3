@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, HttpResponse
 from django.core.mail import send_mail
-from HST.ignored import NGROK_URL
+from HST.ignored import MAIL_PASSWORD
 
 from apps.people.managers   import Families, Addresses, Parents, Users, Students
 from apps.program.managers  import CourseTrads, Courses, Enrollments
@@ -182,14 +182,20 @@ def send(request, **kwargs):
 	user = Users.fetch(id=request.POST['user_id'])
 	email = user.all_emails[int(request.POST['email'])]
 	new_password = generate(20,30)
-	print send_mail(
+
+	send_mail(
 		subject='HST Website Password Reset',
 		message='Your password is '+new_password,
 		recipient_list=[email],
-		from_email='password.reset@'+NGROK_URL,
+		from_email='account-recovery@hstonline.org',
+		auth_user ='account-recovery@hstonline.org',
 		fail_silently=False,
+		# auth_password=MAIL_PASSWORD,
+		# connection='hstonline.org',
 	)
 	return HttpResponse('Email has been sent')
 
 def dciv(request):
 	return render(request, 'main/404.html', status=404)
+
+

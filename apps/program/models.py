@@ -355,7 +355,6 @@ class Enrollment(models.Model):
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
 	rest_model = "enrollment"
-	emoji = "&#x1f517;"
 	objects = Enrollments
 
 	def title(self):
@@ -385,6 +384,46 @@ class Enrollment(models.Model):
 		title = self.title
 		self.status = real_status
 		return title
+
+	def emoji(self):
+		red    = "&#x2764;&#xfe0f;"
+		orange = "&#x1f9e1;"
+		yellow = "&#x1f49b;"
+		green  = "&#x1f49a;"
+		blue   = "&#x1f499;"
+		purple = "&#x1f49c;"
+		black  = "&#x1f5a4;"
+		decor  = "&#x1f49f;"
+		ribbon = "&#x1f49d;"
+		status_emoji = {
+			"enrolled":green,
+			"eligible":black,
+			"invoiced":orange,
+			"need_pay":yellow,
+			"not_elig":black,
+			"aud_need":black,
+			"aud_pend":blue,
+			"pendpass":blue,
+			"pendfail":blue,
+			"pend_pub":blue,
+			"fail_pub":black,
+			"aud_pass":yellow,
+			"aud_fail":black,
+			"aud_drop":red,
+			"aud_lock":ribbon,
+			"conflict":black,
+			"need_cur":black,
+			"needboth":black,
+			"nonexist":black,
+			"nopolicy":black,
+			"clasfull":black,
+			"maydefer":yellow,
+			"deferred":purple,
+		}
+		if self.status in status_emoji:
+			return status_emoji[self.status]
+		else:
+			return ""
 
 	def stand(self, me):
 		if me.owner_type == 'Family':
@@ -467,7 +506,7 @@ class Enrollment(models.Model):
 		return '{} in {}'.format(self.student, self.course)
 
 	def __getattribute__(self, field):
-		if field in ['paid','eligible','display_student','title','public_title','public_status']:
+		if field in ['paid','eligible','display_student','title','public_title','public_status','emoji']:
 			call = super(Enrollment, self).__getattribute__(field)
 			return call()
 		elif field in Students.fields:

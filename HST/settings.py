@@ -11,7 +11,7 @@ import os
 
 from . import ignored
 
-from django.core.mail.backends.smtp import EmailBackend
+# from django.core.mail.backends.smtp import EmailBackend
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -81,16 +81,27 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'HST.wsgi.application'
 
-class CustomEmailBackend(EmailBackend):
-    """docstring for CustomEmailBackend"""
-    def __init__(self, **kwargs):
-        super(CustomEmailBackend, self).__init__(**kwargs)
-    def rsplit(**kwargs):
-        print kwargs
+# class CustomEmailBackend(EmailBackend):
+#     """docstring for CustomEmailBackend"""
+#     def __init__(self, **kwargs):
+#         print '*'*100
+#         print kwargs
+#         kwargs['host'] = 'smtp.dreamhost.com'
+#         kwargs['port'] = 465
+#         kwargs['username'] = 'account-recovery',
+#         kwargs['password'] = ignored.MAIL_PASSWORD,
+#         super(CustomEmailBackend, self).__init__(**kwargs)
+#     def rsplit(**kwargs):
+#         print kwargs
 
 # https://stackoverflow.com/questions/21563227/django-allauth-example-errno-61-connection-refused
 # https://stackoverflow.com/questions/28074127/django-send-email-shows-success-but-no-email-received
-EMAIL_BACKEND = CustomEmailBackend
+# EMAIL_BACKEND = CustomEmailBackend
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.dreamhost.com'
+EMAIL_PORT = 465
+# EMAIL_HOST_USER = ''
+EMAIL_HOST_PASSWORD = ignored.MAIL_PASSWORD
 
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
