@@ -178,22 +178,39 @@ def forgot_password(request, path):
 	else:
 		return HttpResponse("Unrecognized HTTP Verb", status=405)
 
+#MODIFIED BY Johan Vandegriff ON 10/21/2018
+import os
+
+def sendEmail(sender, recipient, subject, body):
+	subject = re.sub("'", "'\"'\"'", subject)
+	body = re.sub("'", "'\"'\"'", body)
+	file = "From: " + sender + "\nTo: " + recipient + "\nSubject: " + subject + "\n\n" + body
+	os.system("echo '" + file + "' | /usr/sbin/sendmail '" + recipient + "'")
+
 def send(request, **kwargs):
 	user = Users.fetch(id=request.POST['user_id'])
 	email = user.all_emails[int(request.POST['email'])]
 	new_password = generate(20,30)
+	user.password = new_password
+	user.save()
 
-	send_mail(
-		subject='HST Website Password Reset',
-		message='Your password is '+new_password,
-		recipient_list=[email],
-		from_email='account-recovery@hstonline.org',
-		auth_user ='account-recovery@hstonline.org',
-		fail_silently=False,
-		# auth_password=MAIL_PASSWORD,
-		# connection='hstonline.org',
-	)
-	return HttpResponse('Email has been sent')
+	sender = "account-recovery@hstonline.org"
+	recipient = email
+	subject = "HST Website Password Reset"
+	body = "Your password is "+new_password
+	sendEmail(sender, recipient, subject, body)
+
+#	send_mail(
+#		subject='HST Website Password Reset',
+#		message='Your password is '+new_password,
+#		recipient_list=[email],
+#		from_email='account-recovery@hstonline.org',
+#		auth_user ='account-recovery@hstonline.org',
+#		fail_silently=False,
+#		# auth_password=MAIL_PASSWORD,
+#		# connection='hstonline.org',
+#	)
+	return HttpResponse('Password reset email has been sent. Check your spam folder if it does not show up in your inbox.')
 
 def dciv(request):
 	return render(request, 'main/404.html', status=404)
